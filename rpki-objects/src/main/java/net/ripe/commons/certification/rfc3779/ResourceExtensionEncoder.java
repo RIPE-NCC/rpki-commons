@@ -1,0 +1,247 @@
+package net.ripe.commons.certification.rfc3779;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import net.ripe.commons.certification.Asn1Util;
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpAddress;
+import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.IpResourceRange;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
+
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
+
+/**
+ * Encodes the certificate resource extensions as specified in RFC3779. Resource
+ * inheritance is not yet supported.
+ *
+ * The methods in this class are named after the grammar rules in RFC3779,
+ * suffixed with "ToDer".
+ */
+public class ResourceExtensionEncoder {
+
+    /**
+     * id-pkix OBJECT IDENTIFIER ::= { iso(1) identified-organization(3) dod(6)
+     * internet(1) security(5) mechanisms(5) pkix(7) }
+     */
+    public static final String OID_PKIX = "1.3.6.1.5.5.7";
+
+    /**
+     * id-pe OBJECT IDENTIFIER ::= { id-pkix 1 }
+     */
+    public static final String OID_PE = OID_PKIX + ".1";
+
+    /**
+     * id-pe-ipAddrBlocks OBJECT IDENTIFIER ::= { id-pe 7 }
+     */
+    public static final String OID_IP_ADDRESS_BLOCKS = OID_PE + ".7";
+
+    /**
+     * id-pe-autonomousSysIds OBJECT IDENTIFIER ::= { id-pe 8 }
+     */
+    public static final String OID_AUTONOMOUS_SYS_IDS = OID_PE + ".8";
+
+    /**
+     * Encode the IP Address Block extension for Resource Certificates. This
+     * extension is identified by {@link #OID_IP_ADDRESS_BLOCKS}.
+     *
+     * @param inheritIpv4
+     *            inherit IPv4 resources from signing certificate.
+     * @param inheritIpv6
+     *            inherit IPv6 resources from signing certificate.
+     * @param resources
+     *            the set of IPv4 and IPv6 resources.
+     * @return the DER encoding of the IP Address Block Extension.
+     */
+    public byte[] encodeIpAddressBlocks(boolean inheritIpv4, boolean inheritIpv6, IpResourceSet resources) {
+        SortedMap<AddressFamily, IpResourceSet> addressBlocks = new TreeMap<AddressFamily, IpResourceSet>();
+
+        if (inheritIpv4) {
+            addressBlocks.put(AddressFamily.IPV4, null);
+        } else if (resources.containsType(IpResourceType.IPv4)) {
+            addressBlocks.put(AddressFamily.IPV4, resources);
+        }
+
+        if (inheritIpv6) {
+            addressBlocks.put(AddressFamily.IPV6, null);
+        } else if (resources.containsType(IpResourceType.IPv6)) {
+            addressBlocks.put(AddressFamily.IPV6, resources);
+        }
+
+        return addressBlocks.isEmpty() ? null : Asn1Util.encode(ipAddressBlocksToDer(addressBlocks));
+    }
+
+    /**
+     * Encode the AS Identifier extension for resource certificates. Only the
+     * "asnum" part is encoded, since we do not use the "rdi" (routing domain
+     * identifiers).
+     *
+     * @param inherit
+     *            inherit ASNs from signing certificate.
+     * @param resources
+     *            the set of ASNs.
+     * @return the DER encoding of the AS Identifier extension.
+     */
+    public byte[] encodeAsIdentifiers(boolean inherit, IpResourceSet resources) {
+        if (inherit || resources.containsType(IpResourceType.ASN)) {
+            return Asn1Util.encode(asIdentifiersToDer(inherit, resources, false, new IpResourceSet()));
+        }
+        return null;
+    }
+
+    /*
+     * Internal support code.
+     */
+
+    /**
+     * ASIdentifiers ::= SEQUENCE { asnum [0] EXPLICIT ASIdentifierChoice
+     * OPTIONAL, rdi [1] EXPLICIT ASIdentifierChoice OPTIONAL}
+     */
+    ASN1Encodable asIdentifiersToDer(boolean inheritAsn, IpResourceSet asnResources, boolean inheritRdi, IpResourceSet rdiResources) {
+        List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>(2);
+        if (inheritAsn || asnResources.containsType(IpResourceType.ASN)) {
+            seq.add(new DERTaggedObject(0, asIdentifierChoiceToDer(inheritAsn, asnResources)));
+        }
+        if (inheritRdi || rdiResources.containsType(IpResourceType.ASN)) {
+            seq.add(new DERTaggedObject(1, asIdentifierChoiceToDer(inheritRdi, rdiResources)));
+        }
+        return new DERSequence(seq.toArray(new ASN1Encodable[seq.size()]));
+    }
+
+    /**
+     * ASIdentifierChoice ::= CHOICE { inherit NULL, -- inherit from issuer --
+     * asIdsOrRanges SEQUENCE OF ASIdOrRange }
+     */
+    ASN1Encodable asIdentifierChoiceToDer(boolean inherit, IpResourceSet resources) {
+        return inherit ? DERNull.INSTANCE : asIdsOrRangesToDer(resources);
+    }
+
+    /**
+     * asIdsOrRanges ::= SEQUENCE OF ASIdOrRange
+     */
+    DERSequence asIdsOrRangesToDer(IpResourceSet resources) {
+        List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>();
+        for (IpResource resource : resources) {
+            if (IpResourceType.ASN == resource.getType()) {
+                seq.add(asIdOrRangeToDer(IpResourceRange.range(resource.getStart(), resource.getEnd())));
+            }
+        }
+        return new DERSequence(seq.toArray(new ASN1Encodable[seq.size()]));
+    }
+
+    /**
+     * ASIdOrRange ::= CHOICE { id ASId, range ASRange }
+     */
+    ASN1Encodable asIdOrRangeToDer(IpResourceRange range) {
+        return range.isUnique() ? asIdToDer((Asn) range.getStart()) : asRangeToDer(range);
+    }
+
+    /**
+     * ASRange ::= SEQUENCE { min ASId, max ASId }
+     */
+    DERSequence asRangeToDer(IpResourceRange range) {
+        ASN1Encodable[] seq = { asIdToDer((Asn) range.getStart()), asIdToDer((Asn) range.getEnd()) };
+        return new DERSequence(seq);
+    }
+
+    /**
+     * ASId ::= INTEGER
+     */
+    DERInteger asIdToDer(Asn asn) {
+        return new DERInteger(asn.getValue());
+    }
+
+    /**
+     * IPAddrBlocks ::= SEQUENCE OF IPAddressFamily
+     */
+    ASN1Encodable ipAddressBlocksToDer(SortedMap<AddressFamily, IpResourceSet> resources) {
+        List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>(2);
+        for (AddressFamily addressFamily : resources.keySet()) {
+            seq.add(ipAddressFamilyToDer(addressFamily, resources.get(addressFamily)));
+        }
+        return new DERSequence(seq.toArray(new ASN1Encodable[seq.size()]));
+    }
+
+    /**
+     * IPAddressFamily ::= SEQUENCE { -- AFI & opt SAFI -- addressFamily OCTET
+     * STRING (SIZE (2..3)), ipAddressChoice IPAddressChoice }
+     */
+    ASN1Encodable ipAddressFamilyToDer(AddressFamily addressFamily, IpResourceSet resources) {
+        IpResourceType type = addressFamily.toIpResourceType();
+        ASN1Encodable[] seq = new ASN1Encodable[2];
+        seq[0] = addressFamily.toDer();
+        seq[1] = ipAddressChoiceToDer(type, resources);
+        return new DERSequence(seq);
+    }
+
+    /**
+     * IPAddressChoice ::= CHOICE { inherit NULL, -- inherit from issuer --
+     * addressesOrRanges SEQUENCE OF IPAddressOrRange }
+     */
+    ASN1Encodable ipAddressChoiceToDer(IpResourceType type, IpResourceSet resources) {
+        if (resources == null) {
+            return DERNull.INSTANCE;
+        }
+
+        List<ASN1Encodable> addressesOrRanges = new ArrayList<ASN1Encodable>();
+        for (IpResource resource : resources) {
+            if (resource.getType() == type) {
+                addressesOrRanges.add(ipAddressOrRangeToDer(asRange(resource)));
+            }
+        }
+        Validate.notEmpty(addressesOrRanges, "no resources of type " + type + " in set");
+        return new DERSequence(addressesOrRanges.toArray(new ASN1Encodable[addressesOrRanges.size()]));
+    }
+
+    private IpRange asRange(IpResource resource) {
+        return IpRange.range((IpAddress) resource.getStart(), (IpAddress) resource.getEnd());
+    }
+
+    /**
+     * IPAddressOrRange ::= CHOICE { addressPrefix IPAddress, addressRange
+     * IPAddressRange }
+     */
+    ASN1Encodable ipAddressOrRangeToDer(IpRange range) {
+        return range.isLegalPrefix() ? Asn1Util.encodeIpAddress(range) : ipRangeToDer(range);
+    }
+
+    /**
+     * IPAddressRange ::= SEQUENCE { min IPAddress, max IPAddress }
+     */
+    DERSequence ipRangeToDer(IpRange range) {
+        ASN1Encodable[] encodables = { startIpAddressToDer((IpAddress) range.getStart()), endIpAddressToDer((IpAddress) range.getEnd()) };
+        return new DERSequence(encodables);
+    }
+
+    /**
+     * get the {DERBitString} for the ending IPv4 address; i.e. strip the least
+     * significant ZERO values as described by rfc3779
+     */
+    private static DERBitString startIpAddressToDer(IpAddress address) {
+        // Just keep track of the index of the last ONE bit
+        int lastOne = address.getLeastSignificantOne();
+        return Asn1Util.resourceToBitString(address, address.getType().getBitSize() - lastOne);
+    }
+
+    /**
+     * get the {DERBitString} for the ending IPv4 address; i.e. strip the least
+     * significant ONE values as described by rfc3779
+     */
+    private static DERBitString endIpAddressToDer(IpAddress address) {
+        // Just keep track of the index of the last Zero bit
+        int lastOne = address.getLeastSignificantZero();
+        return Asn1Util.resourceToBitString(address.stripLeastSignificantOnes(), address.getType().getBitSize() - lastOne);
+    }
+
+}
