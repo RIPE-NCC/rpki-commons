@@ -37,19 +37,16 @@
 			<artifactId>bcmail-jdk16</artifactId>
 			<version>1.43</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-			<scope>provided</scope>
+			<version>${hibernate-validator.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-annotations</artifactId>
+            <version>${hibernate.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -57,10 +54,6 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons.io.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.ejb</groupId>
-			<artifactId>ejb-api</artifactId>
 		</dependency>
 	</dependencies>
 
