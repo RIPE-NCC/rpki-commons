@@ -27,16 +27,21 @@
     </distributionManagement>
 
     <properties>
+        <net.ripe.commons.version>1.30</net.ripe.commons.version>
+
         <dist.repo.url>nexus.ripe.net</dist.repo.url>
         <dist.repo.snapshot.url>nexus.ripe.net</dist.repo.snapshot.url>
-        <net.ripe.commons.version>1.30</net.ripe.commons.version>
+        
         <easymock.version>3.0</easymock.version>
         <commons.io.version>1.4</commons.io.version>
+        
         <hibernate.version>3.4.0.GA</hibernate.version>
         <hibernate-validator.version>3.1.0.GA</hibernate-validator.version>
-        <slf4j.version>1.4.2</slf4j.version>
+        
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.clover.reportPath>target/site/clover/clover.xml</sonar.clover.reportPath>
+        
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
     <modules>
@@ -45,11 +50,6 @@
     </modules>
     
     <dependencies>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
-        </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -60,15 +60,22 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
+            <version>${easymock.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
+            <version>1.5.3</version>
+            <scope>test</scope>
         </dependency>
+        
         <!-- Used in unit tests for Equals Hashcode tests. -->
         <dependency>
             <groupId>gsbase</groupId>
@@ -81,87 +88,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>javax.ejb</groupId>
-                <artifactId>ejb-api</artifactId>
-                <version>3.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>jsr250-api</artifactId>
-                <version>1.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.persistence</groupId>
-                <artifactId>persistence-api</artifactId>
-                <version>1.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.8.1</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>${easymock.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${hibernate-validator.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-annotations</artifactId>
-                <version>${hibernate.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-entitymanager</artifactId>
-                <version>${hibernate.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.thoughtworks.xstream</groupId>
-                <artifactId>xstream</artifactId>
-                <version>1.3.1</version>
-            </dependency>
-        
-            <!-- Easymock needs asm -->
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>1.5.3</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>8.2-507.jdbc3</version>
-                <scope>provided</scope>
-            </dependency>
-            
-            <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.14</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -172,24 +101,9 @@
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
                 <version>3.0.2</version>
-                <configuration>
-                    <jdk>1.6</jdk>
-                    <licenseLocation>${clover2.licenseLocation}</licenseLocation>
-                    <generateXml>true</generateXml>
-                    <includesTestSourceRoots>false</includesTestSourceRoots>
-                    <excludes>
-                        <exclude>net/ripe/certification/fixture/**/*</exclude>
-                        <exclude>net/ripe/certification/ripencc/services/stub/*</exclude>
-                        <exclude>net/ripe/certification/ui/stubs/*</exclude>
-                        <exclude>net/ripe/certification/ui/performancetesting/*</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
             </plugin>
         </plugins>
 
@@ -260,12 +174,6 @@
                     <licenseLocation>${clover2.licenseLocation}</licenseLocation>
                     <generateXml>true</generateXml>
                     <includesTestSourceRoots>false</includesTestSourceRoots>
-                    <excludes>
-                        <exclude>net/ripe/certification/fixture/**/*</exclude>
-                        <exclude>net/ripe/certification/ripencc/services/stub/*</exclude>
-                        <exclude>net/ripe/certification/ui/stubs/*</exclude>
-                        <exclude>net/ripe/certification/ui/performancetesting/*</exclude>
-                    </excludes>
                     <executions>
                         <execution>
                             <id>main</id>
@@ -288,30 +196,6 @@
             </plugin>
         </plugins>
     </reporting>
-    <profiles>
-        <profile>
-            <id>deploy_artifact</id>
-            <activation>
-                <property>
-                    <name>deploy</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>jboss-maven-plugin</artifactId>
-                        <configuration>
-                            <fileName>
-                                ${project.build.directory}/${ejbDeployment.finalName}
-                            </fileName>
-                            <serverName>${jboss.serverName}</serverName>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
 
