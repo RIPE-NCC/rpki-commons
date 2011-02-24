@@ -38,6 +38,9 @@
         <hibernate.version>3.4.0.GA</hibernate.version>
         <hibernate-validator.version>3.1.0.GA</hibernate-validator.version>
         
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.clover.reportPath>target/site/clover/clover.xml</sonar.clover.reportPath>
+   
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
