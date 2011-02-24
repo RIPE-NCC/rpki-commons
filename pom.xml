@@ -92,12 +92,45 @@
         </dependencies>
     </dependencyManagement>
 
-    <build>
+    <reporting>
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
                 <version>3.0.2</version>
+                <configuration>
+                    <jdk>1.6</jdk>
+                    <licenseLocation>${clover2.licenseLocation}</licenseLocation>
+                    <generateXml>true</generateXml>
+                    <includesTestSourceRoots>false</includesTestSourceRoots>
+                    <executions>
+                        <execution>
+                            <id>main</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>instrument</goal>
+                                <goal>aggregate</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>site</id>
+                            <phase>pre-site</phase>
+                            <goals>
+                                <goal>instrument</goal>
+                                <goal>aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-clover2-plugin</artifactId>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
