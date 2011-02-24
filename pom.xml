@@ -106,24 +106,6 @@
                     <licenseLocation>${clover2.licenseLocation}</licenseLocation>
                     <generateXml>true</generateXml>
                     <includesTestSourceRoots>false</includesTestSourceRoots>
-                    <executions>
-                        <execution>
-                            <id>main</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>instrument</goal>
-                                <goal>aggregate</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>site</id>
-                            <phase>pre-site</phase>
-                            <goals>
-                                <goal>instrument</goal>
-                                <goal>aggregate</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </configuration>
             </plugin>
         </plugins>
