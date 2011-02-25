@@ -56,6 +56,12 @@
             <version>1.5</version>
         </dependency>
         
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+        </dependency>
+        
         <!-- DEPENDENCIES FOR TESTING -->
         <dependency>
             <groupId>junit</groupId>
