@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">r
     <modelVersion>4.0.0</modelVersion>
     <name>RPKI Commmons</name>
     <groupId>net.ripe.rpki-commons</groupId>
@@ -98,10 +98,6 @@
     <reporting>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>dashboard-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
                 <version>3.0.2</version>
@@ -110,24 +106,6 @@
                     <licenseLocation>${clover2.licenseLocation}</licenseLocation>
                     <generateXml>true</generateXml>
                     <includesTestSourceRoots>false</includesTestSourceRoots>
-                    <executions>
-                        <execution>
-                            <id>main</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>instrument</goal>
-                                <goal>aggregate</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>site</id>
-                            <phase>pre-site</phase>
-                            <goals>
-                                <goal>instrument</goal>
-                                <goal>aggregate</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </configuration>
             </plugin>
         </plugins>
@@ -138,7 +116,6 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
-                <version>3.0.2</version>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -196,6 +173,5 @@
             </plugins>
         </pluginManagement>
     </build>
-
 </project>
 
