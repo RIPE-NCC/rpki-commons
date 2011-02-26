@@ -24,8 +24,4 @@ public class XStreamXmlSerializer<T> implements XmlSerializer<T> {
     public String serialize(T object) {
         return xStream.toXML(object);
     }
-
-    public XStream getXStream() {
-        return xStream;
-    }
 }

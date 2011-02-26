@@ -35,7 +35,7 @@ public class XStreamXmlSerializerBuilder<T> {
         createDefaultXStream();
     }
 
-    private void createDefaultXStream() { 
+    private void createDefaultXStream() {
         xStream = new XStream() {
             /*
              * This code ensures additional fields in the XML get ignored. Useful to maintain backwards compatibility with older version
