@@ -46,6 +46,7 @@
     
     <modules>
         <module>rpki-objects</module>
+        <module>rpki-provisioning</module>
         <module>rpki-util</module>
     </modules>
     
