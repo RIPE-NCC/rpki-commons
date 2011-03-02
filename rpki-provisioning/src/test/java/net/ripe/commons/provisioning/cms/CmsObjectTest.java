@@ -6,21 +6,10 @@ import static org.junit.Assert.*;
 
 import java.security.cert.X509Certificate;
 
-import net.ripe.commons.provisioning.cms.CmsObject;
-
 import org.bouncycastle.cms.CMSSignedGenerator;
-import org.junit.Before;
 import org.junit.Test;
 
 public class CmsObjectTest {
-
-    private CmsObject subject;
-
-
-    @Before
-    public void setUp() {
-        subject = new CmsObject(new byte[] {'f', 'o', 'o'}, null);
-    }
 
     @Test
     public void shouldDefineSyntaxVersion() {
