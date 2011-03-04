@@ -15,6 +15,8 @@ import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
+import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
+
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLNumber;
@@ -187,7 +189,7 @@ public class CmsObjectBuilderTest {
     }
 
     private static X509Certificate generateEECertificate() {
-        KeyPair keyPair = generateKeyPair(2048);
+        KeyPair keyPair = ProvisioningKeyPairGenerator.generate();
 
         try {
             X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
