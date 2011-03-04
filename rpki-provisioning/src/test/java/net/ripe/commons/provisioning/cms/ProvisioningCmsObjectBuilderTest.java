@@ -17,6 +17,7 @@ import java.util.Date;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
+
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROctetString;
@@ -38,17 +39,17 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CmsObjectBuilderTest {
+public class ProvisioningCmsObjectBuilderTest {
 
-    private CmsObjectBuilder subject;
-    private CmsObject cmsObject;
+    private ProvisioningCmsObjectBuilder subject;
+    private ProvisioningCmsObject cmsObject;
     private static final X509CRL CRL = generateCrl();
     private static final X509Certificate EE_CERT = generateEECertificate();
 
 
     @Before
     public void setUp() throws Exception {
-        subject =  new CmsObjectBuilder();
+        subject =  new ProvisioningCmsObjectBuilder();
 
         subject.withCertificate(EE_CERT);
         subject.withCrl(CRL);
@@ -58,7 +59,7 @@ public class CmsObjectBuilderTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
-        subject = new CmsObjectBuilder();
+        subject = new ProvisioningCmsObjectBuilder();
         subject.withCrl(CRL);
         subject.withSignatureProvider("SunRsaSign");
         subject.build(TEST_KEY_PAIR.getPrivate());
@@ -66,7 +67,7 @@ public class CmsObjectBuilderTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCrl() throws CMSException {
-        subject = new CmsObjectBuilder();
+        subject = new ProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
         subject.withSignatureProvider("SunRsaSign");
         subject.build(TEST_KEY_PAIR.getPrivate());
@@ -74,7 +75,7 @@ public class CmsObjectBuilderTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceSignatureProvider() throws CMSException {
-        subject = new CmsObjectBuilder();
+        subject = new ProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
         subject.withCrl(CRL);
         subject.build(TEST_KEY_PAIR.getPrivate());
@@ -109,7 +110,7 @@ public class CmsObjectBuilderTest {
     public void shouldCmsObjectHaveCorrectContentType() throws Exception {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncodedContent());
         sp.getSignedContent().drain();
-        assertEquals(CmsObject.CONTENT_TYPE, sp.getSignedContent().getContentType());
+        assertEquals("1.2.840.113549.1.9.16.1.28", sp.getSignedContent().getContentType());
     }
 
     /**
@@ -226,7 +227,7 @@ public class CmsObjectBuilderTest {
         Collection<?> signers = sp.getSignerInfos().getSigners();
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
-        assertEquals(CmsObject.DIGEST_ALGORITHM_OID, signer.getDigestAlgOID());
+        assertEquals(CMSSignedGenerator.DIGEST_SHA256, signer.getDigestAlgOID());
     }
 
     /**

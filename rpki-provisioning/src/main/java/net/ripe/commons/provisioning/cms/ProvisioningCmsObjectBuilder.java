@@ -36,7 +36,11 @@ import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.joda.time.DateTimeUtils;
 
-public class CmsObjectBuilder {
+public class ProvisioningCmsObjectBuilder {
+
+    private static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
+
+    private static final String CONTENT_TYPE = "1.2.840.113549.1.9.16.1.28";
 
     private X509Certificate certificate;
 
@@ -45,56 +49,56 @@ public class CmsObjectBuilder {
     private String signatureProvider;
 
 
-    public CmsObjectBuilder withCertificate(X509Certificate certificate) {
+    public ProvisioningCmsObjectBuilder withCertificate(X509Certificate certificate) {
         this.certificate = certificate;
         return this;
     }
 
-    public CmsObjectBuilder withCrl(X509CRL crl) {
+    public ProvisioningCmsObjectBuilder withCrl(X509CRL crl) {
         this.crl = crl;
         return this;
     }
 
-    public CmsObjectBuilder withSignatureProvider(String signatureProvider) {
+    public ProvisioningCmsObjectBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
         return this;
     }
 
-    public CmsObject build(PrivateKey privateKey) {
+    public ProvisioningCmsObject build(PrivateKey privateKey) {
         Validate.notNull(certificate, "certificate is required");
         Validate.notNull(crl, "crl is required");
         Validate.notNull(signatureProvider, "signatureProvider is required");
 
-        return new CmsObject(generateCms(privateKey, encodableMessageContent()), certificate);
+        return new ProvisioningCmsObject(generateCms(privateKey, encodableMessageContent()), certificate);
     }
 
     private byte[] generateCms(PrivateKey privateKey, ASN1Encodable encodableContent) {
         try {
             return doGenerate(privateKey, encodableContent);
         } catch (NoSuchAlgorithmException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         } catch (NoSuchProviderException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         } catch (CMSException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         } catch (IOException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         } catch (InvalidAlgorithmParameterException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         } catch (CertStoreException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         } catch (CertificateEncodingException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         }
     }
 
     private byte[] doGenerate(PrivateKey privateKey, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         addCertificateAndCrl(generator);
-        generator.addSigner(privateKey, getSubjectKeyIdentifier(certificate), CmsObject.DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
+        generator.addSigner(privateKey, getSubjectKeyIdentifier(certificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
 
         byte[] content = encode(encodableContent);
-        CMSSignedData data = generator.generate(CmsObject.CONTENT_TYPE, new CMSProcessableByteArray(content), true, signatureProvider);
+        CMSSignedData data = generator.generate(CONTENT_TYPE, new CMSProcessableByteArray(content), true, signatureProvider);
 
         return data.getEncoded();
     }
@@ -125,7 +129,7 @@ public class CmsObjectBuilder {
             derOutputStream.close();
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         }
     }
 
@@ -135,7 +139,7 @@ public class CmsObjectBuilder {
             Validate.notNull(extensionValue, "certificate must contain SubjectKeyIdentifier extension");
             return SubjectKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new ProvisioningCmsObjectBuilderException(e);
         }
     }
 }

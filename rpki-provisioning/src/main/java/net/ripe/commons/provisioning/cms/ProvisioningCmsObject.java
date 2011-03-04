@@ -3,22 +3,14 @@ package net.ripe.commons.provisioning.cms;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-
-public class CmsObject {
-
-    public static final int VERSION = 3;
-
-    public static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
-
-    public static final String CONTENT_TYPE = "1.2.840.113549.1.9.16.1.28";
+public class ProvisioningCmsObject {
 
     private byte[] encodedContent;
 
     private X509Certificate certificate;
 
 
-    public CmsObject(byte[] encodedContent, X509Certificate certificate) {
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate certificate) {
         super();
         this.encodedContent = encodedContent;
         this.certificate = certificate;
@@ -49,7 +41,7 @@ public class CmsObject {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CmsObject other = (CmsObject) obj;
+        final ProvisioningCmsObject other = (ProvisioningCmsObject) obj;
         return Arrays.equals(encodedContent, other.getEncodedContent());
     }
 }
