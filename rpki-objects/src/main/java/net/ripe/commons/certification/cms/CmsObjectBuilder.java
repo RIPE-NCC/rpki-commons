@@ -53,7 +53,6 @@ public abstract class CmsObjectBuilder {
     }
 
     private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, String contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException {
-        byte[] result;
         byte[] subjectKeyIdentifier = X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate);
         Validate.notNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
 
@@ -66,8 +65,7 @@ public abstract class CmsObjectBuilder {
 
         byte[] content = Asn1Util.encode(encodableContent);
         CMSSignedData data = generator.generate(contentTypeOid, new CMSProcessableByteArray(content), true, signatureProvider);
-        result = data.getEncoded();
-        return result;
+        return data.getEncoded();
     }
 
     private AttributeTable createSignedAttributes() {

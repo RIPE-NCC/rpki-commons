@@ -11,6 +11,9 @@ import org.junit.Test;
 
 public class CmsObjectTest {
 
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
+     */
     @Test
     public void shouldDefineSyntaxVersion() {
         assertEquals(CmsObject.VERSION, 3);
@@ -21,6 +24,9 @@ public class CmsObjectTest {
         assertEquals(CmsObject.DIGEST_ALGORITHM_OID, CMSSignedGenerator.DIGEST_SHA256);
     }
 
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.1
+     */
     @Test
     public void shouldDefineContentType() {
         assertEquals(CmsObject.CONTENT_TYPE, "1.2.840.113549.1.9.16.1.28");
