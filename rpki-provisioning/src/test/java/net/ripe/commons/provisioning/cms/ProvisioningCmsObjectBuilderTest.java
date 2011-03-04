@@ -18,9 +18,15 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLNumber;
@@ -36,30 +42,37 @@ import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ProvisioningCmsObjectBuilderTest {
 
+    private static final long SIGNING_TIME = new DateTime(2011, 01, 31, 12, 58, 59, 0, DateTimeZone.UTC).getMillis();
     private ProvisioningCmsObjectBuilder subject;
     private ProvisioningCmsObject cmsObject;
     private static final X509CRL CRL = generateCrl();
     private static final X509Certificate EE_CERT = generateEECertificate();
 
 
+
     @Before
     public void setUp() throws Exception {
-        subject =  new ProvisioningCmsObjectBuilder();
+        subject =  new MyProvisioningCmsObjectBuilder();
 
         subject.withCertificate(EE_CERT);
         subject.withCrl(CRL);
         subject.withSignatureProvider("SunRsaSign");
+
+        DateTimeUtils.setCurrentMillisFixed(SIGNING_TIME);
         cmsObject = subject.build(TEST_KEY_PAIR.getPrivate());
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
-        subject = new ProvisioningCmsObjectBuilder();
+        subject = new MyProvisioningCmsObjectBuilder();
         subject.withCrl(CRL);
         subject.withSignatureProvider("SunRsaSign");
         subject.build(TEST_KEY_PAIR.getPrivate());
@@ -67,7 +80,7 @@ public class ProvisioningCmsObjectBuilderTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCrl() throws CMSException {
-        subject = new ProvisioningCmsObjectBuilder();
+        subject = new MyProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
         subject.withSignatureProvider("SunRsaSign");
         subject.build(TEST_KEY_PAIR.getPrivate());
@@ -75,7 +88,7 @@ public class ProvisioningCmsObjectBuilderTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceSignatureProvider() throws CMSException {
-        subject = new ProvisioningCmsObjectBuilder();
+        subject = new MyProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
         subject.withCrl(CRL);
         subject.build(TEST_KEY_PAIR.getPrivate());
@@ -99,7 +112,7 @@ public class ProvisioningCmsObjectBuilderTest {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.2
      */
     @Test
-    public void shouldCmsObjectHaveCorrectDigestAlgorithm() throws CMSException {
+    public void shouldCmsObjectHaveCorrectDigestAlgorithm() throws Exception {
         // TODO:
     }
 
@@ -231,6 +244,89 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4
+     */
+    @Test
+    public void shouldCmsObjectHaveSignedAttributes() throws Exception {
+        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncodedContent());
+        sp.getSignedContent().drain();
+        Collection<?> signers = sp.getSignerInfos().getSigners();
+        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+
+        assertNotNull(signer.getSignedAttributes());
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.1
+     */
+    @Test
+    public void shouldCmsObjectHaveCorrectContentTypeSignedAttribute() throws Exception {
+        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncodedContent());
+        sp.getSignedContent().drain();
+        Collection<?> signers = sp.getSignerInfos().getSigners();
+        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        AttributeTable attributeTable = signer.getSignedAttributes();
+        Attribute contentType = attributeTable.get(CMSAttributes.contentType);
+
+        assertNotNull(contentType);
+        assertEquals(new DERObjectIdentifier("1.2.840.113549.1.9.3"), contentType.getAttrType());
+        assertEquals(1, contentType.getAttrValues().size());
+        assertEquals(new DERObjectIdentifier("1.2.840.113549.1.9.16.1.28"), contentType.getAttrValues().getObjectAt(0));
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.2
+     */
+    @Test
+    public void shouldCmsObjectHaveCorrectMessageDigestSignedAttribute() throws Exception {
+        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncodedContent());
+        sp.getSignedContent().drain();
+        Collection<?> signers = sp.getSignerInfos().getSigners();
+        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        AttributeTable attributeTable = signer.getSignedAttributes();
+        Attribute contentType = attributeTable.get(CMSAttributes.messageDigest);
+
+        assertNotNull(contentType);
+        assertEquals(new DERObjectIdentifier("1.2.840.113549.1.9.4"), contentType.getAttrType());
+        assertEquals(1, contentType.getAttrValues().size());
+        assertNotNull(contentType.getAttrValues().getObjectAt(0));
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.3
+     */
+    @Test
+    public void shouldCmsObjectHaveSigningTimeSignedAttribute() throws Exception {
+        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncodedContent());
+        sp.getSignedContent().drain();
+        Collection<?> signers = sp.getSignerInfos().getSigners();
+        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        AttributeTable attributeTable = signer.getSignedAttributes();
+        Attribute contentType = attributeTable.get(CMSAttributes.signingTime);
+
+        assertNotNull(contentType);
+        assertEquals(new DERObjectIdentifier("1.2.840.113549.1.9.5"), contentType.getAttrType());
+        assertEquals(1, contentType.getAttrValues().size());
+        DERUTCTime signingTime = (DERUTCTime) contentType.getAttrValues().getObjectAt(0);
+        assertEquals(new Date(SIGNING_TIME), signingTime.getDate());
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.4
+     */
+    @Test
+    public void shouldCmsObjectHaveNoBinarySigningTimeSignedAttribute() throws Exception {
+        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncodedContent());
+        sp.getSignedContent().drain();
+        Collection<?> signers = sp.getSignerInfos().getSigners();
+        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        AttributeTable attributeTable = signer.getSignedAttributes();
+        Attribute contentType = attributeTable.get(new DERObjectIdentifier("1.2.840.113549.1.9.16.2.46"));
+
+        assertNull(contentType);
+    }
+
+    /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.5
      * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
      */
@@ -271,7 +367,13 @@ public class ProvisioningCmsObjectBuilderTest {
         assertNull(signer.getUnsignedAttributes());
     }
 
+    private static final class MyProvisioningCmsObjectBuilder extends ProvisioningCmsObjectBuilder {
 
+        @Override
+        protected ASN1Encodable getMessageContent() {
+            return new DEROctetString("Hello".getBytes());
+        }
+    }
 
 
 
