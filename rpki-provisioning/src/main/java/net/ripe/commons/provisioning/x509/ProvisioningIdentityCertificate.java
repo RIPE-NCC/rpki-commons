@@ -5,14 +5,13 @@ import java.security.cert.X509Certificate;
 
 import org.apache.commons.lang.Validate;
 
-public class IdentityCertificate implements Serializable {
+public class ProvisioningIdentityCertificate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private X509Certificate certificate;
 
-
-    public IdentityCertificate(X509Certificate certificate) {
+    ProvisioningIdentityCertificate(X509Certificate certificate) {
         Validate.notNull(certificate);
         this.certificate = certificate;
     }
@@ -37,7 +36,7 @@ public class IdentityCertificate implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final IdentityCertificate other = (IdentityCertificate) obj;
+        final ProvisioningIdentityCertificate other = (ProvisioningIdentityCertificate) obj;
         return certificate.equals(other.certificate);
     }
 }

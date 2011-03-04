@@ -1,6 +1,6 @@
 package net.ripe.commons.provisioning.cms;
 
-import static net.ripe.commons.provisioning.x509.IdentityCertificateTest.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateTest.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -177,11 +177,11 @@ public class CmsObjectBuilderTest {
 
     private static X509V2CRLGenerator createCrlGenerator() throws IOException {
         X509V2CRLGenerator generator = new X509V2CRLGenerator();
-        generator.setIssuerDN(TEST_SELF_SIGNED_X509_CERTIFICATE.getIssuerX500Principal());
-        generator.setThisUpdate(TEST_SELF_SIGNED_X509_CERTIFICATE.getNotBefore());
-        generator.setNextUpdate(TEST_SELF_SIGNED_X509_CERTIFICATE.getNotAfter());
+        generator.setIssuerDN(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getIssuerX500Principal());
+        generator.setThisUpdate(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getNotBefore());
+        generator.setNextUpdate(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getNotAfter());
         generator.setSignatureAlgorithm("SHA256withRSA");
-        generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(TEST_SELF_SIGNED_X509_CERTIFICATE.getExtensionValue(X509Extensions.AuthorityKeyIdentifier.getId()))).getKeyIdentifier());
+        generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getExtensionValue(X509Extensions.AuthorityKeyIdentifier.getId()))).getKeyIdentifier());
         generator.addExtension(X509Extensions.CRLNumber, false, new CRLNumber(BigInteger.ONE));
         return generator;
     }
