@@ -114,7 +114,7 @@ public class CmsObjectBuilder {
     }
 
     private ASN1Encodable encodableMessageContent() {
-        return new DEROctetString(new byte[] {'h', 'e', 'l', 'l', 'o'}); // TODO:
+        return new DEROctetString("Hello".getBytes()); // TODO:
     }
 
     private byte[] encode(ASN1Encodable value) {

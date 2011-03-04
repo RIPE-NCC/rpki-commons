@@ -9,9 +9,11 @@ import java.security.spec.RSAKeyGenParameterSpec;
 
 
 /**
- * Only software keys (no HSM) are supported for the moment. The provisioning draft is unclear about
- * key size requirements, but it seems a good idea to keep this similar to resource certificates:
- * 2048 bit keys and RSA
+ * Only software keys (no HSM) are supported for the moment.
+ * The provisioning draft refers to this section for the algorithm,
+ * key size and public exponent:
+ *
+ * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
  */
 public class ProvisioningKeyPairGenerator {
 
