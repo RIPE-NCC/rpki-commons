@@ -45,9 +45,9 @@
     </properties>
     
     <modules>
-        <module>rpki-objects</module>
-        <module>rpki-provisioning</module>
-        <module>rpki-util</module>
+        <module>rpki-commons-objects</module>
+        <module>rpki-commons-provisioning</module>
+        <module>rpki-commons-util</module>
     </modules>
     
     <dependencies>

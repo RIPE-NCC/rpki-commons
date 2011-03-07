@@ -27,7 +27,7 @@
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>net.ripe.rpki-commons</groupId>
-			<artifactId>rpki-objects</artifactId>
+			<artifactId>rpki-commons-objects</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
