@@ -24,6 +24,7 @@ import org.joda.time.DateTime;
 
 public class ProvisioningIdentityCertificateBuilder {
 
+    private static final int VALIDITY_TIME_YEARS_FROM_NOW = 10;
     private static final String SOFTWARE_SIGNATURE_ALGORITHM = "SHA256withRSA";
     private static final String SOFTWARE_SIGNATURE_PROVIDER = "SunRsaSign";
 
@@ -37,7 +38,7 @@ public class ProvisioningIdentityCertificateBuilder {
         try {
             X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
             generator.setNotBefore(new Date(new DateTime().getMillis()));
-            generator.setNotAfter(new Date(new DateTime().plusYears(10).getMillis()));
+            generator.setNotAfter(new Date(new DateTime().plusYears(VALIDITY_TIME_YEARS_FROM_NOW).getMillis()));
             generator.setIssuerDN(selfSigningDN);
             generator.setSerialNumber(BigInteger.ONE);
             generator.setPublicKey(selfSigningKeyPair.getPublic());
