@@ -111,7 +111,7 @@ public abstract class ProvisioningCmsObjectParser {
 
         certificate = (X509Certificate) cert;
 
-        Validate.isTrue(getSubjectKeyIdetifier(certificate) != null, "cms object certificate must have subject key identifier");
+        Validate.isTrue(X509CertificateUtil.getSubjectKeyIdentifier(certificate) != null, "cms object certificate must have subject key identifier");
         Validate.isTrue(isEndEntityCertificate(certificate), "cms object certificate must be end entity certificate");
     }
 
@@ -126,10 +126,6 @@ public abstract class ProvisioningCmsObjectParser {
         } catch (IOException e) {
             throw new ProvisioningCmsObjectParserException("error while reading cms object certificate", e);
         }
-    }
-
-    private byte[] getSubjectKeyIdetifier(X509Certificate certificate) {
-        return X509CertificateUtil.getSubjectKeyIdentifier(certificate);
     }
 
     private Collection<? extends Certificate> extractCertificate(CMSSignedDataParser sp) {
@@ -186,7 +182,7 @@ public abstract class ProvisioningCmsObjectParser {
      */
     private void verifySubjectKeyIdentifier(SignerInformation signer) {
         try {
-            Validate.isTrue(Arrays.equals(new DEROctetString(getSubjectKeyIdetifier(certificate)).getEncoded(), signer.getSID().getSubjectKeyIdentifier()), "subject key identifier on the cms object and its ee certificate must match");
+            Validate.isTrue(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(certificate)).getEncoded(), signer.getSID().getSubjectKeyIdentifier()), "subject key identifier on the cms object and its ee certificate must match");
         } catch (IOException e) {
             throw new ProvisioningCmsObjectParserException("error while reading cms object certificate subject key identifier", e);
         }

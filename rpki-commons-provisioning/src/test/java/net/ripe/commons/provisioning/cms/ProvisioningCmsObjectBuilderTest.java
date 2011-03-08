@@ -3,13 +3,11 @@ package net.ripe.commons.provisioning.cms;
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateTest.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Date;
@@ -28,19 +26,15 @@ import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLNumber;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.CMSSignedGenerator;
 import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.x509.X509V2CRLGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -52,7 +46,6 @@ public class ProvisioningCmsObjectBuilderTest {
     private static final long SIGNING_TIME = new DateTime(2011, 01, 31, 12, 58, 59, 0, DateTimeZone.UTC).getMillis();
     private ProvisioningCmsObjectBuilder subject;
     private ProvisioningCmsObject cmsObject;
-    private static final X509CRL CRL = generateCrl();
     private static final KeyPair EE_KEYPAIR = ProvisioningKeyPairGenerator.generate();
     private static final X509Certificate EE_CERT = generateEECertificate();
 
@@ -62,7 +55,6 @@ public class ProvisioningCmsObjectBuilderTest {
         subject =  new MyProvisioningCmsObjectBuilder();
 
         subject.withCertificate(EE_CERT);
-        subject.withCrl(CRL);
         subject.withSignatureProvider("SunRsaSign");
 
         DateTimeUtils.setCurrentMillisFixed(SIGNING_TIME);
@@ -74,7 +66,6 @@ public class ProvisioningCmsObjectBuilderTest {
         ProvisioningCmsObjectBuilder subject =  new MyProvisioningCmsObjectBuilder();
 
         subject.withCertificate(EE_CERT);
-        subject.withCrl(CRL);
         subject.withSignatureProvider("SunRsaSign");
 
         return subject.build(EE_KEYPAIR.getPrivate());
@@ -83,15 +74,6 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
         subject = new MyProvisioningCmsObjectBuilder();
-        subject.withCrl(CRL);
-        subject.withSignatureProvider("SunRsaSign");
-        subject.build(TEST_KEY_PAIR.getPrivate());
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldForceCrl() throws CMSException {
-        subject = new MyProvisioningCmsObjectBuilder();
-        subject.withCertificate(EE_CERT);
         subject.withSignatureProvider("SunRsaSign");
         subject.build(TEST_KEY_PAIR.getPrivate());
     }
@@ -100,7 +82,6 @@ public class ProvisioningCmsObjectBuilderTest {
     public void shouldForceSignatureProvider() throws CMSException {
         subject = new MyProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
-        subject.withCrl(CRL);
         subject.build(TEST_KEY_PAIR.getPrivate());
     }
 
@@ -376,26 +357,6 @@ public class ProvisioningCmsObjectBuilderTest {
         protected ASN1Encodable getMessageContent() {
             return new DEROctetString("Hello".getBytes());
         }
-    }
-
-    private static X509CRL generateCrl() {
-        try {
-            X509V2CRLGenerator generator = createCrlGenerator();
-            return generator.generate(TEST_KEY_PAIR.getPrivate(), "SunRsaSign");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static X509V2CRLGenerator createCrlGenerator() throws IOException {
-        X509V2CRLGenerator generator = new X509V2CRLGenerator();
-        generator.setIssuerDN(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getIssuerX500Principal());
-        generator.setThisUpdate(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getNotBefore());
-        generator.setNextUpdate(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getNotAfter());
-        generator.setSignatureAlgorithm("SHA256withRSA");
-        generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(TEST_PROVISIONING_IDENTITY_CERTIFICATE.getCertificate().getExtensionValue(X509Extensions.AuthorityKeyIdentifier.getId()))).getKeyIdentifier());
-        generator.addExtension(X509Extensions.CRLNumber, false, new CRLNumber(BigInteger.ONE));
-        return generator;
     }
 
     private static X509Certificate generateEECertificate() {
