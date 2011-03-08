@@ -14,9 +14,9 @@ import java.security.cert.Certificate;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.x509cert.X509CertificateBuilder;
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 import net.ripe.ipresource.IpResourceSet;
 
 import org.apache.commons.io.output.NullOutputStream;
@@ -90,7 +90,7 @@ public final class KeyStoreUtil {
 	private static KeyPair getKeyPairFromKeyStore(KeyStore keyStore) {
 		try {
 			Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
-            X509CertificateParser<X509ResourceCertificate> parser = X509CertificateParser.forResourceCertificate();
+            X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
             parser.parse("mykeystore", c.getEncoded());
             X509ResourceCertificate certificate = parser.getCertificate();
             PublicKey publicKey = certificate.getPublicKey();
@@ -114,7 +114,7 @@ public final class KeyStoreUtil {
     }
 
 	private static X509ResourceCertificate createCertificate(KeyPair keyPair, String signatureProvider) {
-        X509CertificateBuilder builder = new X509CertificateBuilder();
+        X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withSignatureProvider(signatureProvider);
         builder.withSerial(BigInteger.ONE);
         builder.withValidityPeriod(new ValidityPeriod(new DateTime().minusYears(2), new DateTime().minusYears(1)));

@@ -13,7 +13,7 @@ import net.ripe.commons.certification.cms.roa.RoaCms;
 import net.ripe.commons.certification.cms.roa.RoaCmsTest;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlTest;
-import net.ripe.commons.certification.x509cert.X509CertificateBuilder;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
 
@@ -51,7 +51,7 @@ public class CertificateRepositoryObjectPrinterTest {
 
     @Test
     public void shouldPrintResourceCertificate() {
-        X509CertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
         builder.withValidityPeriod(new ValidityPeriod(new DateTime(2008, 1, 4, 0, 0, 0, 0, DateTimeZone.UTC), new DateTime(2009, 1, 4, 0, 0, 0, 0, DateTimeZone.UTC)));
         X509ResourceCertificate certificate = builder.buildResourceCertificate();
 

@@ -1,19 +1,23 @@
 package net.ripe.commons.certification.util;
 
-import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
-import static net.ripe.commons.certification.util.KeyStoreUtil.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.*;
-import static org.junit.Assert.*;
+import static net.ripe.commons.certification.util.KeyPairFactoryTest.DEFAULT_KEYPAIR_GENERATOR_PROVIDER;
+import static net.ripe.commons.certification.util.KeyStoreUtil.KEYSTORE_KEY_ALIAS;
+import static net.ripe.commons.certification.util.KeyStoreUtil.clearKeyStore;
+import static net.ripe.commons.certification.util.KeyStoreUtil.createKeyStoreForKeyPair;
+import static net.ripe.commons.certification.util.KeyStoreUtil.getKeyPairFromKeyStore;
+import static net.ripe.commons.certification.util.KeyStoreUtil.storeKeyStore;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.DEFAULT_SIGNATURE_PROVIDER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 
-import net.ripe.commons.certification.util.KeyPairFactory;
-import net.ripe.commons.certification.util.KeyStoreException;
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 
 import org.junit.Test;
 
@@ -36,7 +40,7 @@ public class KeyStoreUtilTest {
 	    keyStoreData = storeKeyStore(keyStore);
 
 		Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
-        X509CertificateParser<X509ResourceCertificate> parser = X509CertificateParser.forResourceCertificate();
+        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse("mykeystore", c.getEncoded());
         X509ResourceCertificate certificate = parser.getCertificate();
 

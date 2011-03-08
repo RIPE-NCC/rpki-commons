@@ -1,7 +1,6 @@
 package net.ripe.certification.client.xml.converters;
 
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
 import org.apache.commons.lang.Validate;
@@ -22,7 +21,7 @@ public class X509ResourceCertificateConverter implements Converter {
 
 	@Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        X509PlainCertificate certificate = (X509ResourceCertificate) source;
+        X509ResourceCertificate certificate = (X509ResourceCertificate) source;
         writer.startNode("encoded");
         context.convertAnother(certificate.getEncoded());
         writer.endNode();
@@ -34,7 +33,7 @@ public class X509ResourceCertificateConverter implements Converter {
         Validate.isTrue("encoded".equals(reader.getNodeName()));
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
         reader.moveUp();
-        X509CertificateParser<X509ResourceCertificate> parser = X509CertificateParser.forResourceCertificate();
+        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse("encoded", encoded);
         return parser.getCertificate();
     }

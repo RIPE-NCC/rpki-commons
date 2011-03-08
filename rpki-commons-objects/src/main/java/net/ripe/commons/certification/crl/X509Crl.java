@@ -23,7 +23,7 @@ import java.security.*;
 import java.security.cert.*;
 import java.util.*;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.DEFAULT_SIGNATURE_PROVIDER;
 
 public class X509Crl implements CertificateRepositoryObject {
 

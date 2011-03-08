@@ -1,6 +1,6 @@
 package net.ripe.commons.certification.cms.manifest;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -20,7 +20,7 @@ import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.commons.certification.x509cert.X509CertificateBuilder;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
@@ -149,7 +149,7 @@ public class ManifestCmsTest{
 	}
 
 	private X509ResourceCertificate getRootResourceCertificate() {
-		X509CertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+		X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
 
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withPublicKey(ROOT_KEY_PAIR.getPublic());
@@ -185,8 +185,8 @@ public class ManifestCmsTest{
 		return builder;
 	}
 
-	private static X509CertificateBuilder getManifestEEResourceCertificateBuilder() {
-		X509CertificateBuilder builder = new X509CertificateBuilder();
+	private static X509ResourceCertificateBuilder getManifestEEResourceCertificateBuilder() {
+		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
 		builder.withCa(false);
 		builder.withSubjectDN(MANIFEST_DN);

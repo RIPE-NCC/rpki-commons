@@ -4,8 +4,6 @@ import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.cms.manifest.ManifestCms;
 import net.ripe.commons.certification.cms.roa.RoaCms;
 import net.ripe.commons.certification.crl.X509Crl;
-import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
 public final class CertificateRepositoryObjectFactory {
@@ -25,12 +23,6 @@ public final class CertificateRepositoryObjectFactory {
         result = tryParseAsX509ResourceCertificate(encoded);
         if (result != null) {
             return result;
-        }
-
-        // Try to parse as plain certificate
-        result = tryParseAsX509PlainCertificate(encoded);
-        if (result != null) {
-        	return result;
         }
 
         // Try to parse as ROA
@@ -68,14 +60,6 @@ public final class CertificateRepositoryObjectFactory {
         } catch (IllegalArgumentException e) {
             return null;
         }
-    }
-
-    private static X509PlainCertificate tryParseAsX509PlainCertificate(byte[] encoded) {
-    	try {
-    		return X509CertificateUtil.parseDerEncoded(encoded);
-    	} catch (IllegalArgumentException e) {
-    		return null;
-    	}
     }
 
     private static RoaCms tryParseAsROA(byte[] encoded) {

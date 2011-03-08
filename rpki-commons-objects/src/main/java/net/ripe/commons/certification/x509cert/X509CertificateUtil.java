@@ -32,7 +32,7 @@ public final class X509CertificateUtil {
             }
             return SubjectKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
-            throw new X509PlainCertificateException("Cannot get SubjectKeyIdentifier for certificate", e);
+            throw new AbstractX509CertificateWrapperException("Cannot get SubjectKeyIdentifier for certificate", e);
         }
     }
 
@@ -44,19 +44,19 @@ public final class X509CertificateUtil {
             }
             return AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
-            throw new X509PlainCertificateException("Can not get AuthorityKeyIdentifier for certificate", e);
+            throw new AbstractX509CertificateWrapperException("Can not get AuthorityKeyIdentifier for certificate", e);
         }
     }
     
-    public static X509PlainCertificate parseDerEncoded(byte[] encoded) {
-        X509CertificateParser<X509PlainCertificate> parser = X509CertificateParser.forPlainCertificate();
+    public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
+        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse("certificate", encoded);
         return parser.getCertificate();
     }
     
     /**
      * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
-     * @throws X509PlainCertificateException
+     * @throws AbstractX509CertificateWrapperException
      * @throws IOException
      */
     public static String getEncodedSubjectPublicKeyInfo(X509Certificate certificate) {
@@ -65,7 +65,7 @@ public final class X509CertificateUtil {
         try {
             tbsCertificate = certificate.getTBSCertificate();
         } catch (CertificateEncodingException e) {
-            throw new X509PlainCertificateException("Can't extract TBSCertificate from certificate", e);
+            throw new AbstractX509CertificateWrapperException("Can't extract TBSCertificate from certificate", e);
         }
         ASN1Sequence tbsCertificateSequence = (ASN1Sequence) Asn1Util.decode(tbsCertificate);
         TBSCertificateStructure tbsCertificateStructure = new TBSCertificateStructure(tbsCertificateSequence);
@@ -79,7 +79,7 @@ public final class X509CertificateUtil {
             out.flush();
             return out.toString();
         } catch (IOException e) {
-            throw new X509PlainCertificateException("Can't encode SubjectPublicKeyInfo for certificate", e);
+            throw new AbstractX509CertificateWrapperException("Can't encode SubjectPublicKeyInfo for certificate", e);
         }
     }
 }

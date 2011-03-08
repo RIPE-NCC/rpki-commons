@@ -1,17 +1,16 @@
 package net.ripe.commons.certification.cms.roa;
 
-import net.ripe.commons.certification.cms.CmsObject;
-import net.ripe.commons.certification.cms.CmsObjectInfo;
-import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.ipresource.Asn;
-import net.ripe.ipresource.IpResourceSet;
-
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-public class RoaCms extends CmsObject<X509ResourceCertificate> implements Roa {
+import net.ripe.commons.certification.cms.RpkiSignedObject;
+import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
+import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpResourceSet;
+
+public class RoaCms extends RpkiSignedObject implements Roa {
 
     public static final String CONTENT_TYPE = "1.2.840.113549.1.9.16.1.24";
 
@@ -21,7 +20,7 @@ public class RoaCms extends CmsObject<X509ResourceCertificate> implements Roa {
 
     private List<RoaPrefix> prefixes;
 
-    protected RoaCms(CmsObjectInfo cmsObjectInfo, Asn asn, List<RoaPrefix> prefixes) {
+    protected RoaCms(RpkiSignedObjectInfo cmsObjectInfo, Asn asn, List<RoaPrefix> prefixes) {
         super(cmsObjectInfo);
         this.asn = asn;
         this.prefixes = prefixes;

@@ -1,18 +1,22 @@
 package net.ripe.commons.certification.cms.manifest;
 
-import static net.ripe.commons.certification.Asn1Util.*;
-import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.Asn1Util.expect;
+import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_CONTENT_SIZE;
+import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_CONTENT_STRUCTURE;
+import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_CONTENT_TYPE;
+import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_DECODE_FILELIST;
+import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_FILE_HASH_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_RESOURCE_INHERIT;
+import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_TIME_FORMAT;
 
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.ripe.commons.certification.cms.CmsObjectInfo;
-import net.ripe.commons.certification.cms.CmsObjectParser;
+import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
+import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
 import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.DERBitString;
@@ -29,7 +33,7 @@ import org.joda.time.DateTimeZone;
  * See {@link http://tools.ietf.org/html/draft-ietf-sidr-rpki-manifests-07}
  */
 
-public class ManifestCmsParser extends CmsObjectParser {
+public class ManifestCmsParser extends RpkiSignedObjectParser {
 
     private int version = ManifestCms.DEFAULT_VERSION;
 
@@ -71,7 +75,7 @@ public class ManifestCmsParser extends CmsObjectParser {
 			throw new IllegalArgumentException("Manifest validation failed: " + validationResult.getFailuresForCurrentLocation());
 		}
 
-        CmsObjectInfo cmsObjectData = new CmsObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
+        RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
         ManifestCmsGeneralInfo manifestCmsGeneralInfo = new ManifestCmsGeneralInfo(version, number, thisUpdateTime, nextUpdateTime, fileHashAlgorithm);
         
 		return new ManifestCms(cmsObjectData, manifestCmsGeneralInfo, files);
@@ -131,10 +135,5 @@ public class ManifestCmsParser extends CmsObjectParser {
 	@Override
 	public void decodeContent(DEREncodable encoded) {
 		decodeManifest(encoded);
-	}
-
-	@Override
-	protected X509CertificateParser<X509PlainCertificate> getCertificateParser() {
-		return X509CertificateParser.forPlainCertificate();
 	}
 }

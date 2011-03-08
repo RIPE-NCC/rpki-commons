@@ -2,7 +2,7 @@ package net.ripe.commons.certification.cms.manifest;
 
 import static net.ripe.commons.certification.Asn1UtilTest.*;
 import static net.ripe.commons.certification.cms.manifest.ManifestCmsParserTest.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;

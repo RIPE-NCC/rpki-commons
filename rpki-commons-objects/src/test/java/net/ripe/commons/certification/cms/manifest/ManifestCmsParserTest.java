@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.cms.manifest;
 
 import static net.ripe.commons.certification.Asn1Util.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -13,7 +13,7 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
-import net.ripe.commons.certification.x509cert.X509CertificateBuilder;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
@@ -84,7 +84,7 @@ public class ManifestCmsParserTest {
 
 
 	static X509ResourceCertificate createValidManifestEECertificate() {
-        X509CertificateBuilder builder = new X509CertificateBuilder();
+        X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
@@ -94,7 +94,7 @@ public class ManifestCmsParserTest {
     }
 
 	static X509ResourceCertificate createTenSlashEightResourceCertificate() {
-	    X509CertificateBuilder builder = new X509CertificateBuilder();
+	    X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 	    builder.withCa(false).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
 	    builder.withPublicKey(TEST_KEY_PAIR.getPublic());
 	    builder.withSigningKeyPair(TEST_KEY_PAIR);

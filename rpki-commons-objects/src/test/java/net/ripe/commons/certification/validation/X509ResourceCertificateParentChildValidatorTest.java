@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.validation;
 
 import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -14,8 +14,7 @@ import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactory;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
-import net.ripe.commons.certification.x509cert.X509CertificateBuilder;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
@@ -59,7 +58,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
         result = new ValidationResult();
 	}
 
-	private void validate(X509ResourceCertificateParentChildValidator validator, X509PlainCertificate certificate) {
+	private void validate(X509ResourceCertificateParentChildValidator validator, X509ResourceCertificate certificate) {
 		String location = "child";
 		validator.validate(location, certificate);
 	}
@@ -193,35 +192,6 @@ public class X509ResourceCertificateParentChildValidatorTest {
     	assertTrue(result.hasFailures());
     }
 
-    @Test
-    public void shouldValidatePlainCertificates() {
-    	X509PlainCertificate root = getRootPlainCertificate();
-    	X509PlainCertificate child = createChildCertificateBuilder().withResources(null).buildPlainCertificate();
-
-    	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, null);
-    	validate(validator, child);
-    	assertFalse(result.hasFailures());
-    }
-
-	@Test
-	public void shouldRejectIfParentIsPlainCertificate() {
-		X509PlainCertificate root = getRootPlainCertificate();
-    	child = createChildCertificateBuilder().buildResourceCertificate();
-
-    	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, null);
-    	validate(validator, child);
-    	assertTrue(result.hasFailures());
-	}
-
-	@Test
-	public void shouldRejectIfChildIsPlainCertificate() {
-		X509PlainCertificate child = createChildCertificateBuilder().withResources(null).buildPlainCertificate();
-
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
-		validate(validator, child);
-		assertTrue(result.hasFailures());
-	}
-
 
     private X509ResourceCertificate getRootResourceCertificate() {
         return createRootCertificateBuilder().buildResourceCertificate();
@@ -231,12 +201,8 @@ public class X509ResourceCertificateParentChildValidatorTest {
     	return createRootCertificateBuilder().withResources(InheritedIpResourceSet.getInstance()).buildResourceCertificate();
     }
 
-    private X509PlainCertificate getRootPlainCertificate() {
-    	return createRootCertificateBuilder().withResources(null).buildPlainCertificate();
-    }
-
-    private X509CertificateBuilder createRootCertificateBuilder() {
-    	X509CertificateBuilder builder = new X509CertificateBuilder();
+    private X509ResourceCertificateBuilder createRootCertificateBuilder() {
+    	X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
     	builder.withSubjectDN(ROOT_CERTIFICATE_NAME);
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
@@ -254,8 +220,8 @@ public class X509ResourceCertificateParentChildValidatorTest {
         return builder;
     }
 
-	private X509CertificateBuilder createChildCertificateBuilder() {
-		X509CertificateBuilder builder = new X509CertificateBuilder();
+	private X509ResourceCertificateBuilder createChildCertificateBuilder() {
+		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
     	builder.withSubjectDN(FIRST_CHILD_CERTIFICATE_NAME);
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);

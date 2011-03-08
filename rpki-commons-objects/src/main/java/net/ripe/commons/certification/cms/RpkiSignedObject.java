@@ -1,5 +1,10 @@
 package net.ripe.commons.certification.cms;
 
+import java.net.URI;
+import java.util.Arrays;
+
+import javax.security.auth.x500.X500Principal;
+
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.CrlLocator;
@@ -9,15 +14,12 @@ import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTime;
 
-import javax.security.auth.x500.X500Principal;
-import java.net.URI;
-import java.util.Arrays;
-
-public abstract class CmsObject<T extends X509PlainCertificate> implements CertificateRepositoryObject {
+public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,20 +33,18 @@ public abstract class CmsObject<T extends X509PlainCertificate> implements Certi
 
     private byte[] encoded;
 
-    private T certificate;
+    private X509ResourceCertificate certificate;
 
     private String contentType;
 
     private DateTime signingTime;
 
-
-    @SuppressWarnings("unchecked")
-    protected CmsObject(CmsObjectInfo cmsObjectData) {
-        this(cmsObjectData.getEncoded(), (T) cmsObjectData.getCertificate(), cmsObjectData.getContentType(), cmsObjectData.getSigningTime());
+    protected RpkiSignedObject(RpkiSignedObjectInfo cmsObjectData) {
+        this(cmsObjectData.getEncoded(), cmsObjectData.getCertificate(), cmsObjectData.getContentType(), cmsObjectData.getSigningTime());
     }
 
 
-    protected CmsObject(byte[] encoded, T certificate, String contentType, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
+    protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, String contentType, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
         this.certificate = certificate;
         this.contentType = contentType;
@@ -64,11 +64,11 @@ public abstract class CmsObject<T extends X509PlainCertificate> implements Certi
         return contentType;
     }
 
-    public T getCertificate() {
+    public X509ResourceCertificate getCertificate() {
         return certificate;
     }
 
-    public boolean signedBy(X509PlainCertificate certificate) {
+    public boolean signedBy(X509ResourceCertificate certificate) {
         return this.certificate.equals(certificate);
     }
 
@@ -130,7 +130,7 @@ public abstract class CmsObject<T extends X509PlainCertificate> implements Certi
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CmsObject<?> other = (CmsObject<?>) obj;
+        final RpkiSignedObject other = (RpkiSignedObject) obj;
         return Arrays.equals(getEncoded(), other.getEncoded());
     }
 }

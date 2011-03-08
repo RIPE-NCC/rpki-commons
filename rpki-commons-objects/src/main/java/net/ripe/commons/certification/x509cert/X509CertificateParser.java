@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.x509cert;
 
 import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509PlainCertificate.*;
+import static net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
-public final class X509CertificateParser<T extends X509PlainCertificate> {
+public abstract class X509CertificateParser<T extends AbstractX509CertificateWrapper> {
 
     private static final String[] ALLOWED_SIGNATURE_ALGORITHM_OIDS = {
         PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
@@ -33,14 +33,13 @@ public final class X509CertificateParser<T extends X509PlainCertificate> {
 
     private byte[] encoded;
 
-    private X509Certificate certificate;
+    protected X509Certificate certificate;
 
-    private ValidationResult result;
+    protected ValidationResult result;
 
 	private final Class<T> certificateClass;
 
-
-    private X509CertificateParser(Class<T> certificateClass, ValidationResult result) {
+    protected X509CertificateParser(Class<T> certificateClass, ValidationResult result) {
         this.certificateClass = certificateClass;
 		this.result = result;
     }
@@ -62,16 +61,18 @@ public final class X509CertificateParser<T extends X509PlainCertificate> {
         return result;
     }
 
-    public T getCertificate() {
-        if (result.hasFailures()) {
-            throw new IllegalArgumentException("Certificate validation failed");
-        }
-        if (isResourceExtensionPresent()) {
-        	return certificateClass.cast(new X509ResourceCertificate(certificate));
-        } else {
-        	return certificateClass.cast(new X509PlainCertificate(certificate));
-        }
-    }
+    abstract public T getCertificate(); 
+//    {
+//        if (result.hasFailures()) {
+//            throw new IllegalArgumentException("Certificate validation failed");
+//        }
+//        
+//        if (isResourceExtensionPresent()) {
+//        	return certificateClass.cast(new X509ResourceCertificate(certificate));
+//        } else {
+//        	return certificateClass.cast(new X509PlainCertificate(certificate));
+//        }
+//    }
 
     private void parse() {
         InputStream input = null;
@@ -158,19 +159,12 @@ public final class X509CertificateParser<T extends X509PlainCertificate> {
 	    result.isTrue(ipInherited == asInherited, PARTIAL_INHERITANCE);
 	}
 
-	public static X509CertificateParser<X509PlainCertificate> forPlainCertificate() {
-		return forPlainCertificate(new ValidationResult());
-	}
+//	public static X509CertificateParser<X509PlainCertificate> forPlainCertificate() {
+//		return forPlainCertificate(new ValidationResult());
+//	}
+//
+//	public static X509CertificateParser<X509PlainCertificate> forPlainCertificate(ValidationResult result) {
+//	    return new X509CertificateParser<X509PlainCertificate>(X509PlainCertificate.class, result);
+//	}
 
-	public static X509CertificateParser<X509PlainCertificate> forPlainCertificate(ValidationResult result) {
-	    return new X509CertificateParser<X509PlainCertificate>(X509PlainCertificate.class, result);
-	}
-
-	public static X509CertificateParser<X509ResourceCertificate> forResourceCertificate() {
-		return forResourceCertificate(new ValidationResult());
-	}
-
-	public static X509CertificateParser<X509ResourceCertificate> forResourceCertificate(ValidationResult result) {
-	    return new X509CertificateParser<X509ResourceCertificate>(X509ResourceCertificate.class, result);
-	}
 }

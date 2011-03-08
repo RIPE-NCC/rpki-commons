@@ -1,37 +1,44 @@
 package net.ripe.commons.certification.x509cert;
 
-import net.ripe.commons.certification.CertificateRepositoryObject;
-import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.crl.CrlLocator;
-import net.ripe.commons.certification.crl.X509Crl;
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.validation.ValidationString;
-import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
-import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.DEFAULT_SIGNATURE_PROVIDER;
 
-import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.DEFAULT_SIGNATURE_PROVIDER;
+import javax.security.auth.x500.X500Principal;
 
-public class X509PlainCertificate implements CertificateRepositoryObject {
+import net.ripe.commons.certification.ValidityPeriod;
+
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
+
+public abstract class AbstractX509CertificateWrapper {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,9 +46,9 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
 
     public static final PolicyInformation POLICY_INFORMATION = new PolicyInformation(POLICY_OID);
 
-    private final X509Certificate certificate;
+    protected final X509Certificate certificate;
 
-    protected X509PlainCertificate(X509Certificate certificate) {
+    protected AbstractX509CertificateWrapper(X509Certificate certificate) {
         Validate.notNull(certificate);
         this.certificate = certificate;
     }
@@ -64,10 +71,10 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof X509PlainCertificate)) {
+        if (!(obj instanceof AbstractX509CertificateWrapper)) {
             return false;
         }
-        final X509PlainCertificate other = (X509PlainCertificate) obj;
+        final AbstractX509CertificateWrapper other = (AbstractX509CertificateWrapper) obj;
         return certificate.equals(other.certificate);
     }
 
@@ -89,7 +96,7 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
             BasicConstraints constraints = BasicConstraints.getInstance(X509ExtensionUtil.fromExtensionValue(basicConstraintsExtension));
             return constraints.isCA();
         } catch (IOException e) {
-            throw new X509PlainCertificateException(e);
+            throw new AbstractX509CertificateWrapperException(e);
         }
     }
 
@@ -137,25 +144,6 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
         return getCertificate().getSerialNumber();
     }
 
-    @Override
-    public byte[] getEncoded() {
-        try {
-            return certificate.getEncoded();
-        } catch (CertificateEncodingException e) {
-            throw new X509PlainCertificateException(e);
-        }
-    }
-
-    @Override
-    public URI getCrlUri() {
-        return findFirstRsyncCrlDistributionPoint();
-    }
-
-    @Override
-    public URI getParentCertificateUri() {
-        return findFirstAuthorityInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS);
-    }
-
     public X509CertificateInformationAccessDescriptor[] getAuthorityInformationAccess() {
         try {
             byte[] extensionValue = certificate.getExtensionValue(X509Extensions.AuthorityInfoAccess.getId());
@@ -165,7 +153,7 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
             AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
             return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
         } catch (IOException e) {
-            throw new X509PlainCertificateException(e);
+            throw new AbstractX509CertificateWrapperException(e);
         }
     }
 
@@ -195,7 +183,7 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
             AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
             return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
         } catch (IOException e) {
-            throw new X509PlainCertificateException(e);
+            throw new AbstractX509CertificateWrapperException(e);
         }
     }
 
@@ -213,7 +201,7 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
             CRLDistPoint crldp = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
             return convertCrlDistributionPointToUris(crldp);
         } catch (IOException e) {
-            throw new X509PlainCertificateException(e);
+            throw new AbstractX509CertificateWrapperException(e);
         }
     }
 
@@ -251,33 +239,6 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
         return result.toArray(new URI[result.size()]);
     }
 
-    @Override
-    public void validate(String location, X509ResourceCertificateValidator validator) {
-        X509CertificateParser<X509ResourceCertificate> parser = X509CertificateParser.forResourceCertificate(validator.getValidationResult());
-        parser.parse(location, getEncoded());
-        if (parser.getValidationResult().hasFailures()) {
-            return;
-        }
-
-        validator.validate(location, this);
-    }
-
-    @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
-        X509Crl crl = null;
-        if (!isRoot()) {
-            String savedCurrentLocation = result.getCurrentLocation();
-            result.push(getCrlUri());
-            crl = crlLocator.getCrl(getCrlUri(), context, result);
-            result.push(savedCurrentLocation);
-            result.notNull(crl, ValidationString.OBJECTS_CRL_VALID, this);
-            if (crl == null) {
-                return;
-            }
-        }
-        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(result, context.getCertificate(), crl, context.getResources());
-        validator.validate(location, this);
-    }
 
     public void verify(PublicKey publicKey) throws InvalidKeyException, SignatureException {
         try {
@@ -288,6 +249,14 @@ public class X509PlainCertificate implements CertificateRepositoryObject {
             throw new IllegalArgumentException(e);
         } catch (NoSuchProviderException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+    
+    public byte[] getEncoded() {
+        try {
+            return certificate.getEncoded();
+        } catch (CertificateEncodingException e) {
+            throw new AbstractX509CertificateWrapperException(e);
         }
     }
 

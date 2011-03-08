@@ -1,10 +1,18 @@
 package net.ripe.commons.certification.cms.manifest;
 
-import net.ripe.commons.certification.cms.CmsObject;
-import net.ripe.commons.certification.cms.CmsObjectInfo;
+import java.io.IOException;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+
+import net.ripe.commons.certification.cms.RpkiSignedObject;
+import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.utils.Specification;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang.Validate;
@@ -16,20 +24,12 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.io.DigestOutputStream;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * A manifest of files published by a CA certificate.
  * <p/>
  * Use the {@link ManifestCmsBuilder} or {@link ManifestCmsParser} to construct this object.
  */
-public class ManifestCms extends CmsObject<X509ResourceCertificate> {
+public class ManifestCms extends RpkiSignedObject {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +43,7 @@ public class ManifestCms extends CmsObject<X509ResourceCertificate> {
 
     private ManifestCmsGeneralInfo manifestCmsGeneralInfo;
 
-    ManifestCms(CmsObjectInfo cmsObjectData, ManifestCmsGeneralInfo manifestCmsGeneralInfo, Map<String, byte[]> files) {
+    ManifestCms(RpkiSignedObjectInfo cmsObjectData, ManifestCmsGeneralInfo manifestCmsGeneralInfo, Map<String, byte[]> files) {
         super(cmsObjectData);
         this.manifestCmsGeneralInfo = manifestCmsGeneralInfo;
         this.files = files;

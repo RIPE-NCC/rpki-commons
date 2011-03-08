@@ -1,7 +1,27 @@
 package net.ripe.commons.certification.cms;
 
-import static net.ripe.commons.certification.cms.CmsObject.*;
-import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
+import static net.ripe.commons.certification.cms.RpkiSignedObject.ENCRYPTION_ALGORITHM_OID;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_HAS_SKI;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_EE_CERT;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_X509CERT;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_CONTENT_PARSING;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_DATA_PARSING;
+import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.DECODE_CONTENT;
+import static net.ripe.commons.certification.validation.ValidationString.DIGEST_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.ENCRYPTION_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.GET_CERTS_AND_CRLS;
+import static net.ripe.commons.certification.validation.ValidationString.GET_SIGNER_INFO;
+import static net.ripe.commons.certification.validation.ValidationString.MSG_DIGEST_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_CERT_ALLOWED;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNED_OBJECT;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNER;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNING_TIME_ATTR;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNATURE_VERIFICATION;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNED_ATTRS_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNER_ID_MATCH;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNING_TIME_ATTR_PRESENT;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,10 +35,9 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 
 import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
-import net.ripe.commons.certification.x509cert.X509PlainCertificateException;
+import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DEREncodable;
@@ -34,11 +53,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 
-public abstract class CmsObjectParser {
+public abstract class RpkiSignedObjectParser {
 
     private byte[] encoded;
 
-    private X509PlainCertificate certificate;
+    private X509ResourceCertificate certificate;
 
     private String contentType;
 
@@ -48,11 +67,11 @@ public abstract class CmsObjectParser {
 
     private String location;
 
-    protected CmsObjectParser() {
+    protected RpkiSignedObjectParser() {
         validationResult = new ValidationResult();
     }
 
-    protected CmsObjectParser(ValidationResult result) {
+    protected RpkiSignedObjectParser(ValidationResult result) {
         this.validationResult = result;
     }
 
@@ -71,7 +90,7 @@ public abstract class CmsObjectParser {
         return validationResult;
     }
 
-    protected X509PlainCertificate getCertificate() {
+    protected X509ResourceCertificate getCertificate() {
         return certificate;
     }
 
@@ -145,13 +164,13 @@ public abstract class CmsObjectParser {
         validationResult.notNull(certificate.getSubjectKeyIdentifier(), CERT_HAS_SKI);
     }
 
-    private X509PlainCertificate parseCertificate(Collection<? extends Certificate> certificates) {
-        X509CertificateParser<? extends X509PlainCertificate> parser = getCertificateParser();
+    private X509ResourceCertificate parseCertificate(Collection<? extends Certificate> certificates) {
+        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         try {
             X509Certificate x509certificate = (X509Certificate) certificates.iterator().next();
             parser.parse(location, x509certificate.getEncoded());
         } catch (CertificateEncodingException e) {
-            throw new X509PlainCertificateException(e);
+            throw new AbstractX509CertificateWrapperException(e);
         }
         return parser.getCertificate();
     }
@@ -173,8 +192,6 @@ public abstract class CmsObjectParser {
         }
         return certificates;
     }
-
-    protected abstract X509CertificateParser<? extends X509PlainCertificate> getCertificateParser();
 
     private void verifyCmsSigning(CMSSignedDataParser sp, X509Certificate certificate) {
         // Note: validationResult field is updated by methods used here.

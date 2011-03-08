@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.validation;
 
 import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -17,7 +17,7 @@ import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactory;
 import net.ripe.commons.certification.validation.objectvalidators.ResourceCertificateLocator;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
-import net.ripe.commons.certification.x509cert.X509CertificateBuilder;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
@@ -201,7 +201,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     }
 
     private X509ResourceCertificate getRootResourceCertificate() {
-    	X509CertificateBuilder builder = new X509CertificateBuilder();
+    	X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
     	builder.withSubjectDN(ROOT_CERTIFICATE_NAME);
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
@@ -218,8 +218,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         return builder.buildResourceCertificate();
     }
 
-	private X509CertificateBuilder createChildBuilder() {
-		X509CertificateBuilder builder = new X509CertificateBuilder();
+	private X509ResourceCertificateBuilder createChildBuilder() {
+		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
     	builder.withSubjectDN(FIRST_CHILD_CERTIFICATE_NAME);
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
@@ -236,8 +236,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 		return builder;
 	}
 
-	private X509CertificateBuilder createSecondChildBuilder() {
-		X509CertificateBuilder builder = new X509CertificateBuilder();
+	private X509ResourceCertificateBuilder createSecondChildBuilder() {
+		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
     	builder.withSubjectDN(SECOND_CHILD_CERTIFICATE_NAME);
         builder.withIssuerDN(FIRST_CHILD_CERTIFICATE_NAME);

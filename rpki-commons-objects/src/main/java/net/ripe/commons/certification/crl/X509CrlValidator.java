@@ -5,18 +5,18 @@ import java.security.SignatureException;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidator;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
+import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper;
 
 import org.joda.time.DateTime;
 
 public class X509CrlValidator implements CertificateRepositoryObjectValidator<X509Crl>{
 
-    private X509PlainCertificate parent;
+    private AbstractX509CertificateWrapper parent;
 
     private ValidationResult result;
 
 
-    public X509CrlValidator(ValidationResult result, X509PlainCertificate parent) {
+    public X509CrlValidator(ValidationResult result, AbstractX509CertificateWrapper parent) {
         this.result = result;
         this.parent = parent;
     }

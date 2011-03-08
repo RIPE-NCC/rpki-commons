@@ -38,7 +38,7 @@ import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
-public class X509CertificateBuilder {
+public class X509ResourceCertificateBuilder {
 
 	public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
@@ -62,94 +62,89 @@ public class X509CertificateBuilder {
     private PolicyInformation[] policies = { X509ResourceCertificate.POLICY_INFORMATION };
 
 
-    public X509CertificateBuilder withSignatureProvider(String signatureProvider) {
+    public X509ResourceCertificateBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
         return this;
     }
 
-    public X509CertificateBuilder withSerial(BigInteger serial) {
+    public X509ResourceCertificateBuilder withSerial(BigInteger serial) {
         this.serial = serial;
         return this;
     }
 
-    public X509CertificateBuilder withSubjectDN(X500Principal subjectDN) {
+    public X509ResourceCertificateBuilder withSubjectDN(X500Principal subjectDN) {
         this.subjectDN = subjectDN;
         return this;
     }
 
-    public X509CertificateBuilder withIssuerDN(X500Principal issuerDN) {
+    public X509ResourceCertificateBuilder withIssuerDN(X500Principal issuerDN) {
         this.issuerDN = issuerDN;
         return this;
     }
 
-    public X509CertificateBuilder withValidityPeriod(ValidityPeriod validityPeriod) {
+    public X509ResourceCertificateBuilder withValidityPeriod(ValidityPeriod validityPeriod) {
         this.validityPeriod = validityPeriod;
         return this;
     }
 
-    public X509CertificateBuilder withPublicKey(PublicKey publicKey) {
+    public X509ResourceCertificateBuilder withPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
         return this;
     }
 
-    public X509CertificateBuilder withSigningKeyPair(KeyPair signingKey) {
+    public X509ResourceCertificateBuilder withSigningKeyPair(KeyPair signingKey) {
         this.signingKeyPair = signingKey;
         return this;
     }
 
-    public X509CertificateBuilder withSignatureAlgorithm(String signatureAlgorithm) {
+    public X509ResourceCertificateBuilder withSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
         return this;
     }
 
-    public X509CertificateBuilder withKeyUsage(int keyUsage) {
+    public X509ResourceCertificateBuilder withKeyUsage(int keyUsage) {
         this.keyUsage = keyUsage;
         return this;
     }
 
-    public X509CertificateBuilder withResources(IpResourceSet resources) {
+    public X509ResourceCertificateBuilder withResources(IpResourceSet resources) {
         this.resources = resources;
         return this;
     }
 
-    public X509CertificateBuilder withCa(boolean ca) {
+    public X509ResourceCertificateBuilder withCa(boolean ca) {
         this.ca = ca;
         return this;
     }
 
-    public X509CertificateBuilder withSubjectKeyIdentifier(boolean add) {
+    public X509ResourceCertificateBuilder withSubjectKeyIdentifier(boolean add) {
         this.addSubjectKeyIdentifier = add;
         return this;
     }
 
-    public X509CertificateBuilder withAuthorityKeyIdentifier(boolean add) {
+    public X509ResourceCertificateBuilder withAuthorityKeyIdentifier(boolean add) {
         this.addAuthorityKeyIdentifier  = add;
         return this;
     }
 
-    public X509CertificateBuilder withCrlDistributionPoints(URI... uris) {
+    public X509ResourceCertificateBuilder withCrlDistributionPoints(URI... uris) {
         this.crlDistributionPoints = uris;
         return this;
     }
 
-    public X509CertificateBuilder withAuthorityInformationAccess(X509CertificateInformationAccessDescriptor... descriptors) {
+    public X509ResourceCertificateBuilder withAuthorityInformationAccess(X509CertificateInformationAccessDescriptor... descriptors) {
         authorityInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(descriptors);
         return this;
     }
 
-    public X509CertificateBuilder withSubjectInformationAccess(X509CertificateInformationAccessDescriptor... descriptors) {
+    public X509ResourceCertificateBuilder withSubjectInformationAccess(X509CertificateInformationAccessDescriptor... descriptors) {
         subjectInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(descriptors);
         return this;
     }
 
-    public X509CertificateBuilder withPolicies(PolicyInformation... policies) {
+    public X509ResourceCertificateBuilder withPolicies(PolicyInformation... policies) {
         this.policies = policies;
         return this;
-    }
-
-    public X509PlainCertificate buildPlainCertificate() {
-    	Validate.isTrue(resources == null || resources.isEmpty(), "resources not supported on non-RFC3779 certificate");
-    	return new X509PlainCertificate(generateCertificate());
     }
 
     public X509ResourceCertificate buildResourceCertificate() {
@@ -163,17 +158,17 @@ public class X509CertificateBuilder {
         try {
             return certificateGenerator.generate(signingKeyPair.getPrivate(), signatureProvider);
         } catch (CertificateEncodingException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         } catch (InvalidKeyException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         } catch (IllegalStateException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         } catch (NoSuchAlgorithmException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         } catch (SignatureException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         } catch (NoSuchProviderException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         }
     }
 
@@ -240,7 +235,7 @@ public class X509CertificateBuilder {
         try {
             generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(publicKey));
         } catch (CertificateParsingException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         }
     }
 
@@ -248,7 +243,7 @@ public class X509CertificateBuilder {
         try {
             generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(signingKeyPair.getPublic()));
         } catch (InvalidKeyException e) {
-            throw new X509CertificateBuilderException(e);
+            throw new X509ResourceCertificateBuilderException(e);
         }
     }
 

@@ -3,7 +3,7 @@ package net.ripe.commons.certification.cms.roa;
 import static net.ripe.commons.certification.Asn1UtilTest.*;
 import static net.ripe.commons.certification.cms.roa.RoaCmsParserTest.*;
 import static net.ripe.commons.certification.cms.roa.RoaCmsTest.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;

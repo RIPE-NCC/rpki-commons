@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.ripe.commons.certification.Asn1Util;
-import net.ripe.commons.certification.cms.CmsObjectBuilder;
+import net.ripe.commons.certification.cms.RpkiSignedObjectBuilder;
 import net.ripe.commons.certification.rfc3779.AddressFamily;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.Asn;
@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.DERSequence;
  *
  * @see <a href="http://tools.ietf.org/html/draft-ietf-sidr-roa-format-03">ROA format</a>
  */
-public class RoaCmsBuilder extends CmsObjectBuilder {
+public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
 
     private X509ResourceCertificate certificate;
     private Asn asn;

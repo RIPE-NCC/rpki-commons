@@ -1,7 +1,6 @@
 package net.ripe.certification.client.xml.converters;
 
 import static org.junit.Assert.*;
-import net.ripe.commons.certification.x509cert.X509PlainCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
 
@@ -30,7 +29,7 @@ public class X509ResourceCertificateConverterTest {
 
     @Test
     public void shouldSerializeResourceCertificate() {
-        X509PlainCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
+        X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
         String xml = xStream.toXML(certificate);
         assertEquals(certificate, xStream.fromXML(xml));
         // Ensure the xml doesn't reference the java certificate interface

@@ -17,12 +17,10 @@ import java.util.Collections;
 import java.util.List;
 
 import net.ripe.commons.certification.Asn1Util;
-import net.ripe.commons.certification.cms.CmsObjectInfo;
-import net.ripe.commons.certification.cms.CmsObjectParser;
+import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
+import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
 import net.ripe.commons.certification.rfc3779.AddressFamily;
 import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
@@ -32,7 +30,7 @@ import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERSequence;
 
-public class RoaCmsParser extends CmsObjectParser {
+public class RoaCmsParser extends RpkiSignedObjectParser {
 
 	private Asn asn;
 
@@ -58,7 +56,7 @@ public class RoaCmsParser extends CmsObjectParser {
 			throw new IllegalArgumentException("Roa validation failed");
 		}
 
-		CmsObjectInfo cmsObjectInfo = new CmsObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
+		RpkiSignedObjectInfo cmsObjectInfo = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
         return new RoaCms(cmsObjectInfo, asn, prefixes);
 	}
 
@@ -161,9 +159,5 @@ public class RoaCmsParser extends CmsObjectParser {
 	public void decodeContent(DEREncodable encoded) {
 		parseRouteOriginAttestation(encoded);
 	}
-
-	@Override
-	protected X509CertificateParser<X509ResourceCertificate> getCertificateParser() {
-		return X509CertificateParser.forResourceCertificate();
-	}
 }
+

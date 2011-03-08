@@ -5,7 +5,7 @@ import java.security.PrivateKey;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.ripe.commons.certification.cms.CmsObjectBuilder;
+import net.ripe.commons.certification.cms.RpkiSignedObjectBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -18,7 +18,7 @@ import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.joda.time.DateTime;
 
-public class ManifestCmsBuilder extends CmsObjectBuilder {
+public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
 
     private X509ResourceCertificate certificate;
     private BigInteger number;

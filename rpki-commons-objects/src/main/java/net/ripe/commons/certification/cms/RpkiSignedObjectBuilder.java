@@ -30,24 +30,24 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTimeUtils;
 
-public abstract class CmsObjectBuilder {
+public abstract class RpkiSignedObjectBuilder {
 
     protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, String contentTypeOid, ASN1Encodable encodableContent) {
         byte[] result;
         try {
             result = doGenerate(signingCertificate, privateKey, signatureProvider, contentTypeOid, encodableContent);
         } catch (NoSuchAlgorithmException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new RpkiSignedObjectBuilderException(e);
         } catch (NoSuchProviderException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new RpkiSignedObjectBuilderException(e);
         } catch (CMSException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new RpkiSignedObjectBuilderException(e);
         } catch (IOException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new RpkiSignedObjectBuilderException(e);
         } catch (InvalidAlgorithmParameterException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new RpkiSignedObjectBuilderException(e);
         } catch (CertStoreException e) {
-            throw new CmsObjectBuilderException(e);
+            throw new RpkiSignedObjectBuilderException(e);
         }
         return result;
     }
@@ -60,7 +60,7 @@ public abstract class CmsObjectBuilder {
         CertStore certStore = CertStore.getInstance("Collection", certStoreParameters);
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         AttributeTable signedAttributeTable = createSignedAttributes();
-        generator.addSigner(privateKey, subjectKeyIdentifier, CmsObject.DIGEST_ALGORITHM_OID, signedAttributeTable, null);
+        generator.addSigner(privateKey, subjectKeyIdentifier, RpkiSignedObject.DIGEST_ALGORITHM_OID, signedAttributeTable, null);
         generator.addCertificatesAndCRLs(certStore);
 
         byte[] content = Asn1Util.encode(encodableContent);
