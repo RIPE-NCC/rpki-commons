@@ -16,7 +16,7 @@ public class ProvisioningCmsObject {
         this.certificate = certificate;
     }
 
-    public byte[] getEncodedContent() {
+    public byte[] getEncoded() {
         return encodedContent;
     }
 
@@ -42,6 +42,6 @@ public class ProvisioningCmsObject {
             return false;
         }
         final ProvisioningCmsObject other = (ProvisioningCmsObject) obj;
-        return Arrays.equals(encodedContent, other.getEncodedContent());
+        return Arrays.equals(encodedContent, other.getEncoded());
     }
 }

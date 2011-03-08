@@ -12,10 +12,11 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
+
+import net.ripe.commons.provisioning.x509.X509CertificateUtil;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -26,13 +27,10 @@ import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.joda.time.DateTimeUtils;
 
 public abstract class ProvisioningCmsObjectBuilder {
@@ -94,7 +92,7 @@ public abstract class ProvisioningCmsObjectBuilder {
     private byte[] doGenerate(PrivateKey privateKey, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         addCertificateAndCrl(generator);
-        generator.addSigner(privateKey, getSubjectKeyIdentifier(certificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
+        generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(certificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
 
         byte[] content = encode(encodableContent);
         CMSSignedData data = generator.generate(CONTENT_TYPE, new CMSProcessableByteArray(content), true, signatureProvider);
@@ -125,16 +123,6 @@ public abstract class ProvisioningCmsObjectBuilder {
             derOutputStream.writeObject(value);
             derOutputStream.close();
             return byteArrayOutputStream.toByteArray();
-        } catch (IOException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        }
-    }
-
-    private byte[] getSubjectKeyIdentifier(X509Extension certificate) {
-        try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.SubjectKeyIdentifier.getId());
-            Validate.notNull(extensionValue, "certificate must contain SubjectKeyIdentifier extension");
-            return SubjectKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
         }
