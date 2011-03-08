@@ -104,7 +104,7 @@ public abstract class ProvisioningCmsObjectBuilder {
         return new AttributeTable(attributes);
     }
 
-    abstract protected ASN1Encodable getMessageContent();
+    protected abstract ASN1Encodable getMessageContent();
 
     private byte[] encode(ASN1Encodable value) {
         try {

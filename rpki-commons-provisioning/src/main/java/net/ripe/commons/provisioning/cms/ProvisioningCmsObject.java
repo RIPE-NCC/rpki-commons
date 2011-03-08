@@ -10,8 +10,7 @@ public class ProvisioningCmsObject {
     private X509Certificate certificate;
 
 
-    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate certificate) {
-        super();
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate certificate) { //NOPMD - ArrayIsStoredDirectly
         this.encodedContent = encodedContent;
         this.certificate = certificate;
     }
