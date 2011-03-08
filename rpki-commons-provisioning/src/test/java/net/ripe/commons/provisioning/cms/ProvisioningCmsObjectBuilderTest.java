@@ -16,8 +16,8 @@ import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
-import net.ripe.commons.provisioning.x509.X509CertificateUtil;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;

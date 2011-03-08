@@ -13,7 +13,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.ripe.commons.provisioning.x509.X509CertificateUtil;
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1InputStream;
