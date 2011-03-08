@@ -3,6 +3,7 @@ package net.ripe.commons.provisioning.cms;
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateTest.*;
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -19,6 +20,8 @@ import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -26,6 +29,9 @@ import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cms.CMSException;
@@ -104,7 +110,14 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveCorrectDigestAlgorithm() throws Exception {
-        // TODO:
+        ASN1InputStream in = new ASN1InputStream(new ByteArrayInputStream(cmsObject.getEncoded()));
+        ContentInfo info = ContentInfo.getInstance(in.readObject());
+        SignedData signedData = SignedData.getInstance(info.getContent());
+        ASN1Set digestAlgorithms = signedData.getDigestAlgorithms();
+        DEREncodable derObject = digestAlgorithms.getObjectAt(0);
+        AlgorithmIdentifier algorithmId = AlgorithmIdentifier.getInstance(derObject.getDERObject());
+
+        assertEquals(CMSSignedGenerator.DIGEST_SHA256, algorithmId.getObjectId().getId());
     }
 
     /**

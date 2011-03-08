@@ -1,5 +1,6 @@
 package net.ripe.commons.provisioning.cms;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
@@ -17,12 +18,16 @@ import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cms.CMSException;
@@ -54,6 +59,7 @@ public abstract class ProvisioningCmsObjectParser {
         }
 
         verifyVersionNumber();
+        verifyDigestAlgorithm(encoded);
         verifyContentType();
         parseContent();
 
@@ -66,6 +72,28 @@ public abstract class ProvisioningCmsObjectParser {
      */
     private void verifyVersionNumber() {
         Validate.isTrue(sp.getVersion() == 3, "invalid cms object version number");
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.2
+     */
+    private void verifyDigestAlgorithm(byte[] data) {
+        Validate.isTrue(CMSSignedGenerator.DIGEST_SHA256.equals(getDigestAlgorithmOidFromEncodedCmsObject(data).getObjectId().getId()), "invalis cms object digest algorithm");
+    }
+
+    private AlgorithmIdentifier getDigestAlgorithmOidFromEncodedCmsObject(byte[] data) {
+        ASN1InputStream in = new ASN1InputStream(new ByteArrayInputStream(data));
+        ContentInfo info = null;
+        try {
+            info = ContentInfo.getInstance(in.readObject());
+        } catch (IOException e) {
+            throw new ProvisioningCmsObjectParserException("error while reading cms object content info", e);
+        }
+        SignedData signedData = SignedData.getInstance(info.getContent());
+        ASN1Set digestAlgorithms = signedData.getDigestAlgorithms();
+        DEREncodable derObject = digestAlgorithms.getObjectAt(0);
+        AlgorithmIdentifier algorithmId = AlgorithmIdentifier.getInstance(derObject.getDERObject());
+        return algorithmId;
     }
 
     /**
