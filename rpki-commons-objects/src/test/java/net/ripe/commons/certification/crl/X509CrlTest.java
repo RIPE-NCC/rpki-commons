@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.crl;
 
 import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.commons.certification.x509cert.X509ResourceCertificateTest.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;

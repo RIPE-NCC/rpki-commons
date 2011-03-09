@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.validation;
 
 import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -53,7 +53,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	@Before
 	public void setUp() {
         root = getRootResourceCertificate();
-        child = createChildCertificateBuilder().buildResourceCertificate();
+        child = createChildCertificateBuilder().build();
         rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
         result = new ValidationResult();
 	}
@@ -74,7 +74,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
 	@Test
 	public void shouldRejectInvalidSignature() {
-		child = createChildCertificateBuilder().withSigningKeyPair(SECOND_CHILD_KEY_PAIR).buildResourceCertificate();
+		child = createChildCertificateBuilder().withSigningKeyPair(SECOND_CHILD_KEY_PAIR).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
@@ -116,7 +116,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
 	@Test
 	public void shouldRejectCertificateWithWrongValidity() {
-		child = createChildCertificateBuilder().withValidityPeriod(EXPIRED_VALIDITY_PERIOD).buildResourceCertificate();
+		child = createChildCertificateBuilder().withValidityPeriod(EXPIRED_VALIDITY_PERIOD).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
@@ -128,7 +128,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
 	@Test
 	public void shouldRejectInvalidIssuer() {
-		child = createChildCertificateBuilder().withIssuerDN(SECOND_CHILD_CERTIFICATE_NAME).buildResourceCertificate();
+		child = createChildCertificateBuilder().withIssuerDN(SECOND_CHILD_CERTIFICATE_NAME).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
@@ -140,7 +140,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
 	@Test
 	public void shouldRejectInvalidKeyUsage() {
-		child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature).buildResourceCertificate();
+		child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
@@ -151,7 +151,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
     @Test
     public void shouldRejectOnMisingKeyUsage() {
-		child = createChildCertificateBuilder().withKeyUsage(0).buildResourceCertificate();
+		child = createChildCertificateBuilder().withKeyUsage(0).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
@@ -162,7 +162,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
     @Test
     public void shouldRejectMissingAuthorityKeyIdentifier() {
-    	child = createChildCertificateBuilder().withAuthorityKeyIdentifier(false).buildResourceCertificate();
+    	child = createChildCertificateBuilder().withAuthorityKeyIdentifier(false).build();
 
     	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
     	validate(validator, child);
@@ -173,7 +173,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
     @Test
     public void shouldRejectInvalidResorceSet() {
-		child = createChildCertificateBuilder().withResources(INVALID_CHILD_RESOURCE_SET).buildResourceCertificate();
+		child = createChildCertificateBuilder().withResources(INVALID_CHILD_RESOURCE_SET).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
@@ -194,11 +194,11 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
 
     private X509ResourceCertificate getRootResourceCertificate() {
-        return createRootCertificateBuilder().buildResourceCertificate();
+        return createRootCertificateBuilder().build();
     }
 
     private X509ResourceCertificate getRootResourceCertificateWithInheritedResources() {
-    	return createRootCertificateBuilder().withResources(InheritedIpResourceSet.getInstance()).buildResourceCertificate();
+    	return createRootCertificateBuilder().withResources(InheritedIpResourceSet.getInstance()).build();
     }
 
     private X509ResourceCertificateBuilder createRootCertificateBuilder() {

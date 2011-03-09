@@ -77,7 +77,7 @@ public class X509ResourceCertificateTest {
 
     public static X509ResourceCertificate createSelfSignedCaResourceCertificate(IpResourceSet ipResourceSet) {
             X509ResourceCertificateBuilder builder = createSelfSignedCaResourceCertificateBuilder().withResources(ipResourceSet);
-            return builder.buildResourceCertificate();
+            return builder.build();
     }
 
     public static X509ResourceCertificateBuilder createSelfSignedCaResourceCertificateBuilder() {
@@ -116,7 +116,7 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldSupportResourceInheritance() {
-        X509ResourceCertificate inherited = createSelfSignedCaResourceCertificateBuilder().withResources(InheritedIpResourceSet.getInstance()).buildResourceCertificate();
+        X509ResourceCertificate inherited = createSelfSignedCaResourceCertificateBuilder().withResources(InheritedIpResourceSet.getInstance()).build();
         assertTrue(inherited.isResourceSetInherited());
         assertTrue(inherited.getResources() instanceof InheritedIpResourceSet);
         assertFalse(createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET).isResourceSetInherited());
@@ -124,11 +124,11 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldSupportCaCertificate() {
-        X509ResourceCertificate resourceCertificate = createSelfSignedEeCertificateBuilder().buildResourceCertificate();
+        X509ResourceCertificate resourceCertificate = createSelfSignedEeCertificateBuilder().build();
         assertTrue(resourceCertificate.isEe());
         assertFalse(resourceCertificate.isCa());
 
-        X509ResourceCertificate cert = createSelfSignedCaResourceCertificateBuilder().buildResourceCertificate();
+        X509ResourceCertificate cert = createSelfSignedCaResourceCertificateBuilder().build();
         assertTrue(cert.isCa());
         assertFalse(cert.isEe());
     }
@@ -141,7 +141,7 @@ public class X509ResourceCertificateTest {
         };
         X509ResourceCertificateBuilder builder = createSelfSignedEeCertificateBuilder();
         builder.withAuthorityInformationAccess(descriptors);
-        X509ResourceCertificate cert = builder.buildResourceCertificate();
+        X509ResourceCertificate cert = builder.build();
         assertArrayEquals(descriptors, cert.getAuthorityInformationAccess());
 
         assertEquals(descriptors[0].getLocation(), cert.findFirstAuthorityInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS));
@@ -157,7 +157,7 @@ public class X509ResourceCertificateTest {
         };
         X509ResourceCertificateBuilder builder = createSelfSignedEeCertificateBuilder();
         builder.withSubjectInformationAccess(descriptors);
-        X509ResourceCertificate cert = builder.buildResourceCertificate();
+        X509ResourceCertificate cert = builder.build();
         assertArrayEquals(descriptors, cert.getSubjectInformationAccess());
         assertNotNull(cert.findFirstSubjectInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY));
     }
@@ -169,7 +169,7 @@ public class X509ResourceCertificateTest {
         };
         X509ResourceCertificateBuilder builder = createSelfSignedEeCertificateBuilder();
         builder.withCrlDistributionPoints(crlDistributionPoints);
-        X509ResourceCertificate cert = builder.buildResourceCertificate();
+        X509ResourceCertificate cert = builder.build();
         assertArrayEquals(crlDistributionPoints, cert.getCrlDistributionPoints());
         assertNotNull(cert.findFirstRsyncCrlDistributionPoint());
     }
@@ -215,7 +215,7 @@ public class X509ResourceCertificateTest {
             .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
             .withSubjectDN(new X500Principal("CN=child"))
             .withCrlDistributionPoints(CRL_DP)
-            .buildResourceCertificate();
+            .build();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, rootCertificate);
 
         expect(crlLocator.getCrl(CRL_DP, context, result)).andAnswer(new IAnswer<X509Crl>() {
@@ -245,7 +245,7 @@ public class X509ResourceCertificateTest {
             .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
             .withSubjectDN(new X500Principal("CN=child"))
             .withCrlDistributionPoints(CRL_DP)
-            .buildResourceCertificate();
+            .build();
         X509Crl crl = X509CrlTest.createCrl();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, rootCertificate);
 

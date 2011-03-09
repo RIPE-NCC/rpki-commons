@@ -6,7 +6,7 @@ import static net.ripe.commons.certification.util.KeyStoreUtil.clearKeyStore;
 import static net.ripe.commons.certification.util.KeyStoreUtil.createKeyStoreForKeyPair;
 import static net.ripe.commons.certification.util.KeyStoreUtil.getKeyPairFromKeyStore;
 import static net.ripe.commons.certification.util.KeyStoreUtil.storeKeyStore;
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

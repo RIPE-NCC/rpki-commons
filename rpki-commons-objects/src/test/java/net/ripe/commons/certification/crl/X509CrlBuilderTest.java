@@ -1,6 +1,6 @@
 package net.ripe.commons.certification.crl;
 
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;

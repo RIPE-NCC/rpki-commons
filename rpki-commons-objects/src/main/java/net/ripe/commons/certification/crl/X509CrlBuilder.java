@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.crl.X509Crl.Entry;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.CRLNumber;
@@ -128,7 +128,7 @@ public class X509CrlBuilder {
         generator.setIssuerDN(issuerDN);
         generator.setThisUpdate(thisUpdateTime.toDate());
         generator.setNextUpdate(nextUpdateTime.toDate());
-        generator.setSignatureAlgorithm(X509ResourceCertificateBuilder.DEFAULT_SIGNATURE_ALGORITHM);
+        generator.setSignatureAlgorithm(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM);
         generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, authorityKeyIdentifier);
         generator.addExtension(X509Extensions.CRLNumber, false, crlNumber);
         for (X509Crl.Entry entry : entries.values()) {

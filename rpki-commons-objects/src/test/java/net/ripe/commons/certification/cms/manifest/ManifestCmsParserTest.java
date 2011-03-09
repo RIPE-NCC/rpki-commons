@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.cms.manifest;
 
 import static net.ripe.commons.certification.Asn1Util.*;
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -90,7 +90,7 @@ public class ManifestCmsParserTest {
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         builder.withResources(InheritedIpResourceSet.getInstance());
         builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
-        return builder.buildResourceCertificate();
+        return builder.build();
     }
 
 	static X509ResourceCertificate createTenSlashEightResourceCertificate() {
@@ -100,7 +100,7 @@ public class ManifestCmsParserTest {
 	    builder.withSigningKeyPair(TEST_KEY_PAIR);
 	    builder.withResources(IpResourceSet.parse("10.0.0.0/8"));
 	    builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
-	    return builder.buildResourceCertificate();
+	    return builder.build();
 	}
 
 	@Before

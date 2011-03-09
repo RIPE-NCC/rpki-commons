@@ -124,6 +124,6 @@ public final class KeyStoreUtil {
         builder.withResources(IpResourceSet.parse("AS1-AS10,10/8,ffc0::/16"));
         builder.withSigningKeyPair(keyPair);
         builder.withPublicKey(keyPair.getPublic());
-        return builder.buildResourceCertificate();
+        return builder.build();
     }
 }

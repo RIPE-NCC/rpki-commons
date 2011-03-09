@@ -41,7 +41,7 @@ public class X509ResourceCertificateParserTest {
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
         X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withPolicies(new PolicyInformation(new DERObjectIdentifier("1.2.3.4")));
-        X509ResourceCertificate certificate = builder.buildResourceCertificate();
+        X509ResourceCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());
         subject.getCertificate();
@@ -50,7 +50,7 @@ public class X509ResourceCertificateParserTest {
     @Test
     public void shouldParseResourceCertificateWhenResourceExtensionsArePresent() {
         X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-        X509ResourceCertificate certificate = builder.buildResourceCertificate();
+        X509ResourceCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());
         X509ResourceCertificate parsed = subject.getCertificate();
@@ -69,7 +69,7 @@ public class X509ResourceCertificateParserTest {
 
     @Test
     public void shouldFailOnInvalidSignatureAlgorithm() {
-        X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withSignatureAlgorithm("MD5withRSA").buildResourceCertificate();
+        X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withSignatureAlgorithm("MD5withRSA").build();
 
         subject.parse("certificate", certificate.getEncoded());
 

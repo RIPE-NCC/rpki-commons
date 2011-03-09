@@ -1,72 +1,81 @@
 package net.ripe.commons.provisioning.x509;
 
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
+import java.net.URI;
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateParsingException;
-import java.security.cert.X509Certificate;
-import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
+import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
+import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
+
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
-import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.joda.time.DateTime;
 
 
 public class ProvisioningIdentityCertificateBuilder {
 
-    private static final String SOFTWARE_SIGNATURE_ALGORITHM = "SHA256withRSA";
-    private static final String SOFTWARE_SIGNATURE_PROVIDER = "SunRsaSign";
-    private static final int VALIDITY_TIME_IN_YEARS = 10;
+    private static final int DEFAULT_VALIDITY_TIME_YEARS_FROM_NOW = 10;
 
-    public ProvisioningIdentityCertificate build(KeyPair selfSigningKeyPair, X500Principal selfSigningDN) {
+    private X509CertificateBuilderHelper builderHelper;
+
+    private KeyPair selfSigningKeyPair;
+
+    private X500Principal selfSigningSubject;
+
+    private URI crlRsyncUri;
+
+    private URI repositoryRsyncUri;
+
+    public ProvisioningIdentityCertificateBuilder() {
+        builderHelper = new X509CertificateBuilderHelper();
+    }
+
+    public ProvisioningIdentityCertificateBuilder withSelfSigningKeyPair(KeyPair selfSigningKeyPair) {
+        this.selfSigningKeyPair = selfSigningKeyPair;
+        builderHelper.withPublicKey(selfSigningKeyPair.getPublic());
+        builderHelper.withSigningKeyPair(selfSigningKeyPair);
+        return this;
+    }
+
+    public ProvisioningIdentityCertificateBuilder withSelfSigningSubject(X500Principal selfSigningSubject) {
+        this.selfSigningSubject = selfSigningSubject;
+        builderHelper.withSubjectDN(selfSigningSubject);
+        builderHelper.withIssuerDN(selfSigningSubject);
+        return this;
+    }
+
+    public ProvisioningIdentityCertificateBuilder withCrlRsyncUri(URI crlRsyncUri) {
+        this.crlRsyncUri = crlRsyncUri;
+        builderHelper.withCrlDistributionPoints(crlRsyncUri);
+        return this;
+    }
+
+    public ProvisioningIdentityCertificateBuilder withRepositoryRsyncUri(URI repositoryRsyncUri) {
+        this.repositoryRsyncUri = repositoryRsyncUri;
+        DERObjectIdentifier caCertRepoIdentifier = X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
+        X509CertificateInformationAccessDescriptor descriptor = new X509CertificateInformationAccessDescriptor(caCertRepoIdentifier, repositoryRsyncUri);
+        builderHelper.withSubjectInformationAccess(descriptor);
+        return this;
+    }
+
+    @SuppressWarnings("deprecation")
+    public ProvisioningIdentityCertificate build() {
         Validate.notNull(selfSigningKeyPair, "Self Signing KeyPair is required");
-        Validate.notNull(selfSigningDN, "Self Signing DN is required");
-        return new ProvisioningIdentityCertificate(generateSelfSignedCertificate(selfSigningKeyPair, selfSigningDN));
+        Validate.notNull(selfSigningSubject, "Self Signing DN is required");
+        Validate.notNull(crlRsyncUri, "CRL URI is required");
+        Validate.notNull(repositoryRsyncUri, "SIA ca repository is required");
+        setUpImplicitRequirementsForBuilderHelper();
+        return new ProvisioningIdentityCertificate(builderHelper.generateCertificate());
     }
 
-    private X509Certificate generateSelfSignedCertificate(KeyPair selfSigningKeyPair, X500Principal selfSigningDN) {
-        try {
-            X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
-            generator.setNotBefore(new Date(new DateTime().getMillis()));
-            generator.setNotAfter(new Date(new DateTime().plusYears(VALIDITY_TIME_IN_YEARS).getMillis()));
-            generator.setIssuerDN(selfSigningDN);
-            generator.setSerialNumber(BigInteger.ONE);
-            generator.setPublicKey(selfSigningKeyPair.getPublic());
-            generator.setSignatureAlgorithm(SOFTWARE_SIGNATURE_ALGORITHM);
-            generator.setSubjectDN(selfSigningDN);
-
-            generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(selfSigningKeyPair.getPublic()));
-            generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(selfSigningKeyPair.getPublic()));
-            generator.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
-            // generator.addExtension(X509Extensions.CertificatePolicies, true, new DERSequence(new
-            // DERObjectIdentifier("1.3.6.1.5.5.7.14.2")));
-            // TODO: check and add other extensions
-            return generator.generate(selfSigningKeyPair.getPrivate(), SOFTWARE_SIGNATURE_PROVIDER);
-        } catch (CertificateEncodingException e) {
-            throw new ProvisioningIdentityCertificateBuilderException(e);
-        } catch (InvalidKeyException e) {
-            throw new ProvisioningIdentityCertificateBuilderException(e);
-        } catch (IllegalStateException e) {
-            throw new ProvisioningIdentityCertificateBuilderException(e);
-        } catch (NoSuchProviderException e) {
-            throw new ProvisioningIdentityCertificateBuilderException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new ProvisioningIdentityCertificateBuilderException(e);
-        } catch (SignatureException e) {
-            throw new ProvisioningIdentityCertificateBuilderException(e);
-        } catch (CertificateParsingException e) {
-            throw new ProvisioningIdentityCertificateBuilderException(e);
-        }
+    private void setUpImplicitRequirementsForBuilderHelper() {
+        builderHelper.withSerial(BigInteger.ONE); // Self-signed! So this is the first!
+        builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusYears(DEFAULT_VALIDITY_TIME_YEARS_FROM_NOW)));
     }
+
+
 
 }

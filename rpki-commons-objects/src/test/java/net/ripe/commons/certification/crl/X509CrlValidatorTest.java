@@ -2,7 +2,7 @@ package net.ripe.commons.certification.crl;
 
 import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
 import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -98,7 +98,7 @@ public class X509CrlValidatorTest {
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
-        return builder.buildResourceCertificate();
+        return builder.build();
     }
 
     private X509CrlBuilder getRootCRL() {

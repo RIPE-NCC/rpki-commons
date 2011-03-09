@@ -1,7 +1,10 @@
 package net.ripe.commons.provisioning.cms;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateTest.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -17,6 +20,7 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -81,14 +85,14 @@ public class ProvisioningCmsObjectBuilderTest {
     public void shouldForceCertificate() throws CMSException {
         subject = new MyProvisioningCmsObjectBuilder();
         subject.withSignatureProvider("SunRsaSign");
-        subject.build(TEST_KEY_PAIR.getPrivate());
+        subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceSignatureProvider() throws CMSException {
         subject = new MyProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
-        subject.build(TEST_KEY_PAIR.getPrivate());
+        subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
     }
 
     @Test
@@ -384,12 +388,12 @@ public class ProvisioningCmsObjectBuilderTest {
             generator.setSubjectDN(new X500Principal("CN=nl.bluelight.ee"));
 
             generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(EE_KEYPAIR.getPublic()));
-            generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(TEST_KEY_PAIR.getPublic()));
+            generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPublic()));
             generator.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
             //        generator.addExtension(X509Extensions.CertificatePolicies, true, new DERSequence(new DERObjectIdentifier("1.3.6.1.5.5.7.14.2")));
             //TODO: check and add other extensions
 
-            return generator.generate(TEST_KEY_PAIR.getPrivate(), "SunRsaSign");
+            return generator.generate(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate(), "SunRsaSign");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

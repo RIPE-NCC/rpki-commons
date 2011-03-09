@@ -64,68 +64,68 @@ public class X509ResourceCertificateBuilderTest {
 
         subject.withPublicKey(publicKey);
         
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireResourcesForResourceCertificates() {
         subject.withResources(null);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireNonEmptyResourceSetForResourceCertificates() {
         subject.withResources(IpResourceSet.parse(""));
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireIssuer() {
         subject.withIssuerDN(null);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireSubject() {
         subject.withSubjectDN(null);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireSerial() {
         subject.withSerial(null);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequirePublicKey() {
         subject.withPublicKey(null);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireSigningKeyPair() {
         subject.withSigningKeyPair(null);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireValidityPeriod() {
         subject.withValidityPeriod(null);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldNotAllowKeyCertSignForNonCAs() {
         subject.withCa(false);
         subject.withKeyUsage(KeyUsage.keyCertSign);
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test
     public void shouldSetBasicConstraintsForCAs() {
         subject.withCa(true);
-        X509ResourceCertificate certificate = subject.buildResourceCertificate();
+        X509ResourceCertificate certificate = subject.build();
 
         assertEquals(Integer.MAX_VALUE, certificate.getCertificate().getBasicConstraints());
     }
@@ -133,7 +133,7 @@ public class X509ResourceCertificateBuilderTest {
     @Test
     public void shouldNotSetBasicConstraintsForNonCAs() {
         subject.withCa(false);
-        X509ResourceCertificate certificate = subject.buildResourceCertificate();
+        X509ResourceCertificate certificate = subject.build();
 
         assertEquals(-1, certificate.getCertificate().getBasicConstraints());
     }
@@ -142,7 +142,7 @@ public class X509ResourceCertificateBuilderTest {
     public void shouldHaveSubjectKeyIdentifierForResourceCertificates() {
         subject.withResources(IpResourceSet.parse("10/8"));
         subject.withSubjectKeyIdentifier(true);
-        X509ResourceCertificate certificate = subject.buildResourceCertificate();
+        X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getSubjectKeyIdentifier());
     }
@@ -151,7 +151,7 @@ public class X509ResourceCertificateBuilderTest {
     public void shouldHaveAuthorityKeyIdentifierForResourceCertificates() {
         subject.withResources(IpResourceSet.parse("10/8"));
         subject.withAuthorityKeyIdentifier(true);
-        X509ResourceCertificate certificate = subject.buildResourceCertificate();
+        X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getAuthorityKeyIdentifier());
     }
@@ -159,7 +159,7 @@ public class X509ResourceCertificateBuilderTest {
     @Test
     public void shouldHaveResourceExtensionForResourceCertificates() {
         subject.withResources(IpResourceSet.parse("10/8, AS123"));
-        X509ResourceCertificate certificate = subject.buildResourceCertificate();
+        X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS));
         assertNotNull(certificate.getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS));
@@ -170,7 +170,7 @@ public class X509ResourceCertificateBuilderTest {
         subject.withCa(true);
         subject.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         subject.withResources(IpResourceSet.parse("10/8"));
-        X509ResourceCertificate certificate = subject.buildResourceCertificate();
+        X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getCertificate().getKeyUsage());
     }
@@ -179,7 +179,7 @@ public class X509ResourceCertificateBuilderTest {
     public void shouldHaveCrlDistributionPoints() {
         URI crlURI = URI.create("rsync://foo/bar.crl");
         subject.withCrlDistributionPoints(crlURI);
-        X509ResourceCertificate certificate = subject.buildResourceCertificate();
+        X509ResourceCertificate certificate = subject.build();
 
         assertEquals(crlURI, certificate.getCrlDistributionPoints()[0]);
     }
@@ -187,13 +187,13 @@ public class X509ResourceCertificateBuilderTest {
     @Test(expected=X509ResourceCertificateBuilderException.class)
     public void shouldFailOnIncorrectProvider() {
         subject.withSignatureProvider("foo");
-        subject.buildResourceCertificate();
+        subject.build();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldFailOnIncorrectAlgorithm() {
         subject.withSignatureAlgorithm("foo");
-        subject.buildResourceCertificate();
+        subject.build();
     }
 }
 

@@ -1,6 +1,6 @@
 package net.ripe.commons.certification.x509cert;
 
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 import java.io.IOException;
 import java.math.BigInteger;

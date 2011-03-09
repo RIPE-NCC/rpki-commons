@@ -1,6 +1,6 @@
 package net.ripe.commons.certification.cms.roa;
 
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -69,7 +69,7 @@ public class RoaCmsObjectMother {
         }
         X509ResourceCertificateBuilder builder = createCertificateBuilder(resources, validityPeriod);
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        X509ResourceCertificate result = builder.buildResourceCertificate();
+        X509ResourceCertificate result = builder.build();
         return result;
     }
 

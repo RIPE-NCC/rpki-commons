@@ -1,6 +1,6 @@
 package net.ripe.commons.certification.cms.manifest;
 
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -160,7 +160,7 @@ public class ManifestCmsTest{
         };
         builder.withSubjectInformationAccess(descriptors);
         builder.withCrlDistributionPoints(ROOT_MANIFEST_CRL_LOCATION);
-		return builder.buildResourceCertificate();
+		return builder.build();
 	}
 
     private X509CrlBuilder getRootCrlBuilder() {
@@ -176,7 +176,7 @@ public class ManifestCmsTest{
 
 	private static ManifestCmsBuilder getRootManifestBuilder() {
 		ManifestCmsBuilder builder = new ManifestCmsBuilder();
-		builder.withCertificate(getManifestEEResourceCertificateBuilder().buildResourceCertificate());
+		builder.withCertificate(getManifestEEResourceCertificateBuilder().build());
 		builder.withManifestNumber(BigInteger.valueOf(68));
 		builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
 		builder.putFile("foo1", FOO_HASH);

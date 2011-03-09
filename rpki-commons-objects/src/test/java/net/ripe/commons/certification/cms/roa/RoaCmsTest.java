@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.cms.roa;
 
 import static net.ripe.commons.certification.cms.roa.RoaCmsParserTest.*;
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -71,7 +71,7 @@ public class RoaCmsTest {
             resources.add(prefix.getPrefix());
         }
         X509ResourceCertificateBuilder builder = createCertificateBuilder(resources);
-        X509ResourceCertificate result = builder.buildResourceCertificate();
+        X509ResourceCertificate result = builder.build();
         return result;
     }
 
@@ -99,13 +99,13 @@ public class RoaCmsTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRejectCaCertificateInRoa() {
-        X509ResourceCertificate caCert = createCertificateBuilder(new IpResourceSet(TEST_IPV4_PREFIX_1.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV6_PREFIX.getPrefix())).withCa(true).buildResourceCertificate();
+        X509ResourceCertificate caCert = createCertificateBuilder(new IpResourceSet(TEST_IPV4_PREFIX_1.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV6_PREFIX.getPrefix())).withCa(true).build();
         subject = new RoaCmsBuilder().withAsn(TEST_ASN).withPrefixes(allPrefixes).withCertificate(caCert).build(TEST_KEY_PAIR.getPrivate());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireSubjectKeyIdentifier() {
-        X509ResourceCertificate cert = createCertificateBuilder(new IpResourceSet(TEST_IPV4_PREFIX_1.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV6_PREFIX.getPrefix())).withSubjectKeyIdentifier(false).buildResourceCertificate();
+        X509ResourceCertificate cert = createCertificateBuilder(new IpResourceSet(TEST_IPV4_PREFIX_1.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV6_PREFIX.getPrefix())).withSubjectKeyIdentifier(false).build();
         subject = new RoaCmsBuilder().withAsn(TEST_ASN).withPrefixes(allPrefixes).withCertificate(cert).build(TEST_KEY_PAIR.getPrivate());
     }
 

@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.validation;
 
 import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
-import static net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -59,7 +59,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 	@Before
 	public void setUp() {
         root = getRootResourceCertificate();
-		child = createChildBuilder().buildResourceCertificate();
+		child = createChildBuilder().build();
 		grandchild = null;
         rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
         childCrl = getChildCRL().build(FIRST_CHILD_KEY_PAIR.getPrivate());
@@ -75,8 +75,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldBeValidChildCertificates() throws CRLException {
-		child = createChildBuilder().buildResourceCertificate();
-		grandchild = createSecondChildBuilder().buildResourceCertificate();
+		child = createChildBuilder().build();
+		grandchild = createSecondChildBuilder().build();
 
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl(), root);
     	validator.validate("grandchild", grandchild);
@@ -85,7 +85,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnInvalidResorceSet() {
-		child = createChildBuilder().withResources(INVALID_CHILD_RESOURCE_SET).buildResourceCertificate();
+		child = createChildBuilder().withResources(INVALID_CHILD_RESOURCE_SET).build();
 
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -96,8 +96,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnInvalidResorceSetAfterInheritance() {
-		child = createChildBuilder().buildResourceCertificate();
-		grandchild = createSecondChildBuilder().withResources(INVALID_CHILD_RESOURCE_SET).buildResourceCertificate();
+		child = createChildBuilder().build();
+		grandchild = createSecondChildBuilder().withResources(INVALID_CHILD_RESOURCE_SET).build();
 
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("grandchild", grandchild);
@@ -108,7 +108,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnInvalidSignature() {
-		child = createChildBuilder().withSigningKeyPair(FIRST_CHILD_KEY_PAIR).buildResourceCertificate();
+		child = createChildBuilder().withSigningKeyPair(FIRST_CHILD_KEY_PAIR).build();
 
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -119,7 +119,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnExpiredValidityPeriod() {
-		child = createChildBuilder().withValidityPeriod(EXPIRED_VALIDITY_PERIOD).buildResourceCertificate();
+		child = createChildBuilder().withValidityPeriod(EXPIRED_VALIDITY_PERIOD).build();
 
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -130,7 +130,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnInvalidIssuer() {
-		child = createChildBuilder().withIssuerDN(SECOND_CHILD_CERTIFICATE_NAME).buildResourceCertificate();
+		child = createChildBuilder().withIssuerDN(SECOND_CHILD_CERTIFICATE_NAME).build();
 
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -141,7 +141,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnMisingKeyUsage() {
-		child = createChildBuilder().withKeyUsage(0).buildResourceCertificate();
+		child = createChildBuilder().withKeyUsage(0).build();
 
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -152,7 +152,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnInvalidKeyUsage() {
-		child = createChildBuilder().withKeyUsage(KeyUsage.digitalSignature).buildResourceCertificate();
+		child = createChildBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
 
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -163,7 +163,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnMissingAKI() {
-		child = createChildBuilder().withAuthorityKeyIdentifier(false).buildResourceCertificate();
+		child = createChildBuilder().withAuthorityKeyIdentifier(false).build();
 
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -174,8 +174,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnCrlCheck() throws CRLException {
-    	child = createChildBuilder().buildResourceCertificate();
-    	grandchild = createSecondChildBuilder().buildResourceCertificate();
+    	child = createChildBuilder().build();
+    	grandchild = createSecondChildBuilder().build();
 
     	rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plusDays(2)).build(ROOT_KEY_PAIR.getPrivate());
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
@@ -189,7 +189,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailWhenCrlInvalid() {
-        child = createChildBuilder().buildResourceCertificate();
+        child = createChildBuilder().build();
         rootCrl = getChildCRL().build(FIRST_CHILD_KEY_PAIR.getPrivate());
 
         X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
@@ -215,7 +215,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
-        return builder.buildResourceCertificate();
+        return builder.build();
     }
 
 	private X509ResourceCertificateBuilder createChildBuilder() {
