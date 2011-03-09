@@ -26,6 +26,7 @@ public class ProvisioningIdentityCertificateBuilder {
 
     private static final String SOFTWARE_SIGNATURE_ALGORITHM = "SHA256withRSA";
     private static final String SOFTWARE_SIGNATURE_PROVIDER = "SunRsaSign";
+    private static final int VALIDITY_TIME_IN_YEARS = 10;
 
     public ProvisioningIdentityCertificate build(KeyPair selfSigningKeyPair, X500Principal selfSigningDN) {
         Validate.notNull(selfSigningKeyPair, "Self Signing KeyPair is required");
@@ -37,7 +38,7 @@ public class ProvisioningIdentityCertificateBuilder {
         try {
             X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
             generator.setNotBefore(new Date(new DateTime().getMillis()));
-            generator.setNotAfter(new Date(new DateTime().plusYears(10).getMillis()));
+            generator.setNotAfter(new Date(new DateTime().plusYears(VALIDITY_TIME_IN_YEARS).getMillis()));
             generator.setIssuerDN(selfSigningDN);
             generator.setSerialNumber(BigInteger.ONE);
             generator.setPublicKey(selfSigningKeyPair.getPublic());

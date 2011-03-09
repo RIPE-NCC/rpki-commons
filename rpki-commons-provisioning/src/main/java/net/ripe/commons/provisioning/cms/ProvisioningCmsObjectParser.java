@@ -38,6 +38,10 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 public abstract class ProvisioningCmsObjectParser {
 
+    private static final int CMS_OBJECT_SIGNER_VERSION = 3;
+
+    private static final int CMS_OBJECT_VERSION = 3;
+
     private static final String SUN_RSA_SIGN = "SunRsaSign";
 
     private byte[] encoded;
@@ -47,7 +51,7 @@ public abstract class ProvisioningCmsObjectParser {
     private CMSSignedDataParser sp;
 
 
-    public ProvisioningCmsObjectParser(byte[] encoded) {
+    public ProvisioningCmsObjectParser(byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
     }
 
@@ -71,7 +75,7 @@ public abstract class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
      */
     private void verifyVersionNumber() {
-        Validate.isTrue(sp.getVersion() == 3, "invalid cms object version number");
+        Validate.isTrue(sp.getVersion() == CMS_OBJECT_VERSION, "invalid cms object version number");
     }
 
     /**
@@ -92,8 +96,7 @@ public abstract class ProvisioningCmsObjectParser {
         SignedData signedData = SignedData.getInstance(info.getContent());
         ASN1Set digestAlgorithms = signedData.getDigestAlgorithms();
         DEREncodable derObject = digestAlgorithms.getObjectAt(0);
-        AlgorithmIdentifier algorithmId = AlgorithmIdentifier.getInstance(derObject.getDERObject());
-        return algorithmId;
+        return AlgorithmIdentifier.getInstance(derObject.getDERObject());
     }
 
     /**
@@ -202,7 +205,7 @@ public abstract class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.1
      */
     private void verifySignerVersion(SignerInformation signer) {
-        Validate.isTrue(signer.getVersion() == 3, "invalid cms object signer version number");
+        Validate.isTrue(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, "invalid cms object signer version number");
     }
 
     /**

@@ -15,11 +15,15 @@ import java.security.spec.RSAKeyGenParameterSpec;
  *
  * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
  */
-public class ProvisioningKeyPairGenerator {
+public final class ProvisioningKeyPairGenerator {
 
     private static final String ALGORITHM = "RSA";
     private static final String SUN_RSA_SIGN = "SunRsaSign";
     private static final int IDENTITY_KEY_SIZE = 2048;
+
+    private ProvisioningKeyPairGenerator() {
+        //Utility classes should not have a public or default constructor.
+    }
 
     public static KeyPair generate() {
         try {
