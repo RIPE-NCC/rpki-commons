@@ -75,9 +75,6 @@ public final class CertificateRepositoryObjectFactory {
             return ManifestCms.parseDerEncoded(encoded);
         } catch (IllegalArgumentException e) {
             return null;
-        } catch (IllegalStateException e) {
-            // Happens when we try to parse an RtaCMS as manifest; it contains a plain X509 EE Certificate, not a resource certificate.
-            return null;
         }
     }
 }

@@ -1,13 +1,7 @@
 package net.ripe.commons.certification.cms.manifest;
 
-import static net.ripe.commons.certification.Asn1Util.expect;
-import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_CONTENT_SIZE;
-import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_CONTENT_STRUCTURE;
-import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_CONTENT_TYPE;
-import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_DECODE_FILELIST;
-import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_FILE_HASH_ALGORITHM;
-import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_RESOURCE_INHERIT;
-import static net.ripe.commons.certification.validation.ValidationString.MANIFEST_TIME_FORMAT;
+import static net.ripe.commons.certification.Asn1Util.*;
+import static net.ripe.commons.certification.validation.ValidationString.*;
 
 import java.math.BigInteger;
 import java.text.ParseException;
@@ -77,13 +71,17 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 
         RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
         ManifestCmsGeneralInfo manifestCmsGeneralInfo = new ManifestCmsGeneralInfo(version, number, thisUpdateTime, nextUpdateTime, fileHashAlgorithm);
-        
+
 		return new ManifestCms(cmsObjectData, manifestCmsGeneralInfo, files);
 	}
 
 	private void validateManifest() {
 	    ValidationResult validationResult = getValidationResult();
-        validationResult.isTrue(ManifestCms.CONTENT_TYPE.equals(getContentType()), MANIFEST_CONTENT_TYPE);
+
+	    if (!validationResult.isTrue(ManifestCms.CONTENT_TYPE.equals(getContentType()), MANIFEST_CONTENT_TYPE)) {
+            return;
+        }
+
         validationResult.isTrue(getResourceCertificate().isResourceSetInherited(), MANIFEST_RESOURCE_INHERIT);
     }
 

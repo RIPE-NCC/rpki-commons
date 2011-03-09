@@ -1,27 +1,7 @@
 package net.ripe.commons.certification.cms;
 
-import static net.ripe.commons.certification.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
-import static net.ripe.commons.certification.cms.RpkiSignedObject.ENCRYPTION_ALGORITHM_OID;
-import static net.ripe.commons.certification.validation.ValidationString.CERT_HAS_SKI;
-import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_EE_CERT;
-import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_X509CERT;
-import static net.ripe.commons.certification.validation.ValidationString.CMS_CONTENT_PARSING;
-import static net.ripe.commons.certification.validation.ValidationString.CMS_DATA_PARSING;
-import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_ATTR_PRESENT;
-import static net.ripe.commons.certification.validation.ValidationString.DECODE_CONTENT;
-import static net.ripe.commons.certification.validation.ValidationString.DIGEST_ALGORITHM;
-import static net.ripe.commons.certification.validation.ValidationString.ENCRYPTION_ALGORITHM;
-import static net.ripe.commons.certification.validation.ValidationString.GET_CERTS_AND_CRLS;
-import static net.ripe.commons.certification.validation.ValidationString.GET_SIGNER_INFO;
-import static net.ripe.commons.certification.validation.ValidationString.MSG_DIGEST_ATTR_PRESENT;
-import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_CERT_ALLOWED;
-import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNED_OBJECT;
-import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNER;
-import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNING_TIME_ATTR;
-import static net.ripe.commons.certification.validation.ValidationString.SIGNATURE_VERIFICATION;
-import static net.ripe.commons.certification.validation.ValidationString.SIGNED_ATTRS_PRESENT;
-import static net.ripe.commons.certification.validation.ValidationString.SIGNER_ID_MATCH;
-import static net.ripe.commons.certification.validation.ValidationString.SIGNING_TIME_ATTR_PRESENT;
+import static net.ripe.commons.certification.cms.RpkiSignedObject.*;
+import static net.ripe.commons.certification.validation.ValidationString.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,10 +75,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     protected X509ResourceCertificate getResourceCertificate() {
-        if (!(certificate instanceof X509ResourceCertificate)) {
-            throw new IllegalStateException("Cms object does not contain a Resource Certificate");
-        }
-        return (X509ResourceCertificate) certificate;
+        return certificate;
     }
 
     protected String getContentType() {
