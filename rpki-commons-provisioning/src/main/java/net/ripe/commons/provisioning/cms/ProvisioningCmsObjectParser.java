@@ -55,11 +55,11 @@ public abstract class ProvisioningCmsObjectParser {
     private ValidationResult validationResult;
 
 
-    public ProvisioningCmsObjectParser() { //NOPMD - ArrayIsStoredDirectly
+    public ProvisioningCmsObjectParser() {
         this(new ValidationResult());
     }
 
-    public ProvisioningCmsObjectParser(ValidationResult validationResult) { //NOPMD - ArrayIsStoredDirectly
+    public ProvisioningCmsObjectParser(ValidationResult validationResult) {
         this.validationResult = validationResult;
     }
 
@@ -67,7 +67,7 @@ public abstract class ProvisioningCmsObjectParser {
         return validationResult;
     }
 
-    public void parseCms(byte[] encoded) {
+    public void parseCms(byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
         validationResult.push("CmsObjectLocation"); //FIXME: pushing a placeholder for now
 
