@@ -43,7 +43,7 @@ import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
-public abstract class ProvisioningCmsObjectParser {
+public class ProvisioningCmsObjectParser {
 
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
     private static final int CMS_OBJECT_VERSION = 3;
@@ -157,7 +157,9 @@ public abstract class ProvisioningCmsObjectParser {
         validationResult.isTrue(true, CMS_CONTENT_PARSING);
     }
 
-    protected abstract void decodeContent(DEREncodable encoded);
+    private void decodeContent(DEREncodable encoded) {
+        //TODO: to be implemented
+    }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4

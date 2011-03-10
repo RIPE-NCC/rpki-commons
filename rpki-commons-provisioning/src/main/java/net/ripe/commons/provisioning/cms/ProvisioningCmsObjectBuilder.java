@@ -65,7 +65,9 @@ public abstract class ProvisioningCmsObjectBuilder {
         Validate.notNull(certificate, "certificate is required");
         Validate.notNull(crl, "crl is required");
 
-        return new ProvisioningCmsObject(generateCms(privateKey, getMessageContent()), certificate);
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms(generateCms(privateKey, getMessageContent()));
+        return parser.getProvisioningCmsObject();
     }
 
     private byte[] generateCms(PrivateKey privateKey, ASN1Encodable encodableContent) {
