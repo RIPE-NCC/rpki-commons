@@ -1,6 +1,7 @@
 package net.ripe.commons.provisioning.cms;
 
 import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -44,7 +45,6 @@ public abstract class ProvisioningCmsObjectParser {
 
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
     private static final int CMS_OBJECT_VERSION = 3;
-    private static final String SUN_RSA_SIGN = "SunRsaSign";
 
     private byte[] encoded;
 
@@ -341,7 +341,7 @@ public abstract class ProvisioningCmsObjectParser {
     private void verifySignature(SignerInformation signer) {
         boolean errorOccured = false;
         try {
-            validationResult.isTrue(signer.verify(certificate, SUN_RSA_SIGN), SIGNATURE_VERIFICATION);
+            validationResult.isTrue(signer.verify(certificate, DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
         } catch (CertificateExpiredException e) {
             errorOccured = true;
         } catch (CertificateNotYetValidException e) {

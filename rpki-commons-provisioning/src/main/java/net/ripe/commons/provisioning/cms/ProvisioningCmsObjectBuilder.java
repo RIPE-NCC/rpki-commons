@@ -55,7 +55,6 @@ public abstract class ProvisioningCmsObjectBuilder {
 
     public ProvisioningCmsObject build(PrivateKey privateKey) {
         Validate.notNull(certificate, "certificate is required");
-        Validate.notNull(signatureProvider, "signatureProvider is required");
 
         return new ProvisioningCmsObject(generateCms(privateKey, getMessageContent()), certificate);
     }

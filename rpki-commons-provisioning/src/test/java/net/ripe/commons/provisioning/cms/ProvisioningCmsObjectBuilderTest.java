@@ -1,5 +1,6 @@
 package net.ripe.commons.provisioning.cms;
 
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
 import static org.junit.Assert.*;
 
@@ -54,9 +55,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Before
     public void setUp() throws Exception {
         subject =  new MyProvisioningCmsObjectBuilder();
-
         subject.withCertificate(EE_CERT);
-        subject.withSignatureProvider("SunRsaSign");
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
         DateTimeUtils.setCurrentMillisFixed(signingTime);
@@ -66,9 +65,7 @@ public class ProvisioningCmsObjectBuilderTest {
 
     public static ProvisioningCmsObject createProvisioningCmsObject() {
         ProvisioningCmsObjectBuilder subject =  new MyProvisioningCmsObjectBuilder();
-
         subject.withCertificate(EE_CERT);
-        subject.withSignatureProvider("SunRsaSign");
 
         return subject.build(EE_KEYPAIR.getPrivate());
     }
@@ -76,14 +73,6 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
         subject = new MyProvisioningCmsObjectBuilder();
-        subject.withSignatureProvider("SunRsaSign");
-        subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldForceSignatureProvider() throws CMSException {
-        subject = new MyProvisioningCmsObjectBuilder();
-        subject.withCertificate(EE_CERT);
         subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
     }
 
@@ -344,7 +333,7 @@ public class ProvisioningCmsObjectBuilderTest {
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignature());
-        signer.verify(EE_CERT, "SunRsaSign");
+        signer.verify(EE_CERT, DEFAULT_SIGNATURE_PROVIDER);
     }
 
     /**
@@ -373,10 +362,8 @@ public class ProvisioningCmsObjectBuilderTest {
         builder.withIssuerDN(new X500Principal("CN=nl.bluelight"));
         builder.withSerial(BigInteger.TEN);
         builder.withPublicKey(EE_KEYPAIR.getPublic());
-        builder.withSignatureAlgorithm("SHA256withRSA");
         builder.withSubjectDN(new X500Principal("CN=nl.bluelight.end-entity"));
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        builder.withSignatureProvider("SunRsaSign");
         return builder.build().getCertificate();
     }
 }

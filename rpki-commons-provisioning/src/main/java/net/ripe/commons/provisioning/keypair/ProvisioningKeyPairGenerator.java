@@ -18,7 +18,7 @@ import java.security.spec.RSAKeyGenParameterSpec;
 public final class ProvisioningKeyPairGenerator {
 
     private static final String ALGORITHM = "RSA";
-    private static final String SUN_RSA_SIGN = "SunRsaSign";
+    private static final String KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
     private static final int IDENTITY_KEY_SIZE = 2048;
 
     private ProvisioningKeyPairGenerator() {
@@ -28,7 +28,7 @@ public final class ProvisioningKeyPairGenerator {
     public static KeyPair generate() {
         try {
             KeyPairGenerator generator;
-            generator = KeyPairGenerator.getInstance(ALGORITHM, SUN_RSA_SIGN);
+            generator = KeyPairGenerator.getInstance(ALGORITHM, KEYPAIR_GENERATOR_PROVIDER);
             generator.initialize(new RSAKeyGenParameterSpec(IDENTITY_KEY_SIZE, RSAKeyGenParameterSpec.F4));
             return generator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
