@@ -88,6 +88,13 @@ public abstract class ProvisioningCmsObjectParser {
         verifySignerInfos();
     }
 
+    public ProvisioningCmsObject getProvisioningCmsObject() {
+        if (validationResult.hasFailures()) {
+            throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed");
+        }
+        return new ProvisioningCmsObject(encoded, certificate);
+    }
+
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
      */

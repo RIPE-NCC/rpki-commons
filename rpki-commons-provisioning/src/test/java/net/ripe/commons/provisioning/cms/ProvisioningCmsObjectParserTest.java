@@ -23,9 +23,11 @@ public class ProvisioningCmsObjectParserTest {
 
         ValidationResult validationResult = parser.getValidationResult();
         assertFalse(validationResult.hasFailures());
+
+        assertEquals(cmsObject, parser.getProvisioningCmsObject());
     }
 
-    @Test
+    @Test(expected=ProvisioningCmsObjectParserException.class)
     public void shouldFailOnInvalidObject() {
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser() {
             @Override
@@ -38,5 +40,7 @@ public class ProvisioningCmsObjectParserTest {
         assertTrue(validationResult.hasFailures());
         assertEquals(1, validationResult.getFailuresForCurrentLocation().size());
         assertEquals(CMS_DATA_PARSING, validationResult.getFailuresForCurrentLocation().iterator().next().getKey());
+
+        parser.getProvisioningCmsObject(); // results in an exception
     }
 }

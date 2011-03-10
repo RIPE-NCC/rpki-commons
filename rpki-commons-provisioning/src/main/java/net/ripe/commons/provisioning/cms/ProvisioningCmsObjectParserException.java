@@ -8,4 +8,8 @@ public class ProvisioningCmsObjectParserException extends RuntimeException {
     public ProvisioningCmsObjectParserException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public ProvisioningCmsObjectParserException(String message) {
+        super(message);
+    }
 }
