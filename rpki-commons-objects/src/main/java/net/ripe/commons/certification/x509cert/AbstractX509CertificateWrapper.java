@@ -1,6 +1,6 @@
 package net.ripe.commons.certification.x509cert;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -91,6 +91,11 @@ public abstract class AbstractX509CertificateWrapper {
         try {
             byte[] basicConstraintsExtension = certificate.getExtensionValue(X509Extensions.BasicConstraints.getId());
             if (basicConstraintsExtension == null) {
+                /**
+                 * The Basic Constraints extension field [...] MUST be present when
+                 * the Subject is a CA, and MUST NOT be present otherwise.
+                 * http://tools.ietf.org/html/draft-ietf-sidr-res-certs-21#section-4.9.1
+                 */
                 return false;
             }
             BasicConstraints constraints = BasicConstraints.getInstance(X509ExtensionUtil.fromExtensionValue(basicConstraintsExtension));
@@ -251,7 +256,7 @@ public abstract class AbstractX509CertificateWrapper {
             throw new IllegalArgumentException(e);
         }
     }
-    
+
     public byte[] getEncoded() {
         try {
             return certificate.getEncoded();

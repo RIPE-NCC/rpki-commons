@@ -182,7 +182,12 @@ public abstract class ProvisioningCmsObjectParser {
         try {
             byte[] basicConstraintsExtension = certificate.getExtensionValue(X509Extensions.BasicConstraints.getId());
             if (basicConstraintsExtension == null) {
-                return false;
+                /**
+                 * If the basic constraints extension is not present [...] then the certified public key MUST NOT be used
+                 * to verify certificate signatures.
+                 *  http://tools.ietf.org/html/rfc5280#section-4.2.1.9
+                 */
+                return true;
             }
             BasicConstraints constraints = BasicConstraints.getInstance(X509ExtensionUtil.fromExtensionValue(basicConstraintsExtension));
             return ! constraints.isCA();

@@ -1,10 +1,7 @@
 package net.ripe.commons.provisioning.cms;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -14,12 +11,12 @@ import java.security.cert.CertStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
+import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilder;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -36,28 +33,22 @@ import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.CMSSignedGenerator;
 import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
-import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ProvisioningCmsObjectBuilderTest {
 
-    private static final long SIGNING_TIME = new DateTime(2011, 01, 31, 12, 58, 59, 0, DateTimeZone.UTC).getMillis();
     private ProvisioningCmsObjectBuilder subject;
     private ProvisioningCmsObject cmsObject;
     private static final KeyPair EE_KEYPAIR = ProvisioningKeyPairGenerator.generate();
     private static final X509Certificate EE_CERT = generateEECertificate();
+    private long signingTime;
 
 
     @Before
@@ -67,7 +58,8 @@ public class ProvisioningCmsObjectBuilderTest {
         subject.withCertificate(EE_CERT);
         subject.withSignatureProvider("SunRsaSign");
 
-        DateTimeUtils.setCurrentMillisFixed(SIGNING_TIME);
+        signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
+        DateTimeUtils.setCurrentMillisFixed(signingTime);
         cmsObject = subject.build(EE_KEYPAIR.getPrivate());
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -309,7 +301,7 @@ public class ProvisioningCmsObjectBuilderTest {
         assertNotNull(signingTimeAttr);
         assertEquals(1, signingTimeAttr.getAttrValues().size());
         DERUTCTime signingTime = (DERUTCTime) signingTimeAttr.getAttrValues().getObjectAt(0);
-        assertEquals(new Date(SIGNING_TIME), signingTime.getDate());
+        assertEquals(this.signingTime, signingTime.getDate().getTime());
     }
 
     /**
@@ -377,25 +369,14 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     private static X509Certificate generateEECertificate() {
-        try {
-            X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
-            generator.setNotBefore(new Date(new DateTime().minusYears(50).getMillis()));
-            generator.setNotAfter(new Date(new DateTime().plusYears(50).getMillis()));
-            generator.setIssuerDN(new X500Principal("CN=nl.bluelight"));
-            generator.setSerialNumber(BigInteger.TEN);
-            generator.setPublicKey(EE_KEYPAIR.getPublic());
-            generator.setSignatureAlgorithm("SHA256withRSA");
-            generator.setSubjectDN(new X500Principal("CN=nl.bluelight.ee"));
-
-            generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(EE_KEYPAIR.getPublic()));
-            generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPublic()));
-            generator.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
-            //        generator.addExtension(X509Extensions.CertificatePolicies, true, new DERSequence(new DERObjectIdentifier("1.3.6.1.5.5.7.14.2")));
-            //TODO: check and add other extensions
-
-            return generator.generate(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate(), "SunRsaSign");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        ProvisioningCmsCertificateBuilder builder = new ProvisioningCmsCertificateBuilder();
+        builder.withIssuerDN(new X500Principal("CN=nl.bluelight"));
+        builder.withSerial(BigInteger.TEN);
+        builder.withPublicKey(EE_KEYPAIR.getPublic());
+        builder.withSignatureAlgorithm("SHA256withRSA");
+        builder.withSubjectDN(new X500Principal("CN=nl.bluelight.end-entity"));
+        builder.withSigningKeyPair(TEST_KEY_PAIR);
+        builder.withSignatureProvider("SunRsaSign");
+        return builder.build().getCertificate();
     }
 }

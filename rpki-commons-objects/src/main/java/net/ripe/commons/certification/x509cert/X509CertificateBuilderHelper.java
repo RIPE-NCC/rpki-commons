@@ -42,10 +42,10 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by (delegated to, not
  * extended) specific certificate builders.
- * 
+ *
  * Because we want to maintain the pattern where a specific Certificate builder can be chained like:
  * builder.withValidity(val).withSubjectDn(subject) etc... dynamic typing would be required.. hence delegation.
- * 
+ *
  */
 public final class X509CertificateBuilderHelper {
 
@@ -64,7 +64,7 @@ public final class X509CertificateBuilderHelper {
     private X500Principal issuerDN;
 
     private ValidityPeriod validityPeriod;
-    
+
     private IpResourceSet resources;
 
     private PublicKey publicKey;
@@ -116,7 +116,7 @@ public final class X509CertificateBuilderHelper {
         this.resources = resources;
         return this;
     }
-    
+
     public X509CertificateBuilderHelper withPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
         return this;
@@ -278,8 +278,7 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void addAIA(X509V3CertificateGenerator generator) {
-        generator
-                .addExtension(X509Extensions.AuthorityInfoAccess, false, new AuthorityInformationAccess(new DERSequence(authorityInformationAccess)));
+        generator.addExtension(X509Extensions.AuthorityInfoAccess, false, new AuthorityInformationAccess(new DERSequence(authorityInformationAccess)));
     }
 
     private void addSIA(X509V3CertificateGenerator generator) {
@@ -294,7 +293,7 @@ public final class X509CertificateBuilderHelper {
     private void addPolicies(X509V3CertificateGenerator generator) {
         generator.addExtension(X509Extensions.CertificatePolicies, true, new DERSequence(policies));
     }
-    
+
     private void addResourceExtensions(X509V3CertificateGenerator generator) {
         ResourceExtensionEncoder encoder = new ResourceExtensionEncoder();
 
