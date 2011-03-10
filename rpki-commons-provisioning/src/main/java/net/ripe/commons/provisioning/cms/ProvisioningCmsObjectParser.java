@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.cert.CRL;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
@@ -85,6 +87,7 @@ public abstract class ProvisioningCmsObjectParser {
         parseContent();
 
         parseCmsCertificate();
+        parseCmsCrl();
         verifySignerInfos();
     }
 
@@ -202,6 +205,38 @@ public abstract class ProvisioningCmsObjectParser {
             CertStore certs;
             certs = sp.getCertificatesAndCRLs("Collection", (String) null);
             certificates = certs.getCertificates(null);
+        } catch (NoSuchAlgorithmException e) {
+            certificates = null;
+        } catch (NoSuchProviderException e) {
+            certificates = null;
+        } catch (CMSException e) {
+            certificates = null;
+        } catch (CertStoreException e) {
+            certificates = null;
+        }
+        return certificates;
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.5
+     */
+    private void parseCmsCrl() {
+        Collection<? extends CRL> certificates = extractCrl(sp);
+        if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
+            return;
+        }
+        validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED);
+
+        CRL cert = certificates.iterator().next();
+        validationResult.isTrue(cert instanceof X509CRL, CRL_IS_X509CRL);
+    }
+
+    private Collection<? extends CRL> extractCrl(CMSSignedDataParser sp) {
+        Collection<? extends CRL> certificates;
+        try {
+            CertStore certs;
+            certs = sp.getCertificatesAndCRLs("Collection", (String) null);
+            certificates = certs.getCRLs(null);
         } catch (NoSuchAlgorithmException e) {
             certificates = null;
         } catch (NoSuchProviderException e) {

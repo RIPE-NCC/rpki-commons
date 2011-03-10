@@ -10,11 +10,13 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
 import javax.security.auth.x500.X500Principal;
 
+import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
 import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilder;
@@ -49,6 +51,7 @@ public class ProvisioningCmsObjectBuilderTest {
     private ProvisioningCmsObject cmsObject;
     private static final KeyPair EE_KEYPAIR = ProvisioningKeyPairGenerator.generate();
     private static final X509Certificate EE_CERT = generateEECertificate();
+    private static final X509CRL CRL = generateCrl();
     private long signingTime;
 
 
@@ -56,6 +59,7 @@ public class ProvisioningCmsObjectBuilderTest {
     public void setUp() throws Exception {
         subject =  new MyProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
+        subject.withCrl(CRL);
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
         DateTimeUtils.setCurrentMillisFixed(signingTime);
@@ -66,12 +70,19 @@ public class ProvisioningCmsObjectBuilderTest {
     public static ProvisioningCmsObject createProvisioningCmsObject() {
         ProvisioningCmsObjectBuilder subject =  new MyProvisioningCmsObjectBuilder();
         subject.withCertificate(EE_CERT);
+        subject.withCrl(CRL);
 
         return subject.build(EE_KEYPAIR.getPrivate());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
+        subject = new MyProvisioningCmsObjectBuilder();
+        subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void shouldForceCrl() throws CMSException {
         subject = new MyProvisioningCmsObjectBuilder();
         subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
     }
@@ -158,9 +169,8 @@ public class ProvisioningCmsObjectBuilderTest {
         Collection<? extends java.security.cert.CRL> crls = certificatesAndCRLs.getCRLs(null);
 
         assertNotNull(crls);
-        //FIXME:
-//        assertFalse(crls.isEmpty());
-//        assertEquals(CRL, crls.iterator().next());
+        assertFalse(crls.isEmpty());
+        assertEquals(CRL, crls.iterator().next());
     }
 
     /**
@@ -366,4 +376,17 @@ public class ProvisioningCmsObjectBuilderTest {
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         return builder.build().getCertificate();
     }
+
+    private static X509CRL generateCrl() {
+        X509CrlBuilder builder = new X509CrlBuilder();
+        builder.withIssuerDN(new X500Principal("CN=nl.bluelight"));
+        builder.withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic());
+        DateTime now = new DateTime();
+        builder.withThisUpdateTime(now);
+        builder.withNextUpdateTime(now.plusHours(24));
+        builder.withNumber(BigInteger.TEN);
+
+        return builder.build(TEST_KEY_PAIR.getPrivate()).getCrl();
+    }
+
 }

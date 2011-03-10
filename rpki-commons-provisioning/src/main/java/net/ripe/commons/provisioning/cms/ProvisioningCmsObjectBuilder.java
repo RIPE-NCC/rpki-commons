@@ -10,8 +10,9 @@ import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 
@@ -40,11 +41,18 @@ public abstract class ProvisioningCmsObjectBuilder {
 
     private X509Certificate certificate;
 
+    private X509CRL crl;
+
     private String signatureProvider;
 
 
     public ProvisioningCmsObjectBuilder withCertificate(X509Certificate certificate) {
         this.certificate = certificate;
+        return this;
+    }
+
+    public ProvisioningCmsObjectBuilder withCrl(X509CRL crl) {
+        this.crl = crl;
         return this;
     }
 
@@ -55,6 +63,7 @@ public abstract class ProvisioningCmsObjectBuilder {
 
     public ProvisioningCmsObject build(PrivateKey privateKey) {
         Validate.notNull(certificate, "certificate is required");
+        Validate.notNull(crl, "crl is required");
 
         return new ProvisioningCmsObject(generateCms(privateKey, getMessageContent()), certificate);
     }
@@ -91,7 +100,7 @@ public abstract class ProvisioningCmsObjectBuilder {
     }
 
     private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException {
-        CollectionCertStoreParameters certStoreParameters = new CollectionCertStoreParameters(Collections.singleton(certificate));
+        CollectionCertStoreParameters certStoreParameters = new CollectionCertStoreParameters(Arrays.asList(certificate, crl));
         CertStore certStore = CertStore.getInstance("Collection", certStoreParameters);
         generator.addCertificatesAndCRLs(certStore);
     }
