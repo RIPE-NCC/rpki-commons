@@ -2,6 +2,8 @@ package net.ripe.certification.client.xml;
 
 import com.thoughtworks.xstream.XStream;
 
+import java.io.Writer;
+
 public class XStreamXmlSerializer<T> implements XmlSerializer<T> {
 
     private final XStream xStream;
@@ -23,5 +25,10 @@ public class XStreamXmlSerializer<T> implements XmlSerializer<T> {
     @Override
     public String serialize(T object) {
         return xStream.toXML(object);
+    }
+
+    @Override
+    public void serialize(T object, Writer writer) {
+        xStream.toXML(object, writer);
     }
 }

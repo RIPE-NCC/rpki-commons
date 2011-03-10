@@ -1,28 +1,8 @@
 package net.ripe.commons.provisioning.cms;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.cert.CertStore;
-import java.security.cert.CertStoreException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Hashtable;
-
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROutputStream;
-import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -33,7 +13,18 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTimeUtils;
 
-public abstract class ProvisioningCmsObjectBuilder {
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.cert.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Hashtable;
+
+public class ProvisioningCmsObjectBuilder {
 
     private static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
 
@@ -44,6 +35,8 @@ public abstract class ProvisioningCmsObjectBuilder {
     private X509CRL crl;
 
     private String signatureProvider;
+
+    private String payloadContent;
 
 
     public ProvisioningCmsObjectBuilder withCertificate(X509Certificate certificate) {
@@ -61,9 +54,16 @@ public abstract class ProvisioningCmsObjectBuilder {
         return this;
     }
 
+    public ProvisioningCmsObjectBuilder withPayloadContent(String payloadContent) {
+        this.payloadContent = payloadContent;
+        return this;
+    }
+
+
     public ProvisioningCmsObject build(PrivateKey privateKey) {
         Validate.notNull(certificate, "certificate is required");
         Validate.notNull(crl, "crl is required");
+        Validate.notEmpty(payloadContent, "Payload content is required");
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms(generateCms(privateKey, getMessageContent()));
@@ -114,7 +114,9 @@ public abstract class ProvisioningCmsObjectBuilder {
         return new AttributeTable(attributes);
     }
 
-    protected abstract ASN1Encodable getMessageContent();
+    private ASN1Encodable getMessageContent() {
+        return new DEROctetString(payloadContent.getBytes());
+    }
 
     private byte[] encode(ASN1Encodable value) {
         try {
