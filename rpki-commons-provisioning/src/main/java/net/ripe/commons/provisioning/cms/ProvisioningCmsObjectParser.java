@@ -1,5 +1,7 @@
 package net.ripe.commons.provisioning.cms;
 
+import static net.ripe.commons.certification.validation.ValidationString.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,9 +16,9 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 
+import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 
-import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREncodable;
@@ -33,15 +35,15 @@ import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.CMSSignedGenerator;
+import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 public abstract class ProvisioningCmsObjectParser {
 
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
-
     private static final int CMS_OBJECT_VERSION = 3;
-
     private static final String SUN_RSA_SIGN = "SunRsaSign";
 
     private byte[] encoded;
@@ -50,17 +52,32 @@ public abstract class ProvisioningCmsObjectParser {
 
     private CMSSignedDataParser sp;
 
+    private ValidationResult validationResult;
 
-    public ProvisioningCmsObjectParser(byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
-        this.encoded = encoded;
+
+    public ProvisioningCmsObjectParser() { //NOPMD - ArrayIsStoredDirectly
+        this(new ValidationResult());
     }
 
-    public void parseCms() {
+    public ProvisioningCmsObjectParser(ValidationResult validationResult) { //NOPMD - ArrayIsStoredDirectly
+        this.validationResult = validationResult;
+    }
+
+    public ValidationResult getValidationResult() {
+        return validationResult;
+    }
+
+    public void parseCms(byte[] encoded) {
+        this.encoded = encoded;
+        validationResult.push("CmsObjectLocation"); //FIXME: pushing a placeholder for now
+
         try {
             sp = new CMSSignedDataParser(encoded);
         } catch (CMSException e) {
-            throw new ProvisioningCmsObjectParserException("invalid cms object", e);
+            validationResult.isTrue(false, CMS_DATA_PARSING);
+            return;
         }
+        validationResult.isTrue(true, CMS_DATA_PARSING);
 
         verifyVersionNumber();
         verifyDigestAlgorithm(encoded);
@@ -75,14 +92,14 @@ public abstract class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
      */
     private void verifyVersionNumber() {
-        Validate.isTrue(sp.getVersion() == CMS_OBJECT_VERSION, "invalid cms object version number");
+        validationResult.isTrue(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.2
      */
     private void verifyDigestAlgorithm(byte[] data) {
-        Validate.isTrue(CMSSignedGenerator.DIGEST_SHA256.equals(getDigestAlgorithmOidFromEncodedCmsObject(data).getObjectId().getId()), "invalis cms object digest algorithm");
+        validationResult.isTrue(CMSSignedGenerator.DIGEST_SHA256.equals(getDigestAlgorithmOidFromEncodedCmsObject(data).getObjectId().getId()), CMS_SIGNED_DATA_DIGEST_ALGORITHM);
     }
 
     private AlgorithmIdentifier getDigestAlgorithmOidFromEncodedCmsObject(byte[] data) {
@@ -103,7 +120,7 @@ public abstract class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.1
      */
     private void verifyContentType() {
-        Validate.isTrue("1.2.840.113549.1.9.16.1.28".equals(sp.getSignedContent().getContentType()));
+        validationResult.isTrue("1.2.840.113549.1.9.16.1.28".equals(sp.getSignedContent().getContentType()), CMS_CONTENT_TYPE);
     }
 
     /**
@@ -116,15 +133,18 @@ public abstract class ProvisioningCmsObjectParser {
         try {
             decodeContent(asn1InputStream.readObject());
         } catch (IOException e) {
-            throw new ProvisioningCmsObjectParserException("cannot decode cms object signed content", e);
+            validationResult.isTrue(false, DECODE_CONTENT);
+            return;
         }
+        validationResult.isTrue(true, DECODE_CONTENT);
 
         try {
-            Validate.isTrue(asn1InputStream.readObject() == null, "more than one signed object in cms object signed content");
+            validationResult.isTrue(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
             asn1InputStream.close();
         } catch (IOException e) {
-            throw new ProvisioningCmsObjectParserException("error while reading cms object signed content", e);
+            validationResult.isTrue(false, CMS_CONTENT_PARSING);
         }
+        validationResult.isTrue(true, CMS_CONTENT_PARSING);
     }
 
     protected abstract void decodeContent(DEREncodable encoded);
@@ -134,16 +154,21 @@ public abstract class ProvisioningCmsObjectParser {
      */
     private void parseCmsCertificate() {
         Collection<? extends Certificate> certificates = extractCertificate(sp);
-        Validate.notNull(certificates, "error while extracting the certificate from the cms object");
-        Validate.notEmpty(certificates, "cms object must contain one certificate");
-        Validate.isTrue(certificates.size() == 1, "cms object must contain exactly one certificate");
-        Certificate cert = certificates.iterator().next();
-        Validate.isTrue(cert instanceof X509Certificate, "cms object certificate must be X509Certificate");
 
+        if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
+            return;
+        }
+
+        validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CERT_ALLOWED);
+
+        Certificate cert = certificates.iterator().next();
+        if (!validationResult.isTrue(cert instanceof X509Certificate, CERT_IS_X509CERT)) {
+            return;
+        }
         certificate = (X509Certificate) cert;
 
-        Validate.isTrue(X509CertificateUtil.getSubjectKeyIdentifier(certificate) != null, "cms object certificate must have subject key identifier");
-        Validate.isTrue(isEndEntityCertificate(certificate), "cms object certificate must be end entity certificate");
+        validationResult.isTrue(isEndEntityCertificate(certificate), CERT_IS_EE_CERT);
+        validationResult.notNull(X509CertificateUtil.getSubjectKeyIdentifier(certificate) != null, CERT_HAS_SKI);
     }
 
     private boolean isEndEntityCertificate(X509Certificate certificate) {
@@ -181,15 +206,13 @@ public abstract class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6
      */
     private void verifySignerInfos() {
-        Collection<?> signers = null;
-        try {
-            signers = sp.getSignerInfos().getSigners();
-        } catch (CMSException e) {
-            throw new ProvisioningCmsObjectParserException("error while reading cms object signers", e);
+        SignerInformationStore signerStore = getSignerStore();
+        if (!validationResult.notNull(signerStore, GET_SIGNER_INFO)) {
+            return;
         }
 
-        Validate.notNull(signers, "one signer is required for the cms object");
-        Validate.isTrue(signers.size() == 1, "only one signer allowed in the cms object");
+        Collection<?> signers = signerStore.getSigners();
+        validationResult.isTrue(signers.size() == 1, ONLY_ONE_SIGNER);
 
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
         verifySignerVersion(signer);
@@ -201,31 +224,41 @@ public abstract class ProvisioningCmsObjectParser {
         verifyUnsignedAttributes(signer);
     }
 
+    private SignerInformationStore getSignerStore() {
+        SignerInformationStore signerStore;
+        try {
+            signerStore = sp.getSignerInfos();
+        } catch (CMSException e) {
+            signerStore = null;
+        }
+        return signerStore;
+    }
+
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.1
      */
     private void verifySignerVersion(SignerInformation signer) {
-        Validate.isTrue(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, "invalid cms object signer version number");
+        validationResult.isTrue(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.2
      */
     private void verifySubjectKeyIdentifier(SignerInformation signer) {
+        SignerId sid = signer.getSID();
         try {
-            Validate.isTrue(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(certificate)).getEncoded(), signer.getSID().getSubjectKeyIdentifier()), "subject key identifier on the cms object and its ee certificate must match");
+            validationResult.isTrue(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(certificate)).getEncoded(), sid.getSubjectKeyIdentifier()), CMS_SIGNER_INFO_SKI);
         } catch (IOException e) {
-            throw new ProvisioningCmsObjectParserException("error while reading cms object certificate subject key identifier", e);
+            validationResult.isTrue(false, CMS_SIGNER_INFO_SKI);
         }
-        Validate.isTrue(signer.getSID().getIssuer() == null, "cms object signer identifier must contain subject key identifier only");
-        Validate.isTrue(signer.getSID().getSerialNumber() == null, "cms object signer identifier must contain subject key identifier only");
+        validationResult.isTrue(sid.getIssuer() == null && sid.getSerialNumber() == null, CMS_SIGNER_INFO_SKI_ONLY);
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.3
      */
     private void verifyDigestAlgorithm(SignerInformation signer) {
-        Validate.isTrue(signer.getDigestAlgOID().equals(CMSSignedGenerator.DIGEST_SHA256), "incorrect digest algorithm");
+        validationResult.isTrue(CMSSignedGenerator.DIGEST_SHA256.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
     }
 
     /**
@@ -233,7 +266,9 @@ public abstract class ProvisioningCmsObjectParser {
      */
     private void verifySignedAttributes(SignerInformation signer) {
         AttributeTable attributeTable = signer.getSignedAttributes();
-        Validate.notNull(attributeTable, "cms object must have signed attributes");
+        if (!validationResult.notNull(attributeTable, SIGNED_ATTRS_PRESENT)) {
+            return;
+        }
 
         verifyContentType(attributeTable);
         verifyMessageDigest(attributeTable);
@@ -245,9 +280,13 @@ public abstract class ProvisioningCmsObjectParser {
      */
     private void verifyContentType(AttributeTable attributeTable) {
         Attribute contentType = attributeTable.get(CMSAttributes.contentType);
-        Validate.notNull(contentType, "cms object must have content type signed attribute");
-        Validate.isTrue(contentType.getAttrValues().size() == 1, "cms object content type signed attribute must have only 1 value");
-        Validate.isTrue(new DERObjectIdentifier("1.2.840.113549.1.9.16.1.28").equals(contentType.getAttrValues().getObjectAt(0)), "incorrect cms content type");
+        if (!validationResult.notNull(contentType, CONTENT_TYPE_ATTR_PRESENT)) {
+            return;
+        }
+        if(!validationResult.isTrue(contentType.getAttrValues().size() == 1, CONTENT_TYPE_VALUE_COUNT)) {
+            return;
+        }
+        validationResult.isTrue(new DERObjectIdentifier("1.2.840.113549.1.9.16.1.28").equals(contentType.getAttrValues().getObjectAt(0)), CONTENT_TYPE_VALUE);
     }
 
     /**
@@ -255,9 +294,12 @@ public abstract class ProvisioningCmsObjectParser {
      */
     private void verifyMessageDigest(AttributeTable attributeTable) {
         Attribute messageDigest = attributeTable.get(CMSAttributes.messageDigest);
-        Validate.notNull(messageDigest, "cms object must have message digest signed attribute");
-        Validate.isTrue(messageDigest.getAttrValues().size() == 1, "cms object message digest signed attribute must have only 1 value");
-        Validate.notNull(messageDigest.getAttrValues().getObjectAt(0) != null, "cms object must have message digest signed attribute value");
+        if (!validationResult.notNull(messageDigest, MSG_DIGEST_ATTR_PRESENT)) {
+            return;
+        }
+        if (!validationResult.isTrue(messageDigest.getAttrValues().size() == 1, MSG_DIGEST_VALUE_COUNT)) {
+            return;
+        }
     }
 
     /**
@@ -265,36 +307,43 @@ public abstract class ProvisioningCmsObjectParser {
      */
     private void verifySigningTime(AttributeTable attributeTable) {
         Attribute signingTime = attributeTable.get(CMSAttributes.signingTime);
-        Validate.notNull(signingTime, "cms object must have signing time signed attribute");
-        Validate.isTrue(signingTime.getAttrValues().size() == 1, "cms object signing time signed attribute must have only 1 value");
-        Validate.notNull(signingTime.getAttrValues().getObjectAt(0) != null, "cms object must have signing time signed attribute value");
+        if (!validationResult.notNull(signingTime, SIGNING_TIME_ATTR_PRESENT)) {
+            return;
+        }
+        if (!validationResult.isTrue(signingTime.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
+            return;
+        }
     }
 
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.5
+     * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
+     */
     private void verifyEncryptionAlgorithm(SignerInformation signer) {
-        /**
-         * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.5
-         * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
-         */
-        Validate.isTrue(CMSSignedGenerator.ENCRYPTION_RSA.equals(signer.getEncryptionAlgOID()), "signature algorith must be RSA");
+        validationResult.isTrue(CMSSignedGenerator.ENCRYPTION_RSA.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.6
      */
     private void verifySignature(SignerInformation signer) {
-        Validate.notNull(signer.getSignature(), "cms object must have signature");
+        boolean errorOccured = false;
         try {
-            Validate.isTrue(signer.verify(certificate, SUN_RSA_SIGN), "cms object signature verification failed");
+            validationResult.isTrue(signer.verify(certificate, SUN_RSA_SIGN), SIGNATURE_VERIFICATION);
         } catch (CertificateExpiredException e) {
-            throw new ProvisioningCmsObjectParserException("cms object signature verification failed", e);
+            errorOccured = true;
         } catch (CertificateNotYetValidException e) {
-            throw new ProvisioningCmsObjectParserException("cms object signature verification failed", e);
+            errorOccured = true;
         } catch (NoSuchAlgorithmException e) {
-            throw new ProvisioningCmsObjectParserException("cms object signature verification failed", e);
+            errorOccured = true;
         } catch (NoSuchProviderException e) {
-            throw new ProvisioningCmsObjectParserException("cms object signature verification failed", e);
+            errorOccured = true;
         } catch (CMSException e) {
-            throw new ProvisioningCmsObjectParserException("cms object signature verification failed", e);
+            errorOccured = true;
+        }
+
+        if (errorOccured) {
+            validationResult.isTrue(false, SIGNATURE_VERIFICATION);
         }
     }
 
@@ -302,6 +351,6 @@ public abstract class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.7
      */
     private void verifyUnsignedAttributes(SignerInformation signer) {
-        Validate.isTrue(signer.getUnsignedAttributes() == null, "cms object must not have unsigned attributes");
+        validationResult.isTrue(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);
     }
 }

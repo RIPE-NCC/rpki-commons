@@ -59,6 +59,9 @@ public final class ValidationString {
 
 	//cms object
 	public static final String CMS_DATA_PARSING = "cms.signed.data.parsing";
+	public static final String CMS_SIGNED_DATA_VERSION = "cms.signed.data.version";
+	public static final String CMS_SIGNED_DATA_DIGEST_ALGORITHM = "cms.signed.data.digest.algorithm";
+	public static final String CMS_CONTENT_TYPE = "cms.content.type";
 	public static final String DECODE_CONTENT = "cms.decode.content";
 	public static final String ONLY_ONE_SIGNED_OBJECT = "cms.only.one.signed.object";
 	public static final String CMS_CONTENT_PARSING = "cms.content.parsing";
@@ -69,15 +72,22 @@ public final class ValidationString {
 	public static final String CERT_HAS_SKI = "cms.cert.has.ski";
 	public static final String GET_SIGNER_INFO = "cms.signature.signer.info";
 	public static final String ONLY_ONE_SIGNER = "cms.signature.has.one.signer";
-	public static final String DIGEST_ALGORITHM = "cms.digest.algorithm";
+	public static final String CMS_SIGNER_INFO_VERSION = "cms.signer.info.version";
+	public static final String CMS_SIGNER_INFO_DIGEST_ALGORITHM = "cms.signer.info.digest.algorithm";
+	public static final String CMS_SIGNER_INFO_SKI = "cms.signer.info.ski";
+	public static final String CMS_SIGNER_INFO_SKI_ONLY = "cms.signer.info.ski.only";
 	public static final String ENCRYPTION_ALGORITHM = "cms.encryption.algorithm";
 	public static final String SIGNED_ATTRS_PRESENT = "cms.signed.attrs.present";
 	public static final String CONTENT_TYPE_ATTR_PRESENT = "cms.content.type.attr.present";
+	public static final String CONTENT_TYPE_VALUE_COUNT = "cms.content.type.value.count";
+	public static final String CONTENT_TYPE_VALUE = "cms.content.type.value";
 	public static final String MSG_DIGEST_ATTR_PRESENT = "cms.msg.digest.attr.present";
+	public static final String MSG_DIGEST_VALUE_COUNT = "cms.msg.digest.value.count";
 	public static final String SIGNING_TIME_ATTR_PRESENT = "cms.signing.time.attr.present";
 	public static final String ONLY_ONE_SIGNING_TIME_ATTR = "cms.only.one.signing.time.attr";
-	public static final String SIGNER_ID_MATCH = "cms.signer.id.matc.cert";
+	public static final String SIGNER_ID_MATCH = "cms.signer.id.match.cert";
 	public static final String SIGNATURE_VERIFICATION = "cms.signature";
+	public static final String UNSIGNED_ATTRS_OMITTED = "cms.unsigned.attrs.omitted";
 
 	//roacms
 	public static final String ROA_CONTENT_TYPE = "roa.content.type";

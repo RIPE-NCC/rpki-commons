@@ -115,6 +115,7 @@ public abstract class RpkiSignedObjectParser {
             validationResult.isTrue(false, DECODE_CONTENT);
             return;
         }
+        validationResult.isTrue(true, DECODE_CONTENT);
 
         try {
             validationResult.isTrue(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
@@ -122,6 +123,7 @@ public abstract class RpkiSignedObjectParser {
         } catch (IOException e) {
             validationResult.isTrue(false, CMS_CONTENT_PARSING);
         }
+        validationResult.isTrue(true, CMS_CONTENT_PARSING);
     }
 
     private void parseCmsCertificate(CMSSignedDataParser sp) {
@@ -196,9 +198,7 @@ public abstract class RpkiSignedObjectParser {
         }
 
         Collection<?> signers = signerStore.getSigners();
-        if (!validationResult.isTrue(signers.size() == 1, ONLY_ONE_SIGNER)) {
-            return null;
-        }
+        validationResult.isTrue(signers.size() == 1, ONLY_ONE_SIGNER);
 
         return (SignerInformation) signers.iterator().next();
     }
@@ -212,7 +212,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
-        validationResult.isTrue(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), DIGEST_ALGORITHM);
+        validationResult.isTrue(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
         validationResult.isTrue(ENCRYPTION_ALGORITHM_OID.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
         if (!validationResult.notNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
             return false;
