@@ -27,8 +27,7 @@ public class XStreamXmlSerializer<T> implements XmlSerializer<T> {
         return xStream.toXML(object);
     }
 
-    @Override
-    public void serialize(T object, Writer writer) {
+    protected void serialize(T object, Writer writer) {
         xStream.toXML(object, writer);
     }
 }
