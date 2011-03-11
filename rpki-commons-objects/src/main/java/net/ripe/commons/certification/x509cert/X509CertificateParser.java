@@ -61,18 +61,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         return result;
     }
 
-    abstract public T getCertificate(); 
-//    {
-//        if (result.hasFailures()) {
-//            throw new IllegalArgumentException("Certificate validation failed");
-//        }
-//        
-//        if (isResourceExtensionPresent()) {
-//        	return certificateClass.cast(new X509ResourceCertificate(certificate));
-//        } else {
-//        	return certificateClass.cast(new X509PlainCertificate(certificate));
-//        }
-//    }
+    abstract public T getCertificate();
 
     private void parse() {
         InputStream input = null;
@@ -158,13 +147,4 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 	    }
 	    result.isTrue(ipInherited == asInherited, PARTIAL_INHERITANCE);
 	}
-
-//	public static X509CertificateParser<X509PlainCertificate> forPlainCertificate() {
-//		return forPlainCertificate(new ValidationResult());
-//	}
-//
-//	public static X509CertificateParser<X509PlainCertificate> forPlainCertificate(ValidationResult result) {
-//	    return new X509CertificateParser<X509PlainCertificate>(X509PlainCertificate.class, result);
-//	}
-
 }
