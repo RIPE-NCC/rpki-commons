@@ -1,12 +1,29 @@
 package net.ripe.commons.provisioning.message;
 
-class ProvisioningPayload {
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+@XStreamAlias("message")
+public abstract class ProvisioningPayload {
+    private static final Integer SUPPORTED_VERSION = 1;
+
+    @XStreamAsAttribute
     private Integer version;
-    private String sender;
-    private String recipient;
+
+    @XStreamAsAttribute
+    public String sender;
+
+    @XStreamAsAttribute
+    public String recipient;
+
+    @XStreamAsAttribute
     private PayloadMessageType type;
 
-    ProvisioningPayload(Integer version, String sender, String recipient, PayloadMessageType type) {
+    public ProvisioningPayload(String sender, String recipient, PayloadMessageType type) {
+        this(SUPPORTED_VERSION, sender, recipient, type);
+    }
+
+    public ProvisioningPayload(Integer version, String sender, String recipient, PayloadMessageType type) {
         this.version = version;
         this.sender = sender;
         this.recipient = recipient;
@@ -28,4 +45,22 @@ class ProvisioningPayload {
     public PayloadMessageType getType() {
         return type;
     }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
+    }
+
+    public void setType(PayloadMessageType type) {
+        this.type = type;
+    }
+
+    public abstract ProvisioningPayloadClass getPayloadClass();
 }

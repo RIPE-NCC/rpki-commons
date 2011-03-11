@@ -3,6 +3,8 @@ package net.ripe.certification.client.xml;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 import net.ripe.certification.client.xml.converters.*;
 import net.ripe.commons.certification.ValidityPeriod;
@@ -19,34 +21,27 @@ public class XStreamXmlSerializerBuilder<T> {
     private Class<T> objectType;
 
 
-    public XStreamXmlSerializerBuilder(Class <T> objectType) {
+    public XStreamXmlSerializerBuilder(Class<T> objectType) {
         this.objectType = objectType;
         createDefaultXStream();
     }
 
     private void createDefaultXStream() {
-        xStream = new XStream() {
-            /*
-             * This code ensures additional fields in the XML get ignored. Useful to maintain backwards compatibility with older version
-             * of command objects.
-             */
-            @Override
-            protected MapperWrapper wrapMapper(MapperWrapper next) {
-                return new MapperWrapper(next) {
-					@Override
-                    @SuppressWarnings("rawtypes")
-                    public boolean shouldSerializeMember(Class definedIn, String fieldName) {
-                        return definedIn != Object.class ? super.shouldSerializeMember(definedIn, fieldName) : false;
-                    }
-                };
-            }
-        };
+        xStream = new MyXStream(getStreamDriver());
         xStream.setMode(XStream.NO_REFERENCES);
         xStream.aliasPackage("commons", ValidityPeriod.class.getPackage().getName());
 
         registerIpResourceRelated();
         registerDateTimeRelated();
         registerRpkiRelated();
+    }
+
+    protected HierarchicalStreamDriver getStreamDriver() {
+        return new XppDriver();
+    }
+
+    protected final Class<T> getObjectType() {
+        return objectType;
     }
 
     private void registerIpResourceRelated() {
@@ -97,11 +92,37 @@ public class XStreamXmlSerializerBuilder<T> {
         return this;
     }
 
+    public final XStreamXmlSerializerBuilder<T> withAliasField(String field, String alias, Class<?> aliasOnField) {
+        xStream.aliasField(alias, aliasOnField, field);
+        return this;
+    }
+
     public XStreamXmlSerializer<T> build() {
         return new XStreamXmlSerializer<T>(xStream, objectType);
     }
 
     protected XStream getXStream() {
         return xStream;
+    }
+
+    private class MyXStream extends XStream {
+        private MyXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
+            super(hierarchicalStreamDriver);
+        }
+
+        /*
+        * This code ensures additional fields in the XML get ignored. Useful to maintain backwards compatibility with older version
+        * of command objects.
+        */
+        @Override
+        protected MapperWrapper wrapMapper(MapperWrapper next) {
+            return new MapperWrapper(next) {
+                @Override
+                @SuppressWarnings("rawtypes")
+                public boolean shouldSerializeMember(Class definedIn, String fieldName) {
+                    return definedIn != Object.class && super.shouldSerializeMember(definedIn, fieldName);
+                }
+            };
+        }
     }
 }

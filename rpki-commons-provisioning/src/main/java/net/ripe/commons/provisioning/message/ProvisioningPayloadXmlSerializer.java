@@ -6,14 +6,14 @@ import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
 
 import java.io.*;
 
-public class ProvisioningPayloadXmlSerializer extends XStreamXmlSerializer<ProvisioningPayload> {
+public class ProvisioningPayloadXmlSerializer<T extends ProvisioningPayload> extends XStreamXmlSerializer<T> {
 
-    public ProvisioningPayloadXmlSerializer(XStream xStream, Class<ProvisioningPayload> objectType) {
+    public ProvisioningPayloadXmlSerializer(XStream xStream, Class<T> objectType) {
         super(xStream, objectType);
     }
 
     @Override
-    public String serialize(ProvisioningPayload object) {
+    public String serialize(T object) {
         try {
             return serializeUTF8Encoded(object);
         } catch (IOException e) {
@@ -21,7 +21,7 @@ public class ProvisioningPayloadXmlSerializer extends XStreamXmlSerializer<Provi
         }
     }
 
-    private String serializeUTF8Encoded(ProvisioningPayload payload) throws IOException {
+    private String serializeUTF8Encoded(T payload) throws IOException {
         ByteArrayOutputStream outputStream = null;
         Writer writer = null;
 

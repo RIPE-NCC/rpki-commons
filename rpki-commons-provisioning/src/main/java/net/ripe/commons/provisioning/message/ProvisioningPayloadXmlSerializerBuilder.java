@@ -1,23 +1,25 @@
 package net.ripe.commons.provisioning.message;
 
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.certification.client.xml.XStreamXmlSerializerBuilder;
 
-public class ProvisioningPayloadXmlSerializerBuilder extends XStreamXmlSerializerBuilder<ProvisioningPayload> {
+public class ProvisioningPayloadXmlSerializerBuilder<T extends ProvisioningPayload> extends XStreamXmlSerializerBuilder<T> {
 
-    public ProvisioningPayloadXmlSerializerBuilder() {
-        super(ProvisioningPayload.class);
-
-        withAttribute("sender", ProvisioningPayload.class);
-        withAttribute("recipient", ProvisioningPayload.class);
-        withAttribute("version", ProvisioningPayload.class);
-
-        withAliasType("message", ProvisioningPayload.class);
-
-        withAttribute("type", ProvisioningPayload.class);
+    public ProvisioningPayloadXmlSerializerBuilder(Class<T> objectType) {
+        super(objectType);
     }
 
-    public XStreamXmlSerializer<ProvisioningPayload> build() {
-        return new ProvisioningPayloadXmlSerializer(getXStream(), ProvisioningPayload.class);
+    public XStreamXmlSerializer<T> build() {
+        getXStream().processAnnotations(ProvisioningPayload.class);
+
+        return new ProvisioningPayloadXmlSerializer<T>(getXStream(), getObjectType());
+    }
+
+    @Override
+    protected HierarchicalStreamDriver getStreamDriver() {
+        return new XppDriver(new XmlFriendlyReplacer("_", "_"));
     }
 }
