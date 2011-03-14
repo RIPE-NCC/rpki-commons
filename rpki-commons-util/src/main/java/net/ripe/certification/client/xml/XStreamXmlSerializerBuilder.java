@@ -1,18 +1,29 @@
 package net.ripe.certification.client.xml;
 
+import javax.security.auth.x500.X500Principal;
+
+import net.ripe.certification.client.xml.converters.DateTimeConverter;
+import net.ripe.certification.client.xml.converters.IpResourceConverter;
+import net.ripe.certification.client.xml.converters.IpResourceSetConverter;
+import net.ripe.certification.client.xml.converters.JavaUtilTimestampConverter;
+import net.ripe.certification.client.xml.converters.ManifestCmsConverter;
+import net.ripe.certification.client.xml.converters.ReadablePeriodConverter;
+import net.ripe.certification.client.xml.converters.RoaCmsConverter;
+import net.ripe.certification.client.xml.converters.VersionedIdConverter;
+import net.ripe.certification.client.xml.converters.X500PrincipalConverter;
+import net.ripe.certification.client.xml.converters.X509ResourceCertificateConverter;
+import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.IpResourceSet;
+
+import org.joda.time.DateTime;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
-import net.ripe.certification.client.xml.converters.*;
-import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.ipresource.IpResource;
-import net.ripe.ipresource.IpResourceSet;
-import org.joda.time.DateTime;
-
-import javax.security.auth.x500.X500Principal;
 
 public class XStreamXmlSerializerBuilder<T> {
 
@@ -105,7 +116,8 @@ public class XStreamXmlSerializerBuilder<T> {
         return xStream;
     }
 
-    private class MyXStream extends XStream {
+    private final class MyXStream extends XStream {
+
         private MyXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
             super(hierarchicalStreamDriver);
         }

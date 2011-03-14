@@ -46,7 +46,8 @@ public abstract class AbstractX509CertificateWrapper {
 
     public static final PolicyInformation POLICY_INFORMATION = new PolicyInformation(POLICY_OID);
 
-    protected final X509Certificate certificate;
+    private final X509Certificate certificate;
+
 
     protected AbstractX509CertificateWrapper(X509Certificate certificate) {
         Validate.notNull(certificate);

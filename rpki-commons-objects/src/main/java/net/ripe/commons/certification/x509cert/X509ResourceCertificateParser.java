@@ -15,9 +15,9 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
     @Override
     public X509ResourceCertificate getCertificate() {
-        if (result.hasFailures()) {
+        if (getValidationResult().hasFailures()) {
             throw new IllegalArgumentException("Certificate validation failed");
         }
-        return new X509ResourceCertificate(certificate);
+        return new X509ResourceCertificate(getX509Certificate());
     }
 }

@@ -1,10 +1,16 @@
 package net.ripe.commons.provisioning.message;
 
-import com.thoughtworks.xstream.XStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
 
-import java.io.*;
+import org.apache.commons.io.IOUtils;
+
+import com.thoughtworks.xstream.XStream;
 
 public class ProvisioningPayloadXmlSerializer<T extends ProvisioningPayload> extends XStreamXmlSerializer<T> {
 
@@ -37,19 +43,8 @@ public class ProvisioningPayloadXmlSerializer<T extends ProvisioningPayload> ext
 
             return xml.replace("<message", "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"");
         } finally {
-            close(writer);
-            close(outputStream);
-        }
-    }
-
-    private void close(Closeable closeable) {
-        if (closeable != null)
-        {
-            try {
-                closeable.close();
-            } catch (IOException e) {
-                // NOPMD safely ignore
-            }
+            IOUtils.closeQuietly(writer);
+            IOUtils.closeQuietly(outputStream);
         }
     }
 }

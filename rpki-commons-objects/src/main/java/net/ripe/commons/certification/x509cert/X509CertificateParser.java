@@ -33,9 +33,9 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     private byte[] encoded;
 
-    protected X509Certificate certificate;
+    private X509Certificate certificate;
 
-    protected ValidationResult result;
+    private ValidationResult result;
 
 	private final Class<T> certificateClass;
 
@@ -61,7 +61,11 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         return result;
     }
 
-    abstract public T getCertificate();
+    public abstract T getCertificate();
+
+    protected X509Certificate getX509Certificate() {
+        return certificate;
+    }
 
     private void parse() {
         InputStream input = null;
