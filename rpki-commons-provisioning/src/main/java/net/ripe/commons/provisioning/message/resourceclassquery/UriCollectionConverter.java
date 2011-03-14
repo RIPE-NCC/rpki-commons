@@ -1,15 +1,16 @@
 package net.ripe.commons.provisioning.message.resourceclassquery;
 
 
+import java.net.URI;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-import java.net.URI;
-
 public class UriCollectionConverter implements Converter {
+
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         URI[] uris = (URI[])source;
@@ -38,7 +39,7 @@ public class UriCollectionConverter implements Converter {
     }
 
     @Override
-    public boolean canConvert(Class type) {
+    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
         return type == URI[].class;
     }
 }

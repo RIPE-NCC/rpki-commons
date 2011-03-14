@@ -86,6 +86,7 @@ public class ProvisioningCmsObjectBuilderTest {
         subject.build(EE_KEYPAIR.getPrivate());
     }
 
+    @Test
     public void shouldNotForceIdentityCertificate() throws CMSException {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
                                                         .withCmsCertificate(EE_CERT)

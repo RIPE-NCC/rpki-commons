@@ -1,10 +1,11 @@
 package net.ripe.commons.provisioning.message.resourceclassquery;
 
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import org.junit.Test;
-
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+
+import org.junit.Test;
 
 public class ListResponseCmsBuilderTest {
 
@@ -14,7 +15,7 @@ public class ListResponseCmsBuilderTest {
         ListResponseCmsBuilder builder = new ListResponseCmsBuilder();
         builder.withClassName("a classname");
         builder.withCertificateAuthorityUri(new URI("rsync://localhost/some/where"));
-        builder.withCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL);
+        builder.withCmsCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL);
         builder.withSender("sender").withRecipient("recipient");
 
         builder.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
@@ -31,7 +32,7 @@ public class ListResponseCmsBuilderTest {
         ListResponseCmsBuilder builder = new ListResponseCmsBuilder();
         builder.withClassName("a classname");
         builder.withCertificateAuthorityUri(new URI("http://localhost/some/where"));
-        builder.withCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL);
+        builder.withCmsCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL);
         builder.withSender("sender").withRecipient("recipient");
 
         builder.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());

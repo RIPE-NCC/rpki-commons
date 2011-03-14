@@ -124,7 +124,9 @@ public class ProvisioningCmsObjectBuilder {
     private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException {
         List<X509Extension> signedObjects = new ArrayList<X509Extension>();
         signedObjects.add(cmsCertificate);
-        signedObjects.addAll(Arrays.asList(caCertificates));
+        if (caCertificates != null) {
+            signedObjects.addAll(Arrays.asList(caCertificates));
+        }
         signedObjects.add(crl);
 
         CollectionCertStoreParameters certStoreParameters = new CollectionCertStoreParameters(signedObjects);
