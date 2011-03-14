@@ -55,6 +55,8 @@ public class ProvisioningCmsObjectParser {
 
     private Collection<X509Certificate> caCertificates = new HashSet<X509Certificate>();
 
+    private X509CRL crl;
+
     private CMSSignedDataParser sp;
 
     private ValidationResult validationResult;
@@ -89,7 +91,7 @@ public class ProvisioningCmsObjectParser {
         verifyContentType();
         parseContent();
 
-        parseCmsCertificate();
+        parseCertificates();
         parseCmsCrl();
         verifySignerInfos();
     }
@@ -98,7 +100,7 @@ public class ProvisioningCmsObjectParser {
         if (validationResult.hasFailures()) {
             throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed");
         }
-        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates);
+        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl);
     }
 
     /**
@@ -167,7 +169,7 @@ public class ProvisioningCmsObjectParser {
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
      */
-    private void parseCmsCertificate() {
+    private void parseCertificates() {
         Collection<? extends Certificate> certificates = extractCertificates(sp);
         if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
@@ -241,8 +243,11 @@ public class ProvisioningCmsObjectParser {
         }
         validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED);
 
-        CRL cert = certificates.iterator().next();
-        validationResult.isTrue(cert instanceof X509CRL, CRL_IS_X509CRL);
+        CRL x509Crl = certificates.iterator().next();
+
+        if (validationResult.isTrue(x509Crl instanceof X509CRL, CRL_IS_X509CRL)) {
+            crl = (X509CRL) x509Crl;
+        }
     }
 
     private Collection<? extends CRL> extractCrl(CMSSignedDataParser sp) {
