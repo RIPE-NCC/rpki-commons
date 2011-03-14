@@ -5,6 +5,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -17,8 +18,8 @@ public class ProvisioningCmsObjectTest {
 
         byte[] encodedContent = new byte[] {'f', 'o', 'o'};
 
-        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1);
-        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2);
+        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet());
+        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet());
 
         assertEquals(cms1, cms2);
     }
@@ -30,8 +31,8 @@ public class ProvisioningCmsObjectTest {
 
         byte[] encodedContent = new byte[] {'f', 'o', 'o'};
 
-        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1);
-        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2);
+        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet());
+        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet());
 
         assertEquals(cms1.hashCode(), cms2.hashCode());
     }

@@ -116,4 +116,10 @@ public class ProvisioningIdentityCertificateBuilderTest {
         X509CertificateInformationAccessDescriptor[] subjectInformationAccess = TEST_IDENTITY_CERT.getSubjectInformationAccess();
         assertEquals(1, subjectInformationAccess.length);
     }
+
+    @Test
+    public void shouldBeACACertificate() {
+        assertTrue(TEST_IDENTITY_CERT.isCa());
+    }
 }
+

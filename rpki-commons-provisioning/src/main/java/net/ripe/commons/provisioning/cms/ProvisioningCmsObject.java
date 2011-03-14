@@ -2,27 +2,34 @@ package net.ripe.commons.provisioning.cms;
 
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 
 public class ProvisioningCmsObject {
 
     private byte[] encodedContent;
 
-    private X509Certificate certificate;
+    private X509Certificate cmsCertificate;
+
+    private final Collection<X509Certificate> caCertificates;
 
 
-    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate certificate) { //NOPMD - ArrayIsStoredDirectly
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates) { //NOPMD - ArrayIsStoredDirectly
         this.encodedContent = encodedContent;
-        this.certificate = certificate;
+        this.cmsCertificate = cmsCertificate;
+        this.caCertificates = caCertificates;
     }
 
     public byte[] getEncoded() {
         return encodedContent;
     }
 
-    public X509Certificate getCertificate() {
-        return certificate;
+    public X509Certificate getCmsCertificate() {
+        return cmsCertificate;
     }
 
+    public Collection<X509Certificate> getCaCertificates() {
+        return caCertificates;
+    }
 
     @Override
     public int hashCode() {

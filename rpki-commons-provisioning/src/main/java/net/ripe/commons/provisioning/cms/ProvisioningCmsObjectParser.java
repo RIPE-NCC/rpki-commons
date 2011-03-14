@@ -18,6 +18,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
@@ -50,7 +51,9 @@ public class ProvisioningCmsObjectParser {
 
     private byte[] encoded;
 
-    private X509Certificate certificate;
+    private X509Certificate cmsCertificate;
+
+    private Collection<X509Certificate> caCertificates = new HashSet<X509Certificate>();
 
     private CMSSignedDataParser sp;
 
@@ -95,9 +98,7 @@ public class ProvisioningCmsObjectParser {
         if (validationResult.hasFailures()) {
             throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed");
         }
-
-
-        return new ProvisioningCmsObject(encoded, certificate);
+        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates);
     }
 
     /**
@@ -167,22 +168,31 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
      */
     private void parseCmsCertificate() {
-        Collection<? extends Certificate> certificates = extractCertificate(sp);
-
+        Collection<? extends Certificate> certificates = extractCertificates(sp);
         if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
 
-        validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CERT_ALLOWED);
-
-        Certificate cert = certificates.iterator().next();
-        if (!validationResult.isTrue(cert instanceof X509Certificate, CERT_IS_X509CERT)) {
-            return;
+        for (Certificate cert : certificates) {
+            if (!validationResult.isTrue(cert instanceof X509Certificate, CERT_IS_X509CERT)) {
+                continue;
+            }
+            processX509Certificate((X509Certificate)cert);
         }
-        certificate = (X509Certificate) cert;//TODO: parse certificate
+    }
 
-        validationResult.isTrue(isEndEntityCertificate(certificate), CERT_IS_EE_CERT);
-        validationResult.notNull(X509CertificateUtil.getSubjectKeyIdentifier(certificate) != null, CERT_HAS_SKI);
+    private void processX509Certificate(X509Certificate certificate) {
+        if (isEndEntityCertificate(certificate)) {
+            if (cmsCertificate == null) {
+                cmsCertificate = certificate;
+                validationResult.isTrue(true, CERT_IS_EE_CERT);
+                validationResult.notNull(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate) != null, CERT_HAS_SKI);
+            } else {
+                validationResult.isTrue(false, ONLY_ONE_EE_CERT_ALLOWED);
+            }
+        } else {
+            caCertificates.add(certificate);
+        }
     }
 
     private boolean isEndEntityCertificate(X509Certificate certificate) {
@@ -203,7 +213,7 @@ public class ProvisioningCmsObjectParser {
         }
     }
 
-    private Collection<? extends Certificate> extractCertificate(CMSSignedDataParser sp) {
+    private Collection<? extends Certificate> extractCertificates(CMSSignedDataParser sp) {
         Collection<? extends Certificate> certificates;
         try {
             CertStore certs;
@@ -298,7 +308,7 @@ public class ProvisioningCmsObjectParser {
     private void verifySubjectKeyIdentifier(SignerInformation signer) {
         SignerId sid = signer.getSID();
         try {
-            validationResult.isTrue(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(certificate)).getEncoded(), sid.getSubjectKeyIdentifier()), CMS_SIGNER_INFO_SKI);
+            validationResult.isTrue(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate)).getEncoded(), sid.getSubjectKeyIdentifier()), CMS_SIGNER_INFO_SKI);
         } catch (IOException e) {
             validationResult.isTrue(false, CMS_SIGNER_INFO_SKI);
         }
@@ -380,7 +390,7 @@ public class ProvisioningCmsObjectParser {
     private void verifySignature(SignerInformation signer) {
         boolean errorOccured = false;
         try {
-            validationResult.isTrue(signer.verify(certificate, DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
+            validationResult.isTrue(signer.verify(cmsCertificate, DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
         } catch (CertificateExpiredException e) {
             errorOccured = true;
         } catch (CertificateNotYetValidException e) {

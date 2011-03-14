@@ -74,8 +74,6 @@ public class ProvisioningIdentityCertificateBuilder {
     private void setUpImplicitRequirementsForBuilderHelper() {
         builderHelper.withSerial(BigInteger.ONE); // Self-signed! So this is the first!
         builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusYears(DEFAULT_VALIDITY_TIME_YEARS_FROM_NOW)));
+        builderHelper.withCa(true);
     }
-
-
-
 }

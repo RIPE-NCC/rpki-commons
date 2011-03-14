@@ -132,7 +132,7 @@ public abstract class RpkiSignedObjectParser {
         if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
-        validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CERT_ALLOWED);
+        validationResult.isTrue(certificates.size() == 1, ONLY_ONE_EE_CERT_ALLOWED);
         if (!validationResult.isTrue(certificates.iterator().next() instanceof X509Certificate, CERT_IS_X509CERT)) {
             return;
         }

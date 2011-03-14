@@ -1,28 +1,41 @@
 package net.ripe.commons.provisioning.cms;
 
-import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.*;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedDataParser;
-import org.bouncycastle.cms.CMSSignedGenerator;
-import org.bouncycastle.cms.SignerInformation;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.junit.Before;
-import org.junit.Test;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
+import static org.bouncycastle.cms.CMSSignedGenerator.*;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
 import java.util.Collection;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static org.junit.Assert.*;
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.SignerInformation;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ProvisioningCmsObjectBuilderTest {
 
@@ -33,39 +46,61 @@ public class ProvisioningCmsObjectBuilderTest {
 
     @Before
     public void setUp() throws Exception {
-        subject = new ProvisioningCmsObjectBuilder().withCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL).withPayloadContent("Hello");
+        subject = new ProvisioningCmsObjectBuilder()
+                        .withCmsCertificate(EE_CERT)
+                        .withCrl(CRL)
+                        .withPayloadContent("Hello")
+                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
         DateTimeUtils.setCurrentMillisFixed(signingTime);
-        cmsObject = subject.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
+        cmsObject = subject.build(EE_KEYPAIR.getPrivate());
         DateTimeUtils.setCurrentMillisSystem();
     }
 
     public static ProvisioningCmsObject createProvisioningCmsObject() {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
-                                                        .withCertificate(ProvisioningObjectMother.EE_CERT)
-                                                        .withCrl(ProvisioningObjectMother.CRL)
-                                                        .withPayloadContent("hello");
+                                                        .withCmsCertificate(EE_CERT)
+                                                        .withCrl(CRL)
+                                                        .withPayloadContent("hello")
+                                                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
 
-        return subject.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
+        return subject.build(EE_KEYPAIR.getPrivate());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
-        subject = new ProvisioningCmsObjectBuilder().withPayloadContent("content").withCrl(ProvisioningObjectMother.CRL);
-        subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
+        subject = new ProvisioningCmsObjectBuilder()
+                        .withPayloadContent("content")
+                        .withCrl(CRL)
+                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
+        subject.build(EE_KEYPAIR.getPrivate());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCrl() throws CMSException {
-        subject = new ProvisioningCmsObjectBuilder().withPayloadContent("content").withCertificate(ProvisioningObjectMother.EE_CERT);
-        subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
+        subject = new ProvisioningCmsObjectBuilder()
+                        .withPayloadContent("content")
+                        .withCmsCertificate(EE_CERT)
+                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
+        subject.build(EE_KEYPAIR.getPrivate());
+    }
+
+    public void shouldNotForceIdentityCertificate() throws CMSException {
+        ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
+                                                        .withCmsCertificate(EE_CERT)
+                                                        .withCrl(CRL)
+                                                        .withPayloadContent("hello");
+        subject.build(EE_KEYPAIR.getPrivate());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldForcePayload() throws CMSException {
-        subject = new ProvisioningCmsObjectBuilder().withCrl(ProvisioningObjectMother.CRL).withCertificate(ProvisioningObjectMother.EE_CERT);
-        subject.build(ProvisioningIdentityCertificateBuilderTest.TEST_KEY_PAIR.getPrivate());
+        subject = new ProvisioningCmsObjectBuilder()
+                        .withCrl(ProvisioningObjectMother.CRL)
+                        .withCmsCertificate(EE_CERT)
+                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
+        subject.build(EE_KEYPAIR.getPrivate());
     }
 
     @Test
@@ -94,7 +129,7 @@ public class ProvisioningCmsObjectBuilderTest {
         DEREncodable derObject = digestAlgorithms.getObjectAt(0);
         AlgorithmIdentifier algorithmId = AlgorithmIdentifier.getInstance(derObject.getDERObject());
 
-        assertEquals(CMSSignedGenerator.DIGEST_SHA256, algorithmId.getObjectId().getId());
+        assertEquals(DIGEST_SHA256, algorithmId.getObjectId().getId());
     }
 
     /**
@@ -128,7 +163,7 @@ public class ProvisioningCmsObjectBuilderTest {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
      */
     @Test
-    public void shouldCmsObjectHaveEmbeddedCertificate() throws Exception {
+    public void shouldCmsObjectHaveEmbeddedEECertificate() throws Exception {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         CertStore certificatesAndCRLs = sp.getCertificatesAndCRLs("Collection", (String) null);
@@ -136,7 +171,27 @@ public class ProvisioningCmsObjectBuilderTest {
 
         assertNotNull(certificates);
         assertFalse(certificates.isEmpty());
-        assertEquals(ProvisioningObjectMother.EE_CERT, certificates.iterator().next());
+
+        certificates = new ArrayList<Certificate>(certificates);
+        assertTrue(certificates.contains(EE_CERT));
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
+     */
+    @Test
+    public void shouldCmsObjectHaveEmbeddedIdentityCertificate() throws Exception {
+        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
+        sp.getSignedContent().drain();
+        CertStore certificatesAndCRLs = sp.getCertificatesAndCRLs("Collection", (String) null);
+        Collection<? extends Certificate> certificates = certificatesAndCRLs.getCertificates(null);
+
+        assertNotNull(certificates);
+        assertFalse(certificates.isEmpty());
+        assertEquals(2, certificates.size());
+
+        certificates = new ArrayList<Certificate>(certificates);
+        assertTrue(certificates.contains(TEST_IDENTITY_CERT.getCertificate()));
     }
 
     /**
@@ -151,7 +206,7 @@ public class ProvisioningCmsObjectBuilderTest {
 
         assertNotNull(crls);
         assertFalse(crls.isEmpty());
-        assertEquals(ProvisioningObjectMother.CRL, crls.iterator().next());
+        assertEquals(CRL, crls.iterator().next());
     }
 
     /**
@@ -189,7 +244,7 @@ public class ProvisioningCmsObjectBuilderTest {
         Collection<?> signers = sp.getSignerInfos().getSigners();
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
-        assertArrayEquals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(ProvisioningObjectMother.EE_CERT)).getEncoded(), signer.getSID().getSubjectKeyIdentifier());
+        assertArrayEquals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(EE_CERT)).getEncoded(), signer.getSID().getSubjectKeyIdentifier());
     }
 
     /**
@@ -216,7 +271,7 @@ public class ProvisioningCmsObjectBuilderTest {
         Collection<?> signers = sp.getSignerInfos().getSigners();
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
-        assertEquals(CMSSignedGenerator.DIGEST_SHA256, signer.getDigestAlgOID());
+        assertEquals(DIGEST_SHA256, signer.getDigestAlgOID());
     }
 
     /**
@@ -310,7 +365,7 @@ public class ProvisioningCmsObjectBuilderTest {
         Collection<?> signers = sp.getSignerInfos().getSigners();
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
-        assertEquals(CMSSignedGenerator.ENCRYPTION_RSA, signer.getEncryptionAlgOID());
+        assertEquals(ENCRYPTION_RSA, signer.getEncryptionAlgOID());
     }
 
     /**
@@ -324,7 +379,7 @@ public class ProvisioningCmsObjectBuilderTest {
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignature());
-        signer.verify(ProvisioningObjectMother.EE_CERT, DEFAULT_SIGNATURE_PROVIDER);
+        signer.verify(EE_CERT, DEFAULT_SIGNATURE_PROVIDER);
     }
 
     /**

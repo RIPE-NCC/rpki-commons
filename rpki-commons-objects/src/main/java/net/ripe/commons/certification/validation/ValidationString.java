@@ -66,7 +66,7 @@ public final class ValidationString {
 	public static final String ONLY_ONE_SIGNED_OBJECT = "cms.only.one.signed.object";
 	public static final String CMS_CONTENT_PARSING = "cms.content.parsing";
 	public static final String GET_CERTS_AND_CRLS = "cms.get.certs.and.crls";
-	public static final String ONLY_ONE_CERT_ALLOWED = "cms.only.one.cert";
+	public static final String ONLY_ONE_EE_CERT_ALLOWED = "cms.only.one.ee.cert";
 	public static final String CERT_IS_X509CERT = "cms.cert.is.x509";
 	public static final String CERT_IS_EE_CERT = "cms.cert.is.ee.cert";
 	public static final String ONLY_ONE_CRL_ALLOWED = "cms.only.one.crl";

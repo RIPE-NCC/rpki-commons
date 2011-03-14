@@ -1,23 +1,24 @@
 package net.ripe.commons.provisioning.message.resourceclassquery;
 
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+
+import org.junit.Test;
 
 public class ListQueryCmsBuilderTest {
+
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.1
     @Test
     public void shouldCreateListQueryXml() throws IOException {
         ListQueryCmsBuilder builder = new ListQueryCmsBuilder().withSender("sender").withRecipient("recipient");
 
-        builder.withCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL);
+        builder.withCmsCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL).withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
 
-        ProvisioningCmsObject cmsObject = builder.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
-
+        builder.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
         String xml = builder.xml;
 
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list\"/>", xml);
@@ -36,5 +37,4 @@ public class ListQueryCmsBuilderTest {
         ListQueryCmsBuilder payloadBuilder = new ListQueryCmsBuilder().withSender("sender");
         payloadBuilder.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
     }
-
 }
