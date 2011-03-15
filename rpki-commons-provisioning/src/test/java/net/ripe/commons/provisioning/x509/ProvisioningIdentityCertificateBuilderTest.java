@@ -1,15 +1,14 @@
 package net.ripe.commons.provisioning.x509;
 
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
 import static org.junit.Assert.*;
 
 import java.net.URI;
-import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
-import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +17,6 @@ public class ProvisioningIdentityCertificateBuilderTest {
 
     private ProvisioningIdentityCertificateBuilder subject;
 
-    public static final KeyPair TEST_KEY_PAIR = ProvisioningKeyPairGenerator.generate();
     public static final X500Principal SELF_SIGNING_DN = new X500Principal("CN=test");
     public static final URI TEST_CRL_RSYNC_URI = URI.create("rsync://some.host:10873/camanagername/myid/id.crl");
     public static final URI TEST_SIA_RSYNC_URI = URI.create("rsync://some.host:10873/camanagername/myid/");

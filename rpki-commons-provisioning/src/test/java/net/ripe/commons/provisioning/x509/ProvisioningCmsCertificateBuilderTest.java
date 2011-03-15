@@ -1,0 +1,134 @@
+package net.ripe.commons.provisioning.x509;
+
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
+import static org.junit.Assert.*;
+
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.interfaces.RSAPublicKey;
+
+import javax.security.auth.x500.X500Principal;
+
+import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
+import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class ProvisioningCmsCertificateBuilderTest {
+
+    public static final KeyPair EE_KEYPAIR = ProvisioningKeyPairGenerator.generate();
+
+    public static final ProvisioningCmsCertificate TEST_CMS_CERT = getTestProvisioningCmsCertificate();
+
+    private ProvisioningCmsCertificateBuilder subject;
+
+
+    private static ProvisioningCmsCertificate getTestProvisioningCmsCertificate() {
+        ProvisioningCmsCertificateBuilder cmsCertificateBuilder = getTestBuilder();
+        return cmsCertificateBuilder.build();
+    }
+
+    private static ProvisioningCmsCertificateBuilder getTestBuilder() {
+        ProvisioningCmsCertificateBuilder builder = new ProvisioningCmsCertificateBuilder();
+        builder.withIssuerDN(TEST_IDENTITY_CERT.getSubject());
+        builder.withSerial(BigInteger.TEN);
+        builder.withPublicKey(EE_KEYPAIR.getPublic());
+        builder.withSubjectDN(new X500Principal("CN=end-entity"));
+        builder.withSigningKeyPair(TEST_KEY_PAIR);
+        return builder;
+    }
+
+
+    @Before
+    public void setUp() {
+        // Create a builder with all requirements so that we can exclude (nullify) each
+        // requirement for easy unit testing of the builder
+        subject = getTestBuilder();
+    }
+
+    @Test
+    public void shouldBuild() {
+        ProvisioningCmsCertificate cmsCertificate = subject.build();
+        assertNotNull(cmsCertificate);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void shouldRequirePublicKey() {
+        subject.withPublicKey(null);
+        subject.build();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void shouldRequireIssuerDN() {
+        subject.withIssuerDN(null);
+        subject.build();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void shouldRequireSubjectDN() {
+        subject.withSubjectDN(null);
+        subject.build();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void shouldRequireSerial() {
+        subject.withSerial(null);
+        subject.build();
+    }
+
+//    @Test(expected=IllegalArgumentException.class)
+    public void shouldRequireAia() {
+        //TODO:
+    }
+
+//    @Test(expected=IllegalArgumentException.class)
+    public void shouldRequireCrlRsyncUri() {
+        //TODO:
+    }
+
+
+    // ======= the following unit tests test properties of the certificate built by this builder =====
+
+    /**
+     * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
+     */
+    @Test
+    public void shouldUseSHA256withRSA() {
+        assertEquals("SHA256withRSA", TEST_CMS_CERT.getCertificate().getSigAlgName());
+    }
+
+    /**
+     * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
+     */
+    @Test
+    public void shouldUse2048BitRsaKey() {
+        assertTrue(TEST_CMS_CERT.getPublicKey() instanceof RSAPublicKey);
+        assertEquals(((RSAPublicKey) TEST_CMS_CERT.getPublicKey()).getModulus().bitLength(), 2048);
+    }
+
+    @Test
+    public void shouldHaveRsyncCrlPointer() {
+//        assertNotNull(TEST_CMS_CERT.findFirstRsyncCrlDistributionPoint());
+        //TODO:
+    }
+
+    @Test
+    public void shouldHaveAiaPointer() {
+//        assertNull(TEST_CMS_CERT.getAuthorityInformationAccess());
+        //TODO:
+    }
+
+    @Test
+    public void shouldHaveNoSiaPointer() {
+        X509CertificateInformationAccessDescriptor[] subjectInformationAccess = TEST_CMS_CERT.getSubjectInformationAccess();
+        assertNull(subjectInformationAccess);
+    }
+
+    @Test
+    public void shouldBeAEECertificate() {
+        assertFalse(TEST_CMS_CERT.isCa());
+    }
+}
+

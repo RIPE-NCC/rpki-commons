@@ -6,15 +6,15 @@ import java.security.cert.X509Certificate;
 
 import org.junit.Test;
 
-public class ProvisioningIdentityCertificateTest {
+public class ProvisioningCmsCertificateTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldCheckForNullArgument() {
-        new ProvisioningIdentityCertificate(null);
+        new ProvisioningCmsCertificate(null);
     }
 
     @Test
     public void shouldWrapX509Certificate() {
-        assertTrue(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate() instanceof X509Certificate);
+        assertTrue(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT.getCertificate() instanceof X509Certificate);
     }
 }

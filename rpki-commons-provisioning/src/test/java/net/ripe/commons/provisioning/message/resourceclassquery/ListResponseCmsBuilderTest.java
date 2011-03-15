@@ -1,5 +1,7 @@
 package net.ripe.commons.provisioning.message.resourceclassquery;
 
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -15,15 +17,13 @@ public class ListResponseCmsBuilderTest {
         ListResponseCmsBuilder builder = new ListResponseCmsBuilder();
         builder.withClassName("a classname");
         builder.withCertificateAuthorityUri(new URI("rsync://localhost/some/where"));
-        builder.withCmsCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL);
+        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
         builder.withSender("sender").withRecipient("recipient");
 
-        builder.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
+        builder.build(EE_KEYPAIR.getPrivate());
 
         // TODO remove
 //        System.out.println(builder.xml);
-
-
     }
 
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3
@@ -32,9 +32,9 @@ public class ListResponseCmsBuilderTest {
         ListResponseCmsBuilder builder = new ListResponseCmsBuilder();
         builder.withClassName("a classname");
         builder.withCertificateAuthorityUri(new URI("http://localhost/some/where"));
-        builder.withCmsCertificate(ProvisioningObjectMother.EE_CERT).withCrl(ProvisioningObjectMother.CRL);
+        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
         builder.withSender("sender").withRecipient("recipient");
 
-        builder.build(ProvisioningObjectMother.EE_KEYPAIR.getPrivate());
+        builder.build(EE_KEYPAIR.getPrivate());
     }
 }

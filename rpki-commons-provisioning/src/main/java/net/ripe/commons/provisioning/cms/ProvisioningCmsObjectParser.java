@@ -186,14 +186,14 @@ public class ProvisioningCmsObjectParser {
     private void processX509Certificate(X509Certificate certificate) {
         if (isEndEntityCertificate(certificate)) {
             if (cmsCertificate == null) {
-                cmsCertificate = certificate;
+                cmsCertificate = certificate; //TODO: parse cms cert
                 validationResult.isTrue(true, CERT_IS_EE_CERT);
                 validationResult.notNull(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate) != null, CERT_HAS_SKI);
             } else {
                 validationResult.isTrue(false, ONLY_ONE_EE_CERT_ALLOWED);
             }
         } else {
-            caCertificates.add(certificate);
+            caCertificates.add(certificate); //TODO: parse ca cert
         }
     }
 

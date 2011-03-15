@@ -70,12 +70,6 @@ public class ProvisioningCmsCertificateBuilder {
         return this;
     }
 
-    public ProvisioningCmsCertificateBuilder withSubjectInformationAccess(X509CertificateInformationAccessDescriptor... descriptors) {
-        builderHelper.withSubjectInformationAccess(descriptors);
-        return this;
-    }
-
-
     public ProvisioningCmsCertificate build() {
         setUpImplicitRequirementsForBuilderHelper();
         return new ProvisioningCmsCertificate(builderHelper.generateCertificate());
@@ -83,7 +77,7 @@ public class ProvisioningCmsCertificateBuilder {
 
     private void setUpImplicitRequirementsForBuilderHelper() {
         builderHelper.withCa(false);
-        builderHelper.withSubjectKeyIdentifier(true);
+        builderHelper.withAuthorityKeyIdentifier(true);
         builderHelper.withSubjectKeyIdentifier(true);
         builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusMonths(DEFAULT_VALIDITY_TIME_MONTHS_FROM_NOW)));
     }

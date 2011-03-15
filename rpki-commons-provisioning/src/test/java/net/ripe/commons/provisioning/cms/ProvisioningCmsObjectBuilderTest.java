@@ -2,6 +2,7 @@ package net.ripe.commons.provisioning.cms;
 
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
 import static org.bouncycastle.cms.CMSSignedGenerator.*;
 import static org.junit.Assert.*;
@@ -47,7 +48,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Before
     public void setUp() throws Exception {
         subject = new ProvisioningCmsObjectBuilder()
-                        .withCmsCertificate(EE_CERT)
+                        .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCrl(CRL)
                         .withPayloadContent("Hello")
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
@@ -60,7 +61,7 @@ public class ProvisioningCmsObjectBuilderTest {
 
     public static ProvisioningCmsObject createProvisioningCmsObject() {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
-                                                        .withCmsCertificate(EE_CERT)
+                                                        .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
                                                         .withPayloadContent("hello")
                                                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
@@ -81,7 +82,7 @@ public class ProvisioningCmsObjectBuilderTest {
     public void shouldForceCrl() throws CMSException {
         subject = new ProvisioningCmsObjectBuilder()
                         .withPayloadContent("content")
-                        .withCmsCertificate(EE_CERT)
+                        .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.build(EE_KEYPAIR.getPrivate());
     }
@@ -89,7 +90,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test
     public void shouldNotForceIdentityCertificate() throws CMSException {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
-                                                        .withCmsCertificate(EE_CERT)
+                                                        .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
                                                         .withPayloadContent("hello");
         subject.build(EE_KEYPAIR.getPrivate());
@@ -99,7 +100,7 @@ public class ProvisioningCmsObjectBuilderTest {
     public void shouldForcePayload() throws CMSException {
         subject = new ProvisioningCmsObjectBuilder()
                         .withCrl(ProvisioningObjectMother.CRL)
-                        .withCmsCertificate(EE_CERT)
+                        .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.build(EE_KEYPAIR.getPrivate());
     }
@@ -174,7 +175,7 @@ public class ProvisioningCmsObjectBuilderTest {
         assertFalse(certificates.isEmpty());
 
         certificates = new ArrayList<Certificate>(certificates);
-        assertTrue(certificates.contains(EE_CERT));
+        assertTrue(certificates.contains(TEST_CMS_CERT.getCertificate()));
     }
 
     /**
@@ -245,7 +246,7 @@ public class ProvisioningCmsObjectBuilderTest {
         Collection<?> signers = sp.getSignerInfos().getSigners();
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
-        assertArrayEquals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(EE_CERT)).getEncoded(), signer.getSID().getSubjectKeyIdentifier());
+        assertArrayEquals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(TEST_CMS_CERT.getCertificate())).getEncoded(), signer.getSID().getSubjectKeyIdentifier());
     }
 
     /**
@@ -380,7 +381,7 @@ public class ProvisioningCmsObjectBuilderTest {
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignature());
-        signer.verify(EE_CERT, DEFAULT_SIGNATURE_PROVIDER);
+        signer.verify(TEST_CMS_CERT.getCertificate(), DEFAULT_SIGNATURE_PROVIDER);
     }
 
     /**
