@@ -101,7 +101,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
-    	assertTrue(ValidationString.CERT_REVOKED.equals(result.getFailures("child").get(0).getKey()));
+    	assertTrue(ValidationString.CERT_NOT_REVOKED.equals(result.getFailures("child").get(0).getKey()));
 	}
 
 	@Test

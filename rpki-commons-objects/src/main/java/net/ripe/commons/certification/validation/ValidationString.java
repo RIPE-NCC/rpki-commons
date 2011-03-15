@@ -30,7 +30,7 @@ public final class ValidationString {
 	public static final String SKI_PRESENT = "cert.ski.present";
 	public static final String AKI_PRESENT = "cert.aki.present";
 	public static final String PREV_SKI_EQ_AKI = "cert.aki.eq.prev.ski";
-	public static final String CERT_REVOKED = "cert.revoked";
+	public static final String CERT_NOT_REVOKED = "cert.not.revoked";
 	public static final String ROOT_IS_TA = "cert.root.is.ta";
 	public static final String CERT_AIA_NOT_POINTING_TO_CERT = "cert.aia.no.certificate";
 	public static final String DIFFERENT_CERTIFICATE_TYPES = "cert.types.different";

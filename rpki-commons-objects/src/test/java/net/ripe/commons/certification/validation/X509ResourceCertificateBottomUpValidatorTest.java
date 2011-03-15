@@ -184,7 +184,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     	ValidationResult validationResult = validator.getValidationResult();
         assertTrue(validationResult.hasFailures());
     	assertTrue(validationResult.hasFailureForLocation("child"));
-    	assertTrue(ValidationString.CERT_REVOKED.equals(validationResult.getFailures("child").get(0).getKey()));
+    	assertTrue(ValidationString.CERT_NOT_REVOKED.equals(validationResult.getFailures("child").get(0).getKey()));
     }
 
     @Test

@@ -1,7 +1,7 @@
 package net.ripe.commons.certification.validation.objectvalidators;
 
 import static net.ripe.commons.certification.validation.ValidationString.AKI_PRESENT;
-import static net.ripe.commons.certification.validation.ValidationString.CERT_REVOKED;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_NOT_REVOKED;
 import static net.ripe.commons.certification.validation.ValidationString.CRL_REQUIRED;
 import static net.ripe.commons.certification.validation.ValidationString.CRL_SIGNATURE_VALID;
 import static net.ripe.commons.certification.validation.ValidationString.ISSUER_IS_CA;
@@ -97,7 +97,7 @@ public class X509ResourceCertificateParentChildValidator implements X509Resource
         }
 
         result.isFalse(errorOccured, CRL_SIGNATURE_VALID);
-        result.isFalse(crl.isRevoked(child.getCertificate()), CERT_REVOKED);
+        result.isFalse(crl.isRevoked(child.getCertificate()), CERT_NOT_REVOKED);
     }
 
     private void verifyValidity() {
