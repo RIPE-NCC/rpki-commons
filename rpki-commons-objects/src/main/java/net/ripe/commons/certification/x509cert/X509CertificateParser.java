@@ -53,7 +53,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         if (!result.hasFailureForLocation(location)) {
             validateCertificatePolicy();
             validateSignatureAlgorithm();
-	        validateResourceExtensions();
+	        validateResourceExtensionsForResourceCertificates();
         }
     }
 
@@ -112,13 +112,14 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         result.isTrue(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM);
     }
 
-	private void validateResourceExtensions() {
-		if (isResourceExtensionPresent()) {
-			result.isTrue(true, RESOURCE_EXT_PRESENT);
-			result.isTrue(true, AS_OR_IP_RESOURCE_PRESENT);
-			parseResourceExtensions();
+	private void validateResourceExtensionsForResourceCertificates() {
+		if (X509ResourceCertificate.class.isAssignableFrom(certificateClass)) {
+		    if (result.isTrue(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
+		        result.isTrue(true, AS_OR_IP_RESOURCE_PRESENT);
+		        parseResourceExtensions();
+		    }
 		} else {
-			result.isFalse(X509ResourceCertificate.class.isAssignableFrom(certificateClass), AS_OR_IP_RESOURCE_PRESENT);
+		    result.isFalse(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
 		}
 	}
 

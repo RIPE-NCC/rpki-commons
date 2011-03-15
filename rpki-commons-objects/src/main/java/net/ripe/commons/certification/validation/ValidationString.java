@@ -54,6 +54,7 @@ public final class ValidationString {
 	public static final String POLICY_ID_VERSION = "cert.policy.id.version";
 	public static final String POLICY_VALIDATION = "cert.policy.validation";
 	public static final String RESOURCE_EXT_PRESENT = "cert.resource.ext.present";
+	public static final String RESOURCE_EXT_NOT_PRESENT = "cert.resource.ext.not.present";
 	public static final String AS_OR_IP_RESOURCE_PRESENT = "cert.as.or.ip.resource.present";
 	public static final String PARTIAL_INHERITANCE = "cert.partial.resource.inheritance";
 

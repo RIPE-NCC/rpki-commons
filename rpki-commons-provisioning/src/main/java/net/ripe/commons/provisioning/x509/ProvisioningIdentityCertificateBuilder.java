@@ -29,6 +29,7 @@ public class ProvisioningIdentityCertificateBuilder {
 
     private URI repositoryRsyncUri;
 
+
     public ProvisioningIdentityCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
     }
@@ -61,7 +62,6 @@ public class ProvisioningIdentityCertificateBuilder {
         return this;
     }
 
-    @SuppressWarnings("deprecation")
     public ProvisioningIdentityCertificate build() {
         Validate.notNull(selfSigningKeyPair, "Self Signing KeyPair is required");
         Validate.notNull(selfSigningSubject, "Self Signing DN is required");
