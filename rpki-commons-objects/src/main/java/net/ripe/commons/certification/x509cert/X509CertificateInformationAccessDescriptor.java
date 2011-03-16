@@ -68,6 +68,7 @@ public class X509CertificateInformationAccessDescriptor extends ValueObjectSuppo
     }
 
     public static AccessDescription[] convertAccessDescriptors(X509CertificateInformationAccessDescriptor... descriptors) {
+        Validate.noNullElements(descriptors);
         AccessDescription[] result = new AccessDescription[descriptors.length];
         for (int i = 0; i < descriptors.length; ++i) {
             result[i] = descriptors[i].toAccessDescription();

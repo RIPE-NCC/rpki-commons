@@ -5,6 +5,7 @@ import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 
@@ -37,9 +38,12 @@ public class ProvisioningCmsCertificateBuilderTest {
         builder.withPublicKey(EE_KEYPAIR.getPublic());
         builder.withSubjectDN(new X500Principal("CN=end-entity"));
         builder.withSigningKeyPair(TEST_KEY_PAIR);
+        builder.withCrlRsyncUri(URI.create("rsync://repository/parent-publication-dir/"));
+        builder.withAuthorityInformationAccess(new X509CertificateInformationAccessDescriptor[] {
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, URI.create("rsync://repository/member/identity-cert-publication-uri"))
+        });
         return builder;
     }
-
 
     @Before
     public void setUp() {
@@ -78,14 +82,16 @@ public class ProvisioningCmsCertificateBuilderTest {
         subject.build();
     }
 
-//    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void shouldRequireAia() {
-        //TODO:
+        subject.withAuthorityInformationAccess((X509CertificateInformationAccessDescriptor)null);
+        subject.build();
     }
 
-//    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void shouldRequireCrlRsyncUri() {
-        //TODO:
+        subject.withCrlRsyncUri(null);
+        subject.build();
     }
 
 
@@ -110,14 +116,12 @@ public class ProvisioningCmsCertificateBuilderTest {
 
     @Test
     public void shouldHaveRsyncCrlPointer() {
-//        assertNotNull(TEST_CMS_CERT.findFirstRsyncCrlDistributionPoint());
-        //TODO:
+        assertNotNull(TEST_CMS_CERT.findFirstRsyncCrlDistributionPoint());
     }
 
     @Test
     public void shouldHaveAiaPointer() {
-//        assertNull(TEST_CMS_CERT.getAuthorityInformationAccess());
-        //TODO:
+        assertNotNull(TEST_CMS_CERT.getAuthorityInformationAccess());
     }
 
     @Test

@@ -216,6 +216,7 @@ public final class X509CertificateBuilderHelper {
             addSIA(generator);
         }
         if (crlDistributionPoints != null) {
+            Validate.noNullElements(crlDistributionPoints);
             addCrlDistributionPoints(generator);
         }
         if (policies != null) {
