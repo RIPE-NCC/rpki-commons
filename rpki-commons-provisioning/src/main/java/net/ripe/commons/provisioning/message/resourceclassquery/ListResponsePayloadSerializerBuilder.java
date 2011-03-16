@@ -12,6 +12,7 @@ public class ListResponsePayloadSerializerBuilder extends ProvisioningPayloadXml
     @Override
     public XStreamXmlSerializer<ListResponsePayload> build() {
         getXStream().processAnnotations(ListResponsePayload.class);
+        getXStream().processAnnotations(ListResponsePayloadClass.class);
         return super.build();
     }
 }

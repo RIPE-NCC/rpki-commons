@@ -2,13 +2,16 @@ package net.ripe.commons.provisioning.message.resourceclassquery;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import net.ripe.commons.provisioning.message.ProvisioningPayloadClass;
 import net.ripe.ipresource.IpRange;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @XStreamAlias("class")
 public class ListResponsePayloadClass extends ProvisioningPayloadClass {
@@ -40,11 +43,30 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
     @XStreamAsAttribute
     private String suggestedSiaHeadUri;
 
+    @XStreamAlias("certificate")
+    @XStreamImplicit(itemFieldName = "certificate")
+    private List<ResourceSet> resourceSets;
+
     public String getClassName() {
         return className;
     }
 
+    ListResponsePayloadClass setClassName(String className) {
+        this.className = className;
+        return this;
+    }
+
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
+
     public URI[] getCertificateAuthorityUri() {
+        if (certificateUrl == null) {
+            return null;
+        }
+
         String[] urls = certificateUrl.split(",");
 
         URI[] uris = new URI[urls.length];
@@ -70,24 +92,13 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
     public IpRange[] getResourceSetIpv4() {
         String[] ipV4 = resourceSetIpv4.split(",");
 
-        return toIpRange(ipV4);
+        return ResourceClassUtil.toIpRange(ipV4);
     }
 
     public IpRange[] getResourceSetIpv6() {
         String[] ipV6 = resourceSetIpv6.split(",");
 
-        return toIpRange(ipV6);
-    }
-
-    private IpRange[] toIpRange(String[] ipV4) {
-        int index = 0;
-        IpRange[] ranges = new IpRange[ipV4.length];
-
-        for (String ip : ipV4) {
-            ranges[index++]= IpRange.parse(ip);
-        }
-
-        return ranges;
+        return ResourceClassUtil.toIpRange(ipV6);
     }
 
     public DateTime getResourceSetNotAfter() {
@@ -98,10 +109,7 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return suggestedSiaHeadUri;
     }
 
-    ListResponsePayloadClass setClassName(String className) {
-        this.className = className;
-        return this;
-    }
+
 
     public String[] getResourceSetAsNumbers() {
         return resourceSetAsNumbers != null ? resourceSetAsNumbers.split(",") : null;
@@ -140,4 +148,13 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return this;
     }
 
+
+    public List<ResourceSet> getResourceSets() {
+        return resourceSets;
+    }
+
+    ListResponsePayloadClass setResourceSets(List<ResourceSet> resourceSets) {
+        this.resourceSets = resourceSets;
+        return this;
+    }
 }

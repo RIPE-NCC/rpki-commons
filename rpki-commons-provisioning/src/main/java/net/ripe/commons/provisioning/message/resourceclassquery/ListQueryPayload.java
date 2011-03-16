@@ -11,7 +11,6 @@ public class ListQueryPayload extends ProvisioningPayload {
         super(sender, recipient, PayloadMessageType.list);
     }
 
-    @Override
     public ProvisioningPayloadClass getPayloadClass() {
         return null;
     }

@@ -1,5 +1,6 @@
 package net.ripe.commons.provisioning.message.resourceclassquery;
 
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.ipresource.IpRange;
 import org.joda.time.DateTime;
@@ -28,17 +29,24 @@ public class ListResponseCmsBuilderTest {
         builder.withIpv6ResourceSet(IpRange.parse("2001:0DB8::/48"), IpRange.parse("2001:0DB8:002::-2001:0DB8:005::"));
         builder.withValidityNotAfter(new DateTime(2011, 1, 1, 23, 58, 23, 12));
         builder.withPublicationPoint("rsync://some/where");
+        builder.withResourceSet(new ResourceSetBuilder().withIpv4ResourceSet("192.168.0.0/2 4").withCertificateAuthorityUri("rsync://jaja/jja").withCertificate(ProvisioningObjectMother.X509_CA).build());
 
         // when
         builder.build(EE_KEYPAIR.getPrivate());
 
         // then
         // TODO replace with decoded from cms obj
+
+        XStreamXmlSerializer<ListResponsePayload> serializer = new ListResponsePayloadSerializerBuilder().build();
+        ListResponsePayload deserializedPayload = serializer.deserialize(builder.xml);
+
         System.out.println(builder.xml);
 
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list_response\">\n" +
-                "  <class class_name=\"a classname\" cert_url=\"rsync://localhost/some/where,http://some/other\" resource_set_as=\"AS1234,AS456\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\" resource_set_notafter=\"2011-01-01T22:58:23.012Z\" suggested_sia_head=\"rsync://some/where\"/>\n" +
-                "</message>", builder.xml);
+        System.out.println(deserializedPayload);
+
+        assertEquals("sender", deserializedPayload.getSender());
+        assertEquals("recipient", deserializedPayload.getRecipient());
+        assertEquals("a classname", deserializedPayload.getPayloadClass().getClassName());
     }
 
 

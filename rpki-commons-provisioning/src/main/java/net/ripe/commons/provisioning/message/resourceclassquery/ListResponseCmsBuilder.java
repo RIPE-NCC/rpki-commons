@@ -10,6 +10,8 @@ import org.joda.time.DateTime;
 
 import java.net.URI;
 import java.security.PrivateKey;
+import java.util.Arrays;
+import java.util.List;
 
 public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
 
@@ -24,6 +26,7 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
     private IpRange[] ipv6ResourceSet;
     private DateTime validityNotAfter;
     private String publicationPoint;
+    private List<ResourceSet> resourceSets;
 
     // TODO remove after parser decodes the content - strictly for junit testing
     public String xml;
@@ -73,6 +76,11 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
         return this;
     }
 
+    public ListResponseCmsBuilder withResourceSet(ResourceSet... resourceSets) {
+        this.resourceSets = Arrays.asList(resourceSets);
+        return this;
+    }
+
     @Override
     public ProvisioningCmsObject build(PrivateKey privateKey) {
         validateFields();
@@ -89,37 +97,25 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
         Validate.notNull(className, "No className provided");
         Validate.notNull(validityNotAfter, "Validity not after is required");
 
-        boolean rsyncUriFound = findRsyncUri();
+        boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(certificateAuthorityUri);
         Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
     }
 
     private String createSerializedPayload() {
-        ListResponsePayloadClass payloadClassClass = new ListResponsePayloadClass()
+        ListResponsePayloadClass payloadClass = new ListResponsePayloadClass()
                 .setClassName(className)
                 .setCertificateAuthorityUri(certificateAuthorityUri)
                 .setResourceSetAsNumbers(asn)
                 .setResourceSetIpv4(ipv4ResourceSet)
                 .setResourceSetIpv6(ipv6ResourceSet)
                 .setResourceSetNotAfter(validityNotAfter)
-                .setSuggestedSiaHeadUri(publicationPoint);
+                .setSuggestedSiaHeadUri(publicationPoint)
+                .setResourceSets(resourceSets);
 
-        ListResponsePayload payload = new ListResponsePayload(sender, recipient, PayloadMessageType.list_response, payloadClassClass);
+        ListResponsePayload payload = new ListResponsePayload(sender, recipient, PayloadMessageType.list_response, payloadClass);
 
         xml = SERIALIZER.serialize(payload);
-//        System.out.println(xml);
-//        System.out.println(SERIALIZER.deserialize(xml).getPayloadClass().getClassName());
         return xml;
     }
 
-    private boolean findRsyncUri() {
-        boolean rsyncUriFound = false;
-
-        for (URI uri : certificateAuthorityUri) {
-            if (uri.getScheme().toLowerCase().startsWith("rsync")) {
-                rsyncUriFound = true;
-                break;
-            }
-        }
-        return rsyncUriFound;
-    }
 }

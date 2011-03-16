@@ -1,9 +1,7 @@
 package net.ripe.commons.provisioning.message;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("message")
 public abstract class ProvisioningPayload {
     private static final Integer SUPPORTED_VERSION = 1;
 
@@ -62,5 +60,5 @@ public abstract class ProvisioningPayload {
         this.type = type;
     }
 
-    public abstract ProvisioningPayloadClass getPayloadClass();
+
 }

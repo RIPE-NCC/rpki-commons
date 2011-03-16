@@ -13,13 +13,13 @@ public class ProvisioningPayloadXmlSerializerBuilder<T extends ProvisioningPaylo
     }
 
     public XStreamXmlSerializer<T> build() {
-        getXStream().processAnnotations(ProvisioningPayload.class);
+        getXStream().processAnnotations(getObjectType());
 
         return new ProvisioningPayloadXmlSerializer<T>(getXStream(), getObjectType());
     }
 
     @Override
     protected HierarchicalStreamDriver getStreamDriver() {
-        return new XppDriver(new XmlFriendlyReplacer("_", "_"));
+        return new XppDriver(new XmlFriendlyReplacer("__", "_"));
     }
 }
