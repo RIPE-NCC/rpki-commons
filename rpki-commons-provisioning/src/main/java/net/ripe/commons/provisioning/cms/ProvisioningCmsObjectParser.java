@@ -12,6 +12,7 @@ import java.security.cert.CRL;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509CRL;
@@ -21,7 +22,9 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Set;
@@ -61,6 +64,8 @@ public class ProvisioningCmsObjectParser {
 
     private ValidationResult validationResult;
 
+    private String location;
+
 
     public ProvisioningCmsObjectParser() {
         this(new ValidationResult());
@@ -74,7 +79,8 @@ public class ProvisioningCmsObjectParser {
         return validationResult;
     }
 
-    public void parseCms(byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
+    public void parseCms(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
+        this.location = location;
         this.encoded = encoded;
         validationResult.push("CmsObjectLocation"); //FIXME: pushing a placeholder for now
 
@@ -186,15 +192,25 @@ public class ProvisioningCmsObjectParser {
     private void processX509Certificate(X509Certificate certificate) {
         if (isEndEntityCertificate(certificate)) {
             if (cmsCertificate == null) {
-                cmsCertificate = certificate; //TODO: parse cms cert
+                cmsCertificate = parseCmsCertificate(certificate);
                 validationResult.isTrue(true, CERT_IS_EE_CERT);
                 validationResult.notNull(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate) != null, CERT_HAS_SKI);
             } else {
                 validationResult.isTrue(false, ONLY_ONE_EE_CERT_ALLOWED);
             }
         } else {
-            caCertificates.add(certificate); //TODO: parse ca cert
+            caCertificates.add(certificate);
         }
+    }
+
+    private <T> X509Certificate parseCmsCertificate(X509Certificate certificate) {
+        ProvisioningCmsCertificateParser parser = new ProvisioningCmsCertificateParser();
+        try {
+            parser.parse(location, certificate.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new AbstractX509CertificateWrapperException(e);
+        }
+        return parser.getCertificate().getCertificate();
     }
 
     private boolean isEndEntityCertificate(X509Certificate certificate) {

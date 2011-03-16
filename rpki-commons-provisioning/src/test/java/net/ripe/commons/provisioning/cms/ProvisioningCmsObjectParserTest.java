@@ -21,7 +21,7 @@ public class ProvisioningCmsObjectParserTest {
     @Test
     public void shouldParseValidObject() {
         ProvisioningCmsObject cmsObject = ProvisioningCmsObjectBuilderTest.createProvisioningCmsObject();
-        subject.parseCms(cmsObject.getEncoded());
+        subject.parseCms("test-location", cmsObject.getEncoded());
 
         ValidationResult validationResult = subject.getValidationResult();
         assertFalse(validationResult.hasFailures());
@@ -30,7 +30,7 @@ public class ProvisioningCmsObjectParserTest {
 
     @Test(expected=ProvisioningCmsObjectParserException.class)
     public void shouldFailOnInvalidObject() {
-        subject.parseCms(new byte[] {0});
+        subject.parseCms("test-location", new byte[] {0});
 
         ValidationResult validationResult = subject.getValidationResult();
         assertTrue(validationResult.hasFailures());

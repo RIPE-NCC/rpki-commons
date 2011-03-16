@@ -86,7 +86,7 @@ public class ProvisioningCmsObjectBuilder {
         Validate.notEmpty(payloadContent, "Payload content is required");
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms(generateCms(privateKey, getMessageContent()));
+        parser.parseCms("<generated>", generateCms(privateKey, getMessageContent()));
         return parser.getProvisioningCmsObject();
     }
 
