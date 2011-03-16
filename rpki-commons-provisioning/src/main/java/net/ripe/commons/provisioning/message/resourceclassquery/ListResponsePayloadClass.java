@@ -3,6 +3,8 @@ package net.ripe.commons.provisioning.message.resourceclassquery;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.commons.provisioning.message.ProvisioningPayloadClass;
+import net.ripe.ipresource.IpRange;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import java.net.URI;
@@ -18,10 +20,24 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
     @XStreamAsAttribute
     private String certificateUrl;
 
-    private String resourceSetAs;
-    private String resourceSetIpv4;
-    private String resourceSetIpv6;
+    @XStreamAlias("resource_set_as")
+    @XStreamAsAttribute
+    private String resourceSetAsNumbers = "";
+
+    @XStreamAlias("resource_set_ipv4")
+    @XStreamAsAttribute
+    private String resourceSetIpv4 = "";
+
+    @XStreamAlias("resource_set_ipv6")
+    @XStreamAsAttribute
+    private String resourceSetIpv6 = "";
+
+    @XStreamAlias("resource_set_notafter")
+    @XStreamAsAttribute
     private DateTime resourceSetNotAfter;
+
+    @XStreamAlias("suggested_sia_head")
+    @XStreamAsAttribute
     private String suggestedSiaHeadUri;
 
     public String getClassName() {
@@ -46,37 +62,32 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return uris;
     }
 
-
     ListResponsePayloadClass setCertificateAuthorityUri(URI[] certificateAuthorityUri) {
-        StringBuilder builder = new StringBuilder();
-
-        boolean isFirst = true;
-
-        for (URI uri : certificateAuthorityUri) {
-
-            if (!isFirst) {
-                builder.append(",");
-            }
-
-            builder.append(uri.toString());
-
-            isFirst = false;
-        }
-
-        this.certificateUrl = builder.toString();
+        this.certificateUrl = StringUtils.join(certificateAuthorityUri, ",");
         return this;
     }
 
-    public String getResourceSetAs() {
-        return resourceSetAs;
+    public IpRange[] getResourceSetIpv4() {
+        String[] ipV4 = resourceSetIpv4.split(",");
+
+        return toIpRange(ipV4);
     }
 
-    public String getResourceSetIpv4() {
-        return resourceSetIpv4;
+    public IpRange[] getResourceSetIpv6() {
+        String[] ipV6 = resourceSetIpv6.split(",");
+
+        return toIpRange(ipV6);
     }
 
-    public String getResourceSetIpv6() {
-        return resourceSetIpv6;
+    private IpRange[] toIpRange(String[] ipV4) {
+        int index = 0;
+        IpRange[] ranges = new IpRange[ipV4.length];
+
+        for (String ip : ipV4) {
+            ranges[index++]= IpRange.parse(ip);
+        }
+
+        return ranges;
     }
 
     public DateTime getResourceSetNotAfter() {
@@ -92,25 +103,41 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return this;
     }
 
-
-    void setResourceSetAs(String resourceSetAs) {
-        this.resourceSetAs = resourceSetAs;
+    public String[] getResourceSetAsNumbers() {
+        return resourceSetAsNumbers != null ? resourceSetAsNumbers.split(",") : null;
     }
 
-    void setResourceSetIpv4(String resourceSetIpv4) {
-        this.resourceSetIpv4 = resourceSetIpv4;
+    ListResponsePayloadClass setResourceSetAsNumbers(String... resourceSetAsNumbers) {
+        if (resourceSetAsNumbers != null) {
+            this.resourceSetAsNumbers = StringUtils.join(resourceSetAsNumbers, ",");
+        }
+        return this;
     }
 
-    void setResourceSetIpv6(String resourceSetIpv6) {
-        this.resourceSetIpv6 = resourceSetIpv6;
+    ListResponsePayloadClass setResourceSetIpv4(IpRange... resourceSetIpv4) {
+        if (resourceSetIpv4 != null) {
+            this.resourceSetIpv4 = StringUtils.join(resourceSetIpv4, ",");
+        }
+
+        return this;
     }
 
-    void setResourceSetNotAfter(DateTime resourceSetNotAfter) {
+    ListResponsePayloadClass setResourceSetIpv6(IpRange... resourceSetIpv6) {
+        if (resourceSetIpv6 != null) {
+            this.resourceSetIpv6 = StringUtils.join(resourceSetIpv6, ",");
+        }
+
+        return this;
+    }
+
+    ListResponsePayloadClass setResourceSetNotAfter(DateTime resourceSetNotAfter) {
         this.resourceSetNotAfter = resourceSetNotAfter;
+        return this;
     }
 
-    void setSuggestedSiaHeadUri(String suggestedSiaHeadUri) {
+    ListResponsePayloadClass setSuggestedSiaHeadUri(String suggestedSiaHeadUri) {
         this.suggestedSiaHeadUri = suggestedSiaHeadUri;
+        return this;
     }
 
 }
