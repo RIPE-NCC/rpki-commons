@@ -6,7 +6,7 @@ import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper;
 
 public class ProvisioningCmsCertificate extends AbstractX509CertificateWrapper {
 
-    protected ProvisioningCmsCertificate(X509Certificate certificate) {
+    public ProvisioningCmsCertificate(X509Certificate certificate) {
         super(certificate);
     }
 }
