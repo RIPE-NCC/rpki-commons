@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.certificateissuance;
+package net.ripe.commons.provisioning.message.issuance;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;

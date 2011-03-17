@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.certificateissuance;
+package net.ripe.commons.provisioning.message.issuance;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bouncycastle.jce.PKCS10CertificationRequest;

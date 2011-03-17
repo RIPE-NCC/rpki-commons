@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.resourceclassquery;
+package net.ripe.commons.provisioning.message.query;
 
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;

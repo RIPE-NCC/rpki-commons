@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.certificateissuance;
+package net.ripe.commons.provisioning.message.issuance;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;

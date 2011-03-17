@@ -5,7 +5,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.commons.provisioning.message.resourceclassquery.X509ResourceCertificateBase64Converter;
+import net.ripe.commons.provisioning.message.query.X509ResourceCertificateBase64Converter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 

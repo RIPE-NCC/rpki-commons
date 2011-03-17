@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.certificateissuance;
+package net.ripe.commons.provisioning.message.issuance;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.message.common.CommonCmsBuilder;
@@ -61,5 +61,4 @@ public class CertificateIssuanceRequestCmsBuilder extends CommonCmsBuilder {
         Validate.isTrue(ResourceClassUtil.validateAsn(asn), "AS numbers should not start with AS");
         Validate.notNull(certificateRequest);
     }
-
 }
