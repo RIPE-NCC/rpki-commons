@@ -1,28 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?><message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="issue_response">
-  <class class_name="a classname" cert_url="rsync://localhost/some/where,http://some/other" resource_set_as="1234,456" resource_set_ipv4="192.168.0.0/24" resource_set_ipv6="2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::">
-    <certificate cert_url="rsync://jaja/jja" req_resource_set_as="123" req_resource_set_ipv4="10.0.0.0/8" req_resource_set_ipv6="2001:0DB8::/48">MIICmDCCAkKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDEwl6ei5pc3N1ZXIwHhcN
-MTEwMjI4MjMwMDAwWhcNMTYwMjI5MjMwMDAwWjAVMRMwEQYDVQQDEwp6ei5zdWJqZWN0MIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiMRzHrhtUIu7SSj12sqFWAVPE6SkJEXQ9RB2oP1p
-b91IT4twF0Cd1PYMS9dTJJ25Wb+biBg1l52WmtXUrdDLnZcc4bJeuHi9Wv3lT1zLz6/pT40d8XfI
-iQpBqxepiPOoPzBsJ69IGoVqCw3MRfoC6eEV4PPEj98K4YF9oY5Umwb/900IBbhTeima37PRVKg9
-2r8D8KJgxBY9nBjRqs3IaPRoYpg65hjdtTpfl6I51kBMy45T7gaHyL1ZH8eop+KaCs6CNQflU+Tg
-m53UIaecieNY7oRbggFH6c3SpCu2WPKzXlrT6uf7mZBVw8D24D/+TezWKLZb/sSovbxvlCsY/wID
-AQABo4G1MIGyMB0GA1UdDgQWBBQxfza2YOwUR8ZyGzSOe4fXaUqh7TAfBgNVHSMEGDAWgBTavtOQ
-JSJvTkMKai/pUOoxUymBvzAYBgNVHSABAf8EDjAMMAoGCCsGAQUFBw4CMDMGCCsGAQUFBwEHAQH/
-BCQwIjAUBAIAATAOAwIACgMDBKwQAwMAwKgwCgQCAAIwBAMCAfwwIQYIKwYBBQUHAQgBAf8EEjAQ
-oA4wDDAKAgMA/AACAwD//jANBgkqhkiG9w0BAQsFAANBAEzAIFa6qCyTYkK+f6sEqXIq3QEtE/5G
-Vopgk0gSuEsB0su9ISdoH3P/69gpvhC29a0dUm5ATATbnzTP4FC2hYY=</certificate>
-    <issuer>MIICmDCCAkKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDEwl6ei5pc3N1ZXIwHhcN
-MTEwMjI4MjMwMDAwWhcNMTYwMjI5MjMwMDAwWjAVMRMwEQYDVQQDEwp6ei5zdWJqZWN0MIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiMRzHrhtUIu7SSj12sqFWAVPE6SkJEXQ9RB2oP1p
-b91IT4twF0Cd1PYMS9dTJJ25Wb+biBg1l52WmtXUrdDLnZcc4bJeuHi9Wv3lT1zLz6/pT40d8XfI
-iQpBqxepiPOoPzBsJ69IGoVqCw3MRfoC6eEV4PPEj98K4YF9oY5Umwb/900IBbhTeima37PRVKg9
-2r8D8KJgxBY9nBjRqs3IaPRoYpg65hjdtTpfl6I51kBMy45T7gaHyL1ZH8eop+KaCs6CNQflU+Tg
-m53UIaecieNY7oRbggFH6c3SpCu2WPKzXlrT6uf7mZBVw8D24D/+TezWKLZb/sSovbxvlCsY/wID
-AQABo4G1MIGyMB0GA1UdDgQWBBQxfza2YOwUR8ZyGzSOe4fXaUqh7TAfBgNVHSMEGDAWgBTavtOQ
-JSJvTkMKai/pUOoxUymBvzAYBgNVHSABAf8EDjAMMAoGCCsGAQUFBw4CMDMGCCsGAQUFBwEHAQH/
-BCQwIjAUBAIAATAOAwIACgMDBKwQAwMAwKgwCgQCAAIwBAMCAfwwIQYIKwYBBQUHAQgBAf8EEjAQ
-oA4wDDAKAgMA/AACAwD//jANBgkqhkiG9w0BAQsFAANBAEzAIFa6qCyTYkK+f6sEqXIq3QEtE/5G
-Vopgk0gSuEsB0su9ISdoH3P/69gpvhC29a0dUm5ATATbnzTP4FC2hYY=</issuer>
-  </class>
+<?xml version="1.0" encoding="UTF-8"?><message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="revoke">
+  <key class_name="a classname" ski="SKI"/>
 </message>

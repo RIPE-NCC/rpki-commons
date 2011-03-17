@@ -5,5 +5,6 @@ public enum PayloadMessageType {
     list,
     list_response,
     issue,
-    issue_response
+    issue_response,
+    revoke
 }
