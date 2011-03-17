@@ -1,11 +1,11 @@
-package net.ripe.commons.provisioning.message.resourceclassquery;
+package net.ripe.commons.provisioning.message.common;
 
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@XStreamConverter(ResourceSetConverter.class)
-public class ResourceSet {
+@XStreamConverter(ResourceClassConverter.class)
+public class ResourceClass {
     private String[] issuerCertificatePublicationLocation;
 
     private String[] allocatedAsn;
@@ -20,7 +20,7 @@ public class ResourceSet {
         return issuerCertificatePublicationLocation;
     }
 
-    ResourceSet setIssuerCertificatePublicationLocation(String[] issuerCertificatePublicationLocation) {
+    ResourceClass setIssuerCertificatePublicationLocation(String[] issuerCertificatePublicationLocation) {
         this.issuerCertificatePublicationLocation = issuerCertificatePublicationLocation;
         return this;
     }
@@ -29,7 +29,7 @@ public class ResourceSet {
         return allocatedAsn;
     }
 
-    ResourceSet setAllocatedAsn(String[] allocatedAsn) {
+    ResourceClass setAllocatedAsn(String[] allocatedAsn) {
         this.allocatedAsn = allocatedAsn;
         return this;
     }
@@ -38,7 +38,7 @@ public class ResourceSet {
         return allocatedIpv4;
     }
 
-    ResourceSet setAllocatedIpv4(String[] allocatedIpv4) {
+    ResourceClass setAllocatedIpv4(String[] allocatedIpv4) {
         this.allocatedIpv4 = allocatedIpv4;
         return this;
     }
@@ -47,7 +47,7 @@ public class ResourceSet {
         return allocatedIpv6;
     }
 
-    ResourceSet setAllocatedIpv6(String[] allocatedIpv6) {
+    ResourceClass setAllocatedIpv6(String[] allocatedIpv6) {
         this.allocatedIpv6 = allocatedIpv6;
         return this;
     }
@@ -56,7 +56,7 @@ public class ResourceSet {
         return certificate;
     }
 
-    ResourceSet setCertificate(X509ResourceCertificate certificate) {
+    ResourceClass setCertificate(X509ResourceCertificate certificate) {
         this.certificate = certificate;
         return this;
     }

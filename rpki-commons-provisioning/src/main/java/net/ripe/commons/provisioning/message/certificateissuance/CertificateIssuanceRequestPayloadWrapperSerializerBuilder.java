@@ -1,0 +1,17 @@
+package net.ripe.commons.provisioning.message.certificateissuance;
+
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.commons.provisioning.message.ProvisioningPayloadXmlSerializerBuilder;
+
+class CertificateIssuanceRequestPayloadWrapperSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<CertificateIssuanceRequestPayloadWrapper> {
+
+    public CertificateIssuanceRequestPayloadWrapperSerializerBuilder() {
+        super(CertificateIssuanceRequestPayloadWrapper.class);
+    }
+
+    @Override
+    public XStreamXmlSerializer<CertificateIssuanceRequestPayloadWrapper> build() {
+        getXStream().processAnnotations(CertificateIssuanceRequestPayloadWrapper.class);
+        return super.build();
+    }
+}

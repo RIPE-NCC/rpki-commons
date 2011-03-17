@@ -19,7 +19,8 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         CertificateIssuanceRequestCmsBuilder builder = new CertificateIssuanceRequestCmsBuilder();
         builder.withClassName("a classname");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender").withRecipient("recipient");
+        builder.withSender("sender");
+        builder.withRecipient("recipient");
         builder.withAllocatedAsn("1234", "456");
         builder.withIpv4ResourceSet("10.0.0.0/8");
         builder.withIpv6ResourceSet("2001:0DB8::/48", "2001:0DB8:002::-2001:0DB8:005::");
@@ -31,15 +32,15 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         // then
         // TODO replace with decoded from cms obj
 
-        XStreamXmlSerializer<CertificateIssuanceRequestPayload> serializer = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
-        CertificateIssuanceRequestPayload deserializedPayload = serializer.deserialize(builder.xml);
+        XStreamXmlSerializer<CertificateIssuanceRequestPayloadWrapper> serializer = new CertificateIssuanceRequestPayloadWrapperSerializerBuilder().build();
+        CertificateIssuanceRequestPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
 
         System.out.println(builder.xml);
 
         assertEquals("sender", deserializedPayload.getSender());
         assertEquals("recipient", deserializedPayload.getRecipient());
 
-        CertificateIssuanceRequestContent payloadContent = deserializedPayload.getPayloadContent();
+        CertificateIssuanceRequestPayload payloadContent = deserializedPayload.getPayloadContent();
         assertEquals("a classname", payloadContent.getClassName());
         assertEquals("1234", payloadContent.getAllocatedAsn()[0]);
         assertArrayEquals(pkcs10Request.getEncoded(), payloadContent.getCertificate().getEncoded());
@@ -53,7 +54,8 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         CertificateIssuanceRequestCmsBuilder builder = new CertificateIssuanceRequestCmsBuilder();
         builder.withClassName("a classname");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender").withRecipient("recipient");
+        builder.withSender("sender");
+        builder.withRecipient("recipient");
         builder.withAllocatedAsn("1234", "456");
 
         // when

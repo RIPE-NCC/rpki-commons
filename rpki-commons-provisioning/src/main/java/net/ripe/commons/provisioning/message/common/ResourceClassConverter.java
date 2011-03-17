@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.resourceclassquery;
+package net.ripe.commons.provisioning.message.common;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -9,7 +9,7 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
-public class ResourceSetConverter implements Converter {
+public class ResourceClassConverter implements Converter {
     private static final String CERT__URL = "cert_url";
     private static final String REQ__RESOURCE__SET__AS = "req_resource_set_as";
     private static final String REQ_RESOURCE_SET_IPV4 = "req_resource_set_ipv4";
@@ -17,7 +17,7 @@ public class ResourceSetConverter implements Converter {
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        ResourceSet set = (ResourceSet) source;
+        ResourceClass set = (ResourceClass) source;
 
         writer.addAttribute(CERT__URL, StringUtils.join(set.getIssuerCertificatePublicationLocation(), ","));
 
@@ -38,7 +38,7 @@ public class ResourceSetConverter implements Converter {
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        ResourceSet set = new ResourceSet();
+        ResourceClass set = new ResourceClass();
 
         String attribute = reader.getAttribute(CERT__URL);
         Validate.notNull(attribute, CERT__URL + " attribute is required");
@@ -73,6 +73,6 @@ public class ResourceSetConverter implements Converter {
 
     @Override
     public boolean canConvert(Class type) {
-        return type == ResourceSet.class;
+        return type == ResourceClass.class;
     }
 }

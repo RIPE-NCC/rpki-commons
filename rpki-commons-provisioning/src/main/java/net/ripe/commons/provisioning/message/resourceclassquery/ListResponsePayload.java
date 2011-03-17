@@ -1,28 +1,41 @@
 package net.ripe.commons.provisioning.message.resourceclassquery;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import net.ripe.commons.provisioning.message.PayloadMessageType;
-import net.ripe.commons.provisioning.message.ProvisioningPayload;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import net.ripe.commons.provisioning.message.common.ResourceClassPayload;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.joda.time.DateTime;
 
-@XStreamAlias("message")
-public class ListResponsePayload extends ProvisioningPayload {
+@XStreamAlias("class")
+public class ListResponsePayload extends ResourceClassPayload {
+    @XStreamAlias("resource_set_notafter")
+    @XStreamAsAttribute
+    private DateTime validityNotAfter;
 
-    @XStreamAlias("class")
-    private ListResponsePayloadClass payloadClass;
+    @XStreamAlias("suggested_sia_head")
+    @XStreamAsAttribute
+    private String siaHeadUri;
 
-    public ListResponsePayload(String sender, String recipient, ListResponsePayloadClass payloadClass) {
-        super(sender, recipient, PayloadMessageType.list_response);
-        this.payloadClass = payloadClass;
+    public DateTime getValidityNotAfter() {
+        return validityNotAfter;
     }
 
-    public ListResponsePayloadClass getPayloadClass() {
-        return payloadClass;
+    ListResponsePayload setValidityNotAfter(DateTime validityNotAfter) {
+        this.validityNotAfter = validityNotAfter;
+        return this;
+    }
+
+    public String getSiaHeadUri() {
+        return siaHeadUri;
+    }
+
+    ListResponsePayload setSiaHeadUri(String siaHeadUri) {
+        this.siaHeadUri = siaHeadUri;
+        return this;
     }
 
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
-
 }

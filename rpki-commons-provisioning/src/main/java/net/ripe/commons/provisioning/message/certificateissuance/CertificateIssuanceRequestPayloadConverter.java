@@ -9,7 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
-public class CertificateIssuanceRequestContentConverter implements Converter {
+public class CertificateIssuanceRequestPayloadConverter implements Converter {
     private static final String CERT__URL = "cert_url";
     private static final String REQ__RESOURCE__SET__AS = "req_resource_set_as";
     private static final String REQ_RESOURCE_SET_IPV4 = "req_resource_set_ipv4";
@@ -18,7 +18,7 @@ public class CertificateIssuanceRequestContentConverter implements Converter {
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        CertificateIssuanceRequestContent content = (CertificateIssuanceRequestContent) source;
+        CertificateIssuanceRequestPayload content = (CertificateIssuanceRequestPayload) source;
 
         writer.addAttribute(CLASS_NAME, content.getClassName());
 
@@ -39,7 +39,7 @@ public class CertificateIssuanceRequestContentConverter implements Converter {
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        CertificateIssuanceRequestContent content = new CertificateIssuanceRequestContent();
+        CertificateIssuanceRequestPayload content = new CertificateIssuanceRequestPayload();
 
         String className = reader.getAttribute(CLASS_NAME);
         Validate.notNull(className, "class_name attribute is required");
@@ -73,6 +73,6 @@ public class CertificateIssuanceRequestContentConverter implements Converter {
 
     @Override
     public boolean canConvert(Class type) {
-        return type == CertificateIssuanceRequestContent.class;
+        return type == CertificateIssuanceRequestPayload.class;
     }
 }

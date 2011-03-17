@@ -3,15 +3,15 @@ package net.ripe.commons.provisioning.message.resourceclassquery;
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.message.ProvisioningPayloadXmlSerializerBuilder;
 
-public class ListQueryPayloadSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<ListQueryPayload> {
+class ListQueryPayloadSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<ListQueryPayloadWrapper> {
 
-    public ListQueryPayloadSerializerBuilder() {
-        super(ListQueryPayload.class);
+    ListQueryPayloadSerializerBuilder() {
+        super(ListQueryPayloadWrapper.class);
     }
 
     @Override
-    public XStreamXmlSerializer<ListQueryPayload> build() {
-        getXStream().processAnnotations(ListQueryPayload.class);
+    public XStreamXmlSerializer<ListQueryPayloadWrapper> build() {
+        getXStream().processAnnotations(ListQueryPayloadWrapper.class);
         return super.build();
     }
 }

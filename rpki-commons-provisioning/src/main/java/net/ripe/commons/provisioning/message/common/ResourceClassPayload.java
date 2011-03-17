@@ -1,19 +1,17 @@
-package net.ripe.commons.provisioning.message.resourceclassquery;
+package net.ripe.commons.provisioning.message.common;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.commons.provisioning.message.ProvisioningPayloadClass;
+import net.ripe.commons.provisioning.message.resourceclassquery.X509ResourceCertificateBase64Converter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.joda.time.DateTime;
 
 import java.util.List;
 
-@XStreamAlias("class")
-public class ListResponsePayloadClass extends ProvisioningPayloadClass {
+public class ResourceClassPayload {
     @XStreamAsAttribute
     @XStreamAlias("class_name")
     private String className;
@@ -34,17 +32,9 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
     @XStreamAsAttribute
     private String ipv6ResourceSet = "";
 
-    @XStreamAlias("resource_set_notafter")
-    @XStreamAsAttribute
-    private DateTime validityNotAfter;
-
-    @XStreamAlias("suggested_sia_head")
-    @XStreamAsAttribute
-    private String siaHeadUri;
-
     @XStreamAlias("certificate")
     @XStreamImplicit(itemFieldName = "certificate")
-    private List<ResourceSet> resourceSets;
+    private List<ResourceClass> resourceClasses;
 
     @XStreamConverter(X509ResourceCertificateBase64Converter.class)
     @XStreamAlias("issuer")
@@ -54,7 +44,7 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return className;
     }
 
-    ListResponsePayloadClass setClassName(String className) {
+    protected ResourceClassPayload setClassName(String className) {
         this.className = className;
         return this;
     }
@@ -63,7 +53,7 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return certificateAuthorityUri == null ? null : certificateAuthorityUri.split(",");
     }
 
-    ListResponsePayloadClass setCertificateAuthorityUri(String... certificateAuthorityUri) {
+    protected ResourceClassPayload setCertificateAuthorityUri(String... certificateAuthorityUri) {
         this.certificateAuthorityUri = StringUtils.join(certificateAuthorityUri, ",");
         return this;
     }
@@ -72,7 +62,7 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return ipv4ResourceSet == null ? null : ipv4ResourceSet.split(",");
     }
 
-    ListResponsePayloadClass setIpv4ResourceSet(String... ipv4ResourceSet) {
+    protected ResourceClassPayload setIpv4ResourceSet(String... ipv4ResourceSet) {
         if (ipv4ResourceSet != null) {
             this.ipv4ResourceSet = StringUtils.join(ipv4ResourceSet, ",");
         }
@@ -84,7 +74,7 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return ipv6ResourceSet == null ? null : ipv6ResourceSet.split(",");
     }
 
-    ListResponsePayloadClass setIpv6ResourceSet(String... ipv6ResourceSet) {
+    protected ResourceClassPayload setIpv6ResourceSet(String... ipv6ResourceSet) {
         if (ipv6ResourceSet != null) {
             this.ipv6ResourceSet = StringUtils.join(ipv6ResourceSet, ",");
         }
@@ -92,51 +82,31 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return this;
     }
 
-    public DateTime getValidityNotAfter() {
-        return validityNotAfter;
-    }
-
-    ListResponsePayloadClass setValidityNotAfter(DateTime validityNotAfter) {
-        this.validityNotAfter = validityNotAfter;
-        return this;
-    }
-
-    public String getSiaHeadUri() {
-        return siaHeadUri;
-    }
-
-    ListResponsePayloadClass setSiaHeadUri(String siaHeadUri) {
-        this.siaHeadUri = siaHeadUri;
-        return this;
-    }
-
     public String[] getResourceSetAsNumbers() {
         return resourceSetAsNumbers != null ? resourceSetAsNumbers.split(",") : null;
     }
 
-    ListResponsePayloadClass setResourceSetAsNumbers(String... resourceSetAsNumbers) {
+    protected ResourceClassPayload setResourceSetAsNumbers(String... resourceSetAsNumbers) {
         if (resourceSetAsNumbers != null) {
             this.resourceSetAsNumbers = StringUtils.join(resourceSetAsNumbers, ",");
         }
         return this;
     }
 
-
-    public List<ResourceSet> getResourceSets() {
-        return resourceSets;
+    public List<ResourceClass> getResourceClasses() {
+        return resourceClasses;
     }
 
-    ListResponsePayloadClass setResourceSets(List<ResourceSet> resourceSets) {
-        this.resourceSets = resourceSets;
+    protected ResourceClassPayload setResourceClasses(List<ResourceClass> resourceClasses) {
+        this.resourceClasses = resourceClasses;
         return this;
     }
-
 
     public X509ResourceCertificate getIssuer() {
         return issuer;
     }
 
-    ListResponsePayloadClass setIssuer(X509ResourceCertificate issuer) {
+    protected ResourceClassPayload setIssuer(X509ResourceCertificate issuer) {
         this.issuer = issuer;
         return this;
     }

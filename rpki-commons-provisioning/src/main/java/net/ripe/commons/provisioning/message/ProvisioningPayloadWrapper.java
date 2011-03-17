@@ -1,8 +1,9 @@
 package net.ripe.commons.provisioning.message;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
-public abstract class ProvisioningPayload {
+public abstract class ProvisioningPayloadWrapper {
     private static final Integer SUPPORTED_VERSION = 1;
 
     @XStreamAsAttribute
@@ -17,11 +18,11 @@ public abstract class ProvisioningPayload {
     @XStreamAsAttribute
     private PayloadMessageType type;
 
-    public ProvisioningPayload(String sender, String recipient, PayloadMessageType type) {
+    public ProvisioningPayloadWrapper(String sender, String recipient, PayloadMessageType type) {
         this(SUPPORTED_VERSION, sender, recipient, type);
     }
 
-    public ProvisioningPayload(Integer version, String sender, String recipient, PayloadMessageType type) {
+    public ProvisioningPayloadWrapper(Integer version, String sender, String recipient, PayloadMessageType type) {
         this.version = version;
         this.sender = sender;
         this.recipient = recipient;
@@ -60,5 +61,8 @@ public abstract class ProvisioningPayload {
         this.type = type;
     }
 
-
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }

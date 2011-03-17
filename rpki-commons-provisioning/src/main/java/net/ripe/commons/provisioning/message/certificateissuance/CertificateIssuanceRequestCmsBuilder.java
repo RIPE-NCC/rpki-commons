@@ -1,38 +1,19 @@
 package net.ripe.commons.provisioning.message.certificateissuance;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
-import net.ripe.commons.provisioning.message.resourceclassquery.ResourceClassUtil;
+import net.ripe.commons.provisioning.message.common.CommonCmsBuilder;
+import net.ripe.commons.provisioning.message.common.ResourceClassUtil;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
-import java.security.PrivateKey;
-
-public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectBuilder {
-    private static final XStreamXmlSerializer<CertificateIssuanceRequestPayload> SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
+public class CertificateIssuanceRequestCmsBuilder extends CommonCmsBuilder {
+    private static final XStreamXmlSerializer<CertificateIssuanceRequestPayloadWrapper> SERIALIZER = new CertificateIssuanceRequestPayloadWrapperSerializerBuilder().build();
 
     private String className;
-    private String sender;
-    private String recipient;
     private String[] asn;
     private String[] ipv4ResourceSet;
     private String[] ipv6ResourceSet;
     private PKCS10CertificationRequest certificateRequest;
-
-
-    // TODO remove after parser decodes the content - strictly for junit testing
-    public String xml;
-
-    public CertificateIssuanceRequestCmsBuilder withSender(String sender) {
-        this.sender = sender;
-        return this;
-    }
-
-    public CertificateIssuanceRequestCmsBuilder withRecipient(String recipient) {
-        this.recipient = recipient;
-        return this;
-    }
 
     public CertificateIssuanceRequestCmsBuilder withClassName(String className) {
         this.className = className;
@@ -61,34 +42,24 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
     }
 
     @Override
-    public ProvisioningCmsObject build(PrivateKey privateKey) {
-        validateFields();
-
-        String payload = createSerializedPayload();
-        withPayloadContent(payload);
-
-        return super.build(privateKey);
-    }
-
-    private void validateFields() {
-        Validate.notNull(sender, "Sender is required");
-        Validate.notNull(recipient, "Recipient is required");
-        Validate.notNull(className, "No className provided");
-        Validate.isTrue(ResourceClassUtil.validateAsn(asn), "AS numbers should not start with AS");
-        Validate.notNull(certificateRequest);
-    }
-
-    private String createSerializedPayload() {
-        CertificateIssuanceRequestContent content = new CertificateIssuanceRequestContent()
+    protected String serializePayloadWrapper(String sender, String recipient) {
+        CertificateIssuanceRequestPayload content = new CertificateIssuanceRequestPayload()
                 .setClassName(className)
                 .setAllocatedAsn(asn)
                 .setAllocatedIpv4(ipv4ResourceSet)
                 .setAllocatedIpv6(ipv6ResourceSet)
                 .setCertificate(certificateRequest);
 
-        CertificateIssuanceRequestPayload payload = new CertificateIssuanceRequestPayload(sender, recipient, content);
+        CertificateIssuanceRequestPayloadWrapper payload = new CertificateIssuanceRequestPayloadWrapper(sender, recipient, content);
 
-        xml = SERIALIZER.serialize(payload);
-        return xml;
+        return SERIALIZER.serialize(payload);
     }
+
+    @Override
+    protected void onValidateFields() {
+        Validate.notNull(className, "No className provided");
+        Validate.isTrue(ResourceClassUtil.validateAsn(asn), "AS numbers should not start with AS");
+        Validate.notNull(certificateRequest);
+    }
+
 }

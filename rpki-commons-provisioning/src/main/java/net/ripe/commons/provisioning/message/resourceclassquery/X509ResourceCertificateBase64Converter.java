@@ -10,7 +10,6 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 
 public class X509ResourceCertificateBase64Converter implements Converter {
 
-	@SuppressWarnings("rawtypes")
 	@Override
     public boolean canConvert(Class type) {
         return type == X509ResourceCertificate.class;

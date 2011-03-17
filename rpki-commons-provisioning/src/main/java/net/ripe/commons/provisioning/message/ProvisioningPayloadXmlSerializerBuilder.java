@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.certification.client.xml.XStreamXmlSerializerBuilder;
 
-public class ProvisioningPayloadXmlSerializerBuilder<T extends ProvisioningPayload> extends XStreamXmlSerializerBuilder<T> {
+public class ProvisioningPayloadXmlSerializerBuilder<T extends ProvisioningPayloadWrapper> extends XStreamXmlSerializerBuilder<T> {
 
     public ProvisioningPayloadXmlSerializerBuilder(Class<T> objectType) {
         super(objectType);
