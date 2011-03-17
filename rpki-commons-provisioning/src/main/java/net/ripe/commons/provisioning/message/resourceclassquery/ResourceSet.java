@@ -2,18 +2,17 @@ package net.ripe.commons.provisioning.message.resourceclassquery;
 
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 @XStreamConverter(ResourceSetConverter.class)
-
 public class ResourceSet {
     private String[] issuerCertificatePublicationLocation;
 
-    private String[] resourceSetAsNumbers;
+    private String[] allocatedAsn;
 
-    private String[] resourceSetIpv4;
+    private String[] allocatedIpv4;
 
-    private String[] resourceSetIpv6;
+    private String[] allocatedIpv6;
 
     private X509ResourceCertificate certificate;
 
@@ -26,30 +25,30 @@ public class ResourceSet {
         return this;
     }
 
-    public String[] getResourceSetAsNumbers() {
-        return resourceSetAsNumbers;
+    public String[] getAllocatedAsn() {
+        return allocatedAsn;
     }
 
-    ResourceSet setResourceSetAsNumbers(String[] resourceSetAsNumbers) {
-        this.resourceSetAsNumbers = resourceSetAsNumbers;
+    ResourceSet setAllocatedAsn(String[] allocatedAsn) {
+        this.allocatedAsn = allocatedAsn;
         return this;
     }
 
-    public String[] getResourceSetIpv4() {
-        return resourceSetIpv4;
+    public String[] getAllocatedIpv4() {
+        return allocatedIpv4;
     }
 
-    ResourceSet setResourceSetIpv4(String[] resourceSetIpv4) {
-        this.resourceSetIpv4 = resourceSetIpv4;
+    ResourceSet setAllocatedIpv4(String[] allocatedIpv4) {
+        this.allocatedIpv4 = allocatedIpv4;
         return this;
     }
 
-    public String[] getResourceSetIpv6() {
-        return resourceSetIpv6;
+    public String[] getAllocatedIpv6() {
+        return allocatedIpv6;
     }
 
-    ResourceSet setResourceSetIpv6(String[] resourceSetIpv6) {
-        this.resourceSetIpv6 = resourceSetIpv6;
+    ResourceSet setAllocatedIpv6(String[] allocatedIpv6) {
+        this.allocatedIpv6 = allocatedIpv6;
         return this;
     }
 
@@ -60,5 +59,10 @@ public class ResourceSet {
     ResourceSet setCertificate(X509ResourceCertificate certificate) {
         this.certificate = certificate;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

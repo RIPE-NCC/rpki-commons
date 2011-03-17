@@ -20,10 +20,6 @@ public class ListResponsePayload extends ProvisioningPayload {
         return payloadClass;
     }
 
-    public void setPayloadClass(ListResponsePayloadClass payloadClass) {
-        this.payloadClass = payloadClass;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

@@ -2,15 +2,14 @@ package net.ripe.commons.provisioning.message.resourceclassquery;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.message.ProvisioningPayloadClass;
-import net.ripe.ipresource.IpRange;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @XStreamAlias("class")
@@ -21,7 +20,7 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
 
     @XStreamAlias("cert_url")
     @XStreamAsAttribute
-    private String certificateUrl;
+    private String certificateAuthorityUri;
 
     @XStreamAlias("resource_set_as")
     @XStreamAsAttribute
@@ -29,23 +28,27 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
 
     @XStreamAlias("resource_set_ipv4")
     @XStreamAsAttribute
-    private String resourceSetIpv4 = "";
+    private String ipv4ResourceSet = "";
 
     @XStreamAlias("resource_set_ipv6")
     @XStreamAsAttribute
-    private String resourceSetIpv6 = "";
+    private String ipv6ResourceSet = "";
 
     @XStreamAlias("resource_set_notafter")
     @XStreamAsAttribute
-    private DateTime resourceSetNotAfter;
+    private DateTime validityNotAfter;
 
     @XStreamAlias("suggested_sia_head")
     @XStreamAsAttribute
-    private String suggestedSiaHeadUri;
+    private String siaHeadUri;
 
     @XStreamAlias("certificate")
     @XStreamImplicit(itemFieldName = "certificate")
     private List<ResourceSet> resourceSets;
+
+    @XStreamConverter(X509ResourceCertificateBase64Converter.class)
+    @XStreamAlias("issuer")
+    private X509ResourceCertificate issuer;
 
     public String getClassName() {
         return className;
@@ -56,60 +59,57 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return this;
     }
 
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+    public String[] getCertificateAuthorityUri() {
+        return certificateAuthorityUri == null ? null : certificateAuthorityUri.split(",");
     }
 
-    public URI[] getCertificateAuthorityUri() {
-        if (certificateUrl == null) {
-            return null;
-        }
-
-        String[] urls = certificateUrl.split(",");
-
-        URI[] uris = new URI[urls.length];
-
-        int i = 0;
-        for (String url : urls) {
-            try {
-                uris[i++] = new URI(url);
-            } catch (URISyntaxException e) {
-                // TODO handle
-                e.printStackTrace();
-            }
-        }
-
-        return uris;
-    }
-
-    ListResponsePayloadClass setCertificateAuthorityUri(URI[] certificateAuthorityUri) {
-        this.certificateUrl = StringUtils.join(certificateAuthorityUri, ",");
+    ListResponsePayloadClass setCertificateAuthorityUri(String... certificateAuthorityUri) {
+        this.certificateAuthorityUri = StringUtils.join(certificateAuthorityUri, ",");
         return this;
     }
 
-    public IpRange[] getResourceSetIpv4() {
-        String[] ipV4 = resourceSetIpv4.split(",");
-
-        return ResourceClassUtil.toIpRange(ipV4);
+    public String[] getIpv4ResourceSet() {
+        return ipv4ResourceSet == null ? null : ipv4ResourceSet.split(",");
     }
 
-    public IpRange[] getResourceSetIpv6() {
-        String[] ipV6 = resourceSetIpv6.split(",");
+    ListResponsePayloadClass setIpv4ResourceSet(String... ipv4ResourceSet) {
+        if (ipv4ResourceSet != null) {
+            this.ipv4ResourceSet = StringUtils.join(ipv4ResourceSet, ",");
+        }
 
-        return ResourceClassUtil.toIpRange(ipV6);
+        return this;
     }
 
-    public DateTime getResourceSetNotAfter() {
-        return resourceSetNotAfter;
-    }
-
-    public String getSuggestedSiaHeadUri() {
-        return suggestedSiaHeadUri;
+    public String[] getIpv6ResourceSet() {
+        return ipv6ResourceSet == null ? null : ipv6ResourceSet.split(",");
     }
 
 
+    ListResponsePayloadClass setIpv6ResourceSet(String... ipv6ResourceSet) {
+        if (ipv6ResourceSet != null) {
+            this.ipv6ResourceSet = StringUtils.join(ipv6ResourceSet, ",");
+        }
+
+        return this;
+    }
+
+    public DateTime getValidityNotAfter() {
+        return validityNotAfter;
+    }
+
+    ListResponsePayloadClass setValidityNotAfter(DateTime validityNotAfter) {
+        this.validityNotAfter = validityNotAfter;
+        return this;
+    }
+
+    public String getSiaHeadUri() {
+        return siaHeadUri;
+    }
+
+    ListResponsePayloadClass setSiaHeadUri(String siaHeadUri) {
+        this.siaHeadUri = siaHeadUri;
+        return this;
+    }
 
     public String[] getResourceSetAsNumbers() {
         return resourceSetAsNumbers != null ? resourceSetAsNumbers.split(",") : null;
@@ -122,32 +122,6 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return this;
     }
 
-    ListResponsePayloadClass setResourceSetIpv4(IpRange... resourceSetIpv4) {
-        if (resourceSetIpv4 != null) {
-            this.resourceSetIpv4 = StringUtils.join(resourceSetIpv4, ",");
-        }
-
-        return this;
-    }
-
-    ListResponsePayloadClass setResourceSetIpv6(IpRange... resourceSetIpv6) {
-        if (resourceSetIpv6 != null) {
-            this.resourceSetIpv6 = StringUtils.join(resourceSetIpv6, ",");
-        }
-
-        return this;
-    }
-
-    ListResponsePayloadClass setResourceSetNotAfter(DateTime resourceSetNotAfter) {
-        this.resourceSetNotAfter = resourceSetNotAfter;
-        return this;
-    }
-
-    ListResponsePayloadClass setSuggestedSiaHeadUri(String suggestedSiaHeadUri) {
-        this.suggestedSiaHeadUri = suggestedSiaHeadUri;
-        return this;
-    }
-
 
     public List<ResourceSet> getResourceSets() {
         return resourceSets;
@@ -156,5 +130,20 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
     ListResponsePayloadClass setResourceSets(List<ResourceSet> resourceSets) {
         this.resourceSets = resourceSets;
         return this;
+    }
+
+
+    public X509ResourceCertificate getIssuer() {
+        return issuer;
+    }
+
+    ListResponsePayloadClass setIssuer(X509ResourceCertificate issuer) {
+        this.issuer = issuer;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

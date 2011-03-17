@@ -1,14 +1,14 @@
 package net.ripe.commons.provisioning.message.resourceclassquery;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
-import net.ripe.ipresource.IpRange;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
-import java.net.URI;
 import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.List;
@@ -18,15 +18,16 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
     private static final XStreamXmlSerializer<ListResponsePayload> SERIALIZER = new ListResponsePayloadSerializerBuilder().build();
 
     private String className;
-    private URI[] certificateAuthorityUri;
+    private String[] certificateAuthorityUri;
     private String sender;
     private String recipient;
     private String[] asn;
-    private IpRange[] ipv4ResourceSet;
-    private IpRange[] ipv6ResourceSet;
+    private String[] ipv4ResourceSet;
+    private String[] ipv6ResourceSet;
     private DateTime validityNotAfter;
-    private String publicationPoint;
+    private String siaHeadUri;
     private List<ResourceSet> resourceSets;
+    private X509ResourceCertificate issuer;
 
     // TODO remove after parser decodes the content - strictly for junit testing
     public String xml;
@@ -51,17 +52,17 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
         return this;
     }
 
-    public ListResponseCmsBuilder withCertificateAuthorityUri(URI... caUri) {
+    public ListResponseCmsBuilder withCertificateAuthorityUri(String... caUri) {
         this.certificateAuthorityUri = caUri;
         return this;
     }
 
-    public ListResponseCmsBuilder withIpv4ResourceSet(IpRange... ipv4ResourceSet) {
+    public ListResponseCmsBuilder withIpv4ResourceSet(String... ipv4ResourceSet) {
         this.ipv4ResourceSet = ipv4ResourceSet;
         return this;
     }
 
-    public ListResponseCmsBuilder withIpv6ResourceSet(IpRange... ipv6ResourceSet) {
+    public ListResponseCmsBuilder withIpv6ResourceSet(String... ipv6ResourceSet) {
         this.ipv6ResourceSet = ipv6ResourceSet;
         return this;
     }
@@ -71,13 +72,18 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
         return this;
     }
 
-    public ListResponseCmsBuilder withPublicationPoint(String publicationPoint) {
-        this.publicationPoint = publicationPoint;
+    public ListResponseCmsBuilder withSiaHeadUri(String siaHead) {
+        this.siaHeadUri = siaHead;
         return this;
     }
 
     public ListResponseCmsBuilder withResourceSet(ResourceSet... resourceSets) {
         this.resourceSets = Arrays.asList(resourceSets);
+        return this;
+    }
+
+    public ListResponseCmsBuilder withIssuer(X509ResourceCertificate issuer) {
+        this.issuer = issuer;
         return this;
     }
 
@@ -96,9 +102,12 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
         Validate.notNull(recipient, "Recipient is required");
         Validate.notNull(className, "No className provided");
         Validate.notNull(validityNotAfter, "Validity not after is required");
-
+        Validate.isTrue(validityNotAfter.getZone().equals(DateTimeZone.UTC), "Validity time must be in UTC timezone");
+        Validate.isTrue(ResourceClassUtil.validateAsn(asn), "AS numbers should not start with AS");
         boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(certificateAuthorityUri);
         Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
+
+        Validate.notNull(issuer, "issuer certificate is required");
     }
 
     private String createSerializedPayload() {
@@ -106,11 +115,12 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
                 .setClassName(className)
                 .setCertificateAuthorityUri(certificateAuthorityUri)
                 .setResourceSetAsNumbers(asn)
-                .setResourceSetIpv4(ipv4ResourceSet)
-                .setResourceSetIpv6(ipv6ResourceSet)
-                .setResourceSetNotAfter(validityNotAfter)
-                .setSuggestedSiaHeadUri(publicationPoint)
-                .setResourceSets(resourceSets);
+                .setIpv4ResourceSet(ipv4ResourceSet)
+                .setIpv6ResourceSet(ipv6ResourceSet)
+                .setValidityNotAfter(validityNotAfter)
+                .setSiaHeadUri(siaHeadUri)
+                .setResourceSets(resourceSets)
+                .setIssuer(issuer);
 
         ListResponsePayload payload = new ListResponsePayload(sender, recipient, PayloadMessageType.list_response, payloadClass);
 
