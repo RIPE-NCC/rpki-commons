@@ -7,12 +7,17 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
 import net.ripe.ipresource.IpResourceSet;
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.jce.X509Principal;
 import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
-import java.security.KeyPair;
+import java.security.*;
 import java.security.cert.X509CRL;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class ProvisioningObjectMother {
 
@@ -47,6 +52,42 @@ public class ProvisioningObjectMother {
         builder.withNumber(BigInteger.TEN);
 
         return builder.build(TEST_KEY_PAIR.getPrivate()).getCrl();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static PKCS10CertificationRequest generatePkcs10CertificationRequest(int keySize, String keyName, String sigName, String provider) throws Exception {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance(keyName, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+
+        kpg.initialize(keySize);
+
+        KeyPair kp = kpg.genKeyPair();
+
+        Hashtable attrs = new Hashtable();
+
+        attrs.put(X509Principal.C, "AU");
+        attrs.put(X509Principal.O, "The Legion of the Bouncy Castle");
+        attrs.put(X509Principal.L, "Melbourne");
+        attrs.put(X509Principal.ST, "Victoria");
+        attrs.put(X509Principal.EmailAddress, "feedback-crypto@bouncycastle.org");
+
+        Vector order = new Vector();
+
+        order.addElement(X509Principal.C);
+        order.addElement(X509Principal.O);
+        order.addElement(X509Principal.L);
+        order.addElement(X509Principal.ST);
+        order.addElement(X509Principal.EmailAddress);
+
+        X509Name subject = new X509Name(order, attrs);
+
+        PKCS10CertificationRequest request = new PKCS10CertificationRequest(
+                sigName,
+                subject,
+                kp.getPublic(),
+                null,
+                kp.getPrivate(), DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+
+        return request;
     }
 
 

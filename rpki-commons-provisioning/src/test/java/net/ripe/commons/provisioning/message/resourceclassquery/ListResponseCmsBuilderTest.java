@@ -43,12 +43,11 @@ public class ListResponseCmsBuilderTest {
         builder.build(EE_KEYPAIR.getPrivate());
 
         // then
-        // TODO replace with decoded from cms obj
-
-        XStreamXmlSerializer<ListResponsePayload> serializer = new ListResponsePayloadSerializerBuilder().build();
-        ListResponsePayload deserializedPayload = serializer.deserialize(builder.xml);
+        // TODO replace builder.xml with decoded from cms obj
 
         System.out.println(builder.xml);
+        XStreamXmlSerializer<ListResponsePayload> serializer = new ListResponsePayloadSerializerBuilder().build();
+        ListResponsePayload deserializedPayload = serializer.deserialize(builder.xml);
 
         assertEquals("sender", deserializedPayload.getSender());
         assertEquals("recipient", deserializedPayload.getRecipient());
@@ -71,9 +70,7 @@ public class ListResponseCmsBuilderTest {
         assertEquals("10.0.0.0/8", resourceSet.getAllocatedIpv4()[0]);
         assertEquals("2001:0DB8::/48", resourceSet.getAllocatedIpv6()[0]);
         assertArrayEquals(ProvisioningObjectMother.X509_CA.getEncoded(), resourceSet.getCertificate().getEncoded());
-//        assertEquals(deserializedPayload.getPayloadClass().getResourceSetAsNumbers());
     }
-
 
     @Test
     public void shouldBuildValidListResponsePayloadWithoutIpv4OrIpv6() throws URISyntaxException {

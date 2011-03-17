@@ -4,7 +4,6 @@ import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
-import net.ripe.commons.provisioning.message.PayloadMessageType;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -122,7 +121,7 @@ public class ListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
                 .setResourceSets(resourceSets)
                 .setIssuer(issuer);
 
-        ListResponsePayload payload = new ListResponsePayload(sender, recipient, PayloadMessageType.list_response, payloadClass);
+        ListResponsePayload payload = new ListResponsePayload(sender, recipient, payloadClass);
 
         xml = SERIALIZER.serialize(payload);
         return xml;

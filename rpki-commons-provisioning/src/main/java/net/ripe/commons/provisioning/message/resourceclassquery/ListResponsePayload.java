@@ -11,8 +11,8 @@ public class ListResponsePayload extends ProvisioningPayload {
     @XStreamAlias("class")
     private ListResponsePayloadClass payloadClass;
 
-    public ListResponsePayload(String sender, String recipient, PayloadMessageType type, ListResponsePayloadClass payloadClass) {
-        super(sender, recipient, type);
+    public ListResponsePayload(String sender, String recipient, ListResponsePayloadClass payloadClass) {
+        super(sender, recipient, PayloadMessageType.list_response);
         this.payloadClass = payloadClass;
     }
 

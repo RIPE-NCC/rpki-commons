@@ -84,7 +84,6 @@ public class ListResponsePayloadClass extends ProvisioningPayloadClass {
         return ipv6ResourceSet == null ? null : ipv6ResourceSet.split(",");
     }
 
-
     ListResponsePayloadClass setIpv6ResourceSet(String... ipv6ResourceSet) {
         if (ipv6ResourceSet != null) {
             this.ipv6ResourceSet = StringUtils.join(ipv6ResourceSet, ",");

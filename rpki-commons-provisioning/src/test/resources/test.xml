@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="issue">
+  <request class_name="a classname" req_resource_set_as="1234,456" req_resource_set_ipv4="10.0.0.0/8" req_resource_set_ipv6="2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::">MIIBSDCB8wIBADCBjzELMAkGA1UEBhMCQVUxKDAmBgNVBAoMH1RoZSBMZWdpb24gb2YgdGhlIEJv
+dW5jeSBDYXN0bGUxEjAQBgNVBAcMCU1lbGJvdXJuZTERMA8GA1UECAwIVmljdG9yaWExLzAtBgkq
+hkiG9w0BCQEWIGZlZWRiYWNrLWNyeXB0b0Bib3VuY3ljYXN0bGUub3JnMFwwDQYJKoZIhvcNAQEB
+BQADSwAwSAJBAI/IHpw8iMVVEgwiG3SCIPpZlj6U8e2wWzQgWkI/WDUV3pAFr8h1qUVV0Hbdg4j7
+lcPupFh2/M2bRWd2Kf0VXNkCAwEAATANBgkqhkiG9w0BAQUFAANBADgDuhkWi735VDv5b4IQ89ie
+rt0Ux80O9F2vmzngOQEjKhdlYZfyC1lRpKD7B0ps1MZbukcdsK7DOpUHvoRbG3Q=</request>
+</message>

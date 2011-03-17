@@ -18,7 +18,7 @@ public class ResourceClassUtil {
         return rsyncUriFound;
     }
 
-    static boolean validateAsn(String[] asNumbers) {
+    public static boolean validateAsn(String[] asNumbers) {
         boolean isValid = true;
 
         if (asNumbers != null) {
