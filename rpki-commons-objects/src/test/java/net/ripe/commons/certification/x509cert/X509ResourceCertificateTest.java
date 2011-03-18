@@ -1,15 +1,7 @@
 package net.ripe.commons.certification.x509cert;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -47,14 +39,14 @@ public class X509ResourceCertificateTest {
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
     private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private CrlLocator crlLocator;
-    
+
     private static final ValidityPeriod TEST_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(100));
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
 
     public static X509ResourceCertificateBuilder createSelfSignedCaCertificateBuilder() {
         X509ResourceCertificateBuilder builder = createBasicBuilder();
         builder.withCa(true);
-        builder.withKeyUsage(KeyUsage.keyCertSign);
+        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         return builder;
     }
 
@@ -69,7 +61,7 @@ public class X509ResourceCertificateTest {
         builder.withAuthorityKeyIdentifier(true);
         return builder;
     }
-    
+
 
     public static X509ResourceCertificate createSelfSignedCaResourceCertificate() {
         return createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);

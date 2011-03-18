@@ -17,8 +17,8 @@ import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactory;
 import net.ripe.commons.certification.validation.objectvalidators.ResourceCertificateLocator;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 
@@ -209,7 +209,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withValidityPeriod(VALIDITY_PERIOD);
         builder.withPublicKey(ROOT_KEY_PAIR.getPublic());
         builder.withCa(true);
-        builder.withKeyUsage(KeyUsage.keyCertSign);
+        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
         builder.withSubjectKeyIdentifier(true);
         builder.withResources(ROOT_RESOURCE_SET);
@@ -228,7 +228,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withAuthorityKeyIdentifier(true);
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
         builder.withCa(true);
-        builder.withKeyUsage(KeyUsage.keyCertSign);
+        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
         builder.withSubjectKeyIdentifier(true);
         builder.withResources(InheritedIpResourceSet.getInstance());
@@ -245,6 +245,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withPublicKey(SECOND_CHILD_KEY_PAIR.getPublic());
         builder.withAuthorityKeyIdentifier(true);
         builder.withSigningKeyPair(FIRST_CHILD_KEY_PAIR);
+        builder.withCa(true);
+        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
     	builder.withValidityPeriod(VALIDITY_PERIOD);
     	builder.withAuthorityKeyIdentifier(true);
         builder.withSubjectKeyIdentifier(true);

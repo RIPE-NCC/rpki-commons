@@ -20,14 +20,15 @@ import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.utils.Specification;
 
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.easymock.IAnswer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -189,6 +190,7 @@ public class ManifestCmsTest{
 		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
 		builder.withCa(false);
+		builder.withKeyUsage(KeyUsage.digitalSignature);
 		builder.withSubjectDN(MANIFEST_DN);
 		builder.withIssuerDN(X509ResourceCertificateTest.TEST_SELF_SIGNED_CERTIFICATE_NAME);
 		builder.withSerial(BigInteger.ONE);
