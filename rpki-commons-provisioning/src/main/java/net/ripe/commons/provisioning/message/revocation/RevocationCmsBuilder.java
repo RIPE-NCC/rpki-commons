@@ -4,8 +4,8 @@ import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.message.common.CommonCmsBuilder;
 import org.apache.commons.lang.Validate;
 
-public class RevocationRequestCmsBuilder extends CommonCmsBuilder {
-    private static final XStreamXmlSerializer<RevocationRequestPayloadWrapper> SERIALIZER = new RevocationRequestPayloadWrapperSerializerBuilder().build();
+public class RevocationCmsBuilder extends CommonCmsBuilder {
+    private static final XStreamXmlSerializer<RevocationPayloadWrapper> SERIALIZER = new RevocationPayloadWrapperSerializerBuilder().build();
 
     private String className;
     private String ski;
@@ -26,9 +26,9 @@ public class RevocationRequestCmsBuilder extends CommonCmsBuilder {
 
     @Override
     protected String serializePayloadWrapper(String sender, String recipient) {
-        RevocationRequestPayload payload = new RevocationRequestPayload(className, ski);
+        RevocationPayload payload = new RevocationPayload(className, ski);
 
-        RevocationRequestPayloadWrapper wrapper = new RevocationRequestPayloadWrapper(sender, recipient, payload);
+        RevocationPayloadWrapper wrapper = new RevocationPayloadWrapper(sender, recipient, payload);
 
         return SERIALIZER.serialize(wrapper);
     }

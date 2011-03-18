@@ -5,18 +5,18 @@ import net.ripe.commons.provisioning.message.PayloadMessageType;
 import net.ripe.commons.provisioning.message.ProvisioningPayloadWrapper;
 
 @XStreamAlias("message")
-public class RevocationRequestPayloadWrapper extends ProvisioningPayloadWrapper {
+public class RevocationPayloadWrapper extends ProvisioningPayloadWrapper {
 
     @XStreamAlias("key")
-    private RevocationRequestPayload content;
+    private RevocationPayload content;
 
-    public RevocationRequestPayloadWrapper(String sender, String recipient, RevocationRequestPayload content) {
+    public RevocationPayloadWrapper(String sender, String recipient, RevocationPayload content) {
         super(sender, recipient, PayloadMessageType.revoke);
 
         this.content = content;
     }
 
-    public RevocationRequestPayload getPayloadContent() {
+    public RevocationPayload getPayloadContent() {
         return content;
     }
 }

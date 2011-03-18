@@ -8,11 +8,11 @@ import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuild
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
 import static org.junit.Assert.assertEquals;
 
-public class RevocationRequestCmsBuilderTest {
+public class RevocationCmsBuilderTest {
     @Test
     public void shouldBuildValidRevocationCms() throws Exception {
         // given
-        RevocationRequestCmsBuilder builder = new RevocationRequestCmsBuilder();
+        RevocationCmsBuilder builder = new RevocationCmsBuilder();
         builder.withClassName("a classname");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
         builder.withSender("sender");
@@ -25,15 +25,15 @@ public class RevocationRequestCmsBuilderTest {
         // then
         // TODO replace with decoded from cms obj
 
-        XStreamXmlSerializer<RevocationRequestPayloadWrapper> serializer = new RevocationRequestPayloadWrapperSerializerBuilder().build();
-        RevocationRequestPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
+        XStreamXmlSerializer<RevocationPayloadWrapper> serializer = new RevocationPayloadWrapperSerializerBuilder().build();
+        RevocationPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
 
         System.out.println(builder.xml);
 
         assertEquals("sender", deserializedPayload.getSender());
         assertEquals("recipient", deserializedPayload.getRecipient());
 
-        RevocationRequestPayload payloadContent = deserializedPayload.getPayloadContent();
+        RevocationPayload payloadContent = deserializedPayload.getPayloadContent();
         assertEquals("a classname", payloadContent.getClassName());
         assertEquals("SKI", payloadContent.getSki());
     }
