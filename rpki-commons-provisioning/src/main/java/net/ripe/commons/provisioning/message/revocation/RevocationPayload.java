@@ -2,25 +2,28 @@ package net.ripe.commons.provisioning.message.revocation;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import org.apache.commons.codec.binary.Base64;
 
 public class RevocationPayload {
     @XStreamAlias("class_name")
     @XStreamAsAttribute
     private String className;
 
+    // byte arrays are not allowed as attribute; hence we do the encoding ourselves
+    @XStreamAlias("ski")
     @XStreamAsAttribute
-    private String ski;
+    private String subjectKeyIdentifier;
 
-    public RevocationPayload(String className, String ski) {
+    public RevocationPayload(String className, byte[] subjectKeyIdentifier) {
         this.className = className;
-        this.ski = ski;
+        this.subjectKeyIdentifier = Base64.encodeBase64URLSafeString(subjectKeyIdentifier);
     }
 
     public String getClassName() {
         return className;
     }
 
-    public String getSki() {
-        return ski;
+    public byte[] getSubjectKeyIdentifier() {
+        return Base64.decodeBase64(subjectKeyIdentifier);
     }
 }

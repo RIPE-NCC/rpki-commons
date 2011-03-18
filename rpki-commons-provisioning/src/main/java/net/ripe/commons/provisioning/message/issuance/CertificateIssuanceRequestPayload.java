@@ -23,7 +23,7 @@ public class CertificateIssuanceRequestPayload {
         return allocatedAsn;
     }
 
-    CertificateIssuanceRequestPayload setAllocatedAsn(String[] allocatedAsn) {
+    CertificateIssuanceRequestPayload setAllocatedAsn(String[] allocatedAsn) {   // NOPMD no clone of array stored
         this.allocatedAsn = allocatedAsn;
         return this;
     }
@@ -32,7 +32,7 @@ public class CertificateIssuanceRequestPayload {
         return allocatedIpv4;
     }
 
-    CertificateIssuanceRequestPayload setAllocatedIpv4(String[] allocatedIpv4) {
+    CertificateIssuanceRequestPayload setAllocatedIpv4(String[] allocatedIpv4) {  // NOPMD no clone of array stored
         this.allocatedIpv4 = allocatedIpv4;
         return this;
     }
@@ -41,7 +41,7 @@ public class CertificateIssuanceRequestPayload {
         return allocatedIpv6;
     }
 
-    CertificateIssuanceRequestPayload setAllocatedIpv6(String[] allocatedIpv6) {
+    CertificateIssuanceRequestPayload setAllocatedIpv6(String[] allocatedIpv6) {  // NOPMD no clone of array stored
         this.allocatedIpv6 = allocatedIpv6;
         return this;
     }

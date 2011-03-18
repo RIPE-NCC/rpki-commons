@@ -10,10 +10,10 @@ public abstract class ProvisioningPayloadWrapper {
     private Integer version;
 
     @XStreamAsAttribute
-    public String sender;
+    private String sender;
 
     @XStreamAsAttribute
-    public String recipient;
+    private String recipient;
 
     @XStreamAsAttribute
     private PayloadMessageType type;

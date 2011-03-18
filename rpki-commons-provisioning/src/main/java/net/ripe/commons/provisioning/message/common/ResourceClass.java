@@ -20,7 +20,7 @@ public class ResourceClass {
         return issuerCertificatePublicationLocation;
     }
 
-    ResourceClass setIssuerCertificatePublicationLocation(String[] issuerCertificatePublicationLocation) {
+    ResourceClass setIssuerCertificatePublicationLocation(String[] issuerCertificatePublicationLocation) {   // NOPMD no clone of array stored
         this.issuerCertificatePublicationLocation = issuerCertificatePublicationLocation;
         return this;
     }
@@ -29,7 +29,7 @@ public class ResourceClass {
         return allocatedAsn;
     }
 
-    ResourceClass setAllocatedAsn(String[] allocatedAsn) {
+    ResourceClass setAllocatedAsn(String[] allocatedAsn) {       // NOPMD no clone of array stored
         this.allocatedAsn = allocatedAsn;
         return this;
     }
@@ -38,7 +38,7 @@ public class ResourceClass {
         return allocatedIpv4;
     }
 
-    ResourceClass setAllocatedIpv4(String[] allocatedIpv4) {
+    ResourceClass setAllocatedIpv4(String[] allocatedIpv4) {   // NOPMD no clone of array stored
         this.allocatedIpv4 = allocatedIpv4;
         return this;
     }
@@ -47,7 +47,7 @@ public class ResourceClass {
         return allocatedIpv6;
     }
 
-    ResourceClass setAllocatedIpv6(String[] allocatedIpv6) {
+    ResourceClass setAllocatedIpv6(String[] allocatedIpv6) {   // NOPMD no clone of array stored
         this.allocatedIpv6 = allocatedIpv6;
         return this;
     }

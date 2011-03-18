@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class RevocationCmsBuilderTest {
@@ -17,7 +18,7 @@ public class RevocationCmsBuilderTest {
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
         builder.withSender("sender");
         builder.withRecipient("recipient");
-        builder.withSki("SKI");
+        builder.withCertificate(ProvisioningObjectMother.X509_CA);
 
         // when
         builder.build(EE_KEYPAIR.getPrivate());
@@ -35,6 +36,6 @@ public class RevocationCmsBuilderTest {
 
         RevocationPayload payloadContent = deserializedPayload.getPayloadContent();
         assertEquals("a classname", payloadContent.getClassName());
-        assertEquals("SKI", payloadContent.getSki());
+        assertArrayEquals(ProvisioningObjectMother.X509_CA.getSubjectKeyIdentifier(), payloadContent.getSubjectKeyIdentifier());
     }
 }

@@ -1,3 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?><message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="revoke">
-  <key class_name="a classname" ski="SKI"/>
+  <key class_name="a classname" ski="FD55ymVQJ_bf3STb1R2wf1m_kLg"/>
 </message>

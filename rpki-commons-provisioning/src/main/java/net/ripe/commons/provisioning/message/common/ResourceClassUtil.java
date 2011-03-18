@@ -1,6 +1,9 @@
 package net.ripe.commons.provisioning.message.common;
 
-public class ResourceClassUtil {
+public final class ResourceClassUtil {
+
+    private ResourceClassUtil() {
+    }
 
     static boolean hasRsyncUri(String[] uris) {
         boolean rsyncUriFound = false;

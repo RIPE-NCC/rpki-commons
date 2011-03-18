@@ -10,10 +10,9 @@ import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
 public class CertificateIssuanceRequestPayloadConverter implements Converter {
-    private static final String CERT__URL = "cert_url";
-    private static final String REQ__RESOURCE__SET__AS = "req_resource_set_as";
+    private static final String REQ_RESOURCE_SET_AS = "req_resource_set_as";
     private static final String REQ_RESOURCE_SET_IPV4 = "req_resource_set_ipv4";
-    private static final String REQ__RESOURCE_SET_IPV6 = "req_resource_set_ipv6";
+    private static final String REQ_RESOURCE_SET_IPV6 = "req_resource_set_ipv6";
     private static final String CLASS_NAME = "class_name";
 
     @Override
@@ -23,7 +22,7 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
         writer.addAttribute(CLASS_NAME, content.getClassName());
 
         if (content.getAllocatedAsn() != null) {
-            writer.addAttribute(REQ__RESOURCE__SET__AS, StringUtils.join(content.getAllocatedAsn(), ","));
+            writer.addAttribute(REQ_RESOURCE_SET_AS, StringUtils.join(content.getAllocatedAsn(), ","));
         }
 
         if (content.getAllocatedIpv4() != null) {
@@ -31,7 +30,7 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
         }
 
         if (content.getAllocatedIpv6() != null) {
-            writer.addAttribute(REQ__RESOURCE_SET_IPV6, StringUtils.join(content.getAllocatedIpv6(), ","));
+            writer.addAttribute(REQ_RESOURCE_SET_IPV6, StringUtils.join(content.getAllocatedIpv6(), ","));
         }
 
         context.convertAnother(content.getCertificate().getEncoded());
@@ -45,7 +44,7 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
         Validate.notNull(className, "class_name attribute is required");
         content.setClassName(className);
 
-        String resourceSetAsNumbers = reader.getAttribute(REQ__RESOURCE__SET__AS);
+        String resourceSetAsNumbers = reader.getAttribute(REQ_RESOURCE_SET_AS);
         if (StringUtils.isNotBlank(resourceSetAsNumbers)) {
             content.setAllocatedAsn(resourceSetAsNumbers.split(","));
         }
@@ -55,7 +54,7 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
             content.setAllocatedIpv4(allocatedIpv4.split(","));
         }
 
-        String allocatedIpv6 = reader.getAttribute(REQ__RESOURCE_SET_IPV6);
+        String allocatedIpv6 = reader.getAttribute(REQ_RESOURCE_SET_IPV6);
         if (StringUtils.isNotBlank(allocatedIpv6)) {
             content.setAllocatedIpv6(allocatedIpv6.split(","));
         }
