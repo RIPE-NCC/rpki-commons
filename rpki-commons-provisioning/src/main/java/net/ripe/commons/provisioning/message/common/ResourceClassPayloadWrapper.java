@@ -5,6 +5,7 @@ import net.ripe.commons.provisioning.message.PayloadMessageType;
 import net.ripe.commons.provisioning.message.ProvisioningPayloadWrapper;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@XStreamAlias("message")
 public class ResourceClassPayloadWrapper extends ProvisioningPayloadWrapper {
 
     @XStreamAlias("class")

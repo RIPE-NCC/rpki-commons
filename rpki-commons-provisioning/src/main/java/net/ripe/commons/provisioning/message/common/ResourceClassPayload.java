@@ -5,9 +5,9 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.commons.provisioning.message.query.X509ResourceCertificateBase64Converter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.joda.time.DateTime;
 
 import java.util.List;
 
@@ -39,6 +39,32 @@ public class ResourceClassPayload {
     @XStreamConverter(X509ResourceCertificateBase64Converter.class)
     @XStreamAlias("issuer")
     private X509ResourceCertificate issuer;
+
+    @XStreamAlias("resource_set_notafter")
+    @XStreamAsAttribute
+    private DateTime validityNotAfter;
+
+    @XStreamAlias("suggested_sia_head")
+    @XStreamAsAttribute
+    private String siaHeadUri;
+
+    public DateTime getValidityNotAfter() {
+        return validityNotAfter;
+    }
+
+    ResourceClassPayload setValidityNotAfter(DateTime validityNotAfter) {
+        this.validityNotAfter = validityNotAfter;
+        return this;
+    }
+
+    public String getSiaHeadUri() {
+        return siaHeadUri;
+    }
+
+    ResourceClassPayload setSiaHeadUri(String siaHeadUri) {
+        this.siaHeadUri = siaHeadUri;
+        return this;
+    }
 
     public String getClassName() {
         return className;

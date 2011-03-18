@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.query;
+package net.ripe.commons.provisioning.message.common;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;

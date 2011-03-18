@@ -36,5 +36,4 @@ public class RevocationCmsBuilder extends CommonCmsBuilder {
 
         return SERIALIZER.serialize(wrapper);
     }
-
 }

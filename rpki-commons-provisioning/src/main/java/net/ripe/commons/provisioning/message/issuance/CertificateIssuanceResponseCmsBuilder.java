@@ -1,20 +1,10 @@
 package net.ripe.commons.provisioning.message.issuance;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.commons.provisioning.message.PayloadMessageType;
 import net.ripe.commons.provisioning.message.common.ResourceClassCmsBuilder;
 
 public class CertificateIssuanceResponseCmsBuilder extends ResourceClassCmsBuilder {
-
-    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayloadWrapper> SERIALIZER = new CertificateIssuanceResponsePayloadWrapperSerializerBuilder().build();
-
-    @Override
-    protected String serializePayloadWrapper(String sender, String recipient) {
-        CertificateIssuanceResponsePayload payload = new CertificateIssuanceResponsePayload();
-
-        super.setValuesInPayload(payload);
-
-        CertificateIssuanceResponsePayloadWrapper wrapper = new CertificateIssuanceResponsePayloadWrapper(sender, recipient, payload);
-
-        return SERIALIZER.serialize(wrapper);
+    public CertificateIssuanceResponseCmsBuilder() {
+        super(PayloadMessageType.issue_response);
     }
 }

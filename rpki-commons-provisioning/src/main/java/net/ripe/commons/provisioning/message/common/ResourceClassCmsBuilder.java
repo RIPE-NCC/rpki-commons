@@ -1,12 +1,18 @@
 package net.ripe.commons.provisioning.message.common;
 
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.provisioning.message.PayloadMessageType;
 import org.apache.commons.lang.Validate;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class ResourceClassCmsBuilder extends CommonCmsBuilder {
+public class ResourceClassCmsBuilder extends CommonCmsBuilder {
+
+    private static final XStreamXmlSerializer<ResourceClassPayloadWrapper> SERIALIZER = new ResourceClassPayloadWrapperSerializerBuilder().build();
 
     private String className;
     private String[] certificateAuthorityUri;
@@ -15,6 +21,21 @@ public abstract class ResourceClassCmsBuilder extends CommonCmsBuilder {
     private String[] ipv6ResourceSet;
     private List<ResourceClass> resourceClasses;
     private X509ResourceCertificate issuer;
+    private DateTime validityNotAfter;
+    private String siaHeadUri;
+    private PayloadMessageType payloadMessageType;
+
+    protected ResourceClassCmsBuilder(PayloadMessageType payloadMessageType) {
+        this.payloadMessageType = payloadMessageType;
+    }
+
+    public void withValidityNotAfter(DateTime notAfter) {
+        this.validityNotAfter = notAfter;
+    }
+
+    public void withSiaHeadUri(String siaHead) {
+        this.siaHeadUri = siaHead;
+    }
 
     public void withClassName(String className) {
         this.className = className;
@@ -53,14 +74,15 @@ public abstract class ResourceClassCmsBuilder extends CommonCmsBuilder {
 
         Validate.notNull(issuer, "issuer certificate is required");
 
-        onValidateAdditionalFields();
+        Validate.notNull(validityNotAfter, "Validity not after is required");
+        Validate.isTrue(validityNotAfter.getZone().equals(DateTimeZone.UTC), "Validity time must be in UTC timezone");
+
+        Validate.notNull(payloadMessageType, "Message type is required");
     }
 
-    protected void onValidateAdditionalFields() {
-
-    }
-
-    protected final void setValuesInPayload(ResourceClassPayload resourceClassPayload) {
+    @Override
+    protected String serializePayloadWrapper(String sender, String recipient) {
+        ResourceClassPayload resourceClassPayload = new ResourceClassPayload();
         resourceClassPayload.setClassName(className);
         resourceClassPayload.setCertificateAuthorityUri(certificateAuthorityUri);
         resourceClassPayload.setResourceSetAsNumbers(asn);
@@ -68,5 +90,11 @@ public abstract class ResourceClassCmsBuilder extends CommonCmsBuilder {
         resourceClassPayload.setIpv6ResourceSet(ipv6ResourceSet);
         resourceClassPayload.setResourceClasses(resourceClasses);
         resourceClassPayload.setIssuer(issuer);
+        resourceClassPayload.setValidityNotAfter(validityNotAfter);
+        resourceClassPayload.setSiaHeadUri(siaHeadUri);
+
+        ResourceClassPayloadWrapper wrapper = new ResourceClassPayloadWrapper(sender, recipient, resourceClassPayload, payloadMessageType);
+
+        return SERIALIZER.serialize(wrapper);
     }
 }

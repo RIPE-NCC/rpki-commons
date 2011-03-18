@@ -45,22 +45,6 @@ public abstract class ProvisioningPayloadWrapper {
         return type;
     }
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    public void setRecipient(String recipient) {
-        this.recipient = recipient;
-    }
-
-    public void setType(PayloadMessageType type) {
-        this.type = type;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
