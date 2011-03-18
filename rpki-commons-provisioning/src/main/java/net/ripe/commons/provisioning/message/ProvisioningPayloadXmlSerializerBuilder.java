@@ -20,6 +20,7 @@ public class ProvisioningPayloadXmlSerializerBuilder<T extends ProvisioningPaylo
 
     @Override
     protected HierarchicalStreamDriver getStreamDriver() {
+        // replace $ with __ and don't replace _
         return new XppDriver(new XmlFriendlyReplacer("__", "_"));
     }
 }

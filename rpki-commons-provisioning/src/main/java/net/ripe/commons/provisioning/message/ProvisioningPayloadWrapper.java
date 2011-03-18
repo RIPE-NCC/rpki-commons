@@ -18,11 +18,11 @@ public abstract class ProvisioningPayloadWrapper {
     @XStreamAsAttribute
     private PayloadMessageType type;
 
-    public ProvisioningPayloadWrapper(String sender, String recipient, PayloadMessageType type) {
+    protected ProvisioningPayloadWrapper(String sender, String recipient, PayloadMessageType type) {
         this(SUPPORTED_VERSION, sender, recipient, type);
     }
 
-    public ProvisioningPayloadWrapper(Integer version, String sender, String recipient, PayloadMessageType type) {
+    private ProvisioningPayloadWrapper(Integer version, String sender, String recipient, PayloadMessageType type) {
         this.version = version;
         this.sender = sender;
         this.recipient = recipient;

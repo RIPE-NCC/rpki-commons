@@ -42,13 +42,11 @@ public class ResourceClassBuilder {
         Validate.notNull(certificate);
         Validate.isTrue(ResourceClassUtil.validateAsn(allocatedAsn), "AS numbers should not start with AS");
 
-        ResourceClass resourceClass = new ResourceClass()
+        return new ResourceClass()
                 .setIssuerCertificatePublicationLocation(issuerCertificatePublicationLocation)
                 .setAllocatedIpv4(allocatedIpv4 != null ? allocatedIpv4 : null)
                 .setAllocatedIpv6(allocatedIpv6 != null ? allocatedIpv6 : null)
                 .setAllocatedAsn(allocatedAsn)
                 .setCertificate(certificate);
-
-        return resourceClass;
     }
 }
