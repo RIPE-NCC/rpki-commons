@@ -1,5 +1,6 @@
 package net.ripe.commons.provisioning.x509;
 
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
 import static org.junit.Assert.*;
@@ -39,6 +40,8 @@ public class ProvisioningCmsCertificateBuilderTest {
         builder.withPublicKey(EE_KEYPAIR.getPublic());
         builder.withSubjectDN(new X500Principal("CN=end-entity"));
         builder.withSigningKeyPair(TEST_KEY_PAIR);
+        builder.withSignatureAlgorithm(DEFAULT_SIGNATURE_ALGORITHM);
+        builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         builder.withCrlRsyncUri(URI.create("rsync://repository/parent-publication-dir/"));
         builder.withAuthorityInformationAccess(new X509CertificateInformationAccessDescriptor[] {
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, URI.create("rsync://repository/member/identity-cert-publication-uri"))

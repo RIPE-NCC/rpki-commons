@@ -24,11 +24,6 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
         verifyResources();
     }
 
-    @Override
-    public ValidationResult getValidationResult() {
-        return super.getValidationResult();
-    }
-
     private void verifyResources() {
         ValidationResult result = getValidationResult();
         X509ResourceCertificate child = getChild();

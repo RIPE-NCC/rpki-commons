@@ -1,8 +1,7 @@
 package net.ripe.commons.certification.x509cert;
 
-import static net.ripe.commons.certification.validation.ValidationString.CERTIFICATE_PARSED;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static net.ripe.commons.certification.validation.ValidationString.*;
+import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -32,7 +31,12 @@ public class X509ResourceCertificateParserTest {
 
     public static X509ResourceCertificateBuilder createPreconfiguredBuilder() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        configurePlainCertificateFields(builder);
+        builder.withSubjectDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
+        builder.withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
+        builder.withSerial(TEST_SERIAL_NUMBER);
+        builder.withValidityPeriod(TEST_VALIDITY_PERIOD);
+        builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
+        builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         builder.withResources(RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
         return builder;
@@ -75,14 +79,5 @@ public class X509ResourceCertificateParserTest {
 
         assertTrue(subject.getValidationResult().hasFailures());
         assertTrue(subject.getValidationResult().hasFailuresForLocationAndKey("certificate", ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM));
-    }
-
-    private static void configurePlainCertificateFields(X509ResourceCertificateBuilder builder) {
-        builder.withSubjectDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
-        builder.withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
-        builder.withSerial(TEST_SERIAL_NUMBER);
-        builder.withValidityPeriod(TEST_VALIDITY_PERIOD);
-        builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
-        builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
     }
 }

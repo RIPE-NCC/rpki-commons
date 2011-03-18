@@ -59,8 +59,8 @@ public class ProvisioningCmsObjectBuilder {
         return this;
     }
 
-    public ProvisioningCmsObjectBuilder withCaCertificate(X509Certificate... caCertificate) { //NOPMD - ArrayIsStoredDirectly
-        this.caCertificates = caCertificate;
+    public ProvisioningCmsObjectBuilder withCaCertificate(X509Certificate... caCertificates) { //NOPMD - ArrayIsStoredDirectly
+        this.caCertificates = caCertificates;
         return this;
     }
 

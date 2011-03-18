@@ -10,14 +10,4 @@ public class ProvisioningCertificateValidator extends X509CertificateParentChild
     public ProvisioningCertificateValidator(ValidationResult result, ProvisioningCertificate parent, X509Crl crl) {
         super(result, parent, crl);
     }
-
-    @Override
-    public void validate(String location, ProvisioningCertificate certificate) {
-        super.validate(location, certificate);
-    }
-
-    @Override
-    public ValidationResult getValidationResult() {
-        return super.getValidationResult();
-    }
 }
