@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -131,8 +132,15 @@ public class ProvisioningCmsCertificateBuilderTest {
     }
 
     @Test
-    public void shouldBeAEECertificate() {
+    public void shouldBeAnEECertificate() {
         assertFalse(TEST_CMS_CERT.isCa());
+    }
+
+    @Test
+    public void shouldHaveKeyUsageExtensionDigitalSignature() {
+        boolean[] keyUsage = TEST_CMS_CERT.getCertificate().getKeyUsage();
+        // For KeyUsage flags order see bouncy castle KeyUsage class
+        assertTrue(Arrays.equals(new boolean[] { true, false, false, false, false, false, false, false, false }, keyUsage));
     }
 }
 

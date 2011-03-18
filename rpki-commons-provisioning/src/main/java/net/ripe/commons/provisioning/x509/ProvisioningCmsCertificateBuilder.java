@@ -12,6 +12,7 @@ import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 
 
@@ -83,6 +84,7 @@ public class ProvisioningCmsCertificateBuilder {
 
     private void setUpImplicitRequirementsForBuilderHelper() {
         builderHelper.withCa(false);
+        builderHelper.withKeyUsage(KeyUsage.digitalSignature);
         builderHelper.withAuthorityKeyIdentifier(true);
         builderHelper.withSubjectKeyIdentifier(true);
         builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusMonths(DEFAULT_VALIDITY_TIME_MONTHS_FROM_NOW)));

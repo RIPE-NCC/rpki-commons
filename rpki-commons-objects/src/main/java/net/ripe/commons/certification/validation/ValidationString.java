@@ -27,6 +27,8 @@ public final class ValidationString {
 	public static final String PREV_SUBJECT_EQ_ISSUER = "cert.issuer.eq.prev.subject";
 	public static final String KEY_USAGE_EXT_PRESENT = "cert.key.usage.extension.present";
 	public static final String KEY_CERT_SIGN = "cert.key.cert.sign";
+	public static final String CRL_SIGN = "cert.crl.sign";
+	public static final String DIG_SIGN = "cert.dig.sign";
 	public static final String SKI_PRESENT = "cert.ski.present";
 	public static final String AKI_PRESENT = "cert.aki.present";
 	public static final String PREV_SKI_EQ_AKI = "cert.aki.eq.prev.ski";

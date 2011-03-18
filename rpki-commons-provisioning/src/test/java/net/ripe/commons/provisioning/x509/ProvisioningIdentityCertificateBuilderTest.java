@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -118,6 +119,14 @@ public class ProvisioningIdentityCertificateBuilderTest {
     @Test
     public void shouldBeACACertificate() {
         assertTrue(TEST_IDENTITY_CERT.isCa());
+    }
+
+    @Test
+    public void shouldIncludeKeyUsageBitsCertSignAndCrlCertSign() {
+        boolean[] keyUsage = TEST_IDENTITY_CERT.getCertificate().getKeyUsage();
+        assertNotNull(keyUsage);
+        // For KeyUsage flags order see bouncy castle KeyUsage class
+        assertTrue(Arrays.equals(new boolean[] { false, false, false, false, false, true, true, false, false }, keyUsage));
     }
 }
 
