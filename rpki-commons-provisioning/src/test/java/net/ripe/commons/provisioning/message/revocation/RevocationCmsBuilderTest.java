@@ -1,7 +1,8 @@
 package net.ripe.commons.provisioning.message.revocation;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import org.junit.Test;
 
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
@@ -21,20 +22,17 @@ public class RevocationCmsBuilderTest {
         builder.withCertificate(ProvisioningObjectMother.X509_CA);
 
         // when
-        builder.build(EE_KEYPAIR.getPrivate());
+        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
 
         // then
-        // TODO replace with decoded from cms obj
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        XStreamXmlSerializer<RevocationPayloadWrapper> serializer = new RevocationPayloadWrapperSerializerBuilder().build();
-        RevocationPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
+        RevocationPayloadWrapper revocationPayloadWrapper = (RevocationPayloadWrapper) parser.getPayloadWrapper();
+        assertEquals("sender", revocationPayloadWrapper.getSender());
+        assertEquals("recipient", revocationPayloadWrapper.getRecipient());
 
-        System.out.println(builder.xml);
-
-        assertEquals("sender", deserializedPayload.getSender());
-        assertEquals("recipient", deserializedPayload.getRecipient());
-
-        RevocationPayload payloadContent = deserializedPayload.getPayloadContent();
+        RevocationPayload payloadContent = revocationPayloadWrapper.getPayloadContent();
         assertEquals("a classname", payloadContent.getClassName());
         assertArrayEquals(ProvisioningObjectMother.X509_CA.getSubjectKeyIdentifier(), payloadContent.getSubjectKeyIdentifier());
     }

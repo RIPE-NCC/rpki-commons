@@ -1,7 +1,8 @@
 package net.ripe.commons.provisioning.message.error;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import org.junit.Test;
 
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
@@ -20,15 +21,13 @@ public class NotPerformedCmsBuilderTest {
         builder.withDescription("Something went wrong");
 
         // when
-        builder.build(EE_KEYPAIR.getPrivate());
+        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
 
         // then
-        // TODO replace with decoded from cms obj
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        XStreamXmlSerializer<NotPerformedPayloadWrapper> serializer = new NotPerformedPayloadSerializerBuilder().build();
-        NotPerformedPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
-
-        System.out.println(builder.xml);
+        NotPerformedPayloadWrapper deserializedPayload = (NotPerformedPayloadWrapper) parser.getPayloadWrapper();
 
         assertEquals("sender", deserializedPayload.getSender());
         assertEquals("recipient", deserializedPayload.getRecipient());

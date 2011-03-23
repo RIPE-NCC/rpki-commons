@@ -4,6 +4,7 @@ import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.message.PayloadParser;
+import net.ripe.commons.provisioning.message.ProvisioningPayloadWrapper;
 import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.*;
@@ -44,6 +45,7 @@ public class ProvisioningCmsObjectParser {
     private ValidationResult validationResult;
 
     private String location;
+    private ProvisioningPayloadWrapper payloadWrapper;
 
 
     public ProvisioningCmsObjectParser() {
@@ -56,6 +58,10 @@ public class ProvisioningCmsObjectParser {
 
     public ValidationResult getValidationResult() {
         return validationResult;
+    }
+
+    public ProvisioningPayloadWrapper getPayloadWrapper() {
+        return payloadWrapper;
     }
 
     public void parseCms(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
@@ -147,9 +153,9 @@ public class ProvisioningCmsObjectParser {
         validationResult.isTrue(true, CMS_CONTENT_PARSING);
     }
 
-    private void decodeContent(DEREncodable encoded) {
-//        PayloadParser.parse(encoded.getDERObject().getEncoded());
-        //TODO: to be implemented
+    private void decodeContent(DEREncodable encoded) throws IOException {
+        DEROctetString octetString = (DEROctetString) encoded;
+        payloadWrapper = PayloadParser.parse(octetString.getOctets(), validationResult);
     }
 
     /**

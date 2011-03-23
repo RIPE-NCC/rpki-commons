@@ -10,9 +10,6 @@ public abstract class CommonCmsBuilder extends ProvisioningCmsObjectBuilder {
     private String sender;
     private String recipient;
 
-    // TODO remove after parser decodes the content - strictly for junit testing
-    public String xml;
-
     public void withSender(String sender) {
         this.sender = sender;
     }
@@ -27,9 +24,6 @@ public abstract class CommonCmsBuilder extends ProvisioningCmsObjectBuilder {
 
         String serializedPayloadWrapper = serializePayloadWrapper(sender, recipient);
         super.withPayloadContent(serializedPayloadWrapper);
-
-        // TODO remove after parser decodes the content - strictly for junit testing
-        xml = serializedPayloadWrapper;
 
         return super.build(privateKey);
     }

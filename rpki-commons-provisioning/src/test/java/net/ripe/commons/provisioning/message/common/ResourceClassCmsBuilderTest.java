@@ -1,7 +1,8 @@
 package net.ripe.commons.provisioning.message.common;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,20 +49,18 @@ public class ResourceClassCmsBuilderTest {
         builder.withIssuer(ProvisioningObjectMother.X509_CA);
 
         // when
-        builder.build(EE_KEYPAIR.getPrivate());
+        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
 
         // then
-        // TODO replace builder.xml with decoded from cms obj
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        System.out.println(builder.xml);
+        ResourceClassPayloadWrapper wrapper = (ResourceClassPayloadWrapper) parser.getPayloadWrapper();
 
-        XStreamXmlSerializer<ResourceClassPayloadWrapper> serializer = new ResourceClassPayloadWrapperSerializerBuilder().build();
-        ResourceClassPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
+        assertEquals("sender", wrapper.getSender());
+        assertEquals("recipient", wrapper.getRecipient());
 
-        assertEquals("sender", deserializedPayload.getSender());
-        assertEquals("recipient", deserializedPayload.getRecipient());
-
-        ResourceClassPayload payload = deserializedPayload.getPayloadClass();
+        ResourceClassPayload payload = wrapper.getPayloadClass();
         assertEquals("http://some/other", payload.getCertificateAuthorityUri()[1]);
         assertEquals("a classname", payload.getClassName());
         assertEquals("192.168.0.0/24", payload.getIpv4ResourceSet()[0]);
@@ -79,44 +78,6 @@ public class ResourceClassCmsBuilderTest {
         assertEquals("10.0.0.0/8", resourceClass.getAllocatedIpv4()[0]);
         assertEquals("2001:0DB8::/48", resourceClass.getAllocatedIpv6()[0]);
         assertArrayEquals(ProvisioningObjectMother.X509_CA.getEncoded(), resourceClass.getCertificate().getEncoded());
-    }
-
-    @Test
-    public void shouldBuildValidListResponsePayloadWithoutIpv4OrIpv6() throws URISyntaxException {
-
-        // given
-        builder.withClassName("a classname");
-        builder.withCertificateAuthorityUri("rsync://localhost/some/where", "http://some/other");
-        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
-        builder.withRecipient("recipient");
-        builder.withValidityNotAfter(validityNotAfter);
-        builder.withIssuer(ProvisioningObjectMother.X509_CA);
-
-        // when
-        builder.build(EE_KEYPAIR.getPrivate());
-
-        // then
-        // TODO replace with decoded from cms obj
-        assertTrue(builder.xml.contains("resource_set_ipv4=\"\""));
-        assertTrue(builder.xml.contains("resource_set_ipv6=\"\""));
-    }
-
-    @Test
-    public void shouldBuildValidListResponsePayloadWithoutAsn() throws URISyntaxException {
-
-        builder.withClassName("a classname");
-        builder.withCertificateAuthorityUri("rsync://localhost/some/where", "http://some/other");
-        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
-        builder.withRecipient("recipient");
-        builder.withValidityNotAfter(validityNotAfter);
-        builder.withIssuer(ProvisioningObjectMother.X509_CA);
-
-        builder.build(EE_KEYPAIR.getPrivate());
-
-        // TODO replace with decoded from cms obj
-        assertTrue(builder.xml.contains("resource_set_as=\"\""));
     }
 
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3

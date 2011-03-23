@@ -1,11 +1,10 @@
 package net.ripe.commons.provisioning.message.query;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
 import net.ripe.commons.provisioning.message.common.ResourceClassBuilder;
-import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapper;
-import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapperSerializerBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -44,16 +43,12 @@ public class ListResponseCmsBuilderTest {
         builder.withIssuer(ProvisioningObjectMother.X509_CA);
 
         // when
-        builder.build(EE_KEYPAIR.getPrivate());
+        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
 
         // then
-        // TODO replace builder.xml with decoded from cms obj
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        System.out.println(builder.xml);
-
-        XStreamXmlSerializer<ResourceClassPayloadWrapper> serializer = new ResourceClassPayloadWrapperSerializerBuilder().build();
-        ResourceClassPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
-
-        assertEquals(PayloadMessageType.list_response, deserializedPayload.getType());
+        assertEquals(PayloadMessageType.list_response, parser.getPayloadWrapper().getType());
     }
 }

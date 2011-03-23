@@ -7,5 +7,17 @@ public enum PayloadMessageType {
     issue,
     issue_response,
     revoke,
-    error_response
+    error_response;
+
+    public static boolean containsAsEnum(String name) {
+        PayloadMessageType[] values = PayloadMessageType.values();
+
+        for (PayloadMessageType value : values) {
+            if (value.name().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

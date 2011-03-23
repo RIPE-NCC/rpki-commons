@@ -1,7 +1,8 @@
 package net.ripe.commons.provisioning.message.issuance;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.junit.Test;
 
@@ -27,20 +28,18 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         builder.withCertificateRequest(pkcs10Request);
 
         // when
-        builder.build(EE_KEYPAIR.getPrivate());
+        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
 
         // then
-        // TODO replace with decoded from cms obj
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        XStreamXmlSerializer<CertificateIssuanceRequestPayloadWrapper> serializer = new CertificateIssuanceRequestPayloadWrapperSerializerBuilder().build();
-        CertificateIssuanceRequestPayloadWrapper deserializedPayload = serializer.deserialize(builder.xml);
+        CertificateIssuanceRequestPayloadWrapper payloadWrapper = (CertificateIssuanceRequestPayloadWrapper) parser.getPayloadWrapper();
 
-        System.out.println(builder.xml);
+        assertEquals("sender", payloadWrapper.getSender());
+        assertEquals("recipient", payloadWrapper.getRecipient());
 
-        assertEquals("sender", deserializedPayload.getSender());
-        assertEquals("recipient", deserializedPayload.getRecipient());
-
-        CertificateIssuanceRequestPayload payloadContent = deserializedPayload.getPayloadContent();
+        CertificateIssuanceRequestPayload payloadContent = payloadWrapper.getPayloadContent();
         assertEquals("a classname", payloadContent.getClassName());
         assertEquals("1234", payloadContent.getAllocatedAsn()[0]);
         assertArrayEquals(pkcs10Request.getEncoded(), payloadContent.getCertificate().getEncoded());

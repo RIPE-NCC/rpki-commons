@@ -1,34 +1,9 @@
 package net.ripe.commons.provisioning.cms;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
-import static org.bouncycastle.cms.CMSSignedGenerator.*;
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.cert.CertStore;
-import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
-
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.cms.*;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
@@ -38,19 +13,35 @@ import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.cert.CertStore;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
+import static org.bouncycastle.cms.CMSSignedGenerator.DIGEST_SHA256;
+import static org.bouncycastle.cms.CMSSignedGenerator.ENCRYPTION_RSA;
+import static org.junit.Assert.*;
+
 public class ProvisioningCmsObjectBuilderTest {
 
+    private static final String PAYLOAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list\"/>";
     private ProvisioningCmsObjectBuilder subject;
     private ProvisioningCmsObject cmsObject;
     private long signingTime;
-
 
     @Before
     public void setUp() throws Exception {
         subject = new ProvisioningCmsObjectBuilder()
                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCrl(CRL)
-                        .withPayloadContent("Hello")
+                        .withPayloadContent(PAYLOAD)
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
@@ -63,7 +54,7 @@ public class ProvisioningCmsObjectBuilderTest {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
-                                                        .withPayloadContent("hello")
+                                                        .withPayloadContent(PAYLOAD)
                                                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
 
         return subject.build(EE_KEYPAIR.getPrivate());
@@ -72,7 +63,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
         subject = new ProvisioningCmsObjectBuilder()
-                        .withPayloadContent("content")
+                        .withPayloadContent(PAYLOAD)
                         .withCrl(CRL)
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.build(EE_KEYPAIR.getPrivate());
@@ -81,7 +72,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCrl() throws CMSException {
         subject = new ProvisioningCmsObjectBuilder()
-                        .withPayloadContent("content")
+                        .withPayloadContent(PAYLOAD)
                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.build(EE_KEYPAIR.getPrivate());
@@ -92,7 +83,7 @@ public class ProvisioningCmsObjectBuilderTest {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
-                                                        .withPayloadContent("hello");
+                                                        .withPayloadContent(PAYLOAD);
         subject.build(EE_KEYPAIR.getPrivate());
     }
 
@@ -158,7 +149,7 @@ public class ProvisioningCmsObjectBuilderTest {
         asn1InputStream.close();
 
         DEROctetString derString = (DEROctetString)derObject;
-        assertEquals("Hello", new String(derString.getOctets()));
+        assertEquals(PAYLOAD, new String(derString.getOctets()));
     }
 
     /**

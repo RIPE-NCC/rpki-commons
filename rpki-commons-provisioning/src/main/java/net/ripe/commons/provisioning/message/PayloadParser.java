@@ -1,6 +1,8 @@
 package net.ripe.commons.provisioning.message;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapper;
 import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapperSerializerBuilder;
 import net.ripe.commons.provisioning.message.error.NotPerformedPayloadSerializerBuilder;
@@ -12,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static net.ripe.commons.certification.validation.ValidationString.VALID_PAYLOAD_TYPE;
 
 public final class PayloadParser {
     private static final Pattern TYPE_PATTERN = Pattern.compile(".*<message[^>]*type=['\"]([a-z|\\_]*)['\"].*", Pattern.DOTALL);
@@ -32,22 +36,30 @@ public final class PayloadParser {
     private PayloadParser() {
     }
 
-    public static ProvisioningPayloadWrapper parse(byte[] encoded) {
-//        byte[] decoded = Base64.decodeBase64(base64Encoded);
-
+    public static ProvisioningPayloadWrapper parse(byte[] encoded, ValidationResult validationResult) {
         String payloadXml = new String(encoded);
 
         Matcher matcher = TYPE_PATTERN.matcher(payloadXml);
-        
-        if (matcher.matches()) {
+
+        boolean matches = matcher.matches();
+
+        validationResult.isTrue(matches, ValidationString.FOUND_PAYLOAD_TYPE);
+
+        if (matches) {
             String type = matcher.group(1);
 
-            PayloadMessageType messageType = PayloadMessageType.valueOf(type);
+            boolean isValidType = PayloadMessageType.containsAsEnum(type);
 
-            XStreamXmlSerializer<? extends ProvisioningPayloadWrapper> serializer = TYPE_MAP.get(messageType);
-            return serializer.deserialize(payloadXml);
+            validationResult.isTrue(isValidType, VALID_PAYLOAD_TYPE);
+
+            if (isValidType) {
+                PayloadMessageType messageType = PayloadMessageType.valueOf(type);
+
+                XStreamXmlSerializer<? extends ProvisioningPayloadWrapper> serializer = TYPE_MAP.get(messageType);
+                return serializer.deserialize(payloadXml);
+            }
         }
 
-        throw new IllegalArgumentException("Can't parse message type");
+        return null;
     }
 }

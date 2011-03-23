@@ -1,13 +1,16 @@
 package net.ripe.commons.provisioning.message;
 
+import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapper;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class PayloadParserTest {
     @Test
-    public void shouldParseIssueResponse()  {
+    public void shouldParseIssueResponse() {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"issue_response\">\n" +
                 "  <class class_name=\"a classname\" cert_url=\"rsync://localhost/some/where,http://some/other\" resource_set_as=\"1234,456\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::\" resource_set_notafter=\"2011-01-01T22:58:23.012Z\">\n" +
                 "    <certificate cert_url=\"rsync://jaja/jja\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:0DB8::/48\">MIICmDCCAkKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDEwl6ei5pc3N1ZXIwHhcN\n" +
@@ -37,18 +40,43 @@ public class PayloadParserTest {
                 "  </class>\n" +
                 "</message>";
 
-        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes());
+        ValidationResult result = new ValidationResult();
+        result.push("a");
 
+        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes(), result);
+        assertFalse(result.hasFailures());
         assertEquals(ResourceClassPayloadWrapper.class, wrapper.getClass());
+
+
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldNotParseUnknownType()  {
+    @Test
+    public void shouldNotParseUnknownType() {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"unknown\" />";
 
-        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes());
+        ValidationResult result = new ValidationResult();
+        result.push("a");
+        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes(), result);
 
-        assertEquals(ResourceClassPayloadWrapper.class, wrapper.getClass());
+        assertTrue(result.hasFailures());
+        ValidationCheck validationCheck = result.getFailuresForCurrentLocation().iterator().next();
+        assertEquals(ValidationString.VALID_PAYLOAD_TYPE, validationCheck.getKey());
+        assertNull(wrapper);
+    }
+
+
+    @Test
+    public void shouldNotParseWithoutType() {
+        String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\"  />";
+
+        ValidationResult result = new ValidationResult();
+        result.push("a");
+        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes(), result);
+
+        assertTrue(result.hasFailures());
+        ValidationCheck validationCheck = result.getFailuresForCurrentLocation().iterator().next();
+        assertEquals(ValidationString.FOUND_PAYLOAD_TYPE, validationCheck.getKey());
+        assertNull(wrapper);
     }
 
 }
