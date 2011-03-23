@@ -1,16 +1,18 @@
 package net.ripe.commons.provisioning.message.common;
 
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 
 public class X509ResourceCertificateBase64Converter implements Converter {
 
-	@Override
+	@SuppressWarnings("rawtypes")
+    @Override
     public boolean canConvert(Class type) {
         return type == X509ResourceCertificate.class;
     }

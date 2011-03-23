@@ -1,17 +1,11 @@
 package net.ripe.commons.provisioning.cms;
 
-import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.*;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedDataParser;
-import org.bouncycastle.cms.SignerInformation;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.junit.Before;
-import org.junit.Test;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
+import static org.bouncycastle.cms.CMSSignedGenerator.*;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -20,14 +14,29 @@ import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
-import static org.bouncycastle.cms.CMSSignedGenerator.DIGEST_SHA256;
-import static org.bouncycastle.cms.CMSSignedGenerator.ENCRYPTION_RSA;
-import static org.junit.Assert.*;
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.SignerInformation;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ProvisioningCmsObjectBuilderTest {
 
@@ -41,7 +50,8 @@ public class ProvisioningCmsObjectBuilderTest {
                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCrl(CRL)
                         .withPayloadContent(ProvisioningObjectMother.PAYLOAD)
-                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
+                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate())
+                        .withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
         DateTimeUtils.setCurrentMillisFixed(signingTime);

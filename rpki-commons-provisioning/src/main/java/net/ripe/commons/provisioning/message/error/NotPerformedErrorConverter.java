@@ -1,11 +1,12 @@
 package net.ripe.commons.provisioning.message.error;
 
+import org.apache.commons.lang.Validate;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import org.apache.commons.lang.Validate;
 
 public class NotPerformedErrorConverter implements Converter {
     @Override
@@ -26,6 +27,7 @@ public class NotPerformedErrorConverter implements Converter {
         return NotPerformedError.getError(errorCode);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return type == NotPerformedError.class;

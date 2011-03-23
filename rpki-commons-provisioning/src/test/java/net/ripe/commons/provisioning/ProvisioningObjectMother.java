@@ -1,5 +1,14 @@
 package net.ripe.commons.provisioning;
 
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.cert.X509CRL;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import javax.security.auth.x500.X500Principal;
+
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactory;
@@ -7,17 +16,11 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
 import net.ripe.ipresource.IpResourceSet;
+
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.bouncycastle.jce.X509Principal;
 import org.joda.time.DateTime;
-
-import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
-import java.security.*;
-import java.security.cert.X509CRL;
-import java.util.Hashtable;
-import java.util.Vector;
 
 public class ProvisioningObjectMother {
 
@@ -57,7 +60,6 @@ public class ProvisioningObjectMother {
         return builder.build(TEST_KEY_PAIR.getPrivate()).getCrl();
     }
 
-    @SuppressWarnings("unchecked")
     public static PKCS10CertificationRequest generatePkcs10CertificationRequest(int keySize, String keyName, String sigName, String provider) throws Exception {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(keyName, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
 
@@ -65,21 +67,21 @@ public class ProvisioningObjectMother {
 
         KeyPair kp = kpg.genKeyPair();
 
-        Hashtable attrs = new Hashtable();
+        Hashtable<DERObjectIdentifier, String> attrs = new Hashtable<DERObjectIdentifier, String>();
 
-        attrs.put(X509Principal.C, "AU");
-        attrs.put(X509Principal.O, "The Legion of the Bouncy Castle");
-        attrs.put(X509Principal.L, "Melbourne");
-        attrs.put(X509Principal.ST, "Victoria");
-        attrs.put(X509Principal.EmailAddress, "feedback-crypto@bouncycastle.org");
+        attrs.put(X509Name.C, "AU");
+        attrs.put(X509Name.O, "The Legion of the Bouncy Castle");
+        attrs.put(X509Name.L, "Melbourne");
+        attrs.put(X509Name.ST, "Victoria");
+        attrs.put(X509Name.EmailAddress, "feedback-crypto@bouncycastle.org");
 
-        Vector order = new Vector();
+        Vector<DERObjectIdentifier> order = new Vector<DERObjectIdentifier>();
 
-        order.addElement(X509Principal.C);
-        order.addElement(X509Principal.O);
-        order.addElement(X509Principal.L);
-        order.addElement(X509Principal.ST);
-        order.addElement(X509Principal.EmailAddress);
+        order.addElement(X509Name.C);
+        order.addElement(X509Name.O);
+        order.addElement(X509Name.L);
+        order.addElement(X509Name.ST);
+        order.addElement(X509Name.EmailAddress);
 
         X509Name subject = new X509Name(order, attrs);
 
@@ -92,6 +94,4 @@ public class ProvisioningObjectMother {
 
         return request;
     }
-
-
 }

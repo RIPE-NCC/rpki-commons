@@ -1,13 +1,15 @@
 package net.ripe.commons.provisioning.message.common;
 
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 
 public class ResourceClassConverter implements Converter {
     private static final String CERT_URL = "cert_url";
@@ -71,6 +73,7 @@ public class ResourceClassConverter implements Converter {
         return set;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return type == ResourceClass.class;

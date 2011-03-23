@@ -1,14 +1,16 @@
 package net.ripe.commons.provisioning.message;
 
-import com.thoughtworks.xstream.XStream;
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
-import org.apache.commons.io.IOUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
+
+import org.apache.commons.io.IOUtils;
+
+import com.thoughtworks.xstream.XStream;
 
 class ProvisioningPayloadXmlSerializer<T extends ProvisioningPayloadWrapper> extends XStreamXmlSerializer<T> {
 
@@ -30,7 +32,7 @@ class ProvisioningPayloadXmlSerializer<T extends ProvisioningPayloadWrapper> ext
         Writer writer = null;
 
         try {
-            outputStream = new ByteArrayOutputStream(256);
+            outputStream = new ByteArrayOutputStream();
 
             writer = new OutputStreamWriter(outputStream, "UTF-8");
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");

@@ -1,13 +1,14 @@
 package net.ripe.commons.provisioning.message.issuance;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.jce.PKCS10CertificationRequest;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
 
 public class CertificateIssuanceRequestPayloadConverter implements Converter {
     private static final String REQ_RESOURCE_SET_AS = "req_resource_set_as";
@@ -70,6 +71,7 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
         return content;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return type == CertificateIssuanceRequestPayload.class;
