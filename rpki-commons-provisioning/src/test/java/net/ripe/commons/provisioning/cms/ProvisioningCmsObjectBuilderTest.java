@@ -31,7 +31,6 @@ import static org.junit.Assert.*;
 
 public class ProvisioningCmsObjectBuilderTest {
 
-    private static final String PAYLOAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list\"/>";
     private ProvisioningCmsObjectBuilder subject;
     private ProvisioningCmsObject cmsObject;
     private long signingTime;
@@ -41,7 +40,7 @@ public class ProvisioningCmsObjectBuilderTest {
         subject = new ProvisioningCmsObjectBuilder()
                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCrl(CRL)
-                        .withPayloadContent(PAYLOAD)
+                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD)
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
@@ -54,7 +53,7 @@ public class ProvisioningCmsObjectBuilderTest {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
-                                                        .withPayloadContent(PAYLOAD)
+                                                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD)
                                                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
 
         return subject.build(EE_KEYPAIR.getPrivate());
@@ -63,7 +62,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
         subject = new ProvisioningCmsObjectBuilder()
-                        .withPayloadContent(PAYLOAD)
+                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD)
                         .withCrl(CRL)
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.build(EE_KEYPAIR.getPrivate());
@@ -72,7 +71,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test(expected=IllegalArgumentException.class)
     public void shouldForceCrl() throws CMSException {
         subject = new ProvisioningCmsObjectBuilder()
-                        .withPayloadContent(PAYLOAD)
+                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD)
                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.build(EE_KEYPAIR.getPrivate());
@@ -83,7 +82,7 @@ public class ProvisioningCmsObjectBuilderTest {
         ProvisioningCmsObjectBuilder subject =  new ProvisioningCmsObjectBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
-                                                        .withPayloadContent(PAYLOAD);
+                                                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD);
         subject.build(EE_KEYPAIR.getPrivate());
     }
 
@@ -149,7 +148,7 @@ public class ProvisioningCmsObjectBuilderTest {
         asn1InputStream.close();
 
         DEROctetString derString = (DEROctetString)derObject;
-        assertEquals(PAYLOAD, new String(derString.getOctets()));
+        assertEquals(ProvisioningObjectMother.PAYLOAD, new String(derString.getOctets()));
     }
 
     /**

@@ -1,23 +1,25 @@
 package net.ripe.commons.provisioning.cms;
 
 
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
-import static net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.*;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
-import static org.junit.Assert.*;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilder;
+import org.junit.Before;
+import org.junit.Test;
 
+import javax.security.auth.x500.X500Principal;
 import java.net.URI;
 import java.util.Set;
 
-import javax.security.auth.x500.X500Principal;
-
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilder;
-
-import org.junit.Before;
-import org.junit.Test;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.TEST_KEY_PAIR;
+import static net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.createProvisioningCmsObject;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ProvisioningCmsObjectValidatorTest {
 
@@ -67,7 +69,7 @@ public class ProvisioningCmsObjectValidatorTest {
         ProvisioningCmsObjectBuilder builder =  new ProvisioningCmsObjectBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
-                                                        .withPayloadContent("hello");
+                                                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD);
 
         subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()));
         subject.validate(validationResult);
@@ -82,7 +84,7 @@ public class ProvisioningCmsObjectValidatorTest {
         ProvisioningCmsObjectBuilder builder =  new ProvisioningCmsObjectBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
-                                                        .withPayloadContent("hello")
+                                                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD)
                                                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate(), getProvisioningCertificate().getCertificate());
 
         subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()));
