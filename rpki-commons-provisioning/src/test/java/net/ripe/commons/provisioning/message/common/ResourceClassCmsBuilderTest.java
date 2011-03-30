@@ -4,6 +4,7 @@ import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -30,9 +31,9 @@ public class ResourceClassCmsBuilderTest {
     public void shouldBuildValidListResponsePayload() throws URISyntaxException {
         // given
         builder.withClassName("a classname");
+        builder.withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
         builder.withCertificateAuthorityUri("rsync://localhost/some/where", "http://some/other");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
         builder.withRecipient("recipient");
         builder.withAllocatedAsn("1234", "456");
         builder.withIpv4ResourceSet("192.168.0.0/24");
@@ -57,7 +58,7 @@ public class ResourceClassCmsBuilderTest {
 
         ResourceClassPayloadWrapper wrapper = (ResourceClassPayloadWrapper) parser.getPayloadWrapper();
 
-        assertEquals("sender", wrapper.getSender());
+        assertEquals("CN=test", wrapper.getSender());
         assertEquals("recipient", wrapper.getRecipient());
 
         ResourceClassPayload payload = wrapper.getPayloadClass();
@@ -86,7 +87,6 @@ public class ResourceClassCmsBuilderTest {
         builder.withClassName("a classname");
         builder.withCertificateAuthorityUri("http://some/other");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
         builder.withRecipient("recipient");
 
         builder.build(EE_KEYPAIR.getPrivate());

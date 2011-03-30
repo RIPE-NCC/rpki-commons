@@ -26,7 +26,6 @@ public class ListResponseCmsBuilderTest {
         builder.withClassName("a classname");
         builder.withCertificateAuthorityUri("rsync://localhost/some/where", "http://some/other");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
         builder.withRecipient("recipient");
         builder.withAllocatedAsn("1234", "456");
         builder.withIpv4ResourceSet("192.168.0.0/24");

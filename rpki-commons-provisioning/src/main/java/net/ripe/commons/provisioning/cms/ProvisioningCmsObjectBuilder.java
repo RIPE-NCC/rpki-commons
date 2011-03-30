@@ -64,6 +64,9 @@ public class ProvisioningCmsObjectBuilder {
         return this;
     }
 
+    protected final String getCaDnName() {
+        return (caCertificates != null) ? caCertificates[0].getIssuerDN().getName() : "";
+    }
 
     public ProvisioningCmsObject build(PrivateKey privateKey) {
         Validate.notNull(cmsCertificate, "cms certificate is required");

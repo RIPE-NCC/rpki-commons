@@ -3,6 +3,7 @@ package net.ripe.commons.provisioning.message.revocation;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.junit.Test;
 
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
@@ -17,9 +18,10 @@ public class RevocationCmsBuilderTest {
         RevocationCmsBuilder builder = new RevocationCmsBuilder();
         builder.withClassName("a classname");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
         builder.withRecipient("recipient");
         builder.withCertificate(ProvisioningObjectMother.X509_CA);
+        builder.withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
+
 
         // when
         ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
@@ -29,7 +31,7 @@ public class RevocationCmsBuilderTest {
         parser.parseCms("/tmp/", cmsObject.getEncoded());
 
         RevocationPayloadWrapper revocationPayloadWrapper = (RevocationPayloadWrapper) parser.getPayloadWrapper();
-        assertEquals("sender", revocationPayloadWrapper.getSender());
+        assertEquals("CN=test", revocationPayloadWrapper.getSender());
         assertEquals("recipient", revocationPayloadWrapper.getRecipient());
 
         RevocationPayload payloadContent = revocationPayloadWrapper.getPayloadContent();

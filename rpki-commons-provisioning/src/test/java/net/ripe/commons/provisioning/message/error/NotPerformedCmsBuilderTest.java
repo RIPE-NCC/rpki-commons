@@ -3,6 +3,7 @@ package net.ripe.commons.provisioning.message.error;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.junit.Test;
 
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
@@ -15,7 +16,7 @@ public class NotPerformedCmsBuilderTest {
         // given
         NotPerformedCmsBuilder builder = new NotPerformedCmsBuilder();
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
+        builder.withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
         builder.withRecipient("recipient");
         builder.withError(NotPerformedError.INTERNAL_SERVER_ERROR);
         builder.withDescription("Something went wrong");
@@ -29,7 +30,7 @@ public class NotPerformedCmsBuilderTest {
 
         NotPerformedPayloadWrapper deserializedPayload = (NotPerformedPayloadWrapper) parser.getPayloadWrapper();
 
-        assertEquals("sender", deserializedPayload.getSender());
+        assertEquals("CN=test", deserializedPayload.getSender());
         assertEquals("recipient", deserializedPayload.getRecipient());
 
         assertEquals(NotPerformedError.INTERNAL_SERVER_ERROR, deserializedPayload.getStatus());

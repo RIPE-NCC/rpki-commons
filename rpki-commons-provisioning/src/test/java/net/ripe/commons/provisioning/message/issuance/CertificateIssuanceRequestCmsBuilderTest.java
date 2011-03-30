@@ -3,6 +3,7 @@ package net.ripe.commons.provisioning.message.issuance;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.junit.Test;
 
@@ -20,12 +21,12 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         CertificateIssuanceRequestCmsBuilder builder = new CertificateIssuanceRequestCmsBuilder();
         builder.withClassName("a classname");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
         builder.withRecipient("recipient");
         builder.withAllocatedAsn("1234", "456");
         builder.withIpv4ResourceSet("10.0.0.0/8");
         builder.withIpv6ResourceSet("2001:0DB8::/48", "2001:0DB8:002::-2001:0DB8:005::");
         builder.withCertificateRequest(pkcs10Request);
+        builder.withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
 
         // when
         ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
@@ -36,7 +37,7 @@ public class CertificateIssuanceRequestCmsBuilderTest {
 
         CertificateIssuanceRequestPayloadWrapper payloadWrapper = (CertificateIssuanceRequestPayloadWrapper) parser.getPayloadWrapper();
 
-        assertEquals("sender", payloadWrapper.getSender());
+        assertEquals("CN=test", payloadWrapper.getSender());
         assertEquals("recipient", payloadWrapper.getRecipient());
 
         CertificateIssuanceRequestPayload payloadContent = payloadWrapper.getPayloadContent();
@@ -53,7 +54,6 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         CertificateIssuanceRequestCmsBuilder builder = new CertificateIssuanceRequestCmsBuilder();
         builder.withClassName("a classname");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withSender("sender");
         builder.withRecipient("recipient");
         builder.withAllocatedAsn("1234", "456");
 

@@ -19,7 +19,6 @@ public class ListQueryCmsBuilderTest {
     public void shouldCreateListQueryXml() throws IOException {
         // given
         ListQueryCmsBuilder builder = new ListQueryCmsBuilder();
-        builder.withSender("sender");
         builder.withRecipient("recipient");
 
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL).withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
@@ -31,7 +30,7 @@ public class ListQueryCmsBuilderTest {
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        assertEquals("sender", parser.getPayloadWrapper().getSender());
+        assertEquals("CN=test", parser.getPayloadWrapper().getSender());
         assertEquals("recipient", parser.getPayloadWrapper().getRecipient());
     }
 
@@ -47,7 +46,6 @@ public class ListQueryCmsBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWithoutSender() throws IOException {
         ListQueryCmsBuilder payloadBuilder = new ListQueryCmsBuilder();
-        payloadBuilder.withSender("sender");
         payloadBuilder.build(EE_KEYPAIR.getPrivate());
     }
 }

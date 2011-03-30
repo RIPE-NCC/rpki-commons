@@ -7,12 +7,7 @@ import org.apache.commons.lang.Validate;
 import java.security.PrivateKey;
 
 public abstract class CommonCmsBuilder extends ProvisioningCmsObjectBuilder {
-    private String sender;
     private String recipient;
-
-    public void withSender(String sender) {
-        this.sender = sender;
-    }
 
     public void withRecipient(String recipient) {
         this.recipient = recipient;
@@ -22,7 +17,7 @@ public abstract class CommonCmsBuilder extends ProvisioningCmsObjectBuilder {
         validateFields();
         onValidateFields();
 
-        String serializedPayloadWrapper = serializePayloadWrapper(sender, recipient);
+        String serializedPayloadWrapper = serializePayloadWrapper(getCaDnName(), recipient);
         super.withPayloadContent(serializedPayloadWrapper);
 
         return super.build(privateKey);
@@ -35,7 +30,6 @@ public abstract class CommonCmsBuilder extends ProvisioningCmsObjectBuilder {
     protected abstract String serializePayloadWrapper(String sender, String recipient);
 
     private void validateFields() {
-        Validate.notNull(sender, "Sender is required");
         Validate.notNull(recipient, "Recipient is required");
     }
 }
