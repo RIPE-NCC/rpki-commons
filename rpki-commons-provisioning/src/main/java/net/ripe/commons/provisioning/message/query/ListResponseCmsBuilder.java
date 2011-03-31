@@ -5,7 +5,7 @@ import net.ripe.commons.provisioning.message.common.ResourceClassCmsBuilder;
 
 public class ListResponseCmsBuilder extends ResourceClassCmsBuilder {
 
-    protected ListResponseCmsBuilder() {
+    public ListResponseCmsBuilder() {
         super(PayloadMessageType.list_response);
     }
 }
