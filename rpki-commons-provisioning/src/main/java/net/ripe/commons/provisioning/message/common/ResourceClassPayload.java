@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ResourceClassPayload {
@@ -121,6 +122,15 @@ public class ResourceClassPayload {
 
     public List<ResourceClass> getResourceClasses() {
         return resourceClasses;
+    }
+
+    // purely for junit testin
+    public void addResourceClass(ResourceClass resourceClass) {
+        if (resourceClasses == null) {
+            resourceClasses = new ArrayList<ResourceClass>();
+        }
+
+        resourceClasses.add(resourceClass);
     }
 
     protected ResourceClassPayload setResourceClasses(List<ResourceClass> resourceClasses) {
