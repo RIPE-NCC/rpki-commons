@@ -1,9 +1,14 @@
-package net.ripe.commons.provisioning.message.common;
+package net.ripe.commons.provisioning.message.list.response;
 
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
+import net.ripe.commons.provisioning.message.list.response.ResourceClass;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassBuilder;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassCmsBuilder;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassPayload;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassPayloadWrapper;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -17,7 +22,8 @@ import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuild
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
 import static org.junit.Assert.*;
 
-public class ResourceClassCmsBuilderTest {
+public class ListResponseCmsBuilderTest {
+    
     private DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
     private ResourceClassCmsBuilder builder;
 

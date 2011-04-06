@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.common;
+package net.ripe.commons.provisioning.message.list.response;
 
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;

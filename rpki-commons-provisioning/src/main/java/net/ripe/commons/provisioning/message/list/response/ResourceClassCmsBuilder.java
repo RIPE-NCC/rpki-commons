@@ -1,8 +1,10 @@
-package net.ripe.commons.provisioning.message.common;
+package net.ripe.commons.provisioning.message.list.response;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
+import net.ripe.commons.provisioning.message.common.CommonCmsBuilder;
+
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

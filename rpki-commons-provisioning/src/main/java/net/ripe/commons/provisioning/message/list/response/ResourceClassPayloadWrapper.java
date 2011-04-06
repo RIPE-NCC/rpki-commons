@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.common;
+package net.ripe.commons.provisioning.message.list.response;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import net.ripe.commons.provisioning.message.PayloadMessageType;

@@ -4,7 +4,8 @@ import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
-import net.ripe.commons.provisioning.message.common.ResourceClassBuilder;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassBuilder;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;

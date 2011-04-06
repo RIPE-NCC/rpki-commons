@@ -3,10 +3,10 @@ package net.ripe.commons.provisioning.message;
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
-import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapper;
-import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapperSerializerBuilder;
 import net.ripe.commons.provisioning.message.error.NotPerformedPayloadSerializerBuilder;
 import net.ripe.commons.provisioning.message.issuance.CertificateIssuanceRequestPayloadWrapperSerializerBuilder;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassPayloadWrapper;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassPayloadWrapperSerializerBuilder;
 import net.ripe.commons.provisioning.message.query.ListQueryPayloadSerializerBuilder;
 import net.ripe.commons.provisioning.message.revocation.RevocationPayloadWrapperSerializerBuilder;
 

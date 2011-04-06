@@ -2,7 +2,8 @@ package net.ripe.commons.provisioning.message.issuance;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.message.common.CommonCmsBuilder;
-import net.ripe.commons.provisioning.message.common.ResourceClassUtil;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassUtil;
+
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 

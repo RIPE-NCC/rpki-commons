@@ -1,6 +1,7 @@
-package net.ripe.commons.provisioning.message.common;
+package net.ripe.commons.provisioning.message.list.response;
 
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+
 import org.apache.commons.lang.Validate;
 
 public class ResourceClassBuilder {

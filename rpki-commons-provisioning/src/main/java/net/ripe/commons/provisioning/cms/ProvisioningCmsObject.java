@@ -15,7 +15,6 @@ public class ProvisioningCmsObject {
 
     private final X509CRL crl;
 
-
     public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl) { //NOPMD - ArrayIsStoredDirectly
         this.encodedContent = encodedContent;
         this.cmsCertificate = cmsCertificate;

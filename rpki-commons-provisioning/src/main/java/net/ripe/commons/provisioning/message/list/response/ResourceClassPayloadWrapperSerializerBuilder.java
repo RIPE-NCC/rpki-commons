@@ -1,4 +1,4 @@
-package net.ripe.commons.provisioning.message.common;
+package net.ripe.commons.provisioning.message.list.response;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.message.ProvisioningPayloadXmlSerializerBuilder;

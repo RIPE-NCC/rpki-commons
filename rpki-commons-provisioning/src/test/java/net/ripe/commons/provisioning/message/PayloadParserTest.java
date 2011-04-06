@@ -3,7 +3,8 @@ package net.ripe.commons.provisioning.message;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
-import net.ripe.commons.provisioning.message.common.ResourceClassPayloadWrapper;
+import net.ripe.commons.provisioning.message.list.response.ResourceClassPayloadWrapper;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
