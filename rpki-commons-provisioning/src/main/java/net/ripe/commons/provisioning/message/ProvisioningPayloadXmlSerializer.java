@@ -36,6 +36,7 @@ class ProvisioningPayloadXmlSerializer<T extends ProvisioningPayloadWrapper> ext
 
             writer = new OutputStreamWriter(outputStream, "UTF-8");
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            writer.write(System.getProperty("line.separator"));
 
             super.serialize(payload, writer);
 

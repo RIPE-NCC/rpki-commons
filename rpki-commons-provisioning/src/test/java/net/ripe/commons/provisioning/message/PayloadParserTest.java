@@ -1,13 +1,15 @@
 package net.ripe.commons.provisioning.message;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
-import net.ripe.commons.provisioning.message.list.response.ResourceClassPayloadWrapper;
+import net.ripe.commons.provisioning.message.issue.response.CertificateIssuanceResponsePayloadWrapper;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class PayloadParserTest {
     @Test
@@ -46,7 +48,7 @@ public class PayloadParserTest {
 
         ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes(), result);
         assertFalse(result.hasFailures());
-        assertEquals(ResourceClassPayloadWrapper.class, wrapper.getClass());
+        assertEquals(CertificateIssuanceResponsePayloadWrapper.class, wrapper.getClass());
 
 
     }

@@ -1,17 +1,6 @@
 package net.ripe.commons.provisioning.cms;
 
 
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilder;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.security.auth.x500.X500Principal;
-import java.net.URI;
-import java.util.Set;
-
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.TEST_KEY_PAIR;
 import static net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.createProvisioningCmsObject;
@@ -20,6 +9,19 @@ import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuild
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.net.URI;
+import java.util.Set;
+
+import javax.security.auth.x500.X500Principal;
+
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.provisioning.message.list.request.ResourceClassListQueryCmsBuilder;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilder;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class ProvisioningCmsObjectValidatorTest {
 
@@ -66,10 +68,9 @@ public class ProvisioningCmsObjectValidatorTest {
     public void shouldFailIfCmsObjectDoesNotContainAnyCACertificate() {
         ValidationResult validationResult = new ValidationResult();
 
-        ProvisioningCmsObjectBuilder builder =  new ProvisioningCmsObjectBuilder()
+        ProvisioningCmsObjectBuilder builder =  new ResourceClassListQueryCmsBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
-                                                        .withCrl(CRL)
-                                                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD);
+                                                        .withCrl(CRL);
 
         subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()));
         subject.validate(validationResult);
@@ -81,10 +82,9 @@ public class ProvisioningCmsObjectValidatorTest {
     public void shouldFaiIfCmsObjectContainsMultipleCACertificate() {
         ValidationResult validationResult = new ValidationResult();
 
-        ProvisioningCmsObjectBuilder builder =  new ProvisioningCmsObjectBuilder()
+        ProvisioningCmsObjectBuilder builder =  new ResourceClassListQueryCmsBuilder()
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL)
-                                                        .withPayloadContent(ProvisioningObjectMother.PAYLOAD)
                                                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate(), getProvisioningCertificate().getCertificate());
 
         subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()));

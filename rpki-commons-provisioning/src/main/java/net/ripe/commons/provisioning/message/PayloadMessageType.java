@@ -7,6 +7,7 @@ public enum PayloadMessageType {
     issue,
     issue_response,
     revoke,
+    revoke_response,
     error_response;
 
     public static boolean containsAsEnum(String name) {

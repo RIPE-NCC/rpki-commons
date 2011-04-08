@@ -24,9 +24,6 @@ import org.joda.time.DateTime;
 
 public class ProvisioningObjectMother {
 
-    public static final String PAYLOAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list\"/>";
-
-
     public static final KeyPair TEST_KEY_PAIR = ProvisioningKeyPairGenerator.generate();
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
     public static KeyPair SECOND_TEST_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
