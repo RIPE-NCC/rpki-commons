@@ -41,7 +41,7 @@ public class CertificateRevocationResponseCmsBuilderTest {
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        CertificateRevocationResponsePayloadWrapper revocationPayloadWrapper = (CertificateRevocationResponsePayloadWrapper) parser.getPayloadWrapper();
+        CertificateRevocationResponsePayload revocationPayloadWrapper = (CertificateRevocationResponsePayload) parser.getPayloadWrapper();
         assertEquals("CN=test", revocationPayloadWrapper.getSender());
         assertEquals("recipient", revocationPayloadWrapper.getRecipient());
 

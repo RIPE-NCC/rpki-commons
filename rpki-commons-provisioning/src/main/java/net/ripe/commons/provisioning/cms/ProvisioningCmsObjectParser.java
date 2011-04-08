@@ -4,7 +4,7 @@ import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.message.PayloadParser;
-import net.ripe.commons.provisioning.message.ProvisioningPayloadWrapper;
+import net.ripe.commons.provisioning.message.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.*;
@@ -45,7 +45,7 @@ public class ProvisioningCmsObjectParser {
     private ValidationResult validationResult;
 
     private String location;
-    private ProvisioningPayloadWrapper payloadWrapper;
+    private AbstractProvisioningPayload payloadWrapper;
 
 
     public ProvisioningCmsObjectParser() {
@@ -60,7 +60,7 @@ public class ProvisioningCmsObjectParser {
         return validationResult;
     }
 
-    public ProvisioningPayloadWrapper getPayloadWrapper() {
+    public AbstractProvisioningPayload getPayloadWrapper() {
         return payloadWrapper;
     }
 

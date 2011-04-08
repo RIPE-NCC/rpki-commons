@@ -1,14 +1,14 @@
 package net.ripe.commons.provisioning.message.list.request;
 
 import net.ripe.commons.provisioning.message.PayloadMessageType;
-import net.ripe.commons.provisioning.message.ProvisioningPayloadWrapper;
+import net.ripe.commons.provisioning.message.AbstractProvisioningPayload;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("message")
-public class ResourceClassListQueryPayloadWrapper extends ProvisioningPayloadWrapper {
+public class ResourceClassListQueryPayload extends AbstractProvisioningPayload {
 
-    protected ResourceClassListQueryPayloadWrapper(String sender, String recipient) {
+    protected ResourceClassListQueryPayload(String sender, String recipient) {
         super(sender, recipient, PayloadMessageType.list);
     }
 }

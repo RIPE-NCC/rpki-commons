@@ -1,19 +1,22 @@
 package net.ripe.commons.provisioning.message.common;
 
+import java.net.URI;
+import java.util.List;
+
 public final class ResourceClassUtil {
 
     private ResourceClassUtil() {
     }
 
-    static boolean hasRsyncUri(String[] uris) {
+    static boolean hasRsyncUri(List<URI> uris) {
         boolean rsyncUriFound = false;
 
         if (uris == null) {
             return rsyncUriFound;
         }
 
-        for (String uri : uris) {
-            if (uri.startsWith("rsync:")) {
+        for (URI uri : uris) {
+            if (uri.toString().startsWith("rsync:")) {
                 rsyncUriFound = true;
                 break;
             }

@@ -1,8 +1,13 @@
 package net.ripe.commons.provisioning.message.common;
 
+import java.net.URI;
+import java.util.Iterator;
 import java.util.List;
 
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -12,6 +17,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 
 public class GenericClassElement {
 
@@ -79,39 +85,56 @@ public class GenericClassElement {
         return certificateAuthorityUri == null ? null : certificateAuthorityUri.split(",");
     }
 
-    public void setCertificateAuthorityUri(String... certificateAuthorityUri) {
-        this.certificateAuthorityUri = StringUtils.join(certificateAuthorityUri, ",");
+    public void setCertUris(List<URI> certUris) {
+        this.certificateAuthorityUri = StringUtils.join(certUris, ",");
     }
 
-    public String[] getIpv4ResourceSet() {
-        return ipv4ResourceSet == null ? null : ipv4ResourceSet.split(",");
+    public IpResourceSet getResourceSetAsNumbers() {
+        return resourceSetAsNumbers == null ? null : IpResourceSet.parse(resourceSetAsNumbers);
     }
 
-    public void setIpv4ResourceSet(String... ipv4ResourceSet) {
-        if (ipv4ResourceSet != null) {
-            this.ipv4ResourceSet = StringUtils.join(ipv4ResourceSet, ",");
+    public IpResourceSet getIpv4ResourceSet() {
+        return ipv4ResourceSet == null ? null : IpResourceSet.parse(ipv4ResourceSet);
+    }
+
+    public IpResourceSet getIpv6ResourceSet() {
+        return ipv6ResourceSet == null ? null : IpResourceSet.parse(ipv6ResourceSet);
+    }
+
+    public void setIpResourceSet(IpResourceSet ipResourceSet) {
+        IpResourceSet asns = new IpResourceSet();
+        IpResourceSet ipv4 = new IpResourceSet();
+        IpResourceSet ipv6 = new IpResourceSet();
+
+        Iterator<IpResource> iterator = ipResourceSet.iterator();
+        while (iterator.hasNext()) {
+            IpResource resource = iterator.next();
+            IpResourceType type = resource.getType();
+            if (type.equals(IpResourceType.ASN)) {
+                asns.add(resource);
+            } else if (type.equals(IpResourceType.IPv4)) {
+                ipv4.add(resource);
+            } else if (type.equals(IpResourceType.IPv6)) {
+                ipv6.add(resource);
+            }
+        }
+
+        if (!asns.isEmpty()) {
+            String asnString = asns.toString();
+            asnString = StringUtils.replaceChars(asnString, "AS", "");
+            asnString = StringUtils.replaceChars(asnString, " ", "");
+            resourceSetAsNumbers = asnString;
+        }
+        if (!ipv4.isEmpty()) {
+            String ipv4String = ipv4.toString();
+            ipv4ResourceSet = StringUtils.replaceChars(ipv4String, " ", "");
+        }
+        if (!ipv6.isEmpty()) {
+            String ipv6String = ipv6.toString();
+            ipv6ResourceSet = StringUtils.replaceChars(ipv6String, " ", "");
         }
     }
 
-    public String[] getIpv6ResourceSet() {
-        return ipv6ResourceSet == null ? null : ipv6ResourceSet.split(",");
-    }
-
-    public void setIpv6ResourceSet(String... ipv6ResourceSet) {
-        if (ipv6ResourceSet != null) {
-            this.ipv6ResourceSet = StringUtils.join(ipv6ResourceSet, ",");
-        }
-    }
-
-    public String[] getResourceSetAsNumbers() {
-        return resourceSetAsNumbers != null ? resourceSetAsNumbers.split(",") : null;
-    }
-
-    public void setResourceSetAsNumbers(String... resourceSetAsNumbers) {
-        if (resourceSetAsNumbers != null) {
-            this.resourceSetAsNumbers = StringUtils.join(resourceSetAsNumbers, ",");
-        }
-    }
 
     public X509ResourceCertificate getIssuer() {
         return issuer;

@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
-import net.ripe.commons.provisioning.message.issue.response.CertificateIssuanceResponsePayloadWrapper;
+import net.ripe.commons.provisioning.message.issue.response.CertificateIssuanceResponsePayload;
 
 import org.junit.Test;
 
@@ -46,9 +46,9 @@ public class PayloadParserTest {
         ValidationResult result = new ValidationResult();
         result.push("a");
 
-        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes(), result);
+        AbstractProvisioningPayload wrapper = PayloadParser.parse(message.getBytes(), result);
         assertFalse(result.hasFailures());
-        assertEquals(CertificateIssuanceResponsePayloadWrapper.class, wrapper.getClass());
+        assertEquals(CertificateIssuanceResponsePayload.class, wrapper.getClass());
 
 
     }
@@ -59,7 +59,7 @@ public class PayloadParserTest {
 
         ValidationResult result = new ValidationResult();
         result.push("a");
-        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes(), result);
+        AbstractProvisioningPayload wrapper = PayloadParser.parse(message.getBytes(), result);
 
         assertTrue(result.hasFailures());
         ValidationCheck validationCheck = result.getFailuresForCurrentLocation().iterator().next();
@@ -74,7 +74,7 @@ public class PayloadParserTest {
 
         ValidationResult result = new ValidationResult();
         result.push("a");
-        ProvisioningPayloadWrapper wrapper = PayloadParser.parse(message.getBytes(), result);
+        AbstractProvisioningPayload wrapper = PayloadParser.parse(message.getBytes(), result);
 
         assertTrue(result.hasFailures());
         ValidationCheck validationCheck = result.getFailuresForCurrentLocation().iterator().next();

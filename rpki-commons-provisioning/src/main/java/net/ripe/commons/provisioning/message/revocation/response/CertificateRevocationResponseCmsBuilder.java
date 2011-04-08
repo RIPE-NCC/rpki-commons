@@ -6,12 +6,12 @@ import net.ripe.commons.provisioning.message.revocation.CertificateRevocationKey
 
 public class CertificateRevocationResponseCmsBuilder extends AbstractCertificateRevocationCmsBuilder {
 
-    private static final XStreamXmlSerializer<CertificateRevocationResponsePayloadWrapper> SERIALIZER = new CertificateRevocationResponsePayloadWrapperSerializerBuilder().build();
+    private static final XStreamXmlSerializer<CertificateRevocationResponsePayload> SERIALIZER = new CertificateRevocationResponsePayloadSerializerBuilder().build();
 
     @Override
     protected String serializePayloadWrapper(String sender, String recipient) {
         CertificateRevocationKeyElement payload = new CertificateRevocationKeyElement(className, publicKey);
-        CertificateRevocationResponsePayloadWrapper wrapper = new CertificateRevocationResponsePayloadWrapper(sender, recipient, payload);
+        CertificateRevocationResponsePayload wrapper = new CertificateRevocationResponsePayload(sender, recipient, payload);
         return SERIALIZER.serialize(wrapper);
     }
 

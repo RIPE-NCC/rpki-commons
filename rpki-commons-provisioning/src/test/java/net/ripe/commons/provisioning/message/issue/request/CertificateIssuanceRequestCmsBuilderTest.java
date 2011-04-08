@@ -6,9 +6,11 @@ import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.message.issue.request.CertificateIssuanceRequestCmsBuilder;
+import net.ripe.commons.provisioning.message.issue.request.CertificateIssuanceRequestElement;
 import net.ripe.commons.provisioning.message.issue.request.CertificateIssuanceRequestPayload;
-import net.ripe.commons.provisioning.message.issue.request.CertificateIssuanceRequestPayloadWrapper;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+import net.ripe.ipresource.IpResourceSet;
+
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,9 +34,9 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         subject.withClassName("a classname");
         subject.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
         subject.withRecipient("recipient");
-        subject.withAllocatedAsn("1234", "456");
-        subject.withIpv4ResourceSet("10.0.0.0/8");
-        subject.withIpv6ResourceSet("2001:0DB8::/48", "2001:0DB8:002::-2001:0DB8:005::");
+        subject.withAllocatedAsn(IpResourceSet.parse("1234,456"));
+        subject.withIpv4ResourceSet(IpResourceSet.parse("10.0.0.0/8"));
+        subject.withIpv6ResourceSet(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"));
         subject.withCertificateRequest(pkcs10Request);
         subject.withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
     }
@@ -47,19 +49,19 @@ public class CertificateIssuanceRequestCmsBuilderTest {
 
         // then
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms("/tmp/", cmsObject.getEncoded());
+        parser.parseCms("validationlocation", cmsObject.getEncoded());
 
-        CertificateIssuanceRequestPayloadWrapper payloadWrapper = (CertificateIssuanceRequestPayloadWrapper) parser.getPayloadWrapper();
+        CertificateIssuanceRequestPayload payloadWrapper = (CertificateIssuanceRequestPayload) parser.getPayloadWrapper();
 
         assertEquals("CN=test", payloadWrapper.getSender());
         assertEquals("recipient", payloadWrapper.getRecipient());
 
-        CertificateIssuanceRequestPayload payloadContent = payloadWrapper.getPayloadContent();
+        CertificateIssuanceRequestElement payloadContent = payloadWrapper.getRequestElement();
         assertEquals("a classname", payloadContent.getClassName());
-        assertEquals("1234", payloadContent.getAllocatedAsn()[0]);
+        assertEquals(IpResourceSet.parse("456,1234"), payloadContent.getAllocatedAsn());
         assertArrayEquals(pkcs10Request.getEncoded(), payloadContent.getCertificate().getEncoded());
-        assertEquals("10.0.0.0/8", payloadContent.getAllocatedIpv4()[0]);
-        assertEquals("2001:0DB8:002::-2001:0DB8:005::", payloadContent.getAllocatedIpv6()[1]);
+        assertEquals(IpResourceSet.parse("10.0.0.0/8"), payloadContent.getAllocatedIpv4());
+        assertEquals(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"), payloadContent.getAllocatedIpv6());
     }
 
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1
@@ -69,7 +71,7 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
                                   "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"issue\">" + "\n" +
-                                  "  <request class_name=\"a classname\" req_resource_set_as=\"1234,456\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::\">[^<]*</request>" + "\n" +
+                                  "  <request class_name=\"a classname\" req_resource_set_as=\"456,1234\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\">[^<]*</request>" + "\n" +
                                   "</message>";
 
         assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
@@ -82,7 +84,7 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         builder.withClassName("a classname");
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
         builder.withRecipient("recipient");
-        builder.withAllocatedAsn("1234", "456");
+        builder.withAllocatedAsn(IpResourceSet.parse("1234,456"));
 
         // when
         builder.build(EE_KEYPAIR.getPrivate());

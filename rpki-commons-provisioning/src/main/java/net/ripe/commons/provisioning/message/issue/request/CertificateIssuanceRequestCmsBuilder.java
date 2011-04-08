@@ -2,7 +2,7 @@ package net.ripe.commons.provisioning.message.issue.request;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
-import net.ripe.commons.provisioning.message.common.ResourceClassUtil;
+import net.ripe.ipresource.IpResourceSet;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
@@ -12,12 +12,12 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
  * See: <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
  */
 public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectBuilder {
-    private static final XStreamXmlSerializer<CertificateIssuanceRequestPayloadWrapper> SERIALIZER = new CertificateIssuanceRequestPayloadWrapperSerializerBuilder().build();
+    private static final XStreamXmlSerializer<CertificateIssuanceRequestPayload> SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
 
     private String className;
-    private String[] asn;
-    private String[] ipv4ResourceSet;
-    private String[] ipv6ResourceSet;
+    private IpResourceSet asn;
+    private IpResourceSet ipv4ResourceSet;
+    private IpResourceSet ipv6ResourceSet;
     private PKCS10CertificationRequest certificateRequest;
 
     public CertificateIssuanceRequestCmsBuilder withClassName(String className) {
@@ -25,17 +25,26 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
         return this;
     }
 
-    public CertificateIssuanceRequestCmsBuilder withAllocatedAsn(String... asn) {
-        this.asn = asn;
+    /**
+     * Provide empty list to request *all* eligible Asns. Leave null to request none.
+     */
+    public CertificateIssuanceRequestCmsBuilder withAllocatedAsn(IpResourceSet asnResourceSet) {
+        this.asn = asnResourceSet;
         return this;
     }
 
-    public CertificateIssuanceRequestCmsBuilder withIpv4ResourceSet(String... ipv4ResourceSet) {
+    /**
+     * Provide empty list to request *all* eligible IPv4. Leave null to request none.
+     */
+    public CertificateIssuanceRequestCmsBuilder withIpv4ResourceSet(IpResourceSet ipv4ResourceSet) {
         this.ipv4ResourceSet = ipv4ResourceSet;
         return this;
     }
 
-    public CertificateIssuanceRequestCmsBuilder withIpv6ResourceSet(String... ipv6ResourceSet) {
+    /**
+     * Provide empty list to request *all* eligible IPv6. Leave null to request none.
+     */
+    public CertificateIssuanceRequestCmsBuilder withIpv6ResourceSet(IpResourceSet ipv6ResourceSet) {
         this.ipv6ResourceSet = ipv6ResourceSet;
         return this;
     }
@@ -48,14 +57,14 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
 
     @Override
     protected String serializePayloadWrapper(String sender, String recipient) {
-        CertificateIssuanceRequestPayload content = new CertificateIssuanceRequestPayload()
+        CertificateIssuanceRequestElement content = new CertificateIssuanceRequestElement()
                 .setClassName(className)
                 .setAllocatedAsn(asn)
                 .setAllocatedIpv4(ipv4ResourceSet)
                 .setAllocatedIpv6(ipv6ResourceSet)
                 .setCertificate(certificateRequest);
 
-        CertificateIssuanceRequestPayloadWrapper payload = new CertificateIssuanceRequestPayloadWrapper(sender, recipient, content);
+        CertificateIssuanceRequestPayload payload = new CertificateIssuanceRequestPayload(sender, recipient, content);
 
         return SERIALIZER.serialize(payload);
     }
@@ -63,7 +72,6 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
     @Override
     protected void onValidateFields() {
         Validate.notNull(className, "No className provided");
-        Validate.isTrue(ResourceClassUtil.validateAsn(asn), "AS numbers should not start with AS");
         Validate.notNull(certificateRequest);
     }
 }

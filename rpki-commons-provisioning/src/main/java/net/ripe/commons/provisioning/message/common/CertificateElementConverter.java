@@ -1,6 +1,11 @@
 package net.ripe.commons.provisioning.message.common;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
+import net.ripe.ipresource.IpResourceSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -20,47 +25,65 @@ public class CertificateElementConverter implements Converter {
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        CertificateElement set = (CertificateElement) source;
+        CertificateElement certificateElement = (CertificateElement) source;
 
-        writer.addAttribute(CERT_URL, StringUtils.join(set.getIssuerCertificatePublicationLocation(), ","));
+        String urisString = StringUtils.join(certificateElement.getIssuerCertificatePublicationUris(), ",");
+        writer.addAttribute(CERT_URL, urisString);
 
-        if (set.getAllocatedAsn() != null) {
-            writer.addAttribute(REQ_RESOURCE_SET_AS, StringUtils.join(set.getAllocatedAsn(), ","));
+        if (certificateElement.getAllocatedAsn() != null) {
+            String asnsString = certificateElement.getAllocatedAsn().toString();
+            asnsString = StringUtils.replaceChars(asnsString, "AS", "");
+            asnsString = StringUtils.replaceChars(asnsString, " ", "");
+            writer.addAttribute(REQ_RESOURCE_SET_AS, asnsString);
         }
 
-        if (set.getAllocatedIpv4() != null) {
-            writer.addAttribute(REQ_RESOURCE_SET_IPV4, StringUtils.join(set.getAllocatedIpv4(), ","));
+        if (certificateElement.getAllocatedIpv4() != null) {
+            String ipv4String = certificateElement.getAllocatedIpv4().toString();
+            ipv4String = StringUtils.replaceChars(ipv4String, " ", "");
+            writer.addAttribute(REQ_RESOURCE_SET_IPV4, ipv4String);
         }
 
-        if (set.getAllocatedIpv6() != null) {
-            writer.addAttribute(REQ_RESOURCE_SET_IPV6, StringUtils.join(set.getAllocatedIpv6(), ","));
+        if (certificateElement.getAllocatedIpv6() != null) {
+            String ipv6String = certificateElement.getAllocatedIpv6().toString();
+            ipv6String = StringUtils.replaceChars(ipv6String, " ", "");
+            writer.addAttribute(REQ_RESOURCE_SET_IPV6, ipv6String);
         }
 
-        context.convertAnother(set.getCertificate().getEncoded());
+        context.convertAnother(certificateElement.getCertificate().getEncoded());
     }
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        CertificateElement set = new CertificateElement();
+        CertificateElement certificateElement = new CertificateElement();
 
-        String attribute = reader.getAttribute(CERT_URL);
-        Validate.notNull(attribute, CERT_URL + " attribute is required");
-        set.setIssuerCertificatePublicationLocation(attribute.split(","));
+        String uriString = reader.getAttribute(CERT_URL);
+        Validate.notNull(uriString, CERT_URL + " attribute is required");
+        
+        List<URI> uris = new ArrayList<URI>();
+        for (String uri :uriString.split(",")) {
+            uris.add(URI.create(uri));
+        }
+        
+        certificateElement.setIssuerCertificatePublicationLocation(uris);
 
+        IpResourceSet ipResourceSet = new IpResourceSet();
+        
         String resourceSetAsNumbers = reader.getAttribute(REQ_RESOURCE_SET_AS);
         if (StringUtils.isNotBlank(resourceSetAsNumbers)) {
-            set.setAllocatedAsn(resourceSetAsNumbers.split(","));
+            ipResourceSet.addAll(IpResourceSet.parse(resourceSetAsNumbers));
         }
 
         String allocatedIpv4 = reader.getAttribute(REQ_RESOURCE_SET_IPV4);
         if (StringUtils.isNotBlank(allocatedIpv4)) {
-            set.setAllocatedIpv4(allocatedIpv4.split(","));
+            ipResourceSet.addAll(IpResourceSet.parse(allocatedIpv4));
         }
 
         String allocatedIpv6 = reader.getAttribute(REQ_RESOURCE_SET_IPV6);
         if (StringUtils.isNotBlank(allocatedIpv6)) {
-            set.setAllocatedIpv6(allocatedIpv6.split(","));
+            ipResourceSet.addAll(IpResourceSet.parse(allocatedIpv6));
         }
+        
+        certificateElement.setIpResourceSet(ipResourceSet);
 
         String encodedCertificate = reader.getValue();
         Validate.notNull(encodedCertificate, "No certificate found");
@@ -69,9 +92,9 @@ public class CertificateElementConverter implements Converter {
 
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse("validationLocation", base64DecodedCertificate);
-        set.setCertificate(parser.getCertificate());
+        certificateElement.setCertificate(parser.getCertificate());
 
-        return set;
+        return certificateElement;
     }
 
     @SuppressWarnings("rawtypes")

@@ -28,7 +28,7 @@ public class ResourceClassListQueryCmsBuilderTest {
 
         // then
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms("/tmp/", cmsObject.getEncoded());
+        parser.parseCms("validationlocation", cmsObject.getEncoded());
 
         assertEquals("CN=test", parser.getPayloadWrapper().getSender());
         assertEquals("recipient", parser.getPayloadWrapper().getRecipient());

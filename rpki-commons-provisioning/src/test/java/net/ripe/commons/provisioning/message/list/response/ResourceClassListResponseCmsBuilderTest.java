@@ -6,7 +6,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,7 @@ import net.ripe.commons.provisioning.message.common.CertificateElement;
 import net.ripe.commons.provisioning.message.common.CertificateElementBuilder;
 import net.ripe.commons.provisioning.message.common.GenericClassElementBuilder;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+import net.ripe.ipresource.IpResourceSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -31,18 +34,14 @@ public class ResourceClassListResponseCmsBuilderTest {
     @Before
     public void given() {
         builder = new ResourceClassListResponseCmsBuilder();
-        CertificateElement certificateElement = new CertificateElementBuilder().withAllocatedAsn("123")
-                                                                               .withAllocatedIpv4("10.0.0.0/8")
-                                                                               .withAllocatedIpv6("2001:0DB8::/48")
-                                                                               .withIssuerCertificatePublicationLocation("rsync://jaja/jja")
+        CertificateElement certificateElement = new CertificateElementBuilder().withIpResources(IpResourceSet.parse("123,10.0.0.0/8,2001:0DB8::/48"))
+                                                                               .withIssuerCertificatePublicationLocation(Arrays.asList(URI.create("rsync://jaja/jja")))
                                                                                .withCertificate(ProvisioningObjectMother.X509_CA).build();
         
         GenericClassElementBuilder classElementBuilder = new GenericClassElementBuilder()
                            .withClassName("a classname")
-                           .withCertificateAuthorityUri("rsync://localhost/some/where", "http://some/other")
-                           .withAllocatedAsn("1234", "456")
-                           .withIpv4ResourceSet("192.168.0.0/24")
-                           .withIpv6ResourceSet("2001:0DB8::/48", "2001:0DB8:002::-2001:0DB8:005::")
+                           .withCertificateAuthorityUri(Arrays.asList(URI.create("rsync://localhost/some/where"), URI.create("http://some/other")))
+                           .withIpResourceSet(IpResourceSet.parse("1234,456,192.168.0.0/24,2001:db8::/48,2001:0DB8:002::-2001:0DB8:005::"))
                            .withValidityNotAfter(validityNotAfter)
                            .withSiaHeadUri("rsync://some/where")
                            .withCertificateElements(certificateElement)
@@ -70,7 +69,7 @@ public class ResourceClassListResponseCmsBuilderTest {
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        ResourceClassListResponsePayloadWrapper wrapper = (ResourceClassListResponsePayloadWrapper) parser.getPayloadWrapper();
+        ResourceClassListResponsePayload wrapper = (ResourceClassListResponsePayload) parser.getPayloadWrapper();
 
         assertEquals("CN=test", wrapper.getSender());
         assertEquals("recipient", wrapper.getRecipient());
@@ -78,8 +77,11 @@ public class ResourceClassListResponseCmsBuilderTest {
         ResourceClassListResponseClassElement firstClassElement = wrapper.getClassElements().get(0);
         assertEquals("http://some/other", firstClassElement.getCertificateAuthorityUri()[1]);
         assertEquals("a classname", firstClassElement.getClassName());
-        assertEquals("192.168.0.0/24", firstClassElement.getIpv4ResourceSet()[0]);
-        assertEquals("2001:0DB8:002::-2001:0DB8:005::", firstClassElement.getIpv6ResourceSet()[1]);
+        assertEquals(IpResourceSet.parse("192.168.0.0/24"), firstClassElement.getIpv4ResourceSet());
+        
+        
+        assertEquals(IpResourceSet.parse("2001:db8::/48,2001:0DB8:002::-2001:0DB8:005::"), firstClassElement.getIpv6ResourceSet());
+        
         assertEquals(validityNotAfter, firstClassElement.getValidityNotAfter());
         assertEquals("rsync://some/where", firstClassElement.getSiaHeadUri());
 
@@ -88,10 +90,10 @@ public class ResourceClassListResponseCmsBuilderTest {
         List<CertificateElement> certificateElements = firstClassElement.getCertificateElements();
         assertEquals(1, certificateElements.size());
         CertificateElement certificateElement = certificateElements.get(0);
-        assertEquals("rsync://jaja/jja", certificateElement.getIssuerCertificatePublicationLocation()[0]);
-        assertEquals("123", certificateElement.getAllocatedAsn()[0]);
-        assertEquals("10.0.0.0/8", certificateElement.getAllocatedIpv4()[0]);
-        assertEquals("2001:0DB8::/48", certificateElement.getAllocatedIpv6()[0]);
+        assertEquals(URI.create("rsync://jaja/jja"), certificateElement.getIssuerCertificatePublicationUris().get(0));
+        assertEquals(IpResourceSet.parse("123"), certificateElement.getAllocatedAsn());
+        assertEquals(IpResourceSet.parse("10.0.0.0/8"), certificateElement.getAllocatedIpv4());
+        assertEquals(IpResourceSet.parse("2001:0DB8::/48"), certificateElement.getAllocatedIpv6());
         assertArrayEquals(ProvisioningObjectMother.X509_CA.getEncoded(), certificateElement.getCertificate().getEncoded());
     }
     
@@ -100,16 +102,16 @@ public class ResourceClassListResponseCmsBuilderTest {
     @Test
     public void shouldCreatePayloadXmlConformDraft() {
         String actualXml = builder.serializePayloadWrapper("sender", "recipient");
-
+        
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
                                   "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list_response\">" + "\n" +
-                                  "  <class class_name=\"a classname\" cert_url=\"rsync://localhost/some/where,http://some/other\" resource_set_as=\"1234,456\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::\" resource_set_notafter=\"2011-01-01T22:58:23.012Z\" suggested_sia_head=\"rsync://some/where\">\n" +
-                                  "    <certificate cert_url=\"rsync://jaja/jja\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:0DB8::/48\">[^<]*</certificate>" + "\n" +
+                                  "  <class class_name=\"a classname\" cert_url=\"rsync://localhost/some/where,http://some/other\" resource_set_as=\"456,1234\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\" resource_set_notafter=\"2011-01-01T22:58:23.012Z\" suggested_sia_head=\"rsync://some/where\">\n" +
+                                  "    <certificate cert_url=\"rsync://jaja/jja\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>" + "\n" +
                                   "    <issuer>[^<]*</issuer>" + "\n" +
                                   "  </class>" + "\n" +
-                                  "  <class class_name=\"class2\" cert_url=\"rsync://localhost/some/where,http://some/other\" resource_set_as=\"1234,456\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::\" resource_set_notafter=\"2011-01-01T22:58:23.012Z\" suggested_sia_head=\"rsync://some/where\">\n" +
-                                  "    <certificate cert_url=\"rsync://jaja/jja\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:0DB8::/48\">[^<]*</certificate>" + "\n" +
-                                  "    <certificate cert_url=\"rsync://jaja/jja\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:0DB8::/48\">[^<]*</certificate>" + "\n" +
+                                  "  <class class_name=\"class2\" cert_url=\"rsync://localhost/some/where,http://some/other\" resource_set_as=\"456,1234\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\" resource_set_notafter=\"2011-01-01T22:58:23.012Z\" suggested_sia_head=\"rsync://some/where\">\n" +
+                                  "    <certificate cert_url=\"rsync://jaja/jja\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>" + "\n" +
+                                  "    <certificate cert_url=\"rsync://jaja/jja\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>" + "\n" +
                                   "    <issuer>[^<]*</issuer>" + "\n" +
                                   "  </class>" + "\n" +
                                   "</message>";

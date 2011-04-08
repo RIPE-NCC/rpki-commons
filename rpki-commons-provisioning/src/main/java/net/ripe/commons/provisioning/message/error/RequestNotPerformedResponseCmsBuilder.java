@@ -11,7 +11,7 @@ import org.apache.commons.lang.Validate;
  */
 public class RequestNotPerformedResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
     
-    private static final XStreamXmlSerializer<RequestNotPerformedResponsePayloadWrapper> SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
+    private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
 
     private NotPerformedError error;
     private String description;
@@ -31,7 +31,7 @@ public class RequestNotPerformedResponseCmsBuilder extends ProvisioningCmsObject
 
     @Override
     protected String serializePayloadWrapper(String sender, String recipient) {
-        RequestNotPerformedResponsePayloadWrapper payload = new RequestNotPerformedResponsePayloadWrapper(sender, recipient, error, description);
+        RequestNotPerformedResponsePayload payload = new RequestNotPerformedResponsePayload(sender, recipient, error, description);
 
         String xml = SERIALIZER.serialize(payload);
 

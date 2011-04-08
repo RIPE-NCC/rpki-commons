@@ -10,11 +10,11 @@ import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
  */
 public class ResourceClassListQueryCmsBuilder extends ProvisioningCmsObjectBuilder {
 
-    private static final XStreamXmlSerializer<ResourceClassListQueryPayloadWrapper> SERIALIZER = new ResourceClassListQueryPayloadSerializerBuilder().build();
+    private static final XStreamXmlSerializer<ResourceClassListQueryPayload> SERIALIZER = new ResourceClassListQueryPayloadSerializerBuilder().build();
 
     @Override
     protected String serializePayloadWrapper(String sender, String recipient) {
-        ResourceClassListQueryPayloadWrapper payload = new ResourceClassListQueryPayloadWrapper(sender, recipient);
+        ResourceClassListQueryPayload payload = new ResourceClassListQueryPayload(sender, recipient);
         return SERIALIZER.serialize(payload);
     }
 }

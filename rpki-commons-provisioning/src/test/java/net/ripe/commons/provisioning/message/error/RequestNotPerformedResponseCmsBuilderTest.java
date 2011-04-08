@@ -39,7 +39,7 @@ public class RequestNotPerformedResponseCmsBuilderTest {
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("/tmp/", cmsObject.getEncoded());
 
-        RequestNotPerformedResponsePayloadWrapper deserializedPayload = (RequestNotPerformedResponsePayloadWrapper) parser.getPayloadWrapper();
+        RequestNotPerformedResponsePayload deserializedPayload = (RequestNotPerformedResponsePayload) parser.getPayloadWrapper();
 
         assertEquals("CN=test", deserializedPayload.getSender());
         assertEquals("recipient", deserializedPayload.getRecipient());

@@ -12,7 +12,7 @@ import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
  */
 public class ResourceClassListResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
 
-    private static final XStreamXmlSerializer<ResourceClassListResponsePayloadWrapper> SERIALIZER = new ResourceClassListResponsePayloadWrapperSerializerBuilder().build();
+    private static final XStreamXmlSerializer<ResourceClassListResponsePayload> SERIALIZER = new ResourceClassListResponsePayloadSerializerBuilder().build();
     
     private List<ResourceClassListResponseClassElement> classElements = new ArrayList<ResourceClassListResponseClassElement>();
 
@@ -22,7 +22,7 @@ public class ResourceClassListResponseCmsBuilder extends ProvisioningCmsObjectBu
 
     @Override
     protected String serializePayloadWrapper(String sender, String recipient) {
-        ResourceClassListResponsePayloadWrapper wrapper = new ResourceClassListResponsePayloadWrapper(sender, recipient, classElements);
+        ResourceClassListResponsePayload wrapper = new ResourceClassListResponsePayload(sender, recipient, classElements);
         return SERIALIZER.serialize(wrapper);
     }
 }

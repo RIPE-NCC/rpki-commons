@@ -12,7 +12,7 @@ import org.apache.commons.lang.Validate;
  */
 public class CertificateIssuanceResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
 
-    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayloadWrapper> SERIALIZER = new CertificateIssuanceResponsePayloadWrapperSerializerBuilder()
+    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayload> SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder()
             .build();
 
     private CertificateIssuanceResponseClassElement classElement;
@@ -29,7 +29,7 @@ public class CertificateIssuanceResponseCmsBuilder extends ProvisioningCmsObject
 
     @Override
     protected String serializePayloadWrapper(String sender, String recipient) {
-        CertificateIssuanceResponsePayloadWrapper wrapper = new CertificateIssuanceResponsePayloadWrapper(sender, recipient, classElement);
+        CertificateIssuanceResponsePayload wrapper = new CertificateIssuanceResponsePayload(sender, recipient, classElement);
          return SERIALIZER.serialize(wrapper);
     }
 

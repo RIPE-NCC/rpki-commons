@@ -12,7 +12,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.thoughtworks.xstream.XStream;
 
-class ProvisioningPayloadXmlSerializer<T extends ProvisioningPayloadWrapper> extends XStreamXmlSerializer<T> {
+class ProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> extends XStreamXmlSerializer<T> {
 
     public ProvisioningPayloadXmlSerializer(XStream xStream, Class<T> objectType) {
         super(xStream, objectType);

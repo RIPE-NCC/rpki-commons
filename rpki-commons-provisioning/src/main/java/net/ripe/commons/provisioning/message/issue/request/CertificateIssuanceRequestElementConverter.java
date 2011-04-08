@@ -1,5 +1,7 @@
 package net.ripe.commons.provisioning.message.issue.request;
 
+import net.ripe.ipresource.IpResourceSet;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
@@ -10,7 +12,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-public class CertificateIssuanceRequestPayloadConverter implements Converter {
+public class CertificateIssuanceRequestElementConverter implements Converter {
     
     private static final String REQ_RESOURCE_SET_AS = "req_resource_set_as";
     private static final String REQ_RESOURCE_SET_IPV4 = "req_resource_set_ipv4";
@@ -19,28 +21,37 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        CertificateIssuanceRequestPayload content = (CertificateIssuanceRequestPayload) source;
+        CertificateIssuanceRequestElement content = (CertificateIssuanceRequestElement) source;
 
         writer.addAttribute(CLASS_NAME, content.getClassName());
 
         if (content.getAllocatedAsn() != null) {
-            writer.addAttribute(REQ_RESOURCE_SET_AS, StringUtils.join(content.getAllocatedAsn(), ","));
+            String asnString = stripASandSpaces(content.getAllocatedAsn().toString());
+            writer.addAttribute(REQ_RESOURCE_SET_AS, asnString);
         }
 
         if (content.getAllocatedIpv4() != null) {
-            writer.addAttribute(REQ_RESOURCE_SET_IPV4, StringUtils.join(content.getAllocatedIpv4(), ","));
+            String ipv4String = stripASandSpaces(content.getAllocatedIpv4().toString());
+            writer.addAttribute(REQ_RESOURCE_SET_IPV4, ipv4String);
         }
 
         if (content.getAllocatedIpv6() != null) {
-            writer.addAttribute(REQ_RESOURCE_SET_IPV6, StringUtils.join(content.getAllocatedIpv6(), ","));
+            String ipv6String = stripASandSpaces(content.getAllocatedIpv6().toString());
+            writer.addAttribute(REQ_RESOURCE_SET_IPV6, ipv6String);
         }
 
         context.convertAnother(content.getCertificate().getEncoded());
     }
 
+    private String stripASandSpaces(String string) {
+        string = StringUtils.replaceChars(string, "AS", "");
+        string = StringUtils.replaceChars(string, " ", "");
+        return string;
+    }
+
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        CertificateIssuanceRequestPayload content = new CertificateIssuanceRequestPayload();
+        CertificateIssuanceRequestElement content = new CertificateIssuanceRequestElement();
 
         String className = reader.getAttribute(CLASS_NAME);
         Validate.notNull(className, "class_name attribute is required");
@@ -48,17 +59,17 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
 
         String resourceSetAsNumbers = reader.getAttribute(REQ_RESOURCE_SET_AS);
         if (StringUtils.isNotBlank(resourceSetAsNumbers)) {
-            content.setAllocatedAsn(resourceSetAsNumbers.split(","));
+            content.setAllocatedAsn(IpResourceSet.parse(resourceSetAsNumbers));
         }
 
         String allocatedIpv4 = reader.getAttribute(REQ_RESOURCE_SET_IPV4);
         if (StringUtils.isNotBlank(allocatedIpv4)) {
-            content.setAllocatedIpv4(allocatedIpv4.split(","));
+            content.setAllocatedIpv4(IpResourceSet.parse(allocatedIpv4));
         }
 
         String allocatedIpv6 = reader.getAttribute(REQ_RESOURCE_SET_IPV6);
         if (StringUtils.isNotBlank(allocatedIpv6)) {
-            content.setAllocatedIpv6(allocatedIpv6.split(","));
+            content.setAllocatedIpv6(IpResourceSet.parse(allocatedIpv6));
         }
 
         String encodedCertificate = reader.getValue();
@@ -75,6 +86,6 @@ public class CertificateIssuanceRequestPayloadConverter implements Converter {
     @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
-        return type == CertificateIssuanceRequestPayload.class;
+        return type == CertificateIssuanceRequestElement.class;
     }
 }

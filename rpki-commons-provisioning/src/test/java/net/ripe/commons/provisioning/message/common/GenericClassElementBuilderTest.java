@@ -1,6 +1,8 @@
 package net.ripe.commons.provisioning.message.common;
 
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import net.ripe.commons.provisioning.message.common.GenericClassElementBuilder;
 
@@ -13,7 +15,7 @@ public class GenericClassElementBuilderTest {
     public void shouldNotBuildWithoutRsyncURI() throws URISyntaxException {
         GenericClassElementBuilder builder = new GenericClassElementBuilder();
         builder.withClassName("a classname");
-        builder.withCertificateAuthorityUri("http://some/other");
+        builder.withCertificateAuthorityUri(Arrays.asList(URI.create("http://some/other")));
         builder.buildResourceClassListResponseClassElement();
     }
 }

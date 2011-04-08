@@ -1,11 +1,13 @@
 package net.ripe.commons.provisioning.message.common;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.message.issue.response.CertificateIssuanceResponseClassElement;
 import net.ripe.commons.provisioning.message.list.response.ResourceClassListResponseClassElement;
+import net.ripe.ipresource.IpResourceSet;
 
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
@@ -14,10 +16,8 @@ import org.joda.time.DateTimeZone;
 public class GenericClassElementBuilder {
 
     private String className;
-    private String[] certificateAuthorityUri;
-    private String[] asn;
-    private String[] ipv4ResourceSet;
-    private String[] ipv6ResourceSet;
+    private List<URI> certificateAuthorityUri;
+    private IpResourceSet ipResourceSet;
     private DateTime validityNotAfter;
     private String siaHeadUri;
     protected List<CertificateElement> certificateElements;
@@ -38,23 +38,14 @@ public class GenericClassElementBuilder {
         return this;
     }
 
-    public GenericClassElementBuilder withAllocatedAsn(String... asn) {
-        this.asn = asn;
+    public GenericClassElementBuilder withIpResourceSet(IpResourceSet ipResourceSet) {
+        this.ipResourceSet = ipResourceSet;
         return this;
     }
+    
 
-    public GenericClassElementBuilder withCertificateAuthorityUri(String... caUri) {
+    public GenericClassElementBuilder withCertificateAuthorityUri(List<URI> caUri) {
         this.certificateAuthorityUri = caUri;
-        return this;
-    }
-
-    public GenericClassElementBuilder withIpv4ResourceSet(String... ipv4ResourceSet) {
-        this.ipv4ResourceSet = ipv4ResourceSet;
-        return this;
-    }
-
-    public GenericClassElementBuilder withIpv6ResourceSet(String... ipv6ResourceSet) {
-        this.ipv6ResourceSet = ipv6ResourceSet;
         return this;
     }
 
@@ -70,7 +61,6 @@ public class GenericClassElementBuilder {
 
     private void validateFields() {
         Validate.notNull(className, "No className provided");
-        Validate.isTrue(ResourceClassUtil.validateAsn(asn), "AS numbers should not start with AS");
         boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(certificateAuthorityUri);
         Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
 
@@ -90,6 +80,7 @@ public class GenericClassElementBuilder {
 
     public CertificateIssuanceResponseClassElement buildCertificateIssuanceResponseClassElement() {
         validateFields();
+        Validate.isTrue(certificateElements.size() == 1);
         CertificateIssuanceResponseClassElement classElement = new CertificateIssuanceResponseClassElement();
         setGenericClassElementFields(classElement);
         classElement.setCertificateElement(certificateElements.get(0));
@@ -98,10 +89,8 @@ public class GenericClassElementBuilder {
 
     private void setGenericClassElementFields(GenericClassElement classElement) {
         classElement.setClassName(className);
-        classElement.setCertificateAuthorityUri(certificateAuthorityUri);
-        classElement.setResourceSetAsNumbers(asn);
-        classElement.setIpv4ResourceSet(ipv4ResourceSet);
-        classElement.setIpv6ResourceSet(ipv6ResourceSet);
+        classElement.setCertUris(certificateAuthorityUri);
+        classElement.setIpResourceSet(ipResourceSet);
         classElement.setIssuer(issuer);
         classElement.setValidityNotAfter(validityNotAfter);
         classElement.setSiaHeadUri(siaHeadUri);
