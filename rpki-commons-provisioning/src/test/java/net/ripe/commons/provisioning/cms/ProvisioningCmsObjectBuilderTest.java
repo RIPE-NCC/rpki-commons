@@ -1,7 +1,8 @@
 package net.ripe.commons.provisioning.cms;
 
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.commons.provisioning.message.list.request.ResourceClassListQueryPayloadBuilder;
+import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
+
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREncodable;

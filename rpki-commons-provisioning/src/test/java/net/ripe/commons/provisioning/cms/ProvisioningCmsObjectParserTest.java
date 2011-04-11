@@ -1,8 +1,9 @@
 package net.ripe.commons.provisioning.cms;
 
 import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.provisioning.message.AbstractProvisioningPayload;
-import net.ripe.commons.provisioning.message.PayloadMessageType;
+import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
+import net.ripe.commons.provisioning.payload.PayloadMessageType;
+
 import org.junit.Before;
 import org.junit.Test;
 

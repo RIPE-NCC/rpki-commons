@@ -1,6 +1,6 @@
 package net.ripe.commons.provisioning.cms;
 
-import net.ripe.commons.provisioning.message.list.request.ResourceClassListQueryPayloadBuilder;
+import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
