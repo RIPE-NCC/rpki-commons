@@ -52,7 +52,7 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
         CertificateIssuanceRequestElement payloadContent = payload.getRequestElement();
         assertEquals("a classname", payloadContent.getClassName());
         assertEquals(IpResourceSet.parse("456,1234"), payloadContent.getAllocatedAsn());
-        assertArrayEquals(pkcs10Request.getEncoded(), payloadContent.getCertificate().getEncoded());
+        assertArrayEquals(pkcs10Request.getEncoded(), payloadContent.getCertificateRequest().getEncoded());
         assertEquals(IpResourceSet.parse("10.0.0.0/8"), payloadContent.getAllocatedIpv4());
         assertEquals(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"), payloadContent.getAllocatedIpv6());
     }

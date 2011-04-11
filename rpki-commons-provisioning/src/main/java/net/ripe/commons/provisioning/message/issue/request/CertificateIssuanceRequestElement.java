@@ -19,7 +19,7 @@ public class CertificateIssuanceRequestElement {
     private IpResourceSet allocatedAsn;
     private IpResourceSet allocatedIpv4;
     private IpResourceSet allocatedIpv6;
-    private PKCS10CertificationRequest certificate;
+    private PKCS10CertificationRequest certificateRequest;
 
     public String getClassName() {
         return className;
@@ -70,12 +70,12 @@ public class CertificateIssuanceRequestElement {
     }
 
 
-    public PKCS10CertificationRequest getCertificate() {
-        return certificate;
+    public PKCS10CertificationRequest getCertificateRequest() {
+        return certificateRequest;
     }
 
-    CertificateIssuanceRequestElement setCertificate(PKCS10CertificationRequest certificate) {
-        this.certificate = certificate;
+    CertificateIssuanceRequestElement setCertificateRequest(PKCS10CertificationRequest certificate) {
+        this.certificateRequest = certificate;
         return this;
     }
 

@@ -40,7 +40,7 @@ public class CertificateIssuanceRequestElementConverter implements Converter {
             writer.addAttribute(REQ_RESOURCE_SET_IPV6, ipv6String);
         }
 
-        context.convertAnother(content.getCertificate().getEncoded());
+        context.convertAnother(content.getCertificateRequest().getEncoded());
     }
 
     private String stripASandSpaces(String string) {
@@ -78,7 +78,7 @@ public class CertificateIssuanceRequestElementConverter implements Converter {
         byte[] base64DecodedCertificate = (byte[])context.convertAnother(encodedCertificate.getBytes(), byte[].class);
 
         PKCS10CertificationRequest certificationRequest = new PKCS10CertificationRequest(base64DecodedCertificate);
-        content.setCertificate(certificationRequest);
+        content.setCertificateRequest(certificationRequest);
 
         return content;
     }

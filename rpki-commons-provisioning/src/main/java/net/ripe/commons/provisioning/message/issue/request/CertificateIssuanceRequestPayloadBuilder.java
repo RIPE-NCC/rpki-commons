@@ -61,7 +61,7 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
                 .setAllocatedAsn(asn)
                 .setAllocatedIpv4(ipv4ResourceSet)
                 .setAllocatedIpv6(ipv6ResourceSet)
-                .setCertificate(certificateRequest);
+                .setCertificateRequest(certificateRequest);
 
         CertificateIssuanceRequestPayload payload = new CertificateIssuanceRequestPayload(sender, recipient, content);
 
