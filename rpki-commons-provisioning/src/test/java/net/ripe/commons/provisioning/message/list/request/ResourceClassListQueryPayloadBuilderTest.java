@@ -1,45 +1,40 @@
 package net.ripe.commons.provisioning.message.list.request;
 
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.message.RelaxNgSchemaValidator;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ResourceClassListQueryCmsBuilderTest {
+public class ResourceClassListQueryPayloadBuilderTest {
+
+    private static final XStreamXmlSerializer<ResourceClassListQueryPayload> SERIALIZER = new ResourceClassListQueryPayloadSerializerBuilder().build();
 
     @Test
     public void shouldCreateParsableProvisioningObject() throws IOException {
         // given
-        ResourceClassListQueryCmsBuilder builder = new ResourceClassListQueryCmsBuilder();
+        ResourceClassListQueryPayloadBuilder builder = new ResourceClassListQueryPayloadBuilder();
         builder.withRecipient("recipient");
-
-        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL).withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
+        builder.withSender("sender");
 
         // when
-        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
+        String xml = builder.build();
 
         // then
-        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms("validationlocation", cmsObject.getEncoded());
+        ResourceClassListQueryPayload payload = SERIALIZER.deserialize(xml);
 
-        assertEquals("CN=test", parser.getPayloadWrapper().getSender());
-        assertEquals("recipient", parser.getPayloadWrapper().getRecipient());
+        assertEquals("sender", payload.getSender());
+        assertEquals("recipient", payload.getRecipient());
     }
 
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.1
     @Test
     public void shouldCreateXmlConformDraft() {
-        ResourceClassListQueryCmsBuilder builder = new ResourceClassListQueryCmsBuilder();
+        ResourceClassListQueryPayloadBuilder builder = new ResourceClassListQueryPayloadBuilder();
         String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
                 "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list\"/>";
 
@@ -50,21 +45,21 @@ public class ResourceClassListQueryCmsBuilderTest {
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.2
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWithoutRecipient() throws IOException {
-        ResourceClassListQueryCmsBuilder payloadBuilder = new ResourceClassListQueryCmsBuilder();
+        ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
         payloadBuilder.withRecipient("recipient");
-        payloadBuilder.build(EE_KEYPAIR.getPrivate());
+        payloadBuilder.build();
     }
 
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.2
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWithoutSender() throws IOException {
-        ResourceClassListQueryCmsBuilder payloadBuilder = new ResourceClassListQueryCmsBuilder();
-        payloadBuilder.build(EE_KEYPAIR.getPrivate());
+        ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
+        payloadBuilder.build();
     }
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        ResourceClassListQueryCmsBuilder builder = new ResourceClassListQueryCmsBuilder();
+        ResourceClassListQueryPayloadBuilder builder = new ResourceClassListQueryPayloadBuilder();
         String actualXml = builder.serializePayloadWrapper("sender", "recipient");
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));

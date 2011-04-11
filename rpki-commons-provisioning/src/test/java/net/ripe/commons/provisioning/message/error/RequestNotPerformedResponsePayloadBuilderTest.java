@@ -1,34 +1,28 @@
 package net.ripe.commons.provisioning.message.error;
 
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.message.RelaxNgSchemaValidator;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RequestNotPerformedResponseCmsBuilderTest {
+public class RequestNotPerformedResponsePayloadBuilderTest {
     
     private static final String TEST_ERROR_DESCRIPTION = "Something went wrong";
 
     private static final NotPerformedError TEST_ERROR = NotPerformedError.INTERNAL_SERVER_ERROR;
     
-    private RequestNotPerformedResponseCmsBuilder builder;
+    private RequestNotPerformedResponsePayloadBuilder builder;
 
     @Before
     public void given() {
-        builder = new RequestNotPerformedResponseCmsBuilder();
-        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
-        builder.withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
+        builder = new RequestNotPerformedResponsePayloadBuilder();
+        builder.withSender("sender");
         builder.withRecipient("recipient");
         builder.withError(TEST_ERROR);
         builder.withDescription(TEST_ERROR_DESCRIPTION);
@@ -37,15 +31,14 @@ public class RequestNotPerformedResponseCmsBuilderTest {
     @Test
     public void shouldBuildValidListResponsePayload() throws Exception {
         // when
-        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
+        String xml = builder.build();
 
         // then
-        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms("/tmp/", cmsObject.getEncoded());
+        XStreamXmlSerializer<RequestNotPerformedResponsePayload> deserializer = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
 
-        RequestNotPerformedResponsePayload deserializedPayload = (RequestNotPerformedResponsePayload) parser.getPayloadWrapper();
+        RequestNotPerformedResponsePayload deserializedPayload = deserializer.deserialize(xml);
 
-        assertEquals("CN=test", deserializedPayload.getSender());
+        assertEquals("sender", deserializedPayload.getSender());
         assertEquals("recipient", deserializedPayload.getRecipient());
 
         assertEquals(TEST_ERROR, deserializedPayload.getStatus());

@@ -3,15 +3,28 @@ package net.ripe.commons.provisioning.cms;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.commons.provisioning.message.PayloadParser;
 import net.ripe.commons.provisioning.message.AbstractProvisioningPayload;
+import net.ripe.commons.provisioning.message.PayloadParser;
 import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.CMSSignedGenerator;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import java.io.ByteArrayInputStream;
@@ -19,7 +32,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.cert.*;
+import java.security.cert.CRL;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,7 +66,7 @@ public class ProvisioningCmsObjectParser {
     private ValidationResult validationResult;
 
     private String location;
-    private AbstractProvisioningPayload payloadWrapper;
+    private AbstractProvisioningPayload payload;
 
 
     public ProvisioningCmsObjectParser() {
@@ -60,8 +81,8 @@ public class ProvisioningCmsObjectParser {
         return validationResult;
     }
 
-    public AbstractProvisioningPayload getPayloadWrapper() {
-        return payloadWrapper;
+    public AbstractProvisioningPayload getPayload() {
+        return payload;
     }
 
     public void parseCms(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
@@ -155,7 +176,7 @@ public class ProvisioningCmsObjectParser {
 
     private void decodeContent(DEREncodable encoded) throws IOException {
         DEROctetString octetString = (DEROctetString) encoded;
-        payloadWrapper = PayloadParser.parse(octetString.getOctets(), validationResult);
+        payload = PayloadParser.parse(octetString.getOctets(), validationResult);
     }
 
     /**

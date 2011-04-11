@@ -1,8 +1,7 @@
 package net.ripe.commons.provisioning.message.issue.response;
 
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.message.PayloadMessageType;
 import net.ripe.commons.provisioning.message.RelaxNgSchemaValidator;
 import net.ripe.commons.provisioning.message.common.CertificateElement;
@@ -23,17 +22,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class CertificateIssuanceResponseCmsBuilderTest {
+public class CertificateIssuanceResponsePayloadBuilderTest {
+    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayload> SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder().build();
 
     private DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
 
-    private CertificateIssuanceResponseCmsBuilder builder;
+    private CertificateIssuanceResponsePayloadBuilder builder;
 
     @Before
     public void given() {
@@ -45,28 +43,27 @@ public class CertificateIssuanceResponseCmsBuilderTest {
         List<URI> certUris = new ArrayList<URI>();
         certUris.add(URI.create("rsync://localhost/some/where"));
         certUris.add(URI.create("http://some/other"));
-        
+
         GenericClassElementBuilder classElementBuilder = new GenericClassElementBuilder().withClassName("a classname")
                 .withCertificateAuthorityUri(certUris).withIpResourceSet(IpResourceSet.parse("1234,456,192.168.0.0/24,2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"))
                 .withValidityNotAfter(validityNotAfter).withSiaHeadUri("rsync://some/where").withCertificateElements(certificateElement)
                 .withIssuer(ProvisioningObjectMother.X509_CA);
 
-        builder = new CertificateIssuanceResponseCmsBuilder();
+        builder = new CertificateIssuanceResponsePayloadBuilder();
         builder.withClassElement(classElementBuilder.buildCertificateIssuanceResponseClassElement());
-        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
+        builder.withSender("sender");
+        builder.withRecipient("recipient");
     }
 
     @Test
     public void shouldBuildValidCIResponsePayload() throws URISyntaxException {
         // when
-        ProvisioningCmsObject cmsObject = builder.build(EE_KEYPAIR.getPrivate());
+        String xml = builder.build();
 
         // then
-        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms("validationLocation", cmsObject.getEncoded());
-        CertificateIssuanceResponsePayload wrapper = (CertificateIssuanceResponsePayload) parser.getPayloadWrapper();
+        CertificateIssuanceResponsePayload payload = SERIALIZER.deserialize(xml);
 
-        assertEquals(PayloadMessageType.issue_response, wrapper.getType());
+        assertEquals(PayloadMessageType.issue_response, payload.getType());
     }
 
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2

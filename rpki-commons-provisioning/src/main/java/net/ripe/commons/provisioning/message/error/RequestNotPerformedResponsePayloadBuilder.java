@@ -1,16 +1,14 @@
 package net.ripe.commons.provisioning.message.error;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
-
+import net.ripe.commons.provisioning.message.common.AbstractPayloadBuilder;
 import org.apache.commons.lang.Validate;
 
 /**
- * Build a NotPerformed message, see <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.6">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.6</a> 
- *
+ * Build a NotPerformed message, see <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.6">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.6</a>
  */
-public class RequestNotPerformedResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
-    
+public class RequestNotPerformedResponsePayloadBuilder extends AbstractPayloadBuilder {
+
     private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
 
     private NotPerformedError error;

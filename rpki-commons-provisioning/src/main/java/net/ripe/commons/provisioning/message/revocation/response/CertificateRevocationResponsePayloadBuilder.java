@@ -1,10 +1,10 @@
 package net.ripe.commons.provisioning.message.revocation.response;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.message.revocation.AbstractCertificateRevocationCmsBuilder;
+import net.ripe.commons.provisioning.message.revocation.AbstractCertificateRevocationPayloadBuilder;
 import net.ripe.commons.provisioning.message.revocation.CertificateRevocationKeyElement;
 
-public class CertificateRevocationResponseCmsBuilder extends AbstractCertificateRevocationCmsBuilder {
+public class CertificateRevocationResponsePayloadBuilder extends AbstractCertificateRevocationPayloadBuilder {
 
     private static final XStreamXmlSerializer<CertificateRevocationResponsePayload> SERIALIZER = new CertificateRevocationResponsePayloadSerializerBuilder().build();
 

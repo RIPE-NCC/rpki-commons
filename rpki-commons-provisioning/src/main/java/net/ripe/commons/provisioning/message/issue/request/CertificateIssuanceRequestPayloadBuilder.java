@@ -1,9 +1,8 @@
 package net.ripe.commons.provisioning.message.issue.request;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
+import net.ripe.commons.provisioning.message.common.AbstractPayloadBuilder;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
@@ -11,7 +10,7 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
  * Builder for 'Certificate Issuance Request'<br >
  * See: <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
  */
-public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectBuilder {
+public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBuilder {
     private static final XStreamXmlSerializer<CertificateIssuanceRequestPayload> SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
 
     private String className;
@@ -20,7 +19,7 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
     private IpResourceSet ipv6ResourceSet;
     private PKCS10CertificationRequest certificateRequest;
 
-    public CertificateIssuanceRequestCmsBuilder withClassName(String className) {
+    public CertificateIssuanceRequestPayloadBuilder withClassName(String className) {
         this.className = className;
         return this;
     }
@@ -28,7 +27,7 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
     /**
      * Provide empty list to request *all* eligible Asns. Leave null to request none.
      */
-    public CertificateIssuanceRequestCmsBuilder withAllocatedAsn(IpResourceSet asnResourceSet) {
+    public CertificateIssuanceRequestPayloadBuilder withAllocatedAsn(IpResourceSet asnResourceSet) {
         this.asn = asnResourceSet;
         return this;
     }
@@ -36,7 +35,7 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
     /**
      * Provide empty list to request *all* eligible IPv4. Leave null to request none.
      */
-    public CertificateIssuanceRequestCmsBuilder withIpv4ResourceSet(IpResourceSet ipv4ResourceSet) {
+    public CertificateIssuanceRequestPayloadBuilder withIpv4ResourceSet(IpResourceSet ipv4ResourceSet) {
         this.ipv4ResourceSet = ipv4ResourceSet;
         return this;
     }
@@ -44,13 +43,13 @@ public class CertificateIssuanceRequestCmsBuilder extends ProvisioningCmsObjectB
     /**
      * Provide empty list to request *all* eligible IPv6. Leave null to request none.
      */
-    public CertificateIssuanceRequestCmsBuilder withIpv6ResourceSet(IpResourceSet ipv6ResourceSet) {
+    public CertificateIssuanceRequestPayloadBuilder withIpv6ResourceSet(IpResourceSet ipv6ResourceSet) {
         this.ipv6ResourceSet = ipv6ResourceSet;
         return this;
     }
 
 
-    public CertificateIssuanceRequestCmsBuilder withCertificateRequest(PKCS10CertificationRequest certificateRequest) {
+    public CertificateIssuanceRequestPayloadBuilder withCertificateRequest(PKCS10CertificationRequest certificateRequest) {
         this.certificateRequest = certificateRequest;
         return this;
     }

@@ -1,8 +1,7 @@
 package net.ripe.commons.provisioning.message.issue.response;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
-
+import net.ripe.commons.provisioning.message.common.AbstractPayloadBuilder;
 import org.apache.commons.lang.Validate;
 
 
@@ -10,14 +9,13 @@ import org.apache.commons.lang.Validate;
  * Builder for 'Certificate Issuance Response'<br >
  * See: <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2</a>
  */
-public class CertificateIssuanceResponseCmsBuilder extends ProvisioningCmsObjectBuilder {
+public class CertificateIssuanceResponsePayloadBuilder extends AbstractPayloadBuilder {
 
-    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayload> SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder()
-            .build();
+    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayload> SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder().build();
 
     private CertificateIssuanceResponseClassElement classElement;
 
-    public CertificateIssuanceResponseCmsBuilder withClassElement(CertificateIssuanceResponseClassElement classElement) {
+    public CertificateIssuanceResponsePayloadBuilder withClassElement(CertificateIssuanceResponseClassElement classElement) {
         this.classElement = classElement;
         return this;
     }

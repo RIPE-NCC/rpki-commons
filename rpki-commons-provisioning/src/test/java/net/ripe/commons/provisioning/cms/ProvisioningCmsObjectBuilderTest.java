@@ -1,29 +1,7 @@
 package net.ripe.commons.provisioning.cms;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
-import static org.bouncycastle.cms.CMSSignedGenerator.DIGEST_SHA256;
-import static org.bouncycastle.cms.CMSSignedGenerator.ENCRYPTION_RSA;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayInputStream;
-import java.security.cert.CertStore;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.commons.provisioning.message.list.request.ResourceClassListQueryCmsBuilder;
-
+import net.ripe.commons.provisioning.message.list.request.ResourceClassListQueryPayloadBuilder;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREncodable;
@@ -44,20 +22,42 @@ import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
+import static org.bouncycastle.cms.CMSSignedGenerator.DIGEST_SHA256;
+import static org.bouncycastle.cms.CMSSignedGenerator.ENCRYPTION_RSA;
+import static org.junit.Assert.*;
+
 public class ProvisioningCmsObjectBuilderTest {
 
-    private ProvisioningCmsObjectBuilder subject;
     private ProvisioningCmsObject cmsObject;
     private long signingTime;
+    private ProvisioningCmsObjectBuilder subject;
 
     @Before
     public void setUp() throws Exception {
-        subject = new ResourceClassListQueryCmsBuilder()
-                        .withCmsCertificate(TEST_CMS_CERT.getCertificate())
-                        .withCrl(CRL)
-                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate())
-                        .withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER)
-                        .withRecipient("recipient");
+        ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
+        payloadBuilder.withRecipient("recipient");
+        payloadBuilder.withSender("sender");
+        String payloadXml = payloadBuilder.build();
+
+        subject = new ProvisioningCmsObjectBuilder();
+
+        subject.withCmsCertificate(TEST_CMS_CERT.getCertificate());
+        subject.withCrl(CRL);
+        subject.withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
+        subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+        subject.withPayloadContent(payloadXml);
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
         DateTimeUtils.setCurrentMillisFixed(signingTime);
@@ -65,22 +65,14 @@ public class ProvisioningCmsObjectBuilderTest {
         DateTimeUtils.setCurrentMillisSystem();
     }
 
-    public static ProvisioningCmsObject createProvisioningCmsObject() {
-        ProvisioningCmsObjectBuilder subject =  new ResourceClassListQueryCmsBuilder()
-                                                        .withCmsCertificate(TEST_CMS_CERT.getCertificate())
-                                                        .withCrl(CRL)
-                                                        .withCaCertificate(TEST_IDENTITY_CERT.getCertificate())
-                                                        .withRecipient(TEST_CMS_CERT.getSubject().getName());
-        return subject.build(EE_KEYPAIR.getPrivate());
-    }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldForceCertificate() throws CMSException {
         subject.withCmsCertificate(null);
         subject.build(EE_KEYPAIR.getPrivate());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldForceCrl() throws CMSException {
         subject.withCrl(null);
         subject.build(EE_KEYPAIR.getPrivate());
@@ -201,7 +193,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
         assertEquals(3, signer.getVersion());
     }
 
@@ -213,7 +205,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertArrayEquals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(TEST_CMS_CERT.getCertificate())).getEncoded(), signer.getSID().getSubjectKeyIdentifier());
     }
@@ -226,7 +218,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNull(signer.getSID().getIssuer());
         assertNull(signer.getSID().getSerialNumber());
@@ -240,7 +232,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertEquals(DIGEST_SHA256, signer.getDigestAlgOID());
     }
@@ -253,7 +245,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignedAttributes());
     }
@@ -266,7 +258,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute contentType = attributeTable.get(CMSAttributes.contentType);
 
@@ -283,7 +275,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute messageDigest = attributeTable.get(CMSAttributes.messageDigest);
 
@@ -300,7 +292,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute signingTimeAttr = attributeTable.get(CMSAttributes.signingTime);
 
@@ -318,7 +310,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute contentType = attributeTable.get(new DERObjectIdentifier("1.2.840.113549.1.9.16.2.46"));
 
@@ -334,7 +326,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertEquals(ENCRYPTION_RSA, signer.getEncryptionAlgOID());
     }
@@ -347,7 +339,7 @@ public class ProvisioningCmsObjectBuilderTest {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
         sp.getSignedContent().drain();
         Collection<?> signers = sp.getSignerInfos().getSigners();
-        SignerInformation signer =  (SignerInformation) signers.iterator().next();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignature());
         signer.verify(TEST_CMS_CERT.getCertificate(), DEFAULT_SIGNATURE_PROVIDER);

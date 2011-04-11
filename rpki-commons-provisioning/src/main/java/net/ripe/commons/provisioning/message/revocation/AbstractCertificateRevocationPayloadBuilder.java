@@ -1,18 +1,17 @@
 package net.ripe.commons.provisioning.message.revocation;
 
-import java.security.PublicKey;
-
+import net.ripe.commons.provisioning.message.common.AbstractPayloadBuilder;
 import org.apache.commons.lang.Validate;
 
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
+import java.security.PublicKey;
 
 
-public abstract class AbstractCertificateRevocationCmsBuilder extends ProvisioningCmsObjectBuilder {
+public abstract class AbstractCertificateRevocationPayloadBuilder extends AbstractPayloadBuilder {
 
     protected String className;
     protected PublicKey publicKey;
 
-    public AbstractCertificateRevocationCmsBuilder() {
+    public AbstractCertificateRevocationPayloadBuilder() {
         super();
     }
 

@@ -1,11 +1,13 @@
 package net.ripe.commons.provisioning.cms;
 
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static org.junit.Assert.*;
 import net.ripe.commons.certification.validation.ValidationResult;
-
+import net.ripe.commons.provisioning.message.AbstractProvisioningPayload;
+import net.ripe.commons.provisioning.message.PayloadMessageType;
 import org.junit.Before;
 import org.junit.Test;
+
+import static net.ripe.commons.certification.validation.ValidationString.CMS_DATA_PARSING;
+import static org.junit.Assert.*;
 
 
 public class ProvisioningCmsObjectParserTest {
@@ -20,8 +22,11 @@ public class ProvisioningCmsObjectParserTest {
 
     @Test
     public void shouldParseValidObject() {
-        ProvisioningCmsObject cmsObject = ProvisioningCmsObjectBuilderTest.createProvisioningCmsObject();
+        ProvisioningCmsObject cmsObject = ProvisioningCmsObjectBuilderMother.createProvisioningCmsObject();
         subject.parseCms("test-location", cmsObject.getEncoded());
+
+        AbstractProvisioningPayload payload = subject.getPayload();
+        assertEquals(PayloadMessageType.list, payload.getType());
 
         ValidationResult validationResult = subject.getValidationResult();
         assertFalse(validationResult.hasFailures());

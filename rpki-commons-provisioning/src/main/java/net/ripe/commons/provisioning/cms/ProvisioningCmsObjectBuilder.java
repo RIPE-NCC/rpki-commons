@@ -1,5 +1,22 @@
 package net.ripe.commons.provisioning.cms;
 
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.Time;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.joda.time.DateTimeUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -19,25 +36,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
-import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DEROutputStream;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.Time;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.joda.time.DateTimeUtils;
-
-public abstract class ProvisioningCmsObjectBuilder {
+public class ProvisioningCmsObjectBuilder {
 
     private static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
 
@@ -53,14 +52,6 @@ public abstract class ProvisioningCmsObjectBuilder {
 
     private String payloadContent;
     
-    private String recipient;
-
-
-    public ProvisioningCmsObjectBuilder withRecipient(String recipient) {
-        this.recipient = recipient;
-        return this;
-    }
-
     public ProvisioningCmsObjectBuilder withCmsCertificate(X509Certificate cmsCertificate) {
         this.cmsCertificate = cmsCertificate;
         return this;
@@ -81,26 +72,12 @@ public abstract class ProvisioningCmsObjectBuilder {
         return this;
     }
 
-    protected final String getCaDnName() {
-        return (caCertificates != null) ? caCertificates[0].getIssuerDN().getName() : "";
+    public ProvisioningCmsObjectBuilder withPayloadContent(String payloadContent) {
+        this.payloadContent = payloadContent;
+        return this;
     }
 
-    /**
-     * Override to validate fields for your specific payload
-     */
-    protected void onValidateFields() {
-        Validate.notNull(recipient, "Recipient is required");
-    }
-
-    /*
-     * Should return the complete payload xml, including the sender and recipient values.
-     */
-    protected abstract String serializePayloadWrapper(String sender, String recipient);
-    
     public ProvisioningCmsObject build(PrivateKey privateKey) {
-        onValidateFields();
-        
-        payloadContent = serializePayloadWrapper(getCaDnName(), recipient);
         Validate.notEmpty(payloadContent, "Payload content is required");
 
         Validate.notNull(cmsCertificate, "cms certificate is required");
