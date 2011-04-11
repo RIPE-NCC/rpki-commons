@@ -1,33 +1,33 @@
 package net.ripe.commons.provisioning.message.list.response;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.commons.provisioning.message.RelaxNgSchemaValidator;
+import net.ripe.commons.provisioning.message.common.CertificateElement;
+import net.ripe.commons.provisioning.message.common.CertificateElementBuilder;
+import net.ripe.commons.provisioning.message.common.GenericClassElementBuilder;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+import net.ripe.ipresource.IpResourceSet;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
-import net.ripe.commons.provisioning.message.common.CertificateElement;
-import net.ripe.commons.provisioning.message.common.CertificateElementBuilder;
-import net.ripe.commons.provisioning.message.common.GenericClassElementBuilder;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
-import net.ripe.ipresource.IpResourceSet;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static org.junit.Assert.*;
 
 public class ResourceClassListResponseCmsBuilderTest {
-    
+
     private DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
     private ResourceClassListResponseCmsBuilder builder;
 
@@ -37,7 +37,7 @@ public class ResourceClassListResponseCmsBuilderTest {
         CertificateElement certificateElement = new CertificateElementBuilder().withIpResources(IpResourceSet.parse("123,10.0.0.0/8,2001:0DB8::/48"))
                                                                                .withIssuerCertificatePublicationLocation(Arrays.asList(URI.create("rsync://jaja/jja")))
                                                                                .withCertificate(ProvisioningObjectMother.X509_CA).build();
-        
+
         GenericClassElementBuilder classElementBuilder = new GenericClassElementBuilder()
                            .withClassName("a classname")
                            .withCertificateAuthorityUri(Arrays.asList(URI.create("rsync://localhost/some/where"), URI.create("http://some/other")))
@@ -46,13 +46,13 @@ public class ResourceClassListResponseCmsBuilderTest {
                            .withSiaHeadUri("rsync://some/where")
                            .withCertificateElements(certificateElement)
                            .withIssuer(ProvisioningObjectMother.X509_CA);
-        
+
         builder.addClassElement(classElementBuilder.buildResourceClassListResponseClassElement());
-        
+
         classElementBuilder.withClassName("class2");
         classElementBuilder.withCertificateElements(certificateElement, certificateElement);
         builder.addClassElement(classElementBuilder.buildResourceClassListResponseClassElement());
-        
+
         builder.withCaCertificate(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getCertificate());
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate()).withCrl(ProvisioningObjectMother.CRL);
         builder.withRecipient("recipient");
@@ -78,10 +78,10 @@ public class ResourceClassListResponseCmsBuilderTest {
         assertEquals("http://some/other", firstClassElement.getCertificateAuthorityUri()[1]);
         assertEquals("a classname", firstClassElement.getClassName());
         assertEquals(IpResourceSet.parse("192.168.0.0/24"), firstClassElement.getIpv4ResourceSet());
-        
-        
+
+
         assertEquals(IpResourceSet.parse("2001:db8::/48,2001:0DB8:002::-2001:0DB8:005::"), firstClassElement.getIpv6ResourceSet());
-        
+
         assertEquals(validityNotAfter, firstClassElement.getValidityNotAfter());
         assertEquals("rsync://some/where", firstClassElement.getSiaHeadUri());
 
@@ -96,13 +96,13 @@ public class ResourceClassListResponseCmsBuilderTest {
         assertEquals(IpResourceSet.parse("2001:0DB8::/48"), certificateElement.getAllocatedIpv6());
         assertArrayEquals(ProvisioningObjectMother.X509_CA.getEncoded(), certificateElement.getCertificate().getEncoded());
     }
-    
-    
+
+
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
     @Test
     public void shouldCreatePayloadXmlConformDraft() {
         String actualXml = builder.serializePayloadWrapper("sender", "recipient");
-        
+
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
                                   "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list_response\">" + "\n" +
                                   "  <class class_name=\"a classname\" cert_url=\"rsync://localhost/some/where,http://some/other\" resource_set_as=\"456,1234\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\" resource_set_notafter=\"2011-01-01T22:58:23.012Z\" suggested_sia_head=\"rsync://some/where\">\n" +
@@ -115,8 +115,14 @@ public class ResourceClassListResponseCmsBuilderTest {
                                   "    <issuer>[^<]*</issuer>" + "\n" +
                                   "  </class>" + "\n" +
                                   "</message>";
-        
+
         assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
     }
 
+    @Test
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+
+        assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
+    }
 }

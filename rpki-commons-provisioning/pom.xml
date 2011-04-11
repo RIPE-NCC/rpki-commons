@@ -30,5 +30,12 @@
             <version>1.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.thaiopensource</groupId>
+            <artifactId>jing</artifactId>
+            <version>20091111</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

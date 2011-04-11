@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="error_response">
-  <status>2001</status>
-  <description xml:lang="en-US">Something went wrong</description>
-</message>

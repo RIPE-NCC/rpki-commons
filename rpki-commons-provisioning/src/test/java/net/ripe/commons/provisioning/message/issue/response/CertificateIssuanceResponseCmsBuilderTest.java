@@ -1,11 +1,21 @@
 package net.ripe.commons.provisioning.message.issue.response;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.commons.provisioning.message.PayloadMessageType;
+import net.ripe.commons.provisioning.message.RelaxNgSchemaValidator;
+import net.ripe.commons.provisioning.message.common.CertificateElement;
+import net.ripe.commons.provisioning.message.common.CertificateElementBuilder;
+import net.ripe.commons.provisioning.message.common.GenericClassElementBuilder;
+import net.ripe.ipresource.IpResourceSet;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -13,19 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
-import net.ripe.commons.provisioning.message.PayloadMessageType;
-import net.ripe.commons.provisioning.message.common.CertificateElement;
-import net.ripe.commons.provisioning.message.common.CertificateElementBuilder;
-import net.ripe.commons.provisioning.message.common.GenericClassElementBuilder;
-import net.ripe.ipresource.IpResourceSet;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class CertificateIssuanceResponseCmsBuilderTest {
@@ -84,4 +85,10 @@ public class CertificateIssuanceResponseCmsBuilderTest {
         assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
     }
 
+    @Test
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+
+        assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
+    }
 }

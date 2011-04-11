@@ -1,21 +1,23 @@
 package net.ripe.commons.provisioning.message.revocation.request;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.regex.Pattern;
-
 import net.ripe.commons.certification.util.KeyPairUtil;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.commons.provisioning.message.RelaxNgSchemaValidator;
 import net.ripe.commons.provisioning.message.revocation.CertificateRevocationKeyElement;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
+
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class CertificateRevocationRequestCmsBuilderTest {
@@ -62,5 +64,13 @@ public class CertificateRevocationRequestCmsBuilderTest {
 
         assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
     }
+
+    @Test
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+
+        assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
+    }
+
 
 }

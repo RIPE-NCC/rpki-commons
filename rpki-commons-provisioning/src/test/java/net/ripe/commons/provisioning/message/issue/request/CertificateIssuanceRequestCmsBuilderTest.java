@@ -1,25 +1,22 @@
 package net.ripe.commons.provisioning.message.issue.request;
 
-import java.util.regex.Pattern;
-
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
-import net.ripe.commons.provisioning.message.issue.request.CertificateIssuanceRequestCmsBuilder;
-import net.ripe.commons.provisioning.message.issue.request.CertificateIssuanceRequestElement;
-import net.ripe.commons.provisioning.message.issue.request.CertificateIssuanceRequestPayload;
+import net.ripe.commons.provisioning.message.RelaxNgSchemaValidator;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CertificateIssuanceRequestCmsBuilderTest {
     
@@ -89,5 +86,13 @@ public class CertificateIssuanceRequestCmsBuilderTest {
         // when
         builder.build(EE_KEYPAIR.getPrivate());
     }
-    
+
+    @Test
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+        String actualXml = subject.serializePayloadWrapper("sender", "recipient");
+
+        assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
+    }
+
+
 }
