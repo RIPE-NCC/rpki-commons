@@ -23,6 +23,9 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
     private static final NotPerformedError TEST_ERROR = NotPerformedError.INTERNAL_SERVER_ERROR;
     
     private RequestNotPerformedResponsePayloadBuilder builder;
+    private RequestNotPerformedResponsePayload payload;
+    
+    private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
 
     @Before
     public void given() {
@@ -31,28 +34,21 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
         builder.withRecipient("recipient");
         builder.withError(TEST_ERROR);
         builder.withDescription(TEST_ERROR_DESCRIPTION);
+        payload = builder.build();
     }
     
     @Test
     public void shouldBuildValidListResponsePayload() throws Exception {
-        // when
-        String xml = builder.build();
+        assertEquals("sender", payload.getSender());
+        assertEquals("recipient", payload.getRecipient());
 
-        // then
-        XStreamXmlSerializer<RequestNotPerformedResponsePayload> deserializer = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
-
-        RequestNotPerformedResponsePayload deserializedPayload = deserializer.deserialize(xml);
-
-        assertEquals("sender", deserializedPayload.getSender());
-        assertEquals("recipient", deserializedPayload.getRecipient());
-
-        assertEquals(TEST_ERROR, deserializedPayload.getStatus());
-        assertEquals(TEST_ERROR_DESCRIPTION, deserializedPayload.getDescription());
+        assertEquals(TEST_ERROR, payload.getStatus());
+        assertEquals(TEST_ERROR_DESCRIPTION, payload.getDescription());
     }
     
     @Test
     public void shouldProduceXmlConformDraft() {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
         
         String expectedXml =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
@@ -66,7 +62,7 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

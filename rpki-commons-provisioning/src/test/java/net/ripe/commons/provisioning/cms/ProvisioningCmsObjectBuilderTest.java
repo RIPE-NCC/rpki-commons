@@ -1,6 +1,7 @@
 package net.ripe.commons.provisioning.cms;
 
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -50,7 +51,7 @@ public class ProvisioningCmsObjectBuilderTest {
         ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
         payloadBuilder.withRecipient("recipient");
         payloadBuilder.withSender("sender");
-        String payloadXml = payloadBuilder.build();
+        ResourceClassListQueryPayload payload = payloadBuilder.build();
 
         subject = new ProvisioningCmsObjectBuilder();
 
@@ -58,7 +59,7 @@ public class ProvisioningCmsObjectBuilderTest {
         subject.withCrl(CRL);
         subject.withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-        subject.withPayloadContent(payloadXml);
+        subject.withPayloadContent(payload);
 
         signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
         DateTimeUtils.setCurrentMillisFixed(signingTime);

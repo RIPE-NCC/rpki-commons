@@ -36,6 +36,8 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
 
     private CertificateIssuanceResponsePayloadBuilder builder;
 
+    private CertificateIssuanceResponsePayload payload;
+
     @Before
     public void given() {
 
@@ -56,23 +58,18 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
         builder.withClassElement(classElementBuilder.buildCertificateIssuanceResponseClassElement());
         builder.withSender("sender");
         builder.withRecipient("recipient");
+        payload = builder.build();
     }
 
     @Test
     public void shouldBuildValidCIResponsePayload() throws URISyntaxException {
-        // when
-        String xml = builder.build();
-
-        // then
-        CertificateIssuanceResponsePayload payload = SERIALIZER.deserialize(xml);
-
         assertEquals(PayloadMessageType.issue_response, payload.getType());
     }
 
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
     @Test
     public void shouldHavePayloadXmlConformStandard() {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
 
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>"
                 + "\n"
@@ -87,7 +84,7 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

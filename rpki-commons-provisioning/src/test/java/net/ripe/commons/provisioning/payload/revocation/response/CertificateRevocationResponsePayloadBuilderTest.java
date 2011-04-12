@@ -26,6 +26,8 @@ public class CertificateRevocationResponsePayloadBuilderTest {
 
     private CertificateRevocationResponsePayloadBuilder builder;
 
+    private CertificateRevocationResponsePayload payload;
+
     @Before
     public void given() {
         builder = new CertificateRevocationResponsePayloadBuilder();
@@ -33,15 +35,11 @@ public class CertificateRevocationResponsePayloadBuilderTest {
         builder.withPublicKey(ProvisioningObjectMother.X509_CA.getPublicKey());
         builder.withSender("sender");
         builder.withRecipient("recipient");
+        payload = builder.build();
     }
 
     @Test
     public void shouldBuildValidRevocationCms() throws Exception {
-        // when
-        String xml = builder.build();
-
-        // then
-        CertificateRevocationResponsePayload payload = SERIALIZER.deserialize(xml);
         assertEquals("sender", payload.getSender());
         assertEquals("recipient", payload.getRecipient());
 
@@ -52,7 +50,7 @@ public class CertificateRevocationResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceXmlConformStandard() {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
 
         String expectedXmlRegex =
                 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
@@ -66,7 +64,7 @@ public class CertificateRevocationResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

@@ -34,6 +34,9 @@ public class ResourceClassListResponsePayloadBuilderTest {
     private DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
     private ResourceClassListResponsePayloadBuilder builder;
 
+
+    private ResourceClassListResponsePayload payload;
+
     @Before
     public void given() {
         builder = new ResourceClassListResponsePayloadBuilder();
@@ -58,16 +61,11 @@ public class ResourceClassListResponsePayloadBuilderTest {
 
         builder.withRecipient("recipient");
         builder.withSender("sender");
+        payload = builder.build();
     }
 
     @Test
     public void shouldBuildValidListResponsePayload() throws URISyntaxException {
-        // when
-        String xml = builder.build();
-
-        // then
-        ResourceClassListResponsePayload payload = SERIALIZER.deserialize(xml);
-
         assertEquals("sender", payload.getSender());
         assertEquals("recipient", payload.getRecipient());
 
@@ -98,7 +96,7 @@ public class ResourceClassListResponsePayloadBuilderTest {
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
     @Test
     public void shouldCreatePayloadXmlConformDraft() {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
 
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
                 "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list_response\">" + "\n" +
@@ -118,8 +116,7 @@ public class ResourceClassListResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = builder.serializePayloadWrapper("sender", "recipient");
-
+        String actualXml = SERIALIZER.serialize(payload);
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }
 }

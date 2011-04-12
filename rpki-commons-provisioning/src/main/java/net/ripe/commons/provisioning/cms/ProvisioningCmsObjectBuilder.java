@@ -1,22 +1,5 @@
 package net.ripe.commons.provisioning.cms;
 
-import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DEROutputStream;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.Time;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.joda.time.DateTimeUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -35,6 +18,26 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
+import net.ripe.commons.provisioning.payload.PayloadParser;
+
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.Time;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.joda.time.DateTimeUtils;
 
 public class ProvisioningCmsObjectBuilder {
 
@@ -72,8 +75,8 @@ public class ProvisioningCmsObjectBuilder {
         return this;
     }
 
-    public ProvisioningCmsObjectBuilder withPayloadContent(String payloadContent) {
-        this.payloadContent = payloadContent;
+    public ProvisioningCmsObjectBuilder withPayloadContent(AbstractProvisioningPayload payload) {
+        this.payloadContent = PayloadParser.serialize(payload);
         return this;
     }
 

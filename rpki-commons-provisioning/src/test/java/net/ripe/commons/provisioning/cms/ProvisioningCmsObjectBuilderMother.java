@@ -1,5 +1,6 @@
 package net.ripe.commons.provisioning.cms;
 
+import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
@@ -13,7 +14,7 @@ public abstract class ProvisioningCmsObjectBuilderMother {
         ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
         payloadBuilder.withRecipient("recipient");
         payloadBuilder.withSender("sender");
-        String payloadXml = payloadBuilder.build();
+        ResourceClassListQueryPayload payloadXml = payloadBuilder.build();
 
         ProvisioningCmsObjectBuilder subject = new ProvisioningCmsObjectBuilder()
                 .withCmsCertificate(TEST_CMS_CERT.getCertificate())

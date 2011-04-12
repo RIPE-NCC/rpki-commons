@@ -26,6 +26,9 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
     private CertificateIssuanceRequestPayloadBuilder subject;
     private PKCS10CertificationRequest pkcs10Request;
 
+
+    private CertificateIssuanceRequestPayload payload;
+
     @Before
     public void given() throws Exception {
         pkcs10Request = ProvisioningObjectMother.generatePkcs10CertificationRequest(512, "RSA", "SHA1withRSA", "BC");
@@ -38,18 +41,11 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
         subject.withIpv6ResourceSet(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"));
         subject.withCertificateRequest(pkcs10Request);
         subject.withSender("sender");
+        payload = subject.build();
     }
     
     @Test
     public void shouldBuildValidListResponsePayload() {
-
-        // when
-        String xml = subject.build();
-
-        // then
-        CertificateIssuanceRequestPayload payload = SERIALIZER.deserialize(xml);
-
-
         assertEquals("sender", payload.getSender());
         assertEquals("recipient", payload.getRecipient());
 
@@ -64,7 +60,8 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1
     @Test
     public void shouldUsePayloadXmlConformDraft() {
-        String actualXml = subject.serializePayloadWrapper("sender", "recipient");
+        
+        String actualXml = SERIALIZER.serialize(payload);
         
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
                                   "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"issue\">" + "\n" +
@@ -76,7 +73,7 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = subject.serializePayloadWrapper("sender", "recipient");
+        String actualXml = SERIALIZER.serialize(payload);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

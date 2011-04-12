@@ -1,8 +1,8 @@
 package net.ripe.commons.provisioning.payload.issue.request;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.payload.common.AbstractPayloadBuilder;
 import net.ripe.ipresource.IpResourceSet;
+
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
@@ -10,8 +10,7 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
  * Builder for 'Certificate Issuance Request'<br >
  * See: <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
  */
-public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBuilder {
-    private static final XStreamXmlSerializer<CertificateIssuanceRequestPayload> SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
+public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBuilder<CertificateIssuanceRequestPayload> {
 
     private String className;
     private IpResourceSet asn;
@@ -55,7 +54,8 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
     }
 
     @Override
-    protected String serializePayloadWrapper(String sender, String recipient) {
+    public CertificateIssuanceRequestPayload build() {
+        onValidateFields();
         CertificateIssuanceRequestElement content = new CertificateIssuanceRequestElement()
                 .setClassName(className)
                 .setAllocatedAsn(asn)
@@ -63,14 +63,13 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
                 .setAllocatedIpv6(ipv6ResourceSet)
                 .setCertificateRequest(certificateRequest);
 
-        CertificateIssuanceRequestPayload payload = new CertificateIssuanceRequestPayload(sender, recipient, content);
-
-        return SERIALIZER.serialize(payload);
+        return new CertificateIssuanceRequestPayload(sender, recipient, content);
     }
 
     @Override
     protected void onValidateFields() {
         Validate.notNull(className, "No className provided");
         Validate.notNull(certificateRequest);
+        super.onValidateFields();
     }
 }

@@ -1,10 +1,13 @@
 package net.ripe.commons.provisioning.payload.common;
 
+import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
+
 import org.apache.commons.lang.Validate;
 
-public abstract class AbstractPayloadBuilder {
-    private String sender;
-    private String recipient;
+public abstract class AbstractPayloadBuilder<T extends AbstractProvisioningPayload> {
+    
+    protected String sender;
+    protected String recipient;
 
     public void withSender(String sender) {
         this.sender = sender;
@@ -14,20 +17,13 @@ public abstract class AbstractPayloadBuilder {
         this.recipient = recipient;
     }
 
+    /**
+     * Override and call super to validate fields
+     */
     protected void onValidateFields() {
-
-    }
-
-    protected abstract String serializePayloadWrapper(String sender, String recipient);
-
-
-    public String build() {
-        onValidateFields();
-
         Validate.notNull(sender, "Sender is required");
         Validate.notNull(recipient, "Recipient is required");
-
-        return serializePayloadWrapper(sender, recipient);
     }
 
+    public abstract T build();
 }

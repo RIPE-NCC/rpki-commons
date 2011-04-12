@@ -12,6 +12,7 @@ public class RequestNotPerformedResponsePayload extends AbstractProvisioningPayl
     @XStreamConverter(NotPerformedErrorConverter.class)
     private NotPerformedError status;
 
+    @XStreamConverter(DescriptionElementConverter.class)
     private String description;
 
     protected RequestNotPerformedResponsePayload(String sender, String recipient, NotPerformedError status, String description) {
