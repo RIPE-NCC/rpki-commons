@@ -49,8 +49,6 @@ public class ProvisioningCmsObjectBuilderTest {
     @Before
     public void setUp() throws Exception {
         ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
-        payloadBuilder.withRecipient("recipient");
-        payloadBuilder.withSender("sender");
         ResourceClassListQueryPayload payload = payloadBuilder.build();
 
         subject = new ProvisioningCmsObjectBuilder();

@@ -1,15 +1,16 @@
 package net.ripe.commons.provisioning.x509;
 
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
-import static org.junit.Assert.*;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.TEST_KEY_PAIR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 
 import javax.security.auth.x500.X500Principal;
-
-import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +33,6 @@ public class ProvisioningIdentityCertificateBuilderTest {
         ProvisioningIdentityCertificateBuilder identityCertificateBuilder = new ProvisioningIdentityCertificateBuilder();
         identityCertificateBuilder.withSelfSigningKeyPair(TEST_KEY_PAIR);
         identityCertificateBuilder.withSelfSigningSubject(SELF_SIGNING_DN);
-        identityCertificateBuilder.withCrlRsyncUri(TEST_CRL_RSYNC_URI);
-        identityCertificateBuilder.withRepositoryRsyncUri(TEST_SIA_RSYNC_URI);
         return identityCertificateBuilder;
     }
 
@@ -64,12 +63,6 @@ public class ProvisioningIdentityCertificateBuilderTest {
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldRequireCrlRsyncUri() {
-        subject.withCrlRsyncUri(null);
-        subject.build();
-    }
-
 
     // ======= the following unit tests test properties of the certificate built by this builder =====
 
@@ -92,11 +85,11 @@ public class ProvisioningIdentityCertificateBuilderTest {
     }
 
     /**
-     * Requirements unclear in spec. Seems logical for now to require CRL
+     * No CRL. These certs are not published.
      */
     @Test
-    public void shouldHaveOneRsyncCrlPointer() {
-        assertNotNull(TEST_IDENTITY_CERT.findFirstRsyncCrlDistributionPoint());
+    public void shouldHaveNoRsyncCrlPointer() {
+        assertNull(TEST_IDENTITY_CERT.findFirstRsyncCrlDistributionPoint());
     }
 
     /**
@@ -108,12 +101,11 @@ public class ProvisioningIdentityCertificateBuilderTest {
     }
 
     /**
-     * One SIA pointer to directory, NO manifest
+     * No SIA. These certs are not published.
      */
     @Test
     public void shouldHaveSiaPointerToDirectoryOnly() {
-        X509CertificateInformationAccessDescriptor[] subjectInformationAccess = TEST_IDENTITY_CERT.getSubjectInformationAccess();
-        assertEquals(1, subjectInformationAccess.length);
+        assertNull(TEST_IDENTITY_CERT.getSubjectInformationAccess());
     }
 
     @Test

@@ -56,8 +56,6 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
 
         builder = new CertificateIssuanceResponsePayloadBuilder();
         builder.withClassElement(classElementBuilder.buildCertificateIssuanceResponseClassElement());
-        builder.withSender("sender");
-        builder.withRecipient("recipient");
         payload = builder.build();
     }
 

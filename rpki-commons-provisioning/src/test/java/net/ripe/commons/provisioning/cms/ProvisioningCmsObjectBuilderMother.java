@@ -12,8 +12,6 @@ public abstract class ProvisioningCmsObjectBuilderMother {
 
     public static ProvisioningCmsObject createProvisioningCmsObject() {
         ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
-        payloadBuilder.withRecipient("recipient");
-        payloadBuilder.withSender("sender");
         ResourceClassListQueryPayload payloadXml = payloadBuilder.build();
 
         ProvisioningCmsObjectBuilder subject = new ProvisioningCmsObjectBuilder()

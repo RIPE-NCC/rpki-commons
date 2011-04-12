@@ -20,11 +20,9 @@ public abstract class AbstractCertificateRevocationPayloadBuilder<T extends Abst
         this.publicKey = publicKey;
     }
 
-    @Override
-    protected void onValidateFields() {
+    protected void validateFields() {
         Validate.notNull(className, "Classname is required");
         Validate.notNull(publicKey, "Public Key is required");
-        super.onValidateFields();
     }
 
 }

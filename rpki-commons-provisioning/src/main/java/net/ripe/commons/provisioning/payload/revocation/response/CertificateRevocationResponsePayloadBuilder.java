@@ -8,7 +8,7 @@ public class CertificateRevocationResponsePayloadBuilder extends AbstractCertifi
     @Override
     public CertificateRevocationResponsePayload build() {
         CertificateRevocationKeyElement payload = new CertificateRevocationKeyElement(className, publicKey);
-        return new CertificateRevocationResponsePayload(sender, recipient, payload);
+        return new CertificateRevocationResponsePayload(payload);
     }
 
 }

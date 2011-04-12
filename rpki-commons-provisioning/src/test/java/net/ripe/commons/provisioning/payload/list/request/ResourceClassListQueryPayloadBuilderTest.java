@@ -23,8 +23,6 @@ public class ResourceClassListQueryPayloadBuilderTest {
     @Before
     public void given() {
         ResourceClassListQueryPayloadBuilder builder = new ResourceClassListQueryPayloadBuilder();
-        builder.withRecipient("recipient");
-        builder.withSender("sender");
         payload = builder.build();
     }
     
@@ -48,20 +46,5 @@ public class ResourceClassListQueryPayloadBuilderTest {
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
         String actualXml = SERIALIZER.serialize(payload);
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
-    }
-
-    // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.2
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailWithoutRecipient() throws IOException {
-        ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
-        payloadBuilder.withRecipient("recipient");
-        payloadBuilder.build();
-    }
-    
-    // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.2
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailWithoutSender() throws IOException {
-        ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
-        payloadBuilder.build();
     }
 }

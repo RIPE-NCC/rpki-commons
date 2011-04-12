@@ -11,7 +11,6 @@ public class ResourceClassListQueryPayloadBuilder extends AbstractPayloadBuilder
 
     @Override
     public ResourceClassListQueryPayload build() {
-        onValidateFields();
-        return new ResourceClassListQueryPayload(sender, recipient);
+        return new ResourceClassListQueryPayload();
     }
 }

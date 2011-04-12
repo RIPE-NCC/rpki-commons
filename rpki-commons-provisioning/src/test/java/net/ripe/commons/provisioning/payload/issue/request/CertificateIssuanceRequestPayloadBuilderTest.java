@@ -35,12 +35,10 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
         
         subject = new CertificateIssuanceRequestPayloadBuilder();
         subject.withClassName("a classname");
-        subject.withRecipient("recipient");
         subject.withAllocatedAsn(IpResourceSet.parse("1234,456"));
         subject.withIpv4ResourceSet(IpResourceSet.parse("10.0.0.0/8"));
         subject.withIpv6ResourceSet(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"));
         subject.withCertificateRequest(pkcs10Request);
-        subject.withSender("sender");
         payload = subject.build();
     }
     

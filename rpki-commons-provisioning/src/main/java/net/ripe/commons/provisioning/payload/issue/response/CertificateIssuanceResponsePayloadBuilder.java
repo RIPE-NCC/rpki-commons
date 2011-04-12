@@ -19,15 +19,9 @@ public class CertificateIssuanceResponsePayloadBuilder extends AbstractPayloadBu
     }
 
     @Override
-    protected final void onValidateFields() {
-        Validate.notNull(classElement, "Need one ClassElement");
-        super.onValidateFields();
-    }
-
-    @Override
     public CertificateIssuanceResponsePayload build() {
-        onValidateFields();
-        return new CertificateIssuanceResponsePayload(sender, recipient, classElement);
+        Validate.notNull(classElement, "Need one ClassElement");
+        return new CertificateIssuanceResponsePayload(classElement);
     }
 
 }

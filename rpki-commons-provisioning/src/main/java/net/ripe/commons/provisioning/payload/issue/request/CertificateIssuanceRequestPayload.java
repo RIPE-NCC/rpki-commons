@@ -1,20 +1,20 @@
 package net.ripe.commons.provisioning.payload.issue.request;
 
+import net.ripe.commons.provisioning.payload.AbstractProvisioningQueryPayload;
+import net.ripe.commons.provisioning.payload.PayloadMessageType;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
-import net.ripe.commons.provisioning.payload.PayloadMessageType;
-
 @XStreamAlias("message")
-public class CertificateIssuanceRequestPayload extends AbstractProvisioningPayload {
+public class CertificateIssuanceRequestPayload extends AbstractProvisioningQueryPayload {
 
     @XStreamAlias("request")
     @XStreamConverter(CertificateIssuanceRequestElementConverter.class)
     private CertificateIssuanceRequestElement requestElement;
 
-    public CertificateIssuanceRequestPayload(String sender, String recipient, CertificateIssuanceRequestElement requestElement) {
-        super(sender, recipient, PayloadMessageType.issue);
+    public CertificateIssuanceRequestPayload(CertificateIssuanceRequestElement requestElement) {
+        super(PayloadMessageType.issue);
 
         this.requestElement = requestElement;
     }

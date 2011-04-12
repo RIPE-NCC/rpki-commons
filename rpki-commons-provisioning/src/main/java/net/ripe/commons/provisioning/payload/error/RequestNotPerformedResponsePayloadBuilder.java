@@ -21,12 +21,8 @@ public class RequestNotPerformedResponsePayloadBuilder extends AbstractPayloadBu
     }
 
     @Override
-    protected void onValidateFields() {
-        Validate.notNull(error, "Error is required");
-    }
-
-    @Override
     public RequestNotPerformedResponsePayload build() {
-        return new RequestNotPerformedResponsePayload(sender, recipient, error, description);
+        Validate.notNull(error, "Error is required");
+        return new RequestNotPerformedResponsePayload(error, description);
     }
 }

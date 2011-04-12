@@ -30,8 +30,6 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
     @Before
     public void given() {
         builder = new RequestNotPerformedResponsePayloadBuilder();
-        builder.withSender("sender");
-        builder.withRecipient("recipient");
         builder.withError(TEST_ERROR);
         builder.withDescription(TEST_ERROR_DESCRIPTION);
         payload = builder.build();

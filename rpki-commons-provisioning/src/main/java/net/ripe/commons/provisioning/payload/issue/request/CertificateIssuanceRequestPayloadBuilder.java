@@ -55,7 +55,8 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
 
     @Override
     public CertificateIssuanceRequestPayload build() {
-        onValidateFields();
+        Validate.notNull(className, "No className provided");
+        Validate.notNull(certificateRequest);
         CertificateIssuanceRequestElement content = new CertificateIssuanceRequestElement()
                 .setClassName(className)
                 .setAllocatedAsn(asn)
@@ -63,13 +64,6 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
                 .setAllocatedIpv6(ipv6ResourceSet)
                 .setCertificateRequest(certificateRequest);
 
-        return new CertificateIssuanceRequestPayload(sender, recipient, content);
-    }
-
-    @Override
-    protected void onValidateFields() {
-        Validate.notNull(className, "No className provided");
-        Validate.notNull(certificateRequest);
-        super.onValidateFields();
+        return new CertificateIssuanceRequestPayload(content);
     }
 }

@@ -33,8 +33,6 @@ public class CertificateRevocationResponsePayloadBuilderTest {
         builder = new CertificateRevocationResponsePayloadBuilder();
         builder.withClassName("a classname");
         builder.withPublicKey(ProvisioningObjectMother.X509_CA.getPublicKey());
-        builder.withSender("sender");
-        builder.withRecipient("recipient");
         payload = builder.build();
     }
 

@@ -19,7 +19,6 @@ public class ResourceClassListResponsePayloadBuilder extends AbstractPayloadBuil
 
     @Override
     public ResourceClassListResponsePayload build() {
-        onValidateFields();
-        return new ResourceClassListResponsePayload(sender, recipient, classElements);
+        return new ResourceClassListResponsePayload(classElements);
     }
 }

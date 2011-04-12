@@ -59,8 +59,6 @@ public class ResourceClassListResponsePayloadBuilderTest {
         classElementBuilder.withCertificateElements(certificateElement, certificateElement);
         builder.addClassElement(classElementBuilder.buildResourceClassListResponseClassElement());
 
-        builder.withRecipient("recipient");
-        builder.withSender("sender");
         payload = builder.build();
     }
 
