@@ -42,10 +42,6 @@ public class ProvisioningCmsCertificateBuilderTest {
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         builder.withSignatureAlgorithm(DEFAULT_SIGNATURE_ALGORITHM);
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-        builder.withCrlRsyncUri(URI.create("rsync://repository/parent-publication-dir/"));
-        builder.withAuthorityInformationAccess(new X509CertificateInformationAccessDescriptor[] {
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, URI.create("rsync://repository/member/identity-cert-publication-uri"))
-        });
         return builder;
     }
 
@@ -86,19 +82,6 @@ public class ProvisioningCmsCertificateBuilderTest {
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldRequireAia() {
-        subject.withAuthorityInformationAccess((X509CertificateInformationAccessDescriptor)null);
-        subject.build();
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldRequireCrlRsyncUri() {
-        subject.withCrlRsyncUri(null);
-        subject.build();
-    }
-
-
     // ======= the following unit tests test properties of the certificate built by this builder =====
 
     /**
@@ -119,13 +102,13 @@ public class ProvisioningCmsCertificateBuilderTest {
     }
 
     @Test
-    public void shouldHaveRsyncCrlPointer() {
-        assertNotNull(TEST_CMS_CERT.findFirstRsyncCrlDistributionPoint());
+    public void shouldNotHaveRsyncCrlPointer() {
+        assertNull(TEST_CMS_CERT.findFirstRsyncCrlDistributionPoint());
     }
 
     @Test
-    public void shouldHaveAiaPointer() {
-        assertNotNull(TEST_CMS_CERT.getAuthorityInformationAccess());
+    public void shouldNotHaveAiaPointer() {
+        assertNull(TEST_CMS_CERT.getAuthorityInformationAccess());
     }
 
     @Test
