@@ -2,7 +2,6 @@ package net.ripe.commons.provisioning.payload.issue.response;
 
 import net.ripe.commons.provisioning.payload.AbstractProvisioningResponsePayload;
 import net.ripe.commons.provisioning.payload.PayloadMessageType;
-import net.ripe.commons.provisioning.payload.common.GenericClassElement;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -17,7 +16,7 @@ public class CertificateIssuanceResponsePayload extends AbstractProvisioningResp
         this.classElement = classElement;
     }
     
-    public GenericClassElement getClassElement() {
+    public CertificateIssuanceResponseClassElement getClassElement() {
         return classElement;
     }
 

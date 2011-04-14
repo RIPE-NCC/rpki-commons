@@ -24,7 +24,7 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
     }
 
     /**
-     * Provide empty list to request *all* eligible Asns. Leave null to request none.
+     * Provide empty list to request *NO* Asns. Leave null to request *ALL* eligible.
      */
     public CertificateIssuanceRequestPayloadBuilder withAllocatedAsn(IpResourceSet asnResourceSet) {
         this.asn = asnResourceSet;
@@ -32,7 +32,7 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
     }
 
     /**
-     * Provide empty list to request *all* eligible IPv4. Leave null to request none.
+     * Provide empty list to request *NO* IPv4. Leave null to request *ALL* eligible.
      */
     public CertificateIssuanceRequestPayloadBuilder withIpv4ResourceSet(IpResourceSet ipv4ResourceSet) {
         this.ipv4ResourceSet = ipv4ResourceSet;
@@ -40,7 +40,7 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
     }
 
     /**
-     * Provide empty list to request *all* eligible IPv6. Leave null to request none.
+     * Provide empty list to request *NO* IPv6. Leave null to request *ALL* eligible.
      */
     public CertificateIssuanceRequestPayloadBuilder withIpv6ResourceSet(IpResourceSet ipv6ResourceSet) {
         this.ipv6ResourceSet = ipv6ResourceSet;

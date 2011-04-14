@@ -15,7 +15,7 @@ import org.joda.time.DateTime;
 
 public class ProvisioningCmsCertificateBuilder {
 
-    private static final int DEFAULT_VALIDITY_TIME_MONTHS_FROM_NOW = 12;
+    private static final int DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW = 1;
 
     private X509CertificateBuilderHelper builderHelper;
 
@@ -68,6 +68,6 @@ public class ProvisioningCmsCertificateBuilder {
         builderHelper.withKeyUsage(KeyUsage.digitalSignature);
         builderHelper.withAuthorityKeyIdentifier(true);
         builderHelper.withSubjectKeyIdentifier(true);
-        builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusMonths(DEFAULT_VALIDITY_TIME_MONTHS_FROM_NOW)));
+        builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusDays(DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW)));
     }
 }

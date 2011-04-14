@@ -62,6 +62,9 @@ public class CertificateIssuanceRequestElement {
     }
 
     private void validateResourceSetContainsOnlyType(IpResourceSet resourceSet, IpResourceType type) {
+        if (resourceSet == null) {
+            return;
+        }
         Iterator<IpResource> iterator = resourceSet.iterator();
         while(iterator.hasNext()) {
             IpResource resource = iterator.next();

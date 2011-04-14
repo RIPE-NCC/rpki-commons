@@ -32,8 +32,7 @@ public class CertificateElementBuilder {
     public CertificateElement build() {
         boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(issuerCertificatePublicationLocation);
         Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
-
-        Validate.notNull(certificate);
+        Validate.notNull(certificate, "No certificate provided");
 
         return new CertificateElement()
                 .setIssuerCertificatePublicationLocation(issuerCertificatePublicationLocation)

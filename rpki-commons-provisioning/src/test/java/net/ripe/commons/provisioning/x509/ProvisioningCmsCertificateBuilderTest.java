@@ -1,12 +1,16 @@
 package net.ripe.commons.provisioning.x509;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
-import static org.junit.Assert.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.TEST_KEY_PAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;

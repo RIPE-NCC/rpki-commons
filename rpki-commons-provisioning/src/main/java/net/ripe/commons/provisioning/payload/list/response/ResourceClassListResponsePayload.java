@@ -1,5 +1,6 @@
 package net.ripe.commons.provisioning.payload.list.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.ripe.commons.provisioning.payload.AbstractProvisioningResponsePayload;
@@ -14,7 +15,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 public class ResourceClassListResponsePayload extends AbstractProvisioningResponsePayload {
 
     @XStreamImplicit(itemFieldName = "class")
-    private List<ResourceClassListResponseClassElement> classElements;
+    private List<ResourceClassListResponseClassElement> classElements = new ArrayList<ResourceClassListResponseClassElement>();
 
     public ResourceClassListResponsePayload(List<ResourceClassListResponseClassElement> classElements) {
         super(PayloadMessageType.list_response);
