@@ -13,7 +13,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class CertificateIssuanceRequestElementConverter implements Converter {
-    
+
     private static final String REQ_RESOURCE_SET_AS = "req_resource_set_as";
     private static final String REQ_RESOURCE_SET_IPV4 = "req_resource_set_ipv4";
     private static final String REQ_RESOURCE_SET_IPV6 = "req_resource_set_ipv6";
@@ -44,9 +44,8 @@ public class CertificateIssuanceRequestElementConverter implements Converter {
     }
 
     private String stripASandSpaces(String string) {
-        string = StringUtils.replaceChars(string, "AS", "");
-        string = StringUtils.replaceChars(string, " ", "");
-        return string;
+        String asFilteredOut = StringUtils.replaceChars(string, "AS", "");
+        return StringUtils.replaceChars(asFilteredOut, " ", "");
     }
 
     @Override
@@ -75,7 +74,7 @@ public class CertificateIssuanceRequestElementConverter implements Converter {
         String encodedCertificate = reader.getValue();
         Validate.notNull(encodedCertificate, "No certificate found");
 
-        byte[] base64DecodedCertificate = (byte[])context.convertAnother(encodedCertificate.getBytes(), byte[].class);
+        byte[] base64DecodedCertificate = (byte[]) context.convertAnother(encodedCertificate.getBytes(), byte[].class);
 
         PKCS10CertificationRequest certificationRequest = new PKCS10CertificationRequest(base64DecodedCertificate);
         content.setCertificateRequest(certificationRequest);

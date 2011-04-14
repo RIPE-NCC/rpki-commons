@@ -20,9 +20,9 @@ public class GenericClassElementBuilder {
     private IpResourceSet ipResourceSet;
     private DateTime validityNotAfter;
     private String siaHeadUri;
-    protected List<CertificateElement> certificateElements;
+    private List<CertificateElement> certificateElements;
     private X509ResourceCertificate issuer;
-    
+
     public GenericClassElementBuilder withValidityNotAfter(DateTime notAfter) {
         this.validityNotAfter = notAfter;
         return this;
@@ -42,7 +42,7 @@ public class GenericClassElementBuilder {
         this.ipResourceSet = ipResourceSet;
         return this;
     }
-    
+
 
     public GenericClassElementBuilder withCertificateAuthorityUri(List<URI> caUri) {
         this.certificateAuthorityUri = caUri;
@@ -69,7 +69,7 @@ public class GenericClassElementBuilder {
         Validate.notNull(validityNotAfter, "Validity not after is required");
         Validate.isTrue(validityNotAfter.getZone().equals(DateTimeZone.UTC), "Validity time must be in UTC timezone");
     }
-    
+
     public ResourceClassListResponseClassElement buildResourceClassListResponseClassElement() {
         validateFields();
         ResourceClassListResponseClassElement classElement = new ResourceClassListResponseClassElement();
@@ -96,5 +96,5 @@ public class GenericClassElementBuilder {
         classElement.setSiaHeadUri(siaHeadUri);
     }
 
-    
+
 }

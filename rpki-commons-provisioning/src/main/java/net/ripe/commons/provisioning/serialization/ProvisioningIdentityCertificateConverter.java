@@ -35,8 +35,7 @@ public class ProvisioningIdentityCertificateConverter implements Converter {
         reader.moveUp();
         ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
         parser.parse("encoded", encoded);
-        ProvisioningIdentityCertificate certificate = parser.getCertificate();
-        return certificate;
+        return parser.getCertificate();
     }
 
 }

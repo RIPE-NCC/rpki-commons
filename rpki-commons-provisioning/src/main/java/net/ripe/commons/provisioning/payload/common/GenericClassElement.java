@@ -43,7 +43,7 @@ public class GenericClassElement {
 
     @XStreamAlias("certificate")
     @XStreamImplicit(itemFieldName = "certificate")
-    protected List<CertificateElement> certificateElements;
+    private List<CertificateElement> certificateElements;
 
     @XStreamConverter(X509ResourceCertificateBase64Converter.class)
     @XStreamAlias("issuer")
@@ -142,6 +142,14 @@ public class GenericClassElement {
 
     public void setIssuer(X509ResourceCertificate issuer) {
         this.issuer = issuer;
+    }
+
+    protected List<CertificateElement> getCertificateElements() {
+        return certificateElements;
+    }
+
+    protected void setCertificateElements(List<CertificateElement> certificateElements) {
+        this.certificateElements = certificateElements;
     }
 
     @Override
