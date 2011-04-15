@@ -11,7 +11,11 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-public class ProvisioningIdentityCertificateConverter implements Converter {
+/**
+ * A converter to be used when (de)serializing a ProvisioningIdentityCertificate to/from xml using XStream.
+ * @see ProvisioningIdentityCertificate
+ */
+public class ProvisioningIdentityCertificateXstreamConverter implements Converter {
 
     @SuppressWarnings("rawtypes")
     @Override
