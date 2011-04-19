@@ -43,7 +43,7 @@ public class X509CertificateInformationAccessDescriptor extends ValueObjectSuppo
         METHOD_STRING_TABLE = Collections.unmodifiableMap(map);
     }
 
-    X509CertificateInformationAccessDescriptor(AccessDescription accessDescription) {
+    public X509CertificateInformationAccessDescriptor(AccessDescription accessDescription) {
         try {
             Validate.isTrue(accessDescription.getAccessLocation().getTagNo() == GeneralName.uniformResourceIdentifier, "access location is not an URI");
             this.method = accessDescription.getAccessMethod().getId();

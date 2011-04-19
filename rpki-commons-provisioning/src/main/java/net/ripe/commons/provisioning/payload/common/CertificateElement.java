@@ -60,6 +60,16 @@ public class CertificateElement {
     public List<URI> getIssuerCertificatePublicationUris() {
         return issuerCertificatePublicationLocationUris;
     }
+    
+    public URI getRsyncAIAPointer() {
+        for (URI uri: issuerCertificatePublicationLocationUris) {
+            if (uri.toString().startsWith("rsync")) {
+                return uri;
+            }
+        }
+        return null;
+        
+    }
 
     public IpResourceSet getAllocatedAsn() {
         return allocatedAsn;
@@ -81,5 +91,6 @@ public class CertificateElement {
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
+
 
 }
