@@ -95,8 +95,6 @@ public class RpkiCaCertificateRequestBuilder {
         X509Extension siaExtension = new X509Extension(false, new DEROctetString(derSequence.getDEREncoded()));
         values.add(siaExtension);
 
-        X509Extensions extensions = new X509Extensions(oids, values);
-        return extensions;
+        return new X509Extensions(oids, values);
     }
-
 }
