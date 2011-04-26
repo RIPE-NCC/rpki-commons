@@ -27,7 +27,7 @@ public class ProvisioningCmsObjectValidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        subject = new ProvisioningCmsObjectValidator(ProvisioningCmsObjectBuilderMother.createProvisioningCmsObject());
+        subject = new ProvisioningCmsObjectValidator(ProvisioningCmsObjectBuilderMother.createProvisioningCmsObject(), TEST_IDENTITY_CERT);
     }
 
 
@@ -55,7 +55,7 @@ public class ProvisioningCmsObjectValidatorTest {
     @Test
     public void shouldStopIfCmsObjectIsBadlyFormatted() {
         ValidationResult validationResult = new ValidationResult();
-        subject = new ProvisioningCmsObjectValidator(new ProvisioningCmsObject(new byte[] {0}, null, null, null));
+        subject = new ProvisioningCmsObjectValidator(new ProvisioningCmsObject(new byte[] {0}, null, null, null, null), TEST_IDENTITY_CERT);
         subject.validate(validationResult);
 
         assertTrue(validationResult.hasFailures());
@@ -69,7 +69,7 @@ public class ProvisioningCmsObjectValidatorTest {
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL);
 
-        subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()));
+        subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()), TEST_IDENTITY_CERT);
         subject.validate(validationResult);
 
         assertTrue(validationResult.hasFailures());
@@ -84,7 +84,7 @@ public class ProvisioningCmsObjectValidatorTest {
                                                         .withCrl(CRL)
                                                         .withCaCertificate(TEST_IDENTITY_CERT.getCertificate(), getProvisioningCertificate().getCertificate());
 
-        subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()));
+        subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()), TEST_IDENTITY_CERT);
         subject.validate(validationResult);
     }
 

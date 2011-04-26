@@ -81,10 +81,6 @@ public class ProvisioningCmsObjectParser {
         return validationResult;
     }
 
-    public AbstractProvisioningPayload getPayload() {
-        return payload;
-    }
-
     public void parseCms(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
         this.location = location;
         this.encoded = encoded;
@@ -112,7 +108,7 @@ public class ProvisioningCmsObjectParser {
         if (validationResult.hasFailures()) {
             throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed");
         }
-        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl);
+        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl, payload);
     }
 
     /**

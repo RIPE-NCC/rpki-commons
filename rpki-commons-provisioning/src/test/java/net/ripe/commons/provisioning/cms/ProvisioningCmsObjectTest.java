@@ -18,7 +18,7 @@ public class ProvisioningCmsObjectTest {
         X509Certificate certificate1 = createMock(X509Certificate.class);
         X509CRL crl = createMock(X509CRL.class);
         byte[] encodedContent = new byte[] {'f', 'o', 'o'};
-        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl);
+        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl, null);
 
         assertFalse(cms1.equals(null));
         assertEquals(cms1, cms1);
@@ -33,8 +33,8 @@ public class ProvisioningCmsObjectTest {
 
         byte[] encodedContent = new byte[] {'f', 'o', 'o'};
 
-        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl);
-        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet(), crl);
+        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl, null);
+        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet(), crl, null);
 
         assertEquals(cms1, cms2);
     }
@@ -47,8 +47,8 @@ public class ProvisioningCmsObjectTest {
 
         byte[] encodedContent = new byte[] {'f', 'o', 'o'};
 
-        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl);
-        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet(), crl);
+        ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl, null);
+        ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet(), crl, null);
 
         assertEquals(cms1.hashCode(), cms2.hashCode());
     }

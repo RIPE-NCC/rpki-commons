@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 
+import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
+
 import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -21,20 +23,19 @@ import org.joda.time.DateTime;
 public class ProvisioningCmsObject {
 
     private byte[] encodedContent;
-
     private final X509Certificate cmsCertificate;
-
     private final Collection<X509Certificate> caCertificates;
-
     private final X509CRL crl;
+    private AbstractProvisioningPayload payload;
 
-    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl) { // NOPMD
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload) { // NOPMD
                                                                                                                                                    // -
                                                                                                                                                    // ArrayIsStoredDirectly
         this.encodedContent = encodedContent;
         this.cmsCertificate = cmsCertificate;
         this.caCertificates = caCertificates;
         this.crl = crl;
+        this.payload = payload;
     }
 
     public byte[] getEncoded() {
@@ -44,7 +45,15 @@ public class ProvisioningCmsObject {
     public X509Certificate getCmsCertificate() {
         return cmsCertificate;
     }
+    
+    public AbstractProvisioningPayload getPayload() {
+        return payload;
+    }
 
+    /**
+     * TODO: Remove!
+     * @deprecated
+     */
     public Collection<X509Certificate> getCaCertificates() {
         return caCertificates;
     }

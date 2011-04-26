@@ -1,16 +1,11 @@
 package net.ripe.commons.provisioning.cms;
 
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlValidator;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.provisioning.x509.ProvisioningCertificateValidator;
 import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificate;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
-
-import org.apache.commons.lang.Validate;
 
 public class ProvisioningCmsObjectValidator {
 
@@ -25,8 +20,9 @@ public class ProvisioningCmsObjectValidator {
     private X509Crl crl;
 
 
-    public ProvisioningCmsObjectValidator(ProvisioningCmsObject cmsObject) {
+    public ProvisioningCmsObjectValidator(ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate identityCertificate) {
         this.cmsObject = cmsObject;
+        this.identityCertificate = identityCertificate;
     }
 
     public void validate(ValidationResult validationResult) {
@@ -38,20 +34,8 @@ public class ProvisioningCmsObjectValidator {
             return;
         }
 
-        ProvisioningCmsObject provisioningCmsObject = parser.getProvisioningCmsObject();
-        cmsCertificate = new ProvisioningCmsCertificate(provisioningCmsObject.getCmsCertificate());
-
-        Collection<X509Certificate> caCertificates = provisioningCmsObject.getCaCertificates();
-        Validate.isTrue(!caCertificates.isEmpty(), "identity certificate is required");
-        Validate.isTrue(caCertificates.size() == 1, "multiple embedded ca certificates is not supported");
-
-        //TODO: the identity certificate should be compared to the one which has been uploaded to the 'up'.
-        // If they are the same (and that one was parsed at the time of uploading) we don't have to parse it
-        // here therefore I am not parsing the identity certificate, only validating it to check validity time, etc.
-        identityCertificate = new ProvisioningIdentityCertificate(caCertificates.iterator().next());
-
-        crl = new X509Crl(provisioningCmsObject.getCrl());
-
+        cmsCertificate = new ProvisioningCmsCertificate(cmsObject.getCmsCertificate());
+        crl = new X509Crl(cmsObject.getCrl());
 
         validateCrl();
         validateCertificateChain();

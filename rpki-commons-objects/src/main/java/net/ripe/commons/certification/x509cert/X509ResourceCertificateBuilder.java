@@ -8,11 +8,18 @@ import java.security.PublicKey;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.cms.RpkiSignedObjectEeCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 
+/**
+ * Generic Builder for X509ResourceCertificates<br />
+ * Note that you may want to use one of the following more specific builders to build standard conform signed object EE or CA certificates:
+ * @see RpkiSignedObjectEeCertificateBuilder
+ * @see RpkiCaCertificateBuilder
+ */
 public class X509ResourceCertificateBuilder {
 
     private X509CertificateBuilderHelper builderHelper;
