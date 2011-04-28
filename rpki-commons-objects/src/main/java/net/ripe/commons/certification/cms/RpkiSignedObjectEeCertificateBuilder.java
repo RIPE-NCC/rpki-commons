@@ -18,22 +18,23 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 
 public class RpkiSignedObjectEeCertificateBuilder {
     
-    private URI resourceCertificatePublicationUri;
+    private URI parentResourceCertificatePublicationUri;
     private URI crlPublicationUri;
+    private URI cmsPublicationUri;
     
     private X509ResourceCertificate parentResourceCertificate;
     private KeyPair parentKeyPair;
     
     private KeyPair eeKeyPair;
     private BigInteger serialNumber;
-    private URI cmsPublicationUri;
     private ValidityPeriod validityPeriod;
     private X500Principal subject;
+    
     private String signatureAlgorithm;
     private String signatureProvider;
 
-    public RpkiSignedObjectEeCertificateBuilder withResourceCertificatePublicationUri(URI resourceCertificatePublicationUri) {
-        this.resourceCertificatePublicationUri = resourceCertificatePublicationUri;
+    public RpkiSignedObjectEeCertificateBuilder withParentResourceCertificatePublicationUri(URI parentResourceCertificatePublicationUri) {
+        this.parentResourceCertificatePublicationUri = parentResourceCertificatePublicationUri;
         return this;
     }
 
@@ -94,7 +95,7 @@ public class RpkiSignedObjectEeCertificateBuilder {
         X509ResourceCertificateBuilder eeCertificateBuilder = new X509ResourceCertificateBuilder();
 
         X509CertificateInformationAccessDescriptor[] aiaDescriptors = {
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, resourceCertificatePublicationUri)
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, parentResourceCertificatePublicationUri)
         };
 
         eeCertificateBuilder.withAuthorityInformationAccess(aiaDescriptors);
@@ -123,7 +124,7 @@ public class RpkiSignedObjectEeCertificateBuilder {
     }
 
     private void validateFields() {
-        Validate.notNull(resourceCertificatePublicationUri, "Resource Certificate Publication URI is required");
+        Validate.notNull(parentResourceCertificatePublicationUri, "Resource Certificate Publication URI is required");
         Validate.notNull(crlPublicationUri, "CRL Publication URI is required");
         Validate.notNull(parentResourceCertificate, "Parent resource certificate is required");
         Validate.notNull(parentKeyPair, "Parent keyPair is required");

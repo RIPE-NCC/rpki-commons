@@ -53,7 +53,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         subject.withValidityPeriod(vp);
 
         URI publicationUri = URI.create("rsync://somewhere/certificate.cer");
-        subject.withResourceCertificatePublicationUri(publicationUri);
+        subject.withParentResourceCertificatePublicationUri(publicationUri);
         subject.withSerialNumber(BigInteger.TEN);
         
         subject.withSubject(new X500Principal("CN=subject"));
@@ -86,7 +86,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
     public void shouldNotBuildWithoutResourceCertificatePublicationUri() {
         // given
         createValidEeBuilder();
-        subject.withResourceCertificatePublicationUri(null);
+        subject.withParentResourceCertificatePublicationUri(null);
 
         // when
         buildOrFail();
@@ -160,7 +160,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         subject.withValidityPeriod(new ValidityPeriod(now, now.plusSeconds(5)));
 
         URI publicationUri = URI.create("rsync://somewhere/certificate.cer");
-        subject.withResourceCertificatePublicationUri(publicationUri);
+        subject.withParentResourceCertificatePublicationUri(publicationUri);
 
         subject.withSerialNumber(BigInteger.TEN);
     }

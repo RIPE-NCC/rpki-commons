@@ -16,6 +16,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 /**
  * Builder for X509ResourceCertificates used by RPKI CAs
  */
+// TODO: Stop chaining, and mkae common parent to this and EeCertBuilder, unit test... (this is now lacking signature provider)
 public class RpkiCaCertificateBuilder {
 
     private PublicKey publicKey;
