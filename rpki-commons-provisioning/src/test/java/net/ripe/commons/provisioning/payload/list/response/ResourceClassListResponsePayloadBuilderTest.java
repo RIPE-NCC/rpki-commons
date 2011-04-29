@@ -6,10 +6,6 @@ import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.commons.provisioning.payload.common.CertificateElementBuilder;
 import net.ripe.commons.provisioning.payload.common.GenericClassElementBuilder;
-import net.ripe.commons.provisioning.payload.list.response.ResourceClassListResponseClassElement;
-import net.ripe.commons.provisioning.payload.list.response.ResourceClassListResponsePayload;
-import net.ripe.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadBuilder;
-import net.ripe.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerBuilder;
 import net.ripe.ipresource.IpResourceSet;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -41,7 +37,7 @@ public class ResourceClassListResponsePayloadBuilderTest {
     public void given() {
         builder = new ResourceClassListResponsePayloadBuilder();
         CertificateElement certificateElement = new CertificateElementBuilder().withIpResources(IpResourceSet.parse("123,10.0.0.0/8,2001:0DB8::/48"))
-                .withIssuerCertificatePublicationLocation(Arrays.asList(URI.create("rsync://jaja/jja")))
+                .withCertificatePublishedLocations(Arrays.asList(URI.create("rsync://jaja/jja")))
                 .withCertificate(ProvisioningObjectMother.X509_CA).build();
 
         GenericClassElementBuilder classElementBuilder = new GenericClassElementBuilder()

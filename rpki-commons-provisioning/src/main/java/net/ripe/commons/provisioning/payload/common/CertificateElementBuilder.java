@@ -10,12 +10,12 @@ import org.apache.commons.lang.Validate;
 
 public class CertificateElementBuilder {
     
-    private List<URI> issuerCertificatePublicationLocation;
+    private List<URI> certificatePublishedLocations;
     private IpResourceSet ipResourceSet;
     private X509ResourceCertificate certificate;
 
-    public CertificateElementBuilder withIssuerCertificatePublicationLocation(List<URI> uris) {
-        this.issuerCertificatePublicationLocation = uris;
+    public CertificateElementBuilder withCertificatePublishedLocations(List<URI> uris) {
+        this.certificatePublishedLocations = uris;
         return this;
     }
 
@@ -30,12 +30,12 @@ public class CertificateElementBuilder {
     }
 
     public CertificateElement build() {
-        boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(issuerCertificatePublicationLocation);
+        boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(certificatePublishedLocations);
         Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
         Validate.notNull(certificate, "No certificate provided");
 
         return new CertificateElement()
-                .setIssuerCertificatePublicationLocation(issuerCertificatePublicationLocation)
+                .setIssuerCertificatePublicationLocation(certificatePublishedLocations)
                 .setIpResourceSet(ipResourceSet)
                 .setCertificate(certificate);
     }
