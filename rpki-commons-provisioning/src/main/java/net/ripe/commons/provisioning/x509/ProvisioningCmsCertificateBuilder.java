@@ -53,11 +53,6 @@ public class ProvisioningCmsCertificateBuilder {
         return this;
     }
 
-    public ProvisioningCmsCertificateBuilder withSignatureAlgorithm(String signatureAlgorithm) {
-        builderHelper.withSignatureAlgorithm(signatureAlgorithm);
-        return this;
-    }
-
     public ProvisioningCmsCertificate build() {
         setUpImplicitRequirementsForBuilderHelper();
         return new ProvisioningCmsCertificate(builderHelper.generateCertificate());

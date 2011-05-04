@@ -1,6 +1,5 @@
 package net.ripe.commons.provisioning.x509;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM;
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.TEST_KEY_PAIR;
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
@@ -44,7 +43,6 @@ public class ProvisioningCmsCertificateBuilderTest {
         builder.withPublicKey(EE_KEYPAIR.getPublic());
         builder.withSubjectDN(new X500Principal("CN=end-entity"));
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        builder.withSignatureAlgorithm(DEFAULT_SIGNATURE_ALGORITHM);
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         return builder;
     }
