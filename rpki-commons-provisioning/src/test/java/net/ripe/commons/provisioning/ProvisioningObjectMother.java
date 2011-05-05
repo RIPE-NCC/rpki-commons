@@ -1,6 +1,11 @@
 package net.ripe.commons.provisioning;
 
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
+
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.cert.X509CRL;
@@ -14,7 +19,12 @@ import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactory;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
 import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
+import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
+import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
+import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBuilderParserTest;
 import net.ripe.ipresource.IpResourceSet;
 
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -31,6 +41,14 @@ public class ProvisioningObjectMother {
     public static final X509CRL CRL = generateCrl();
 
     public static final X509ResourceCertificate X509_CA = generateX509();
+    
+    public static URI RPKI_CA_CERT_REQUEST_CA_REPO_URI = URI.create("rsync://host/module/subdir/");
+    public static URI RPKI_CA_CERT_REQUEST_CA_MFT_URI = URI.create("rsync://host/module/subdir/subject.mft");
+    public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
+    public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = KeyPairFactory.getInstance().generate(2048, "SunRsaSign");
+    public static PKCS10CertificationRequest RPKI_CA_CERT_REQUEST = RpkiCaCertificateRequestBuilderParserTest.createRpkiCaCertificateRequest();
+    
+    public static ResourceClassListQueryPayload RESOURCE_CLASS_LIST_QUERY_PAYLOAD = createResourceListQueryPayload();
 
     private static X509ResourceCertificate generateX509() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
@@ -90,5 +108,33 @@ public class ProvisioningObjectMother {
                 kp.getPrivate(), DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
 
         return request;
+    }
+    
+    public static ProvisioningCmsObject createProvisioningCmsObject() {
+        ResourceClassListQueryPayload payloadXml = createResourceListQueryPayload();
+
+        ProvisioningCmsObjectBuilder subject = new ProvisioningCmsObjectBuilder()
+                .withCmsCertificate(TEST_CMS_CERT.getCertificate())
+                .withCrl(CRL)
+                .withCaCertificate(TEST_IDENTITY_CERT.getCertificate())
+                .withPayloadContent(payloadXml);
+        return subject.build(EE_KEYPAIR.getPrivate());
+    }
+    
+    public static ProvisioningCmsObject createInvalidProvisioningCmsObject() {
+        
+
+        ProvisioningCmsObjectBuilder subject = new ProvisioningCmsObjectBuilder()
+                .withCmsCertificate(TEST_CMS_CERT.getCertificate())
+                .withCrl(CRL)
+                .withCaCertificate(TEST_IDENTITY_CERT.getCertificate())
+                .withPayloadContent(RESOURCE_CLASS_LIST_QUERY_PAYLOAD);
+        return subject.build(ProvisioningKeyPairGenerator.generate().getPrivate());
+    }
+
+    private static ResourceClassListQueryPayload createResourceListQueryPayload() {
+        ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
+        ResourceClassListQueryPayload payloadXml = payloadBuilder.build();
+        return payloadXml;
     }
 }

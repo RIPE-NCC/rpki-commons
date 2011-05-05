@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilder;
 
@@ -27,7 +28,7 @@ public class ProvisioningCmsObjectValidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        subject = new ProvisioningCmsObjectValidator(ProvisioningCmsObjectBuilderMother.createProvisioningCmsObject(), TEST_IDENTITY_CERT);
+        subject = new ProvisioningCmsObjectValidator(ProvisioningObjectMother.createProvisioningCmsObject(), TEST_IDENTITY_CERT);
     }
 
 

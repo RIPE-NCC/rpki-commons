@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +23,7 @@ public class ProvisioningCmsObjectParserTest {
 
     @Test
     public void shouldParseValidObject() {
-        ProvisioningCmsObject cmsObject = ProvisioningCmsObjectBuilderMother.createProvisioningCmsObject();
+        ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createProvisioningCmsObject();
         subject.parseCms("test-location", cmsObject.getEncoded());
 
         ValidationResult validationResult = subject.getValidationResult();

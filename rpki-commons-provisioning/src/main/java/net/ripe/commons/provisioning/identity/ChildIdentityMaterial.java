@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 public class ChildIdentityMaterial implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private ProvisioningIdentityCertificate childCertificate;
 
     public ChildIdentityMaterial(ProvisioningIdentityCertificate childCertificate) {

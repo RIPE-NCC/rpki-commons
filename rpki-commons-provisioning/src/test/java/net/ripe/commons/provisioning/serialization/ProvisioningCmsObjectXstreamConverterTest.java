@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.certification.client.xml.XStreamXmlSerializerBuilder;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilderMother;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class ProvisioningCmsObjectXstreamConverterTest {
     
     @Test
     public void shouldRoundTrip() {
-        ProvisioningCmsObject cmsObject = ProvisioningCmsObjectBuilderMother.createProvisioningCmsObject();
+        ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createProvisioningCmsObject();
         String xml = serializer.serialize(cmsObject);
         ProvisioningCmsObject deserializedCmsObject = serializer.deserialize(xml);
         assertEquals(cmsObject, deserializedCmsObject);
@@ -36,7 +36,7 @@ public class ProvisioningCmsObjectXstreamConverterTest {
     
     @Test
     public void shouldUseSimpleXml() {
-        ProvisioningCmsObject cmsObject = ProvisioningCmsObjectBuilderMother.createProvisioningCmsObject();
+        ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createProvisioningCmsObject();
         String xml = serializer.serialize(cmsObject);
         
         String expectedRegex = "<ProvisioningCmsObject>\n" +

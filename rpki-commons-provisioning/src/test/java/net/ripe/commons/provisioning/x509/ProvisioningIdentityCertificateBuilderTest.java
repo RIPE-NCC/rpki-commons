@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
+import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 
@@ -20,8 +20,7 @@ public class ProvisioningIdentityCertificateBuilderTest {
     private ProvisioningIdentityCertificateBuilder subject;
 
     public static final X500Principal SELF_SIGNING_DN = new X500Principal("CN=test");
-    public static final URI TEST_CRL_RSYNC_URI = URI.create("rsync://some.host:10873/camanagername/myid/id.crl");
-    public static final URI TEST_SIA_RSYNC_URI = URI.create("rsync://some.host:10873/camanagername/myid/");
+    public static final KeyPair TEST_IDENTITY_KEYPAIR = TEST_KEY_PAIR;
     public static final ProvisioningIdentityCertificate TEST_IDENTITY_CERT = getTestProvisioningIdentityCertificate();
 
     private static ProvisioningIdentityCertificate getTestProvisioningIdentityCertificate() {
@@ -31,7 +30,7 @@ public class ProvisioningIdentityCertificateBuilderTest {
 
     private static ProvisioningIdentityCertificateBuilder getTestBuilder() {
         ProvisioningIdentityCertificateBuilder identityCertificateBuilder = new ProvisioningIdentityCertificateBuilder();
-        identityCertificateBuilder.withSelfSigningKeyPair(TEST_KEY_PAIR);
+        identityCertificateBuilder.withSelfSigningKeyPair(TEST_IDENTITY_KEYPAIR);
         identityCertificateBuilder.withSelfSigningSubject(SELF_SIGNING_DN);
         return identityCertificateBuilder;
     }
