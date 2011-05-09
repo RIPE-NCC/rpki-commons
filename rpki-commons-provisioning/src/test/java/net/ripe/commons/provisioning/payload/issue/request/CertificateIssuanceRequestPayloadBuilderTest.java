@@ -1,45 +1,43 @@
 package net.ripe.commons.provisioning.payload.issue.request;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
+
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRequestElement;
-import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
-import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadBuilder;
-import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializerBuilder;
 import net.ripe.ipresource.IpResourceSet;
+
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.*;
-
 public class CertificateIssuanceRequestPayloadBuilderTest {
 
     private static final XStreamXmlSerializer<CertificateIssuanceRequestPayload> SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
 
-
-    private CertificateIssuanceRequestPayloadBuilder subject;
     private PKCS10CertificationRequest pkcs10Request;
-
-
     private CertificateIssuanceRequestPayload payload;
 
     @Before
     public void given() throws Exception {
-        pkcs10Request = ProvisioningObjectMother.generatePkcs10CertificationRequest(512, "RSA", "SHA1withRSA", "BC");
-        
-        subject = new CertificateIssuanceRequestPayloadBuilder();
-        subject.withClassName("a classname");
-        subject.withAllocatedAsn(IpResourceSet.parse("1234,456"));
-        subject.withIpv4ResourceSet(IpResourceSet.parse("10.0.0.0/8"));
-        subject.withIpv6ResourceSet(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"));
-        subject.withCertificateRequest(pkcs10Request);
-        payload = subject.build();
+        pkcs10Request = ProvisioningObjectMother.RPKI_CA_CERT_REQUEST;
+        payload = createCertificateIssuanceRequestPayloadForPkcs10Request(pkcs10Request);
+    }
+
+    public static CertificateIssuanceRequestPayload createCertificateIssuanceRequestPayloadForPkcs10Request(PKCS10CertificationRequest pkcs10Request) {
+        CertificateIssuanceRequestPayloadBuilder builder = new CertificateIssuanceRequestPayloadBuilder();
+        builder.withClassName("a classname");
+        builder.withAllocatedAsn(IpResourceSet.parse("1234,456"));
+        builder.withIpv4ResourceSet(IpResourceSet.parse("10.0.0.0/8"));
+        builder.withIpv6ResourceSet(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"));
+        builder.withCertificateRequest(pkcs10Request);
+        return builder.build();
     }
     
     @Test

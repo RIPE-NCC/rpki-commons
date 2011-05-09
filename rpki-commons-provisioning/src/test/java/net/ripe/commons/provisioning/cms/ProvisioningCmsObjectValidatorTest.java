@@ -28,7 +28,7 @@ public class ProvisioningCmsObjectValidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        subject = new ProvisioningCmsObjectValidator(ProvisioningObjectMother.createProvisioningCmsObject(), TEST_IDENTITY_CERT);
+        subject = new ProvisioningCmsObjectValidator(ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject(), TEST_IDENTITY_CERT);
     }
 
 

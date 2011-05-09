@@ -19,10 +19,13 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
+import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.PayloadParser;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -39,6 +42,7 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTimeUtils;
 
+
 public class ProvisioningCmsObjectBuilder {
 
     private static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
@@ -54,13 +58,15 @@ public class ProvisioningCmsObjectBuilder {
     private String signatureProvider;
 
     private String payloadContent;
-    
+
     public ProvisioningCmsObjectBuilder withCmsCertificate(X509Certificate cmsCertificate) {
         this.cmsCertificate = cmsCertificate;
         return this;
     }
 
-    public ProvisioningCmsObjectBuilder withCaCertificate(X509Certificate... caCertificates) { //NOPMD - ArrayIsStoredDirectly
+    public ProvisioningCmsObjectBuilder withCaCertificate(X509Certificate... caCertificates) { // NOPMD
+                                                                                               // -
+                                                                                               // ArrayIsStoredDirectly
         this.caCertificates = caCertificates;
         return this;
     }
@@ -88,6 +94,17 @@ public class ProvisioningCmsObjectBuilder {
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("<generated>", generateCms(privateKey, getMessageContent()));
+
+        ValidationResult validationResult = parser.getValidationResult();
+        if (validationResult.hasFailures()) {
+            List<String> failureMessages = new ArrayList<String>();
+            List<ValidationCheck> failures = validationResult.getFailures("<generated>");
+            for (ValidationCheck check : failures) {
+                failureMessages.add(check.getKey());
+            }
+            Validate.isTrue(false, "Validation of generated CMS object failed with following errors: " + StringUtils.join(failureMessages, ","));
+        }
+
         return parser.getProvisioningCmsObject();
     }
 
@@ -111,10 +128,12 @@ public class ProvisioningCmsObjectBuilder {
         }
     }
 
-    private byte[] doGenerate(PrivateKey privateKey, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
+    private byte[] doGenerate(PrivateKey privateKey, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException,
+            NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         addCertificateAndCrl(generator);
-        generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
+        generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(),
+                null);
 
         byte[] content = encode(encodableContent);
         CMSSignedData data = generator.generate(CONTENT_TYPE, new CMSProcessableByteArray(content), true, signatureProvider);
@@ -122,7 +141,8 @@ public class ProvisioningCmsObjectBuilder {
         return data.getEncoded();
     }
 
-    private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException {
+    private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException,
+            CertStoreException, CMSException {
         List<X509Extension> signedObjects = new ArrayList<X509Extension>();
         signedObjects.add(cmsCertificate);
         if (caCertificates != null) {
@@ -136,7 +156,9 @@ public class ProvisioningCmsObjectBuilder {
     }
 
     private AttributeTable createSignedAttributes() {
-        Hashtable<DERObjectIdentifier, Attribute> attributes = new Hashtable<DERObjectIdentifier, Attribute>(); //NOPMD - ReplaceHashtableWithMap
+        Hashtable<DERObjectIdentifier, Attribute> attributes = new Hashtable<DERObjectIdentifier, Attribute>(); // NOPMD
+                                                                                                                // -
+                                                                                                                // ReplaceHashtableWithMap
         Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));
         attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
         return new AttributeTable(attributes);

@@ -9,10 +9,11 @@ import java.net.URI;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.cms.RpkiSignedObjectEeCertificateBuilder;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
+import net.ripe.commons.certification.x509cert.RpkiSignedObjectEeCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
+import net.ripe.ipresource.InheritedIpResourceSet;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -37,15 +38,14 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         X509ResourceCertificate resourceCertificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
         
         URI crlUri = URI.create("rsync://somewhere/certificate.crl");
-        subject.withCrlPublicationUri(crlUri);
+        subject.withCrlUri(crlUri);
 
         URI manifestUri = URI.create("rsync://somewhere/certificate.mft");
         subject.withCorrespondingCmsPublicationPoint(manifestUri);
 
-        subject.withParentKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
-        subject.withEeKeyPair(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR);
+        subject.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
+        subject.withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic());
         
-        subject.withParentResourceCertificate(resourceCertificate);
         
         DateTime now = new DateTime();
         ValidityPeriod vp = new ValidityPeriod(now, now.plusSeconds(5));
@@ -54,12 +54,15 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
 
         URI publicationUri = URI.create("rsync://somewhere/certificate.cer");
         subject.withParentResourceCertificatePublicationUri(publicationUri);
-        subject.withSerialNumber(BigInteger.TEN);
+        subject.withSerial(BigInteger.TEN);
         
-        subject.withSubject(new X500Principal("CN=subject"));
+        subject.withSubjectDN(new X500Principal("CN=subject"));
+        subject.withIssuerDN(resourceCertificate.getSubject());
         
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         subject.withSignatureAlgorithm(DEFAULT_SIGNATURE_ALGORITHM);
+        
+        subject.withResources(InheritedIpResourceSet.getInstance());
 
         // when
         X509ResourceCertificate certificate = subject.build();
@@ -76,7 +79,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
     public void shouldNotBuildWithoutSerialNumber() {
         // given
         createValidEeBuilder();
-        subject.withSerialNumber(null);
+        subject.withSerial(null);
 
         // when
         buildOrFail();
@@ -102,19 +105,19 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotBuildWithoutParentResourceCertificate() {
+    public void shouldNotBuildWithoutIssuer() {
         // given
         createValidEeBuilder();
-        subject.withParentResourceCertificate(null);
+        subject.withIssuerDN(null);
 
         buildOrFail();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotBuildWithoutParentKeyPair() {
+    public void shouldNotBuildWithoutSigningKeyPair() {
         // given
         createValidEeBuilder();
-        subject.withParentKeyPair(null);
+        subject.withSigningKeyPair(null);
 
         buildOrFail();
     }
@@ -132,7 +135,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
     public void shouldNotBuildWithoutCrlPublicationUri() {
         // given
         createValidEeBuilder();
-        subject.withCrlPublicationUri(null);
+        subject.withCrlUri(null);
 
         buildOrFail();
     }
@@ -148,13 +151,13 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
     private void createValidEeBuilder() {
         X509ResourceCertificate resourceCertificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
         URI crlUri = URI.create("rsync://somewhere/certificate.crl");
-        subject.withCrlPublicationUri(crlUri);
+        subject.withCrlUri(crlUri);
 
         URI manifestUri = URI.create("rsync://somewhere/certificate.mft");
         subject.withCorrespondingCmsPublicationPoint(manifestUri);
 
-        subject.withParentKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
-        subject.withParentResourceCertificate(resourceCertificate);
+        subject.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
+        subject.withIssuerDN(resourceCertificate.getSubject());
         
         DateTime now = new DateTime();
         subject.withValidityPeriod(new ValidityPeriod(now, now.plusSeconds(5)));
@@ -162,7 +165,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         URI publicationUri = URI.create("rsync://somewhere/certificate.cer");
         subject.withParentResourceCertificatePublicationUri(publicationUri);
 
-        subject.withSerialNumber(BigInteger.TEN);
+        subject.withSerial(BigInteger.TEN);
     }
 
 }

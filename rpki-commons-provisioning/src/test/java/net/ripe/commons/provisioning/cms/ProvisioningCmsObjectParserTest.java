@@ -23,7 +23,7 @@ public class ProvisioningCmsObjectParserTest {
 
     @Test
     public void shouldParseValidObject() {
-        ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createProvisioningCmsObject();
+        ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject();
         subject.parseCms("test-location", cmsObject.getEncoded());
 
         ValidationResult validationResult = subject.getValidationResult();

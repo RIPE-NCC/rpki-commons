@@ -8,7 +8,6 @@ import java.security.PublicKey;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.cms.RpkiSignedObjectEeCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;
 
 import org.apache.commons.lang.Validate;
