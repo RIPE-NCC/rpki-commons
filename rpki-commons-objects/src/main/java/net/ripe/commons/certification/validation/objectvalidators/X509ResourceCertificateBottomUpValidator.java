@@ -63,7 +63,10 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
         checkTrustAnchor();
 
         X509ResourceCertificate parent = certificates.get(0).getCertificate();
+        certificates.remove(0); // No need to validate the root (1st parent) certificate against itself
+        
         IpResourceSet resources = parent.getResources();
+        
         for (CertificateWithLocation certificateWithLocation : certificates) {
         	String childLocation = certificateWithLocation.getLocation();
         	X509ResourceCertificate child = certificateWithLocation.getCertificate();
