@@ -31,6 +31,10 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     public ManifestCmsBuilder() {
     }
 
+    /**
+     * This is exposed for Unit Test Support only!
+     * @deprecated
+     */
     public ManifestCmsBuilder putFile(String fileName, byte[] hash) {
         files.put(fileName, hash);
         return this;

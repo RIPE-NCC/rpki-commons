@@ -51,8 +51,13 @@ public class ProvisioningCmsObject {
     }
 
     /**
-     * TODO: Remove!
-     * @deprecated
+     * <p>
+     * ProvisioningCMSObjects may optionally contain a number of CA certificates.
+     * As far as we know, no implementation is using this though. It is provided here
+     * for completeness but in all likelihood not needed.
+     * </p>
+     * Note: the validator expects to be given the direct (trusted) parent CA certificate
+     * to the EE certificate used to sign the CMS.
      */
     public Collection<X509Certificate> getCaCertificates() {
         return caCertificates;

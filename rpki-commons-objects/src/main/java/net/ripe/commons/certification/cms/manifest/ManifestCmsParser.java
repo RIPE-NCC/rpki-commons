@@ -94,7 +94,6 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
             }
             version = ManifestCms.DEFAULT_VERSION;
             number = expect(seq.getObjectAt(MANIFEST_NUMBER_INDEX), DERInteger.class).getValue();
-            // TODO use time zone from date.
             thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), DERGeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
             nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), DERGeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
             fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), DERObjectIdentifier.class).getId();
