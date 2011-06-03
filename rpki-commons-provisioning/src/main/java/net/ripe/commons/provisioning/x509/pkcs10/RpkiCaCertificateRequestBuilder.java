@@ -8,15 +8,10 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
 
@@ -35,30 +30,37 @@ public class RpkiCaCertificateRequestBuilder {
 
     private String signatureProvider = "SunRsaSign";
 
-    public void withSubject(X500Principal subject) {
+    public RpkiCaCertificateRequestBuilder withSubject(X500Principal subject) {
         this.subject = subject;
+        return this;
     }
 
-    public void withCaRepositoryUri(URI caRepositoryUri) {
+    public RpkiCaCertificateRequestBuilder withCaRepositoryUri(URI caRepositoryUri) {
         this.caRepositoryUri = caRepositoryUri;
+        return this;
     }
 
-    public void withManifestUri(URI manifestUri) {
+    public RpkiCaCertificateRequestBuilder withManifestUri(URI manifestUri) {
         this.manifestUri = manifestUri;
+        return this;
     }
 
     /**
      * Default: SunRsaSign
+     * @return 
      */
-    public void withSignatureProvider(String signatureProvider) {
+    public RpkiCaCertificateRequestBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
+        return this;
     }
 
     /**
      * Default: SHA256withRSA
+     * @return 
      */
-    public void withSignatureAlgorithm(String signatureAlgorithm) {
+    public RpkiCaCertificateRequestBuilder withSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
+        return this;
     }
 
     public PKCS10CertificationRequest build(KeyPair keyPair) {
