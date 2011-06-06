@@ -13,7 +13,7 @@ public final class ValidationString {
 
     // generic
     public static final String OBJECTS_CRL_VALID = "objects.crl.valid";
-    public static final String UNKNOWN_OBJECT_TYPE = "unknown.object.type";
+    public static final String KNOWN_OBJECT_TYPE = "known.object.type";
 
     //certificate (validator)
     public static final String CERT_CHAIN_LENGTH = "cert.chain.length";
