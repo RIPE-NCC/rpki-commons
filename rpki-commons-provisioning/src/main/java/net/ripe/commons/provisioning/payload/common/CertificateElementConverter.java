@@ -10,9 +10,7 @@ import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
-import com.thoughtworks.xstream.converters.Converter;
-import com.thoughtworks.xstream.converters.MarshallingContext;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.converters.*;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
@@ -60,6 +58,7 @@ public class CertificateElementConverter implements Converter {
         Validate.notNull(uriString, CERT_URL + " attribute is required");
         
         List<URI> uris = new ArrayList<URI>();
+        // FIXME we currently have a bug here on the split (CA name contains comma)
         for (String uri :uriString.split(",")) {
             uris.add(URI.create(uri));
         }
