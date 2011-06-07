@@ -4,13 +4,14 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 @XStreamConverter(CertificateElementConverter.class)
 public class CertificateElement {
@@ -86,11 +87,22 @@ public class CertificateElement {
     public X509ResourceCertificate getCertificate() {
         return certificate;
     }
+
+    public void setAllocatedAsn(IpResourceSet allocatedAsn) {
+        this.allocatedAsn = allocatedAsn;
+    }
+
+    public void setAllocatedIpv4(IpResourceSet allocatedIpv4) {
+        this.allocatedIpv4 = allocatedIpv4;
+    }
+
+    public void setAllocatedIpv6(IpResourceSet allocatedIpv6) {
+        this.allocatedIpv6 = allocatedIpv6;
+    }
     
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
-
 
 }

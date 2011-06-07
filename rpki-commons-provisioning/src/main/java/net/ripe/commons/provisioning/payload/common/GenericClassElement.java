@@ -5,11 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.provisioning.serialization.CertificateUrlListConverter;
+import net.ripe.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
 
@@ -27,19 +28,23 @@ public class GenericClassElement {
 
     @XStreamAlias("cert_url")
     @XStreamAsAttribute
-    private String certificateAuthorityUri;
+    @XStreamConverter(CertificateUrlListConverter.class)
+    private List<URI> certificateAuthorityUri;
 
     @XStreamAlias("resource_set_as")
     @XStreamAsAttribute
-    private String resourceSetAsNumbers = "";
+    @XStreamConverter(IpResourceSetProvisioningConverter.class)
+    private IpResourceSet resourceSetAsNumbers = new IpResourceSet();
 
     @XStreamAlias("resource_set_ipv4")
     @XStreamAsAttribute
-    private String ipv4ResourceSet = "";
+    @XStreamConverter(IpResourceSetProvisioningConverter.class)
+    private IpResourceSet ipv4ResourceSet = new IpResourceSet();
 
     @XStreamAlias("resource_set_ipv6")
     @XStreamAsAttribute
-    private String ipv6ResourceSet = "";
+    @XStreamConverter(IpResourceSetProvisioningConverter.class)
+    private IpResourceSet ipv6ResourceSet = new IpResourceSet();
 
     @XStreamAlias("certificate")
     @XStreamImplicit(itemFieldName = "certificate")
@@ -81,24 +86,24 @@ public class GenericClassElement {
         this.className = className;
     }
 
-    public String[] getCertificateAuthorityUri() {
-        return certificateAuthorityUri == null ? null : certificateAuthorityUri.split(",");
+    public List<URI> getCertificateAuthorityUri() {
+        return certificateAuthorityUri;
     }
 
     public void setCertUris(List<URI> certUris) {
-        this.certificateAuthorityUri = StringUtils.join(certUris, ",");
+        this.certificateAuthorityUri = certUris;
     }
 
     public IpResourceSet getResourceSetAsNumbers() {
-        return resourceSetAsNumbers == null ? null : IpResourceSet.parse(resourceSetAsNumbers);
+        return resourceSetAsNumbers;
     }
 
     public IpResourceSet getIpv4ResourceSet() {
-        return ipv4ResourceSet == null ? null : IpResourceSet.parse(ipv4ResourceSet);
+        return ipv4ResourceSet;
     }
 
     public IpResourceSet getIpv6ResourceSet() {
-        return ipv6ResourceSet == null ? null : IpResourceSet.parse(ipv6ResourceSet);
+        return ipv6ResourceSet;
     }
 
     public void setIpResourceSet(IpResourceSet ipResourceSet) {
@@ -119,20 +124,9 @@ public class GenericClassElement {
             }
         }
 
-        if (!asns.isEmpty()) {
-            String asnString = asns.toString();
-            asnString = StringUtils.replaceChars(asnString, "AS", "");
-            asnString = StringUtils.replaceChars(asnString, " ", "");
-            resourceSetAsNumbers = asnString;
-        }
-        if (!ipv4.isEmpty()) {
-            String ipv4String = ipv4.toString();
-            ipv4ResourceSet = StringUtils.replaceChars(ipv4String, " ", "");
-        }
-        if (!ipv6.isEmpty()) {
-            String ipv6String = ipv6.toString();
-            ipv6ResourceSet = StringUtils.replaceChars(ipv6String, " ", "");
-        }
+        resourceSetAsNumbers = asns;
+        ipv4ResourceSet = ipv4;
+        ipv6ResourceSet = ipv6;
     }
 
 

@@ -1,17 +1,6 @@
 package net.ripe.commons.provisioning.payload.list.response;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.commons.provisioning.payload.common.CertificateElement;
-import net.ripe.commons.provisioning.payload.common.CertificateElementBuilder;
-import net.ripe.commons.provisioning.payload.common.GenericClassElementBuilder;
-import net.ripe.ipresource.IpResourceSet;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,7 +9,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
+import net.ripe.commons.provisioning.payload.common.CertificateElement;
+import net.ripe.commons.provisioning.payload.common.CertificateElementBuilder;
+import net.ripe.commons.provisioning.payload.common.GenericClassElementBuilder;
+import net.ripe.ipresource.IpResourceSet;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 public class ResourceClassListResponsePayloadBuilderTest {
 
@@ -64,7 +65,7 @@ public class ResourceClassListResponsePayloadBuilderTest {
         assertEquals("recipient", payload.getRecipient());
 
         ResourceClassListResponseClassElement firstClassElement = payload.getClassElements().get(0);
-        assertEquals("http://some/other", firstClassElement.getCertificateAuthorityUri()[1]);
+        assertEquals(URI.create("http://some/other"), firstClassElement.getCertificateAuthorityUri().get(1));
         assertEquals("a classname", firstClassElement.getClassName());
         assertEquals(IpResourceSet.parse("192.168.0.0/24"), firstClassElement.getIpv4ResourceSet());
 
