@@ -2,6 +2,7 @@ package net.ripe.commons.provisioning.protocol;
 
 public enum ResponseExceptionType {
     BAD_DATA(400 /*HttpServletResponse.SC_BAD_REQUEST*/, "Could not validate client's request"),
+    UNKNOWN_PROVISIONING_URL(400, "Provisioning URL not recognized"),
 
     THROTTLING(503 /*HttpServletResponse.SC_SERVICE_UNAVAILABLE*/, "The server cannot handle your request at this time");
 
