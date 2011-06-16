@@ -67,10 +67,10 @@ public class ResourceClassListResponsePayloadBuilderTest {
         ResourceClassListResponseClassElement firstClassElement = payload.getClassElements().get(0);
         assertEquals(URI.create("http://some/other"), firstClassElement.getCertificateAuthorityUri().get(1));
         assertEquals("a classname", firstClassElement.getClassName());
-        assertEquals(IpResourceSet.parse("192.168.0.0/24"), firstClassElement.getIpv4ResourceSet());
+        assertEquals(IpResourceSet.parse("192.168.0.0/24"), firstClassElement.getResourceSetIpv4());
 
 
-        assertEquals(IpResourceSet.parse("2001:db8::/48,2001:0DB8:002::-2001:0DB8:005::"), firstClassElement.getIpv6ResourceSet());
+        assertEquals(IpResourceSet.parse("2001:db8::/48,2001:0DB8:002::-2001:0DB8:005::"), firstClassElement.getResourceSetIpv6());
 
         assertEquals(validityNotAfter, firstClassElement.getValidityNotAfter());
         assertEquals("rsync://some/where", firstClassElement.getSiaHeadUri());

@@ -9,7 +9,6 @@ import net.ripe.commons.provisioning.serialization.CertificateUrlListConverter;
 import net.ripe.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
@@ -34,17 +33,17 @@ public class GenericClassElement {
     @XStreamAlias("resource_set_as")
     @XStreamAsAttribute
     @XStreamConverter(IpResourceSetProvisioningConverter.class)
-    private IpResourceSet resourceSetAsNumbers = new IpResourceSet();
+    private IpResourceSet resourceSetAs = new IpResourceSet();
 
     @XStreamAlias("resource_set_ipv4")
     @XStreamAsAttribute
     @XStreamConverter(IpResourceSetProvisioningConverter.class)
-    private IpResourceSet ipv4ResourceSet = new IpResourceSet();
+    private IpResourceSet resourceSetIpv4 = new IpResourceSet();
 
     @XStreamAlias("resource_set_ipv6")
     @XStreamAsAttribute
     @XStreamConverter(IpResourceSetProvisioningConverter.class)
-    private IpResourceSet ipv6ResourceSet = new IpResourceSet();
+    private IpResourceSet resourceSetIpv6 = new IpResourceSet();
 
     @XStreamAlias("certificate")
     @XStreamImplicit(itemFieldName = "certificate")
@@ -94,16 +93,16 @@ public class GenericClassElement {
         this.certificateAuthorityUri = certUris;
     }
 
-    public IpResourceSet getResourceSetAsNumbers() {
-        return resourceSetAsNumbers;
+    public IpResourceSet getResourceSetAsn() {
+        return resourceSetAs;
     }
 
-    public IpResourceSet getIpv4ResourceSet() {
-        return ipv4ResourceSet;
+    public IpResourceSet getResourceSetIpv4() {
+        return resourceSetIpv4;
     }
 
-    public IpResourceSet getIpv6ResourceSet() {
-        return ipv6ResourceSet;
+    public IpResourceSet getResourceSetIpv6() {
+        return resourceSetIpv6;
     }
 
     public void setIpResourceSet(IpResourceSet ipResourceSet) {
@@ -114,19 +113,22 @@ public class GenericClassElement {
         Iterator<IpResource> iterator = ipResourceSet.iterator();
         while (iterator.hasNext()) {
             IpResource resource = iterator.next();
-            IpResourceType type = resource.getType();
-            if (type.equals(IpResourceType.ASN)) {
+            switch (resource.getType()) {
+            case ASN:
                 asns.add(resource);
-            } else if (type.equals(IpResourceType.IPv4)) {
+                break;
+            case IPv4:
                 ipv4.add(resource);
-            } else if (type.equals(IpResourceType.IPv6)) {
+                break;
+            case IPv6:
                 ipv6.add(resource);
+                break;
             }
         }
 
-        resourceSetAsNumbers = asns;
-        ipv4ResourceSet = ipv4;
-        ipv6ResourceSet = ipv6;
+        resourceSetAs = asns;
+        resourceSetIpv4 = ipv4;
+        resourceSetIpv6 = ipv6;
     }
 
 
@@ -152,3 +154,4 @@ public class GenericClassElement {
     }
 
 }
+
