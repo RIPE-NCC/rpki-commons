@@ -2,6 +2,7 @@ package net.ripe.commons.certification.cms.manifest;
 
 import static net.ripe.commons.certification.Asn1Util.*;
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -13,8 +14,8 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 
@@ -22,6 +23,7 @@ import org.bouncycastle.asn1.DERTags;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -116,6 +118,11 @@ public class ManifestCmsParserTest {
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
 
         parser.parse("test", builder.build(TEST_KEY_PAIR.getPrivate()).getEncoded());
+    }
+
+    @After
+    public void tearDown() {
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
