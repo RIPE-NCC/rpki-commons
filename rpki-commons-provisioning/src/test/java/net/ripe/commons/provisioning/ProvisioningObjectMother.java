@@ -1,8 +1,7 @@
 package net.ripe.commons.provisioning;
 
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -33,6 +32,7 @@ import org.joda.time.DateTime;
 public class ProvisioningObjectMother {
 
     public static final KeyPair TEST_KEY_PAIR = ProvisioningKeyPairGenerator.generate();
+    public static final KeyPair TEST_KEY_PAIR_2 = ProvisioningKeyPairGenerator.generate();
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
     public static KeyPair SECOND_TEST_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
 
@@ -82,7 +82,7 @@ public class ProvisioningObjectMother {
     public static ProvisioningCmsObject createResourceCertificateSignRequestProvisioningCmsObject() {
         return createCmsForQueryPayload(RPKI_CA_CERT_REQUEST_PAYLOAD);
     }
-
+    
     private static ProvisioningCmsObject createCmsForQueryPayload(AbstractProvisioningPayload payloadXml) {
         ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder()
                 .withCmsCertificate(TEST_CMS_CERT.getCertificate())

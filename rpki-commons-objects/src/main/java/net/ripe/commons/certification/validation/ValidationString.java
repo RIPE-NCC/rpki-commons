@@ -97,6 +97,7 @@ public final class ValidationString {
     // provisioning CMS payload
     public static final String VALID_PAYLOAD_TYPE = "provisioning.valid.payloadtype";
     public static final String FOUND_PAYLOAD_TYPE = "provisioning.found.payloadtype";
+    public static final String VALID_PAYLOAD_VERSION = "provisioning.valid.payloadversion";
 
     //roacms
     public static final String ROA_CONTENT_TYPE = "roa.content.type";

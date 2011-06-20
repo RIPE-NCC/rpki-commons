@@ -1,10 +1,7 @@
 package net.ripe.commons.provisioning.x509;
 
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.TEST_KEY_PAIR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
+import static org.junit.Assert.*;
 
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
@@ -21,16 +18,22 @@ public class ProvisioningIdentityCertificateBuilderTest {
 
     public static final X500Principal SELF_SIGNING_DN = new X500Principal("CN=test");
     public static final KeyPair TEST_IDENTITY_KEYPAIR = TEST_KEY_PAIR;
+    public static final KeyPair TEST_IDENTITY_KEYPAIR_2 = TEST_KEY_PAIR_2;
     public static final ProvisioningIdentityCertificate TEST_IDENTITY_CERT = getTestProvisioningIdentityCertificate();
+    public static final ProvisioningIdentityCertificate TEST_IDENTITY_CERT_2 = getProvisioningIdentityCertificateForKey2();
 
     private static ProvisioningIdentityCertificate getTestProvisioningIdentityCertificate() {
-        ProvisioningIdentityCertificateBuilder identityCertificateBuilder = getTestBuilder();
-        return identityCertificateBuilder.build();
+        return getTestBuilder(TEST_IDENTITY_KEYPAIR).build();
+    
+    }
+    
+    private static ProvisioningIdentityCertificate getProvisioningIdentityCertificateForKey2() {
+        return getTestBuilder(TEST_IDENTITY_KEYPAIR_2).build();
     }
 
-    private static ProvisioningIdentityCertificateBuilder getTestBuilder() {
+    private static ProvisioningIdentityCertificateBuilder getTestBuilder(KeyPair keyPair) {
         ProvisioningIdentityCertificateBuilder identityCertificateBuilder = new ProvisioningIdentityCertificateBuilder();
-        identityCertificateBuilder.withSelfSigningKeyPair(TEST_IDENTITY_KEYPAIR);
+        identityCertificateBuilder.withSelfSigningKeyPair(keyPair);
         identityCertificateBuilder.withSelfSigningSubject(SELF_SIGNING_DN);
         return identityCertificateBuilder;
     }
@@ -40,7 +43,7 @@ public class ProvisioningIdentityCertificateBuilderTest {
     public void setUp() {
         // Create a builder with all requirements so that we can exclude (nullify) each
         // requirement for easy unit testing of the builder
-        subject = getTestBuilder();
+        subject = getTestBuilder(TEST_IDENTITY_KEYPAIR);
     }
 
     @Test

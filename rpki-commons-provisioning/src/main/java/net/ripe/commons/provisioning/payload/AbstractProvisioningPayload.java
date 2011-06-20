@@ -7,7 +7,7 @@ public abstract class AbstractProvisioningPayload {
     public static final String DEFAULT_SENDER = "sender";
     public static final String DEFAULT_RECIPIENT = "recipient";
 
-    private static final Integer SUPPORTED_VERSION = 1;
+    public static final Integer SUPPORTED_VERSION = 1;
 
     @XStreamAsAttribute
     private Integer version;
