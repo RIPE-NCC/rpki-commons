@@ -1,6 +1,7 @@
 package net.ripe.commons.provisioning.payload.list.response;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.ripe.commons.provisioning.payload.AbstractProvisioningResponsePayload;
@@ -23,7 +24,7 @@ public class ResourceClassListResponsePayload extends AbstractProvisioningRespon
     }
 
     public List<ResourceClassListResponseClassElement> getClassElements() {
-        return classElements;
+        return classElements != null ? classElements : Collections.<ResourceClassListResponseClassElement>emptyList();
     }
 
     @Override
