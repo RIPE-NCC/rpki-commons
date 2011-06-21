@@ -47,13 +47,13 @@ public class ResourceClassListResponsePayloadBuilderTest {
                 .withIpResourceSet(IpResourceSet.parse("1234,456,192.168.0.0/24,2001:db8::/48,2001:0DB8:002::-2001:0DB8:005::"))
                 .withValidityNotAfter(validityNotAfter)
                 .withSiaHeadUri("rsync://some/where")
-                .withCertificateElements(certificateElement)
+                .withCertificateElements(Arrays.asList(certificateElement))
                 .withIssuer(ProvisioningObjectMother.X509_CA);
 
         builder.addClassElement(classElementBuilder.buildResourceClassListResponseClassElement());
 
         classElementBuilder.withClassName("class2");
-        classElementBuilder.withCertificateElements(certificateElement, certificateElement);
+        classElementBuilder.withCertificateElements(Arrays.asList(certificateElement, certificateElement));
         builder.addClassElement(classElementBuilder.buildResourceClassListResponseClassElement());
 
         payload = builder.build();

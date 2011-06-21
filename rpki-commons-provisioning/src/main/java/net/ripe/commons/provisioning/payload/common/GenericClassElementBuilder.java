@@ -1,7 +1,6 @@
 package net.ripe.commons.provisioning.payload.common;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
@@ -49,8 +48,8 @@ public class GenericClassElementBuilder {
         return this;
     }
 
-    public GenericClassElementBuilder withCertificateElements(CertificateElement... certificateElements) {
-        this.certificateElements = Arrays.asList(certificateElements);
+    public GenericClassElementBuilder withCertificateElements(List<CertificateElement> certificateElements) {
+        this.certificateElements = certificateElements;
         return this;
     }
 

@@ -48,7 +48,7 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
 
         GenericClassElementBuilder classElementBuilder = new GenericClassElementBuilder().withClassName("a classname")
                 .withCertificateAuthorityUri(certUris).withIpResourceSet(IpResourceSet.parse("1234,456,192.168.0.0/24,2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"))
-                .withValidityNotAfter(validityNotAfter).withSiaHeadUri("rsync://some/where").withCertificateElements(certificateElement)
+                .withValidityNotAfter(validityNotAfter).withSiaHeadUri("rsync://some/where").withCertificateElements(Arrays.asList(certificateElement))
                 .withIssuer(ProvisioningObjectMother.X509_CA);
 
         builder = new CertificateIssuanceResponsePayloadBuilder();
