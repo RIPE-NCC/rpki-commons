@@ -1,9 +1,5 @@
 package net.ripe.commons.provisioning.payload.revocation;
 
-import java.security.PublicKey;
-
-import net.ripe.commons.certification.util.KeyPairUtil;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -18,9 +14,9 @@ public class CertificateRevocationKeyElement {
     @XStreamAsAttribute
     private String publicKeyHash;
 
-    public CertificateRevocationKeyElement(String className, PublicKey publicKey) {
+    public CertificateRevocationKeyElement(String className, String publicKeyHash) {
         this.className = className;
-        this.publicKeyHash = KeyPairUtil.getEncodedKeyIdentifier(publicKey);
+        this.publicKeyHash = publicKeyHash;
     }
 
     public String getClassName() {
