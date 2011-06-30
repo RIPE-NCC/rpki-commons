@@ -2,7 +2,6 @@ package net.ripe.commons.certification.cms.manifest;
 
 import static net.ripe.commons.certification.Asn1Util.*;
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
@@ -105,7 +104,8 @@ public class ManifestCmsParserTest {
 	    return builder.build();
 	}
 
-	@Before
+	@SuppressWarnings("deprecation")
+    @Before
     public void setUp() {
         parser = new ManifestCmsParser();
 
@@ -162,6 +162,7 @@ public class ManifestCmsParserTest {
     	assertEquals(NEXT_UPDATE_TIME, manifest.getNextUpdateTime());
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=IllegalArgumentException.class)
     public void shouldRejectManifestWithNonInheritEECert() {
         DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());

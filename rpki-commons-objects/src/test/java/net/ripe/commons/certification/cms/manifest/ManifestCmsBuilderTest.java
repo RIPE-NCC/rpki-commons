@@ -34,6 +34,7 @@ public class ManifestCmsBuilderTest {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Test
     public void shouldTrackFilenameAndHash() {
         byte[] hash = { 1, 2, 3, 4 };
@@ -75,6 +76,7 @@ public class ManifestCmsBuilderTest {
         assertEncoded(ENCODED_EMPTY_FILE_LIST, subject.encodeFileList());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void shouldEncodeFileList() {
         subject.putFile("foo1", HASH_1);
@@ -82,6 +84,7 @@ public class ManifestCmsBuilderTest {
         assertEncoded(ENCODED_FILE_LIST, subject.encodeFileList());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void shouldEncodeManifest() {
         subject.putFile("foo1", HASH_1);

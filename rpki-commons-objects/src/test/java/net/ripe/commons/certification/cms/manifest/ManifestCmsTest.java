@@ -175,7 +175,8 @@ public class ManifestCmsTest{
 		return builder;
 	}
 
-	private static ManifestCmsBuilder getRootManifestBuilder() {
+	@SuppressWarnings("deprecation")
+    private static ManifestCmsBuilder getRootManifestBuilder() {
 		ManifestCmsBuilder builder = new ManifestCmsBuilder();
 		builder.withCertificate(getManifestEEResourceCertificateBuilder().build());
 		builder.withManifestNumber(BigInteger.valueOf(68));

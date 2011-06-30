@@ -14,19 +14,19 @@ import org.apache.commons.lang.Validate;
 
 public abstract class GenericRpkiCertificateBuilder {
 
-    protected PublicKey publicKey;
-    protected KeyPair signingKeyPair;
-    protected BigInteger serial;
-    protected IpResourceSet resources;
-    protected X500Principal subject;
-    protected X500Principal issuer;
-    protected ValidityPeriod validityPeriod;
+    private PublicKey publicKey;
+    private KeyPair signingKeyPair;
+    private BigInteger serial;
+    private IpResourceSet resources;
+    private X500Principal subject;
+    private X500Principal issuer;
+    private ValidityPeriod validityPeriod;
     
-    protected URI crlUri;
-    protected URI parentResourceCertificatePublicationUri;
+    private URI crlUri;
+    private URI parentResourceCertificatePublicationUri;
     
-    protected String signatureAlgorithm = "SHA256withRSA"; 
-    protected String signatureProvider = "SunRsaSign";
+    private String signatureAlgorithm = "SHA256withRSA"; 
+    private String signatureProvider = "SunRsaSign";
     
     public void withPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;

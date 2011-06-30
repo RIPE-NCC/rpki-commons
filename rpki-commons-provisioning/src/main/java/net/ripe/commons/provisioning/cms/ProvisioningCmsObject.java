@@ -95,9 +95,9 @@ public class ProvisioningCmsObject {
             }
             throw new IllegalArgumentException("Malformed encoded cms content");
         } catch (CMSException e) {
-            throw new IllegalArgumentException("Malformed encoded cms content");
+            throw new IllegalArgumentException("Malformed encoded cms content", e);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Malformed encoded cms content");
+            throw new IllegalArgumentException("Malformed encoded cms content", e);
         }
     }
 

@@ -4,6 +4,7 @@ import net.ripe.ipresource.IpResourceSet;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
+
 public class IpResourceSetProvisioningConverter extends AbstractSingleValueConverter {
 
     public static final IpResourceSetProvisioningConverter INSTANCE = new IpResourceSetProvisioningConverter();
@@ -20,8 +21,9 @@ public class IpResourceSetProvisioningConverter extends AbstractSingleValueConve
 
     @Override
     public String toString(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return null;
+        }
         return obj.toString().replace(" ", "").replace("AS", "");
     }
 }

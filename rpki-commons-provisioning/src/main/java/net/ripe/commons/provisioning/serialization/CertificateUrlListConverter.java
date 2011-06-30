@@ -29,8 +29,9 @@ public class CertificateUrlListConverter extends AbstractSingleValueConverter {
     @SuppressWarnings("unchecked")
     @Override
     public String toString(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return null;
+        }
         List<String> encodedUrls = new ArrayList<String>();
         for (URI uri: (List<URI>) obj) {
             encodedUrls.add(uri.toString().replace(",", "%2C"));
