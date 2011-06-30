@@ -1,6 +1,21 @@
 package net.ripe.commons.provisioning.cms;
 
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
+import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
+import static org.bouncycastle.cms.CMSSignedGenerator.*;
+import static org.junit.Assert.*;
+
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 
@@ -23,22 +38,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.security.cert.CertStore;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
-import static org.bouncycastle.cms.CMSSignedGenerator.DIGEST_SHA256;
-import static org.bouncycastle.cms.CMSSignedGenerator.ENCRYPTION_RSA;
-import static org.junit.Assert.*;
 
 public class ProvisioningCmsObjectBuilderTest {
 
@@ -63,6 +62,16 @@ public class ProvisioningCmsObjectBuilderTest {
         DateTimeUtils.setCurrentMillisFixed(signingTime);
         cmsObject = subject.build(EE_KEYPAIR.getPrivate());
         DateTimeUtils.setCurrentMillisSystem();
+    }
+    
+    public static ProvisioningCmsObject createProvisioningCmsObjectForPayload(AbstractProvisioningPayload payload) {
+        ProvisioningCmsObjectBuilder  builder = new ProvisioningCmsObjectBuilder();
+        builder.withCmsCertificate(TEST_CMS_CERT.getCertificate());
+        builder.withCrl(CRL);
+        builder.withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
+        builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+        builder.withPayloadContent(payload);
+        return builder.build(EE_KEYPAIR.getPrivate());
     }
 
 

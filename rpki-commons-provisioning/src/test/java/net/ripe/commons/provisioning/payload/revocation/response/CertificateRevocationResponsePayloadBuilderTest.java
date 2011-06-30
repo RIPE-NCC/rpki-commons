@@ -1,54 +1,47 @@
 package net.ripe.commons.provisioning.payload.revocation.response;
 
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
+
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.certification.util.KeyPairUtil;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
-import net.ripe.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayload;
-import net.ripe.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadBuilder;
-import net.ripe.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadSerializerBuilder;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class CertificateRevocationResponsePayloadBuilderTest {
 
     private static final XStreamXmlSerializer<CertificateRevocationResponsePayload> SERIALIZER = new CertificateRevocationResponsePayloadSerializerBuilder().build();
 
-    private CertificateRevocationResponsePayloadBuilder builder;
+    public static final CertificateRevocationResponsePayload TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD = createCertificateRevocationResponsePayload();
 
-    private CertificateRevocationResponsePayload payload;
 
-    @Before
-    public void given() {
-        builder = new CertificateRevocationResponsePayloadBuilder();
+    public static CertificateRevocationResponsePayload createCertificateRevocationResponsePayload() {
+        CertificateRevocationResponsePayloadBuilder builder = new CertificateRevocationResponsePayloadBuilder();
         builder.withClassName("a classname");
         builder.withPublicKey(ProvisioningObjectMother.X509_CA.getPublicKey());
-        payload = builder.build();
+        return builder.build();
     }
 
     @Test
     public void shouldBuildValidRevocationCms() throws Exception {
-        assertEquals("sender", payload.getSender());
-        assertEquals("recipient", payload.getRecipient());
+        assertEquals("sender", TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD.getSender());
+        assertEquals("recipient", TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD.getRecipient());
 
-        CertificateRevocationKeyElement payloadContent = payload.getKeyElement();
+        CertificateRevocationKeyElement payloadContent = TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD.getKeyElement();
         assertEquals("a classname", payloadContent.getClassName());
         assertEquals(KeyPairUtil.getEncodedKeyIdentifier(ProvisioningObjectMother.X509_CA.getPublicKey()), payloadContent.getPublicKeyHash());
     }
 
     @Test
     public void shouldProduceXmlConformStandard() {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD);
 
         String expectedXmlRegex =
                 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
@@ -62,7 +55,7 @@ public class CertificateRevocationResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

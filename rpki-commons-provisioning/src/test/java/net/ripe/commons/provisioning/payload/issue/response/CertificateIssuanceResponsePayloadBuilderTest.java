@@ -29,16 +29,16 @@ import org.xml.sax.SAXException;
 public class CertificateIssuanceResponsePayloadBuilderTest {
     private static final XStreamXmlSerializer<CertificateIssuanceResponsePayload> SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder().build();
 
-    private DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
+    private static final DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
 
-    private CertificateIssuanceResponsePayloadBuilder builder;
-
-    private CertificateIssuanceResponsePayload payload;
+    public static final CertificateIssuanceResponsePayload TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD = createCertificateIssuanceResponsePayload();
 
     @Before
     public void given() {
+        createCertificateIssuanceResponsePayload();
+    }
 
-        // given
+    private static CertificateIssuanceResponsePayload createCertificateIssuanceResponsePayload() {
         CertificateElement certificateElement = new CertificateElementBuilder().withIpResources(IpResourceSet.parse("123,10.0.0.0/8,192.168.0.0/16,2001:0DB8::/48"))
                 .withCertificatePublishedLocations(Arrays.asList(URI.create("rsync://jaja/jj,a"))).withCertificate(ProvisioningObjectMother.X509_CA).build();
 
@@ -51,20 +51,20 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
                 .withValidityNotAfter(validityNotAfter).withSiaHeadUri("rsync://some/where").withCertificateElements(Arrays.asList(certificateElement))
                 .withIssuer(ProvisioningObjectMother.X509_CA);
 
-        builder = new CertificateIssuanceResponsePayloadBuilder();
+        CertificateIssuanceResponsePayloadBuilder builder = new CertificateIssuanceResponsePayloadBuilder();
         builder.withClassElement(classElementBuilder.buildCertificateIssuanceResponseClassElement());
-        payload = builder.build();
+        return builder.build();
     }
 
     @Test
     public void shouldBuildValidCIResponsePayload() throws URISyntaxException {
-        assertEquals(PayloadMessageType.issue_response, payload.getType());
+        assertEquals(PayloadMessageType.issue_response, TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD.getType());
     }
 
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
     @Test
     public void shouldHavePayloadXmlConformStandard() {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);
 
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>"
                 + "\n"
@@ -79,7 +79,7 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

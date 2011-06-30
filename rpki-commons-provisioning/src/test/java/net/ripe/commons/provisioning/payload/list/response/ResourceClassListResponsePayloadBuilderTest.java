@@ -19,7 +19,6 @@ import net.ripe.ipresource.IpResourceSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -28,15 +27,13 @@ public class ResourceClassListResponsePayloadBuilderTest {
     private static final XStreamXmlSerializer<ResourceClassListResponsePayload> SERIALIZER = new ResourceClassListResponsePayloadSerializerBuilder().build();
 
 
-    private DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
-    private ResourceClassListResponsePayloadBuilder builder;
+    private static DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
+
+    public static ResourceClassListResponsePayload TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD = createResourceClassListResponsePayload();
 
 
-    private ResourceClassListResponsePayload payload;
-
-    @Before
-    public void given() {
-        builder = new ResourceClassListResponsePayloadBuilder();
+    public static ResourceClassListResponsePayload createResourceClassListResponsePayload() {
+        ResourceClassListResponsePayloadBuilder builder = new ResourceClassListResponsePayloadBuilder();
         CertificateElement certificateElement = new CertificateElementBuilder().withIpResources(IpResourceSet.parse("123,10.0.0.0/8,2001:0DB8::/48"))
                 .withCertificatePublishedLocations(Arrays.asList(URI.create("rsync://jaja/jja")))
                 .withCertificate(ProvisioningObjectMother.X509_CA).build();
@@ -56,15 +53,15 @@ public class ResourceClassListResponsePayloadBuilderTest {
         classElementBuilder.withCertificateElements(Arrays.asList(certificateElement, certificateElement));
         builder.addClassElement(classElementBuilder.buildResourceClassListResponseClassElement());
 
-        payload = builder.build();
+        return builder.build();
     }
 
     @Test
     public void shouldBuildValidListResponsePayload() throws URISyntaxException {
-        assertEquals("sender", payload.getSender());
-        assertEquals("recipient", payload.getRecipient());
+        assertEquals("sender", TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD.getSender());
+        assertEquals("recipient", TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD.getRecipient());
 
-        ResourceClassListResponseClassElement firstClassElement = payload.getClassElements().get(0);
+        ResourceClassListResponseClassElement firstClassElement = TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD.getClassElements().get(0);
         assertEquals(URI.create("http://some/other"), firstClassElement.getCertificateAuthorityUri().get(1));
         assertEquals("a classname", firstClassElement.getClassName());
         assertEquals(IpResourceSet.parse("192.168.0.0/24"), firstClassElement.getResourceSetIpv4());
@@ -91,7 +88,7 @@ public class ResourceClassListResponsePayloadBuilderTest {
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
     @Test
     public void shouldCreatePayloadXmlConformDraft() {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD);
 
         String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
                 "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list_response\">" + "\n" +
@@ -111,7 +108,7 @@ public class ResourceClassListResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD);
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }
 }
