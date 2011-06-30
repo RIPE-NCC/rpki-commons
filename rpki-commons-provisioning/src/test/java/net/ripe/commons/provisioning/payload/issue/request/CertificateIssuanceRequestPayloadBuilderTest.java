@@ -23,7 +23,7 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
 
     public static CertificateIssuanceRequestPayload createCertificateIssuanceRequestPayloadForPkcs10Request(PKCS10CertificationRequest pkcs10Request) {
         CertificateIssuanceRequestPayloadBuilder builder = new CertificateIssuanceRequestPayloadBuilder();
-        builder.withClassName("a classname");
+        builder.withClassName("ripe-region");
         builder.withAllocatedAsn(IpResourceSet.parse("1234,456"));
         builder.withIpv4ResourceSet(IpResourceSet.parse("10.0.0.0/8"));
         builder.withIpv6ResourceSet(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"));
@@ -37,7 +37,7 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
         assertEquals("recipient", TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD.getRecipient());
 
         CertificateIssuanceRequestElement payloadContent = TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD.getRequestElement();
-        assertEquals("a classname", payloadContent.getClassName());
+        assertEquals("ripe-region", payloadContent.getClassName());
         assertEquals(IpResourceSet.parse("456,1234"), payloadContent.getAllocatedAsn());
         PKCS10CertificationRequest pkcs10Request = ProvisioningObjectMother.RPKI_CA_CERT_REQUEST;
         assertArrayEquals(pkcs10Request.getEncoded(), payloadContent.getCertificateRequest().getEncoded());
@@ -51,7 +51,7 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
 
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD);
 
-        String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" + "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"issue\">" + "\n" + "  <request class_name=\"a classname\" req_resource_set_as=\"456,1234\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\">[^<]*</request>" + "\n" + "</message>";
+        String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" + "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"issue\">" + "\n" + "  <request class_name=\"ripe-region\" req_resource_set_as=\"456,1234\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\">[^<]*</request>" + "\n" + "</message>";
 
         assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
     }

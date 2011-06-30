@@ -23,6 +23,7 @@ import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRe
 import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadBuilderTest;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
+import net.ripe.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilder;
 import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBuilderParserTest;
 import net.ripe.ipresource.IpResourceSet;
 
@@ -81,6 +82,14 @@ public class ProvisioningObjectMother {
     
     public static ProvisioningCmsObject createResourceCertificateSignRequestProvisioningCmsObject() {
         return createCmsForQueryPayload(RPKI_CA_CERT_REQUEST_PAYLOAD);
+    }
+    
+    public static ProvisioningCmsObject createRevocationRequestCmsObject() throws Exception {
+    	
+    	CertificateRevocationRequestPayloadBuilder revokePayloadBuilder = new CertificateRevocationRequestPayloadBuilder();
+    	revokePayloadBuilder.withClassName(RPKI_CA_CERT_REQUEST_PAYLOAD.getRequestElement().getClassName());
+    	revokePayloadBuilder.withPublicKey(RPKI_CA_CERT_REQUEST_KEYPAIR.getPublic());
+		return createCmsForQueryPayload(revokePayloadBuilder.build());
     }
     
     private static ProvisioningCmsObject createCmsForQueryPayload(AbstractProvisioningPayload payloadXml) {
