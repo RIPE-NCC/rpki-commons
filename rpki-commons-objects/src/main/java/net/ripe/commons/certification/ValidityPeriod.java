@@ -30,7 +30,6 @@ public class ValidityPeriod extends ValueObjectSupport {
     @Column(name = "validity_not_after", nullable = true)
     private Timestamp notValidAfter;
 
-
     public ValidityPeriod() {
         this.notValidBefore = null;
         this.notValidAfter = null;
@@ -47,11 +46,11 @@ public class ValidityPeriod extends ValueObjectSupport {
     }
 
     private void setNotValidBefore(ReadableInstant notValidBefore) {
-    	this.notValidBefore = notValidBefore == null ? null : new Timestamp(truncatedMillis(notValidBefore));
+        this.notValidBefore = notValidBefore == null ? null : new Timestamp(truncatedMillis(notValidBefore));
     }
 
     private void setNotValidAfter(ReadableInstant notValidAfter) {
-    	this.notValidAfter = notValidAfter == null ? null : new Timestamp(truncatedMillis(notValidAfter));
+        this.notValidAfter = notValidAfter == null ? null : new Timestamp(truncatedMillis(notValidAfter));
     }
 
     /**
@@ -100,12 +99,13 @@ public class ValidityPeriod extends ValueObjectSupport {
             return !isClosed();
         } else {
             return (notValidBefore == null || !instant.isBefore(getNotValidBefore()))
-                && (notValidAfter == null || !instant.isAfter(getNotValidAfter()));
+                    && (notValidAfter == null || !instant.isAfter(getNotValidAfter()));
         }
     }
 
     /**
-     * @return true if this instances notValidBefore and notValidAfter are both specified.
+     * @return true if this instances notValidBefore and notValidAfter are both
+     *         specified.
      */
     public boolean isClosed() {
         return notValidBefore != null && notValidAfter != null;
@@ -117,7 +117,8 @@ public class ValidityPeriod extends ValueObjectSupport {
      *
      * @param other
      *            the validity period to intersect with.
-     * @return the intersection of this and the other validity period, or null if there is no overlap.
+     * @return the intersection of this and the other validity period, or null
+     *         if there is no overlap.
      */
     public ValidityPeriod intersect(ValidityPeriod other) {
         ValidityPeriod result = this;
