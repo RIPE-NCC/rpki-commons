@@ -1,8 +1,10 @@
 package net.ripe.commons.certification.cms.manifest;
 
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-import static org.easymock.EasyMock.*;
+
 import static org.junit.Assert.*;
+
+import static org.easymock.EasyMock.*;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -12,6 +14,7 @@ import java.util.Collections;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.cms.manifest.ManifestCms.FileContentSpecification;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
@@ -26,7 +29,6 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
-import net.ripe.utils.Specification;
 
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.easymock.IAnswer;
@@ -93,7 +95,7 @@ public class ManifestCmsTest{
         assertTrue(subject.verifyFileContents("foo1", FOO_CONTENTS));
         assertFalse(subject.verifyFileContents("BaR", FOO_CONTENTS));
 
-        Specification<byte[]> spec = subject.getFileContentSpecification("BaR");
+        FileContentSpecification spec = subject.getFileContentSpecification("BaR");
         assertTrue(spec.isSatisfiedBy(BAR_CONTENTS));
         assertFalse(spec.isSatisfiedBy(FOO_CONTENTS));
     }

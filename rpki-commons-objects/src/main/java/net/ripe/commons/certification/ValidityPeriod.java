@@ -1,12 +1,13 @@
 package net.ripe.commons.certification;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-import net.ripe.utils.support.ValueObjectSupport;
+import net.ripe.commons.certification.util.EqualsSupport;
 
 import org.hibernate.validator.AssertTrue;
 import org.joda.time.DateTime;
@@ -20,7 +21,7 @@ import org.joda.time.ReadableInstant;
  * before and not after to second accuracy.
  */
 @Embeddable
-public class ValidityPeriod extends ValueObjectSupport {
+public class ValidityPeriod extends EqualsSupport implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

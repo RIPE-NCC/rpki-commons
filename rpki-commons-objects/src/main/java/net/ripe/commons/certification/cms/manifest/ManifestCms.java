@@ -1,7 +1,6 @@
 package net.ripe.commons.certification.cms.manifest;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.Arrays;
@@ -10,8 +9,8 @@ import java.util.Set;
 
 import net.ripe.commons.certification.cms.RpkiSignedObject;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
+import net.ripe.commons.certification.util.Specification;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
-import net.ripe.utils.Specification;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
@@ -107,7 +106,7 @@ public class ManifestCms extends RpkiSignedObject {
         return getFileContentSpecification(fileName).isSatisfiedBy(contents);
     }
 
-    public Specification<byte[]> getFileContentSpecification(String fileName) {
+    public FileContentSpecification getFileContentSpecification(String fileName) {
         Validate.isTrue(containsFile(fileName));
         return new FileContentSpecification(getHash(fileName));
     }
@@ -154,9 +153,7 @@ public class ManifestCms extends RpkiSignedObject {
         }
     }
 
-    private static class FileContentSpecification implements Serializable, Specification<byte[]> {
-        private static final long serialVersionUID = 1L;
-
+    public static class FileContentSpecification implements Specification<byte[]> {
         private byte[] hash;
 
         public FileContentSpecification(byte[] hash) { //NOPMD - ArrayIsStoredDirectly

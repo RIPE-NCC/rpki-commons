@@ -1,7 +1,8 @@
 package net.ripe.certification.client.xml.converters;
 
 import static org.junit.Assert.*;
-import net.ripe.utils.VersionedId;
+
+import net.ripe.commons.certification.util.VersionedId;
 
 import org.junit.Test;
 

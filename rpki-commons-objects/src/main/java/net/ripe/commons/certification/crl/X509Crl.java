@@ -4,6 +4,7 @@ import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelp
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.InvalidKeyException;
@@ -26,11 +27,11 @@ import java.util.TreeSet;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.CertificateRepositoryObject;
+import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.utils.support.ValueObjectSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
@@ -232,9 +233,8 @@ public class X509Crl implements CertificateRepositoryObject {
         }
     }
 
-    public static class Entry extends ValueObjectSupport implements Comparable<Entry> {
+    public static class Entry extends EqualsSupport implements Comparable<Entry>, Serializable {
         private static final long serialVersionUID = 1L;
-
         private final BigInteger serialNumber;
         private final DateTime revocationDateTime;
 

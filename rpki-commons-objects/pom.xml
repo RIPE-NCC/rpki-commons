@@ -16,17 +16,6 @@
 			<artifactId>commons-internet-resources</artifactId>
 			<version>${net.ripe.commons.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.ripe.commons</groupId>
-			<artifactId>commons-utils</artifactId>
-			<version>${net.ripe.commons.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons.io</groupId>
-					<artifactId>commons.io</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>

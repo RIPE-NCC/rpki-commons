@@ -1,14 +1,15 @@
 package net.ripe.commons.certification.cms.roa;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceRange;
 import net.ripe.ipresource.IpResourceType;
-import net.ripe.utils.support.ValueObjectSupport;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -16,8 +17,7 @@ import org.hibernate.validator.AssertTrue;
 import org.hibernate.validator.NotNull;
 
 @Embeddable
-public class RoaPrefix extends ValueObjectSupport {
-
+public class RoaPrefix extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotNull
@@ -42,7 +42,7 @@ public class RoaPrefix extends ValueObjectSupport {
     public RoaPrefix(IpRange prefix) {
         this(prefix, null);
     }
-    
+
     public RoaPrefix(IpRange prefix, Integer maximumLength) {
         this.resourceType = prefix.getType();
         this.resourceStart = prefix.getStart().getValue();

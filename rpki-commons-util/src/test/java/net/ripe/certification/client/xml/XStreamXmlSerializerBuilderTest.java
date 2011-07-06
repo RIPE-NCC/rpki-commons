@@ -12,11 +12,11 @@ import net.ripe.commons.certification.cms.manifest.ManifestCms;
 import net.ripe.commons.certification.cms.manifest.ManifestCmsTest;
 import net.ripe.commons.certification.cms.roa.RoaCms;
 import net.ripe.commons.certification.cms.roa.RoaCmsTest;
+import net.ripe.commons.certification.util.VersionedId;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
-import net.ripe.utils.VersionedId;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -119,7 +119,7 @@ public class XStreamXmlSerializerBuilderTest {
         VersionedId versionedId = new VersionedId(1l, 2l);
 
         String serializedData = serializer.serialize(versionedId);
-        assertEquals("<net.ripe.utils.VersionedId>1:2</net.ripe.utils.VersionedId>", serializedData);
+        assertEquals("<versionedId>1:2</versionedId>", serializedData);
         assertEquals(versionedId, serializer.deserialize(serializedData));
     }
 

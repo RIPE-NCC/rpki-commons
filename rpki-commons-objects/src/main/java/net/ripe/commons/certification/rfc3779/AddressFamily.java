@@ -1,7 +1,9 @@
 package net.ripe.commons.certification.rfc3779;
 
+import java.io.Serializable;
+
+import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.IpResourceType;
-import net.ripe.utils.support.ValueObjectSupport;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.DEREncodable;
@@ -12,8 +14,7 @@ import org.bouncycastle.asn1.DEROctetString;
  * {@link http://www.iana.org/assignments/address-family-numbers} and
  * {@link http://www.iana.org/assignments/safi-namespace}.
  */
-public class AddressFamily extends ValueObjectSupport implements Comparable<AddressFamily> {
-
+public class AddressFamily extends EqualsSupport implements Comparable<AddressFamily>, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final int BYTE_MASK = 0xff;

@@ -1,12 +1,14 @@
 package net.ripe.commons.certification.validation;
 
-import net.ripe.utils.support.ValueObjectSupport;
+import java.io.Serializable;
 
-public class ValidationCheck extends ValueObjectSupport {
+import net.ripe.commons.certification.util.EqualsSupport;
+
+public class ValidationCheck extends EqualsSupport implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private boolean status;
+    private boolean status;
 
 	private String key;
 

@@ -1,12 +1,13 @@
 package net.ripe.commons.certification.x509cert;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.ripe.utils.support.ValueObjectSupport;
+import net.ripe.commons.certification.util.EqualsSupport;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -14,7 +15,9 @@ import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
-public class X509CertificateInformationAccessDescriptor extends ValueObjectSupport {
+public class X509CertificateInformationAccessDescriptor extends EqualsSupport implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static final DERObjectIdentifier ID_CA_CA_ISSUERS = AccessDescription.id_ad_caIssuers;
 
@@ -25,8 +28,6 @@ public class X509CertificateInformationAccessDescriptor extends ValueObjectSuppo
     public static final DERObjectIdentifier ID_AD_SIGNED_OBJECT = new DERObjectIdentifier(X509ObjectIdentifiers.id_ad + ".11");
 
     public static final DERObjectIdentifier ID_AD_RPKI_MANIFEST = new DERObjectIdentifier(X509ObjectIdentifiers.id_ad + ".10");
-
-    private static final long serialVersionUID = 1L;
 
     private String method;
     private URI location;
