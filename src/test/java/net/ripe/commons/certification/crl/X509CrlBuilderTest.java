@@ -1,6 +1,7 @@
 package net.ripe.commons.certification.crl;
 
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -10,7 +11,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 
@@ -19,12 +19,10 @@ import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.util.KeyPairUtil;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
-
 
 public class X509CrlBuilderTest {
 
@@ -41,8 +39,6 @@ public class X509CrlBuilderTest {
 
     @Before
     public void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
-
         subject = new X509CrlBuilder();
         subject.withIssuerDN(new X500Principal("CN=ROOT"));
         subject.withThisUpdateTime(THIS_UPDATE_TIME);
