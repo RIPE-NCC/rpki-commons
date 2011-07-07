@@ -27,7 +27,7 @@
     </distributionManagement>
 
     <properties>
-        <net.ripe.commons.version>1.35-SNAPSHOT</net.ripe.commons.version>
+        <net.ripe.commons.version>1.35</net.ripe.commons.version>
 
         <dist.repo.url>nexus.ripe.net</dist.repo.url>
         <dist.repo.snapshot.url>nexus.ripe.net</dist.repo.snapshot.url>
