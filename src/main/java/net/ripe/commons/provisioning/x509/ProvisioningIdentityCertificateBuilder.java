@@ -49,8 +49,8 @@ public class ProvisioningIdentityCertificateBuilder {
     private X509CertificateBuilderHelper builderHelper;
 
     private KeyPair selfSigningKeyPair;
-
     private X500Principal selfSigningSubject;
+    private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 
     public ProvisioningIdentityCertificateBuilder() {
@@ -59,22 +59,33 @@ public class ProvisioningIdentityCertificateBuilder {
 
     public ProvisioningIdentityCertificateBuilder withSelfSigningKeyPair(KeyPair selfSigningKeyPair) {
         this.selfSigningKeyPair = selfSigningKeyPair;
-        builderHelper.withPublicKey(selfSigningKeyPair.getPublic());
-        builderHelper.withSigningKeyPair(selfSigningKeyPair);
         return this;
     }
 
     public ProvisioningIdentityCertificateBuilder withSelfSigningSubject(X500Principal selfSigningSubject) {
         this.selfSigningSubject = selfSigningSubject;
-        builderHelper.withSubjectDN(selfSigningSubject);
-        builderHelper.withIssuerDN(selfSigningSubject);
+        return this;
+    }
+    
+    /**
+     * Only call this if you need to use a special signature provider, eg for HSM. Leave to use default otherwise
+     * @see X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER
+     */
+    public ProvisioningIdentityCertificateBuilder withSignatureProvider(String signatureProvider) {
+        this.signatureProvider = signatureProvider;
         return this;
     }
 
     public ProvisioningIdentityCertificate build() {
         Validate.notNull(selfSigningKeyPair, "Self Signing KeyPair is required");
         Validate.notNull(selfSigningSubject, "Self Signing DN is required");
+        Validate.notNull(signatureProvider, "Signature Provider is required");
         setUpImplicitRequirementsForBuilderHelper();
+        builderHelper.withPublicKey(selfSigningKeyPair.getPublic());
+        builderHelper.withSigningKeyPair(selfSigningKeyPair);
+        builderHelper.withSubjectDN(selfSigningSubject);
+        builderHelper.withIssuerDN(selfSigningSubject);
+        builderHelper.withSignatureProvider(signatureProvider);
         return new ProvisioningIdentityCertificate(builderHelper.generateCertificate());
     }
 

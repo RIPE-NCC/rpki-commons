@@ -47,6 +47,7 @@ public final class ProvisioningKeyPairGenerator {
 
     private static final String ALGORITHM = "RSA";
     private static final int IDENTITY_KEY_SIZE = 2048;
+    
     public static final String DEFAULT_KEYPAIR_PROVIDER = "SunRsaSign";
 
     private ProvisioningKeyPairGenerator() {
@@ -60,6 +61,9 @@ public final class ProvisioningKeyPairGenerator {
         return generate(DEFAULT_KEYPAIR_PROVIDER);
     }
 
+    /**
+     * Make a Provisioning Key Pair using a custom provider (eg HSM provider) 
+     */
     public static KeyPair generate(String provider) {
         try {
             KeyPairGenerator generator;

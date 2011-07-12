@@ -93,6 +93,12 @@ public class ProvisioningIdentityCertificateBuilderTest {
         subject.withSelfSigningSubject(null);
         subject.build();
     }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void shouldRequireSignatureProvider() {
+        subject.withSignatureProvider(null);
+        subject.build();
+    }
 
 
     // ======= the following unit tests test properties of the certificate built by this builder =====
