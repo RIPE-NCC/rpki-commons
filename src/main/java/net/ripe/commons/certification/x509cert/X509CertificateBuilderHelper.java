@@ -156,6 +156,10 @@ public final class X509CertificateBuilderHelper {
         return this;
     }
 
+    /**
+     * Careful! You probably want to stick to the default. This method is here mainly
+     * to allow for testing the parser -> it should reject sig algos not allowed by RFC
+     */
     public X509CertificateBuilderHelper withSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
         return this;

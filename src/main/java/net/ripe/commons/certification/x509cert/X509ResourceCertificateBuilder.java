@@ -92,15 +92,6 @@ public class X509ResourceCertificateBuilder {
         return this;
     }
 
-    /**
-     * Use only for testing that certificates with invalid signature algorithms are rejected!
-     * @deprecated
-     */
-    X509ResourceCertificateBuilder withSignatureAlgorithm(String signatureAlgorithm) {
-        builderHelper.withSignatureAlgorithm(signatureAlgorithm);
-        return this;
-    }
-
     public X509ResourceCertificateBuilder withKeyUsage(int keyUsage) {
         builderHelper.withKeyUsage(keyUsage);
         return this;

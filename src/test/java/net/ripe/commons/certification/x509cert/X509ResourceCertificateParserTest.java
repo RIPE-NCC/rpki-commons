@@ -29,10 +29,13 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
 import static net.ripe.commons.certification.validation.ValidationString.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 import javax.security.auth.x500.X500Principal;
@@ -46,6 +49,7 @@ import net.ripe.ipresource.IpResourceSet;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 
@@ -101,9 +105,17 @@ public class X509ResourceCertificateParserTest {
     }
 
     @Test
-    public void shouldFailOnInvalidSignatureAlgorithm() {
-        @SuppressWarnings("deprecation")
-        X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withSignatureAlgorithm("MD5withRSA").build();
+    public void shouldFailOnInvalidSignatureAlgorithm() throws CertificateEncodingException {
+        X509CertificateBuilderHelper builder = new X509CertificateBuilderHelper();
+        builder.withSubjectDN(new X500Principal("CN=zz.subject")).withIssuerDN(new X500Principal("CN=zz.issuer"));
+        builder.withSerial(BigInteger.ONE);
+        builder.withPublicKey(TEST_KEY_PAIR.getPublic());
+        builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
+        DateTime now = new DateTime(DateTimeZone.UTC);
+        builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear()+1,1,1,0,0,0,0, DateTimeZone.UTC)));
+        builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        builder.withSignatureAlgorithm("MD5withRSA");
+        X509Certificate certificate = builder.generateCertificate();
 
         subject.parse("certificate", certificate.getEncoded());
 
