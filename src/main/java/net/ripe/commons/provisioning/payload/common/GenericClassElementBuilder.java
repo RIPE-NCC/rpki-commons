@@ -30,6 +30,7 @@
 package net.ripe.commons.provisioning.payload.common;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
@@ -44,11 +45,11 @@ import org.joda.time.DateTimeZone;
 public class GenericClassElementBuilder {
 
     private String className;
-    private List<URI> certificateAuthorityUri;
+    private List<URI> certificateAuthorityUri = new ArrayList<URI>();
     private IpResourceSet ipResourceSet;
     private DateTime validityNotAfter;
     private String siaHeadUri;
-    private List<CertificateElement> certificateElements;
+    private List<CertificateElement> certificateElements = new ArrayList<CertificateElement>();
     private X509ResourceCertificate issuer;
 
     public GenericClassElementBuilder withValidityNotAfter(DateTime notAfter) {

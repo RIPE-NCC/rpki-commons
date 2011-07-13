@@ -30,6 +30,7 @@
 package net.ripe.commons.provisioning.payload.common;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class GenericClassElement {
 
     @XStreamAlias("certificate")
     @XStreamImplicit(itemFieldName = "certificate")
-    private List<CertificateElement> certificateElements;
+    private List<CertificateElement> certificateElements = new ArrayList<CertificateElement>();
 
     @XStreamConverter(X509ResourceCertificateBase64Converter.class)
     @XStreamAlias("issuer")

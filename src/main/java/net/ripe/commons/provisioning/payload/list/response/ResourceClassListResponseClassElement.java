@@ -31,6 +31,7 @@ package net.ripe.commons.provisioning.payload.list.response;
 
 import java.util.List;
 
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.commons.provisioning.payload.common.GenericClassElement;
 
@@ -53,5 +54,17 @@ public class ResourceClassListResponseClassElement extends GenericClassElement {
     @Override
     public void setCertificateElements(List<CertificateElement> resourceClasses) {
         super.setCertificateElements(resourceClasses);
+    }
+
+    public boolean containsResourceCertificate(X509ResourceCertificate resourceCertificate) {
+        if (getCertificateElements() == null) {
+            return false;
+        }
+        for (CertificateElement element: getCertificateElements()) {
+            if (resourceCertificate.equals(element.getCertificate())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
