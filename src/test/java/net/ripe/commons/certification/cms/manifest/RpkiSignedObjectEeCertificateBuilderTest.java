@@ -29,8 +29,7 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -51,7 +50,6 @@ import org.junit.Test;
 public class RpkiSignedObjectEeCertificateBuilderTest {
     
     public static final int KEY_SIZE = 2048;
-    public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
     
     private RpkiSignedObjectEeCertificateBuilder subject;
@@ -89,7 +87,6 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         subject.withIssuerDN(resourceCertificate.getSubject());
         
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-        subject.withSignatureAlgorithm(DEFAULT_SIGNATURE_ALGORITHM);
         
         subject.withResources(InheritedIpResourceSet.getInstance());
 

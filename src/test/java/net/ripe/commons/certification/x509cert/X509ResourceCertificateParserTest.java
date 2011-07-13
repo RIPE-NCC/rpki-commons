@@ -102,6 +102,7 @@ public class X509ResourceCertificateParserTest {
 
     @Test
     public void shouldFailOnInvalidSignatureAlgorithm() {
+        @SuppressWarnings("deprecation")
         X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withSignatureAlgorithm("MD5withRSA").build();
 
         subject.parse("certificate", certificate.getEncoded());

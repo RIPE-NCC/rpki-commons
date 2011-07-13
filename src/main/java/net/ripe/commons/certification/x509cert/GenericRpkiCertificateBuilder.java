@@ -54,7 +54,6 @@ public abstract class GenericRpkiCertificateBuilder {
     private URI crlUri;
     private URI parentResourceCertificatePublicationUri;
     
-    private String signatureAlgorithm = "SHA256withRSA"; 
     private String signatureProvider = "SunRsaSign";
     
     public void withPublicKey(PublicKey publicKey) {
@@ -105,13 +104,6 @@ public abstract class GenericRpkiCertificateBuilder {
     }
 
     /**
-     * Default: "SHA256withRSA"
-     */
-    public void withSignatureAlgorithm(String signatureAlgorithm) {
-        this.signatureAlgorithm = signatureAlgorithm;
-    }
-
-    /**
      * Default: SunRsaSign
      */
     public void withSignatureProvider(String signatureProvider) {
@@ -144,7 +136,6 @@ public abstract class GenericRpkiCertificateBuilder {
             builder.withAuthorityKeyIdentifier(true);
         }
         
-        builder.withSignatureAlgorithm(signatureAlgorithm);
         builder.withSignatureProvider(signatureProvider);
         
         builder.withSubjectKeyIdentifier(true);
@@ -167,7 +158,6 @@ public abstract class GenericRpkiCertificateBuilder {
             Validate.notNull(parentResourceCertificatePublicationUri, "Parent Certificate Publication URI is required");
         }
         
-        Validate.notNull(signatureAlgorithm, "SignatureAlgorithm is required");
         Validate.notNull(signatureProvider, "SignatureProvider is required");
     }
     

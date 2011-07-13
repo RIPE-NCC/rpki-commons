@@ -219,6 +219,7 @@ public class X509ResourceCertificateBuilderTest {
         subject.build();
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=IllegalArgumentException.class)
     public void shouldFailOnIncorrectAlgorithm() {
         subject.withSignatureAlgorithm("foo");

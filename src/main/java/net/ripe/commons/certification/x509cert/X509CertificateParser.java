@@ -56,8 +56,6 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     private static final String[] ALLOWED_SIGNATURE_ALGORITHM_OIDS = {
         PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
-        PKCSObjectIdentifiers.sha384WithRSAEncryption.getId(),
-        PKCSObjectIdentifiers.sha512WithRSAEncryption.getId(),
     };
 
     private byte[] encoded;
