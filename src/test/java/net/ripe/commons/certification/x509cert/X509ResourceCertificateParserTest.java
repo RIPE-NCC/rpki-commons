@@ -46,8 +46,6 @@ import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.ipresource.IpResourceSet;
 
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -77,7 +75,7 @@ public class X509ResourceCertificateParserTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
-        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withPolicies(new PolicyInformation(new DERObjectIdentifier("1.2.3.4")));
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withPolicies();
         X509ResourceCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());

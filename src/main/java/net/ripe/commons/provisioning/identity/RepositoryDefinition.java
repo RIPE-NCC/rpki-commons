@@ -27,32 +27,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.commons.provisioning.x509;
+package net.ripe.commons.provisioning.identity;
 
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-public class ProvisioningIdentityCertificateParser extends X509CertificateParser<ProvisioningIdentityCertificate> {
+public class RepositoryDefinition {
+    
+    @XStreamAsAttribute
+    private String type;
 
-    public ProvisioningIdentityCertificateParser() {
-        this(new ValidationResult());
-    }
-
-    public ProvisioningIdentityCertificateParser(ValidationResult result) {
-        super(ProvisioningIdentityCertificate.class, result);
-    }
-
-    @Override
-    public ProvisioningIdentityCertificate getCertificate() {
-        if (getValidationResult().hasFailures()) {
-            throw new IllegalArgumentException("Identity Certificate validation failed");
-        }
-        return new ProvisioningIdentityCertificate(getX509Certificate());
+    public RepositoryDefinition(String type) {
+        this.type = type;
     }
     
-    @Override
-    protected void doTypeSpecificValidation() {
-        result.isFalse(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
+    public String getType() {
+        return type;
     }
+
 }

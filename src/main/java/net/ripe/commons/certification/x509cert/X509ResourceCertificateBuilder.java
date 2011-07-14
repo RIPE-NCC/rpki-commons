@@ -55,6 +55,7 @@ public class X509ResourceCertificateBuilder {
     
     public X509ResourceCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
+        builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
     }
 
     public X509ResourceCertificateBuilder withSignatureProvider(String signatureProvider) {

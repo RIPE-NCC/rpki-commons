@@ -29,7 +29,20 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper.*;
+
+import java.io.IOException;
+
+import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
+import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.ipresource.IpResourceSet;
+
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
@@ -48,5 +61,66 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             throw new IllegalArgumentException("Resource Certificate validation failed");
         }
         return new X509ResourceCertificate(getX509Certificate());
+    }
+
+    @Override
+    protected void doTypeSpecificValidation() {
+        validateCertificatePolicy();
+        validateResourceExtensionsForResourceCertificates();
+    }
+
+    private void validateCertificatePolicy() {
+        if (!result.notNull(certificate.getCriticalExtensionOIDs(), CRITICAL_EXT_PRESENT)) {
+            return;
+        }
+
+        result.isTrue(certificate.getCriticalExtensionOIDs().contains(X509Extensions.CertificatePolicies.getId()), POLICY_EXT_CRITICAL);
+
+        try {
+            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.CertificatePolicies.getId());
+            if (!result.notNull(extensionValue, POLICY_EXT_VALUE)) {
+                return;
+            }
+            ASN1Sequence policies = ASN1Sequence.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            if (!result.isTrue(policies.size() == 1, SINGLE_CERT_POLICY)) {
+                return;
+            }
+            PolicyInformation policy = PolicyInformation.getInstance(policies.getObjectAt(0));
+            result.isTrue(policy.getPolicyQualifiers() == null, POLICY_QUALIFIER);
+            if (!result.notNull(policy.getPolicyIdentifier(), POLICY_ID_PRESENT)) {
+                return;
+            }
+            result.isTrue(POLICY_OID.equals(policy.getPolicyIdentifier()), POLICY_ID_VERSION);
+        } catch (IOException e) {
+            result.isTrue(false, POLICY_VALIDATION);
+        }
+    }
+
+    private void validateResourceExtensionsForResourceCertificates() {
+        if (result.isTrue(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
+            result.isTrue(true, AS_OR_IP_RESOURCE_PRESENT);
+            parseResourceExtensions();
+        }
+    }
+
+    private void parseResourceExtensions() {
+        ResourceExtensionParser parser = new ResourceExtensionParser();
+        boolean ipInherited = false;
+        boolean asInherited = false;
+        byte[] ipAddressBlocksExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS);
+        if (ipAddressBlocksExtension != null) {
+            IpResourceSet ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
+            if (ipResources == null) {
+                ipInherited = true;
+            }
+        }
+        byte[] asnExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS);
+        if (asnExtension != null) {
+            IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
+            if (asResources == null) {
+                asInherited = true;
+            }
+        }
+        result.isTrue(ipInherited == asInherited, PARTIAL_INHERITANCE);
     }
 }

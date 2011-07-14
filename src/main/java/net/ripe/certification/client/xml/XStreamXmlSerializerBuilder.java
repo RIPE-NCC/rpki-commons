@@ -134,7 +134,8 @@ public class XStreamXmlSerializerBuilder<T> {
         return this;
     }
 
-    public final XStreamXmlSerializerBuilder<T> withAliasField(String field, String alias, Class<?> aliasOnField) {
+    public final XStreamXmlSerializerBuilder<T> withAliasField(String alias, Class<?> aliasOnField, String field) {
+        xStream.useAttributeFor(alias, aliasOnField);
         xStream.aliasField(alias, aliasOnField, field);
         return this;
     }

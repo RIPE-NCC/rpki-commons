@@ -27,32 +27,38 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.commons.provisioning.x509;
+package net.ripe.commons.provisioning.identity;
 
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.x509cert.X509CertificateParser;
+import javax.xml.namespace.QName;
 
-public class ProvisioningIdentityCertificateParser extends X509CertificateParser<ProvisioningIdentityCertificate> {
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.QNameMap;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
 
-    public ProvisioningIdentityCertificateParser() {
-        this(new ValidationResult());
+/**
+ * Convert ParentIdentity to/from ISC style XML
+ */
+public class ParentIdentitySerializer {
+
+    private XStream xStream;
+
+    public ParentIdentitySerializer() {
+        
+        QNameMap qNameMap = new QNameMap();
+        QName qName = new QName(ParentIdentity.XMLNS, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
+        qNameMap.registerMapping(qName, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
+        
+        XmlFriendlyReplacer replacer = new XmlFriendlyReplacer("_-", "_");
+        
+        xStream = new XStream(new StaxDriver(qNameMap, replacer));
+        xStream.autodetectAnnotations(true);
+        xStream.processAnnotations(ParentIdentity.class);
+        xStream.registerConverter(new ProvisioningIdentityCertificateConverterForIdExchange());
     }
 
-    public ProvisioningIdentityCertificateParser(ValidationResult result) {
-        super(ProvisioningIdentityCertificate.class, result);
-    }
-
-    @Override
-    public ProvisioningIdentityCertificate getCertificate() {
-        if (getValidationResult().hasFailures()) {
-            throw new IllegalArgumentException("Identity Certificate validation failed");
-        }
-        return new ProvisioningIdentityCertificate(getX509Certificate());
+    public ParentIdentity deserialize(String xml) {
+        return (ParentIdentity) xStream.fromXML(xml);
     }
     
-    @Override
-    protected void doTypeSpecificValidation() {
-        result.isFalse(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
-    }
 }

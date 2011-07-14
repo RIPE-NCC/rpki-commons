@@ -114,7 +114,7 @@ public final class X509CertificateBuilderHelper {
 
     private AccessDescription[] subjectInformationAccess;
 
-    private PolicyInformation[] policies = {X509ResourceCertificate.POLICY_INFORMATION};
+    private PolicyInformation[] policies;
 
     public X509CertificateBuilderHelper withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
