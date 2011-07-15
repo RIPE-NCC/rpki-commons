@@ -38,8 +38,7 @@ import org.junit.Test;
 
 public class ParentIdentitySerializerTest {
     
-    
-    String exampleXml =
+    static final String exampleXml =
         "<ns0:parent xmlns:ns0=\"http://www.hactrn.net/uris/rpki/myrpki/\" valid_until=\"2012-06-30T04:07:50Z\" service_uri=\"http://localhost:4401/up-down/Alice/Bob\" child_handle=\"Bob\" parent_handle=\"Alice\" version=\"2\">\n" +
         "<ns0:bpki_resource_ta>\n" +
         "MIIDJDCCAgygAwIBAgIBATANBgkqhkiG9w0BAQsFADArMSkwJwYDVQQDEyBBbGlj\n" +
@@ -80,6 +79,7 @@ public class ParentIdentitySerializerTest {
         "1BjcmhYHqott+cnK1ITOjLe9EKejRZv/7/BFsmpzm2Zbq1KA\n" +
         "</ns0:bpki_child_ta><ns0:repository type=\"offer\"/></ns0:parent>";
     
+    public static final ParentIdentity PARENT_IDENTITY = new ParentIdentitySerializer().deserialize(exampleXml);
 
     
     @Test

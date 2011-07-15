@@ -42,6 +42,8 @@ public class ParentIdentity {
     public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
     public static final String PARENT_IDENTITY_NODE_NAME = "parent";
     
+    public static final int VERSION = 2;
+    
     public ParentIdentity(URI upDownUrl, String parentHandle,
 			String childHandle,
 			ProvisioningIdentityCertificate parentIdCertificate,
@@ -56,6 +58,11 @@ public class ParentIdentity {
 	}
 
 
+    @SuppressWarnings("unused")
+    @XStreamAsAttribute
+    @XStreamAlias("version")
+    private final int version = VERSION;
+    
 	@XStreamAsAttribute
     @XStreamAlias("child_handle")
     private String childHandle;
