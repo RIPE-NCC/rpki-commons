@@ -62,4 +62,8 @@ public class ParentIdentitySerializer {
     public ParentIdentity deserialize(String xml) {
         return (ParentIdentity) xStream.fromXML(xml);
     }
+    
+    public String serialize(ParentIdentity parentIdentity) {
+    	return xStream.toXML(parentIdentity);
+    }
 }
