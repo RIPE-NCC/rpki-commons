@@ -40,7 +40,7 @@ public class ProvisioningCmsCertificateParser extends X509CertificateParser<Prov
     }
 
     public ProvisioningCmsCertificateParser(ValidationResult result) {
-        super(ProvisioningCmsCertificate.class, result);
+        super(result);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class ProvisioningIdentityCertificateParser extends X509CertificateParser
     }
 
     public ProvisioningIdentityCertificateParser(ValidationResult result) {
-        super(ProvisioningIdentityCertificate.class, result);
+        super(result);
     }
 
     @Override

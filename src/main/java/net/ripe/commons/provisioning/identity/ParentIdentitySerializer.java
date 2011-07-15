@@ -29,12 +29,13 @@
  */
 package net.ripe.commons.provisioning.identity;
 
+
 import javax.xml.namespace.QName;
 
+import net.ripe.certification.client.xml.converters.URIConverter;
+
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.QNameMap;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
+import com.thoughtworks.xstream.io.xml.*;
 
 /**
  * Convert ParentIdentity to/from ISC style XML
@@ -55,10 +56,10 @@ public class ParentIdentitySerializer {
         xStream.autodetectAnnotations(true);
         xStream.processAnnotations(ParentIdentity.class);
         xStream.registerConverter(new ProvisioningIdentityCertificateConverterForIdExchange());
+        xStream.registerConverter(new URIConverter());
     }
 
     public ParentIdentity deserialize(String xml) {
         return (ParentIdentity) xStream.fromXML(xml);
     }
-    
 }

@@ -52,7 +52,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     public X509ResourceCertificateParser(ValidationResult result) {
-        super(X509ResourceCertificate.class, result);
+        super(result);
     }
 
     @Override

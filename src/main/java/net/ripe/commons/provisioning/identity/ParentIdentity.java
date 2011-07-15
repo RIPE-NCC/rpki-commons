@@ -42,7 +42,21 @@ public class ParentIdentity {
     public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
     public static final String PARENT_IDENTITY_NODE_NAME = "parent";
     
-    @XStreamAsAttribute
+    public ParentIdentity(URI upDownUrl, String parentHandle,
+			String childHandle,
+			ProvisioningIdentityCertificate parentIdCertificate,
+			ProvisioningIdentityCertificate childIdCertificate,
+			RepositoryDefinition repositoryDefinition) {
+		this.upDownUrl = upDownUrl;
+		this.parentHandle = parentHandle;
+		this.childHandle = childHandle;
+		this.parentIdCertificate = parentIdCertificate;
+		this.childIdCertificate = childIdCertificate;
+		this.repositoryDefinition = repositoryDefinition;
+	}
+
+
+	@XStreamAsAttribute
     @XStreamAlias("child_handle")
     private String childHandle;
     
@@ -52,7 +66,7 @@ public class ParentIdentity {
     
     @XStreamAsAttribute
     @XStreamAlias("service_uri")
-    private String upDownUrl;
+    private URI upDownUrl;
     
     @XStreamAlias("bpki_resource_ta")
     private ProvisioningIdentityCertificate parentIdCertificate;
@@ -62,12 +76,13 @@ public class ParentIdentity {
     
     @XStreamAlias("repository")
     private RepositoryDefinition repositoryDefinition;
+
     
     public String getChildHandle() {
         return childHandle;
     }
     
-    public Object getParentHandle() {
+    public String getParentHandle() {
         return parentHandle;
     }
 
@@ -85,9 +100,7 @@ public class ParentIdentity {
     }
 
     public URI getUpDownUrl() {
-        return URI.create(upDownUrl);
+        return upDownUrl;
     }
-
-    
 
 }

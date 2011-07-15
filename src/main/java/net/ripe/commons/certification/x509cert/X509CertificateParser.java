@@ -33,9 +33,7 @@ import static net.ripe.commons.certification.validation.ValidationString.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.validation.ValidationResult;
@@ -56,10 +54,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     protected ValidationResult result;
 
-	private final Class<T> certificateClass;
-
-    protected X509CertificateParser(Class<T> certificateClass, ValidationResult result) {
-        this.certificateClass = certificateClass;
+    protected X509CertificateParser(ValidationResult result) {
 		this.result = result;
     }
 
