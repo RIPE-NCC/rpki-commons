@@ -33,6 +33,9 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+
 import org.junit.Test;
 
 
@@ -83,7 +86,7 @@ public class ParentIdentitySerializerTest {
 
     
     @Test
-    public void shouldCreateFromXml() {
+    public void shouldDeserializeXml() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
         
         ParentIdentity parentId = serializer.deserialize(exampleXml);
@@ -96,5 +99,26 @@ public class ParentIdentitySerializerTest {
         assertNotNull(parentId.getChildIdCertificate());
         assertEquals("offer", parentId.getRepositoryDefinition().getType());
     }
+    
+    @Test
+    public void shouldDoRoundTripSerializeDeserialize() {
+        URI upDownUrl = URI.create("http://host/updown");
+        String parentHandle = "parent";
+        String childHandle = "child";
+        ProvisioningIdentityCertificate parentIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
+        ProvisioningIdentityCertificate childIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT_2;
+        RepositoryDefinition repositoryDefinition = null;
+        ParentIdentity parentIdentity = new ParentIdentity(upDownUrl, parentHandle, childHandle, parentIdCertificate, childIdCertificate, repositoryDefinition);
+        
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+        
+        
+        String xml = serializer.serialize(parentIdentity);
+        
+        ParentIdentity deserializedParentId = serializer.deserialize(xml);
+        
+        assertEquals(parentIdentity, deserializedParentId);
+    }
+    
 
 }

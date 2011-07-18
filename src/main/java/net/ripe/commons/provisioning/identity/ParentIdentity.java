@@ -31,18 +31,19 @@ package net.ripe.commons.provisioning.identity;
 
 import java.net.URI;
 
+import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias(ParentIdentity.PARENT_IDENTITY_NODE_NAME)
-public class ParentIdentity {
+public class ParentIdentity extends EqualsSupport {
+
+    public static final int VERSION = 2;
 
     public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
     public static final String PARENT_IDENTITY_NODE_NAME = "parent";
-    
-    public static final int VERSION = 2;
     
     public ParentIdentity(URI upDownUrl, String parentHandle,
 			String childHandle,

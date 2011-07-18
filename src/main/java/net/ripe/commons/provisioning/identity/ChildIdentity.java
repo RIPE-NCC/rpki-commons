@@ -29,6 +29,57 @@
  */
 package net.ripe.commons.provisioning.identity;
 
-public class ChildIdentity {
+import java.util.UUID;
+
+import net.ripe.commons.certification.util.EqualsSupport;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+@XStreamAlias(ChildIdentity.CHILD_IDENTITY_NODE_NAME)
+public class ChildIdentity extends EqualsSupport {
+
+    public static final int VERSION = 2;
+
+    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
+    public static final String CHILD_IDENTITY_NODE_NAME = "identity";
+    
+    @SuppressWarnings("unused")
+    @XStreamAsAttribute
+    @XStreamAlias("version")
+    private final int version = VERSION;
+    
+    @XStreamAsAttribute
+    @XStreamAlias("handle")
+    private String handle;
+    
+    @XStreamAlias("bpki_ta")
+    private ProvisioningIdentityCertificate identityCertificate;
+    
+    
+    /**
+     * Create a child identity to offer to your parent with a random UUID based handle.
+     */
+    public ChildIdentity(ProvisioningIdentityCertificate identityCertificate) {
+        this(UUID.randomUUID().toString(), identityCertificate);
+    }
+    
+    /**
+     * Create a child identity to offer to your parent, including a suggested handle. Note that
+     * your parent may ignore this handle!
+     */
+    public ChildIdentity(String handle, ProvisioningIdentityCertificate identityCertificate) {
+        this.handle = handle;
+        this.identityCertificate = identityCertificate;
+    }
+
+    public String getHandle() {
+        return handle;
+    }
+    
+    public ProvisioningIdentityCertificate getIdentityCertificate() {
+        return identityCertificate;
+    }
 
 }

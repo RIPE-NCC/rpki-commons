@@ -29,22 +29,41 @@
  */
 package net.ripe.commons.provisioning.identity;
 
+import javax.xml.namespace.QName;
 
+import net.ripe.certification.client.xml.converters.URIConverter;
 
-/**
- * Convert ParentIdentity to/from ISC style XML
- */
-public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity> {
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.QNameMap;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
 
-    public ParentIdentitySerializer() {
-        super();
-    }
-
-    public ParentIdentity deserialize(String xml) {
-        return (ParentIdentity) xStream.fromXML(xml);
+public abstract class IdentitySerializer<T> {
+    
+    protected XStream xStream;
+    
+    protected IdentitySerializer() {
+        
+        QNameMap qNameMap = new QNameMap();
+        
+        QName parentIdQName = new QName(ParentIdentity.XMLNS, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
+        qNameMap.registerMapping(parentIdQName, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
+        
+        QName childIdQName = new QName(ChildIdentity.XMLNS, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
+        qNameMap.registerMapping(childIdQName, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
+        
+        XmlFriendlyReplacer replacer = new XmlFriendlyReplacer("_-", "_");
+        
+        xStream = new XStream(new StaxDriver(qNameMap, replacer));
+        xStream.autodetectAnnotations(true);
+        xStream.processAnnotations(ParentIdentity.class);
+        xStream.processAnnotations(ChildIdentity.class);
+        xStream.registerConverter(new ProvisioningIdentityCertificateConverterForIdExchange());
+        xStream.registerConverter(new URIConverter());
     }
     
-    public String serialize(ParentIdentity parentIdentity) {
-    	return xStream.toXML(parentIdentity);
-    }
+    public abstract T deserialize(String xml);
+    
+    public abstract String serialize(T object);
+
 }

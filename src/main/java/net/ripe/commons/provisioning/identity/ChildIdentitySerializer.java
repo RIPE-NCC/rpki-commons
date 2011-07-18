@@ -30,21 +30,22 @@
 package net.ripe.commons.provisioning.identity;
 
 
-
 /**
- * Convert ParentIdentity to/from ISC style XML
+ * Convert ChildIdentity to/from ISC style XML
  */
-public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity> {
+public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity>{
 
-    public ParentIdentitySerializer() {
+    public ChildIdentitySerializer() {
         super();
     }
-
-    public ParentIdentity deserialize(String xml) {
-        return (ParentIdentity) xStream.fromXML(xml);
-    }
     
-    public String serialize(ParentIdentity parentIdentity) {
-    	return xStream.toXML(parentIdentity);
+    public ChildIdentity deserialize(String xml) {
+        return (ChildIdentity) xStream.fromXML(xml);
     }
+
+    @Override
+    public String serialize(ChildIdentity childIdentity) {
+        return xStream.toXML(childIdentity);
+    }
+
 }
