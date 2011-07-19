@@ -69,15 +69,18 @@ public class ProvisioningObjectMother {
     public static final X509CRL CRL = generateCrl();
 
     public static final X509ResourceCertificate X509_CA = generateX509();
-    
+
+    public static String PARENT_HANDLE = "test-parent-handle";
+    public static String CHILD_HANDLE = "test-child-handle";
+
     public static URI RPKI_CA_CERT_REQUEST_CA_REPO_URI = URI.create("rsync://host/module/subdir/");
     public static URI RPKI_CA_CERT_REQUEST_CA_MFT_URI = URI.create("rsync://host/module/subdir/subject.mft");
-    
+
     public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
     public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = KeyPairFactory.getInstance().generate(2048, "SunRsaSign");
     public static PKCS10CertificationRequest RPKI_CA_CERT_REQUEST = RpkiCaCertificateRequestBuilderParserTest.createRpkiCaCertificateRequest();
     private static final CertificateIssuanceRequestPayload RPKI_CA_CERT_REQUEST_PAYLOAD = CertificateIssuanceRequestPayloadBuilderTest.createCertificateIssuanceRequestPayloadForPkcs10Request(RPKI_CA_CERT_REQUEST);
-    
+
     public static ResourceClassListQueryPayload RESOURCE_CLASS_LIST_QUERY_PAYLOAD = createResourceListQueryPayload();
 
     private static X509ResourceCertificate generateX509() {
@@ -104,24 +107,26 @@ public class ProvisioningObjectMother {
 
         return builder.build(TEST_KEY_PAIR.getPrivate()).getCrl();
     }
-    
+
     public static ProvisioningCmsObject createResourceClassListQueryProvisioningCmsObject() {
         return createCmsForQueryPayload(createResourceListQueryPayload());
     }
-    
+
     public static ProvisioningCmsObject createResourceCertificateSignRequestProvisioningCmsObject() {
         return createCmsForQueryPayload(RPKI_CA_CERT_REQUEST_PAYLOAD);
     }
-    
+
     public static ProvisioningCmsObject createRevocationRequestCmsObject() throws Exception {
-    	
+
     	CertificateRevocationRequestPayloadBuilder revokePayloadBuilder = new CertificateRevocationRequestPayloadBuilder();
     	revokePayloadBuilder.withClassName(RPKI_CA_CERT_REQUEST_PAYLOAD.getRequestElement().getClassName());
     	revokePayloadBuilder.withPublicKey(RPKI_CA_CERT_REQUEST_KEYPAIR.getPublic());
 		return createCmsForQueryPayload(revokePayloadBuilder.build());
     }
-    
+
     private static ProvisioningCmsObject createCmsForQueryPayload(AbstractProvisioningPayload payloadXml) {
+        payloadXml.setSender(CHILD_HANDLE);
+        payloadXml.setRecipient(PARENT_HANDLE);
         ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder()
                 .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                 .withCrl(CRL)
@@ -129,7 +134,7 @@ public class ProvisioningObjectMother {
                 .withPayloadContent(payloadXml);
         return builder.build(EE_KEYPAIR.getPrivate());
     }
-    
+
     private static ResourceClassListQueryPayload createResourceListQueryPayload() {
         ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
         ResourceClassListQueryPayload payloadXml = payloadBuilder.build();

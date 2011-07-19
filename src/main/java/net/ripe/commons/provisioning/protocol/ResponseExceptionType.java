@@ -33,6 +33,8 @@ public enum ResponseExceptionType {
     BAD_DATA(400 /*HttpServletResponse.SC_BAD_REQUEST*/, "Could not validate client's request"),
     UNKNOWN_PROVISIONING_URL(400, "Provisioning URL not recognized"),
     UNKNOWN_SENDER(400, "sender not recognized"),
+    UNKNOWN_RECIPIENT(400, "recipient not recognized"),
+    BAD_SENDER_AND_RECIPIENT(400, "sender and recipient do not match"),
 
     THROTTLING(503 /*HttpServletResponse.SC_SERVICE_UNAVAILABLE*/, "The server cannot handle your request at this time");
 
