@@ -46,7 +46,7 @@ public class PayloadParserTest {
         ValidationResult result = new ValidationResult();
         result.push("a");
 
-        AbstractProvisioningPayload wrapper = PayloadParser.parse(message.getBytes(), result);
+        AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
         assertFalse(result.getFailuresForCurrentLocation().toString(), result.hasFailures());
         assertEquals(CertificateIssuanceResponsePayload.class, wrapper.getClass());
     }
@@ -57,7 +57,7 @@ public class PayloadParserTest {
         
         ValidationResult result = new ValidationResult();
         result.push("a");
-        PayloadParser.parse(message.getBytes(), result);
+        PayloadParser.parse(message, result);
         
         assertTrue(result.hasFailures());
         ValidationCheck validationCheck = result.getFailuresForCurrentLocation().iterator().next();
@@ -71,7 +71,7 @@ public class PayloadParserTest {
 
         ValidationResult result = new ValidationResult();
         result.push("a");
-        AbstractProvisioningPayload wrapper = PayloadParser.parse(message.getBytes(), result);
+        AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
 
         assertTrue(result.hasFailures());
         ValidationCheck validationCheck = result.getFailuresForCurrentLocation().iterator().next();
@@ -86,7 +86,7 @@ public class PayloadParserTest {
 
         ValidationResult result = new ValidationResult();
         result.push("a");
-        AbstractProvisioningPayload wrapper = PayloadParser.parse(message.getBytes(), result);
+        AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
 
         assertTrue(result.hasFailures());
         ValidationCheck validationCheck = result.getFailuresForCurrentLocation().iterator().next();

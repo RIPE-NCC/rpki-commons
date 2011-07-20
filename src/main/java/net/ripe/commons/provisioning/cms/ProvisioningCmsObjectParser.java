@@ -29,32 +29,8 @@
  */
 package net.ripe.commons.provisioning.cms;
 
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
-import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
-import net.ripe.commons.provisioning.payload.PayloadParser;
-import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedDataParser;
-import org.bouncycastle.cms.CMSSignedGenerator;
-import org.bouncycastle.cms.SignerId;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -74,11 +50,39 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
+import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
+import net.ripe.commons.provisioning.payload.PayloadParser;
+import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
+
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.CMSSignedGenerator;
+import org.bouncycastle.cms.CMSTypedStream;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 public class ProvisioningCmsObjectParser {
 
+    private static final String PROVISIONING_OBJECT_OID_STRING = "1.2.840.113549.1.9.16.1.28";
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
     private static final int CMS_OBJECT_VERSION = 3;
 
@@ -172,37 +176,52 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.1
      */
     private void verifyContentType() {
-        validationResult.isTrue("1.2.840.113549.1.9.16.1.28".equals(sp.getSignedContent().getContentType()), CMS_CONTENT_TYPE);
+        validationResult.isTrue(PROVISIONING_OBJECT_OID_STRING.equals(sp.getSignedContent().getContentType()), CMS_CONTENT_TYPE);
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.2
      */
     private void parseContent() {
-        InputStream signedContentStream = sp.getSignedContent().getContentStream();
-        ASN1InputStream asn1InputStream = new ASN1InputStream(signedContentStream);
-
         try {
-            decodeContent(asn1InputStream.readObject());
-        } catch (IOException e) {
-            validationResult.isTrue(false, DECODE_CONTENT);
-            return;
-        }
-        validationResult.isTrue(true, DECODE_CONTENT);
-
-        try {
-            validationResult.isTrue(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
-            asn1InputStream.close();
+            CMSTypedStream signedContent = sp.getSignedContent();
+            InputStream signedContentStream = signedContent.getContentStream();
+            
+            String payloadXml = IOUtils.toString(signedContentStream, "UTF-8");
+            payload = PayloadParser.parse(payloadXml, validationResult);
+            
+            validationResult.isTrue(true, CMS_CONTENT_PARSING);
         } catch (IOException e) {
             validationResult.isTrue(false, CMS_CONTENT_PARSING);
         }
-        validationResult.isTrue(true, CMS_CONTENT_PARSING);
     }
-
-    private void decodeContent(DEREncodable encoded) throws IOException {
-        DEROctetString octetString = (DEROctetString) encoded;
-        payload = PayloadParser.parse(octetString.getOctets(), validationResult);
-    }
+    
+//    private void parseContent() {
+//        InputStream signedContentStream = sp.getSignedContent().getContentStream();
+//        ASN1InputStream asn1InputStream = new ASN1InputStream(signedContentStream);
+//        
+//        try {
+//            decodeContent(asn1InputStream.readObject());
+//        } catch (IOException e) {
+//            validationResult.isTrue(false, DECODE_CONTENT);
+//            return;
+//        }
+//        validationResult.isTrue(true, DECODE_CONTENT);
+//        
+//        try {
+//            validationResult.isTrue(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
+//            asn1InputStream.close();
+//        } catch (IOException e) {
+//            validationResult.isTrue(false, CMS_CONTENT_PARSING);
+//        }
+//        validationResult.isTrue(true, CMS_CONTENT_PARSING);
+//    }
+//
+//    private void decodeContent(DEREncodable encoded) throws IOException {
+//        DEROctetString octetString = (DEROctetString) encoded;
+//        String payloadXml = new String(octetString.getEncoded(), Charset.forName("UTF-8"));
+//        payload = PayloadParser.parse(payloadXml, validationResult);
+//    }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
@@ -400,7 +419,7 @@ public class ProvisioningCmsObjectParser {
         if(!validationResult.isTrue(contentType.getAttrValues().size() == 1, CONTENT_TYPE_VALUE_COUNT)) {
             return;
         }
-        validationResult.isTrue(new DERObjectIdentifier("1.2.840.113549.1.9.16.1.28").equals(contentType.getAttrValues().getObjectAt(0)), CONTENT_TYPE_VALUE);
+        validationResult.isTrue(new DERObjectIdentifier(PROVISIONING_OBJECT_OID_STRING).equals(contentType.getAttrValues().getObjectAt(0)), CONTENT_TYPE_VALUE);
     }
 
     /**

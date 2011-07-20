@@ -31,6 +31,7 @@ package net.ripe.commons.provisioning.cms;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -122,7 +123,7 @@ public class ProvisioningCmsObjectBuilder {
         Validate.notNull(crl, "crl is required");
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms("<generated>", generateCms(privateKey, getMessageContent()));
+        parser.parseCms("<generated>", generateCms(privateKey));
 
         ValidationResult validationResult = parser.getValidationResult();
         if (validationResult.hasFailures()) {
@@ -137,9 +138,9 @@ public class ProvisioningCmsObjectBuilder {
         return parser.getProvisioningCmsObject();
     }
 
-    private byte[] generateCms(PrivateKey privateKey, ASN1Encodable encodableContent) {
+    private byte[] generateCms(PrivateKey privateKey) {
         try {
-            return doGenerate(privateKey, encodableContent);
+            return doGenerate(privateKey);
         } catch (NoSuchAlgorithmException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
         } catch (NoSuchProviderException e) {
@@ -157,15 +158,15 @@ public class ProvisioningCmsObjectBuilder {
         }
     }
 
-    private byte[] doGenerate(PrivateKey privateKey, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException,
+    private byte[] doGenerate(PrivateKey privateKey) throws InvalidAlgorithmParameterException,
             NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         addCertificateAndCrl(generator);
         generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(),
                 null);
 
-        byte[] content = encode(encodableContent);
-        CMSSignedData data = generator.generate(CONTENT_TYPE, new CMSProcessableByteArray(content), true, signatureProvider);
+//        byte[] content = encode(encodableContent);
+        CMSSignedData data = generator.generate(CONTENT_TYPE, new CMSProcessableByteArray(payloadContent.getBytes(Charset.forName("UTF-8"))), true, signatureProvider);
 
         return data.getEncoded();
     }
@@ -193,8 +194,8 @@ public class ProvisioningCmsObjectBuilder {
         return new AttributeTable(attributes);
     }
 
-    private ASN1Encodable getMessageContent() {
-        return new DEROctetString(payloadContent.getBytes());
+    private DEROctetString getMessageContent() {
+        return new DEROctetString(payloadContent.getBytes(Charset.forName("UTF-8")));
     }
 
     private byte[] encode(ASN1Encodable value) {

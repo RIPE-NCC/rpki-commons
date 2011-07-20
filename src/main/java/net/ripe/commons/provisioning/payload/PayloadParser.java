@@ -31,7 +31,6 @@ package net.ripe.commons.provisioning.payload;
 
 import static net.ripe.commons.certification.validation.ValidationString.*;
 
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -90,9 +89,7 @@ public final class PayloadParser {
     private PayloadParser() {
     }
 
-    public static AbstractProvisioningPayload parse(byte[] encoded, ValidationResult validationResult) {
-        String payloadXml = new String(encoded, Charset.forName("UTF-8"));
-
+    public static AbstractProvisioningPayload parse(String payloadXml, ValidationResult validationResult) {
         Matcher matcher = TYPE_PATTERN.matcher(payloadXml);
         validationResult.isTrue(matcher.matches(), ValidationString.FOUND_PAYLOAD_TYPE);
         if (validationResult.hasFailures()) {
