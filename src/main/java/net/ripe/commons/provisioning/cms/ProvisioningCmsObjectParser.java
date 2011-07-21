@@ -117,7 +117,7 @@ public class ProvisioningCmsObjectParser {
     public void parseCms(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
         this.location = location;
         this.encoded = encoded;
-        validationResult.push(location);
+        validationResult.setLocation(location);
 
         try {
             sp = new CMSSignedDataParser(encoded);

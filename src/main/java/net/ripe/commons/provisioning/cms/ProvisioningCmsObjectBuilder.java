@@ -29,7 +29,6 @@
  */
 package net.ripe.commons.provisioning.cms;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
@@ -57,10 +56,7 @@ import net.ripe.commons.provisioning.payload.PayloadParser;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -162,10 +158,8 @@ public class ProvisioningCmsObjectBuilder {
             NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         addCertificateAndCrl(generator);
-        generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(),
-                null);
+        generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
 
-//        byte[] content = encode(encodableContent);
         CMSSignedData data = generator.generate(CONTENT_TYPE, new CMSProcessableByteArray(payloadContent.getBytes(Charset.forName("UTF-8"))), true, signatureProvider);
 
         return data.getEncoded();
@@ -194,19 +188,4 @@ public class ProvisioningCmsObjectBuilder {
         return new AttributeTable(attributes);
     }
 
-    private DEROctetString getMessageContent() {
-        return new DEROctetString(payloadContent.getBytes(Charset.forName("UTF-8")));
-    }
-
-    private byte[] encode(ASN1Encodable value) {
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            DEROutputStream derOutputStream = new DEROutputStream(byteArrayOutputStream);
-            derOutputStream.writeObject(value);
-            derOutputStream.close();
-            return byteArrayOutputStream.toByteArray();
-        } catch (IOException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        }
-    }
 }

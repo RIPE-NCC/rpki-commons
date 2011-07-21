@@ -66,7 +66,7 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
 
     public void validate(String location, T certificate) {
         this.child = certificate;
-        result.push(location);
+        result.setLocation(location);
 
         verifySignature();
         verifyValidity();

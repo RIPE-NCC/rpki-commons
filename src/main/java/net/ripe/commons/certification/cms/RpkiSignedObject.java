@@ -133,7 +133,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
         X509Crl crl = crlLocator.getCrl(getCrlUri(), context, result);
 
-        result.push(savedCurrentLocation);
+        result.setLocation(savedCurrentLocation);
         result.notNull(crl, ValidationString.OBJECTS_CRL_VALID, this);
         if (crl == null) {
             return;

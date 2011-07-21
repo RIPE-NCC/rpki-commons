@@ -48,7 +48,7 @@ public class ProvisioningCmsObjectValidator {
 
     private X509Crl crl;
 
-
+    
     public ProvisioningCmsObjectValidator(ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate identityCertificate) {
         this.cmsObject = cmsObject;
         this.identityCertificate = identityCertificate;
@@ -56,7 +56,7 @@ public class ProvisioningCmsObjectValidator {
 
     public void validate(ValidationResult validationResult) {
         this.validationResult = validationResult;
-
+        
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser(validationResult);
         parser.parseCms("<cms>", cmsObject.getEncoded());
         if (parser.getValidationResult().hasFailures()) {
@@ -69,7 +69,6 @@ public class ProvisioningCmsObjectValidator {
         validateCrl();
         validateCertificateChain();
     }
-
 
     private void validateCrl() {
         X509CrlValidator crlValidator = new X509CrlValidator(validationResult, identityCertificate);

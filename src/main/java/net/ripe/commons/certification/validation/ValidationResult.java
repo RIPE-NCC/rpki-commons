@@ -54,10 +54,10 @@ public class ValidationResult implements Serializable {
 	private Set<ValidationCheck> currentCheckList;
 
 	public void push(URI location) {
-	    push(location.toString());
+	    setLocation(location.toString());
 	}
 
-	public void push(String location) {
+	public void setLocation(String location) {
 		currentLocation = location;
 		currentCheckList = validationCheck.get(currentLocation);
 

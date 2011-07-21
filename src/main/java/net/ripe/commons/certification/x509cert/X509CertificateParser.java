@@ -61,7 +61,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 	public void parse(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
 
-        result.push(location);
+        result.setLocation(location);
 
         parse();
         if (!result.hasFailureForLocation(location)) {

@@ -41,7 +41,7 @@ public class ValidationResultTest {
 		ValidationResult result = new ValidationResult();
 		final String validatedObject = "validatedObject";
 
-		result.push(validatedObject);
+		result.setLocation(validatedObject);
 		assertTrue(result.isTrue(true, "A"));
 		assertTrue(result.isFalse(false, "B"));
 		assertTrue(result.notNull("", "C"));
@@ -64,18 +64,18 @@ public class ValidationResultTest {
 		final String firstValidatedObject = "firstValidatedObject";
 		final String secondValidatedObject = "secondValidatedObject";
 
-		result.push(firstValidatedObject);
+		result.setLocation(firstValidatedObject);
 		assertTrue(result.isTrue(true, "A"));
 		assertTrue(result.isFalse(false, "B"));
 
-		result.push(secondValidatedObject);
+		result.setLocation(secondValidatedObject);
 		assertFalse(result.isTrue(false, "A"));
 		assertFalse(result.isFalse(true, "B"));
 
-		result.push(firstValidatedObject);
+		result.setLocation(firstValidatedObject);
 		assertTrue(result.notNull("", "C"));
 
-		result.push(secondValidatedObject);
+		result.setLocation(secondValidatedObject);
 		assertFalse(result.notNull(null, "C"));
 
 		assertTrue(result.hasFailures());

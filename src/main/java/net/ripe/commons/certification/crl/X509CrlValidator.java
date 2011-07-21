@@ -57,7 +57,7 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
 
     @Override
     public void validate(String location, X509Crl crl) {
-        result.push(location);
+        result.setLocation(location);
         checkSignature(crl);
         checkNextUpdate(crl);
     }
