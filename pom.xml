@@ -176,6 +176,10 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
+                <configuration>
+                    <jdk>1.6</jdk>
+                    <licenseLocation>${clover2.licenseLocation}</licenseLocation>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
