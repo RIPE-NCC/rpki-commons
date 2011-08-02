@@ -154,7 +154,7 @@ public class ManifestCmsTest{
 
     	CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
     	final ValidationResult result = new ValidationResult();
-    	result.push(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+    	result.setLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
     	expect(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).andAnswer(new IAnswer<X509Crl>() {
     	    @Override

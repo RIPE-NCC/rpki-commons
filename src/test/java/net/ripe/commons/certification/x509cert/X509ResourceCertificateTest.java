@@ -249,7 +249,7 @@ public class X509ResourceCertificateTest {
         });
         replay(crlLocator);
 
-        result.push(CERT_URI);
+        result.setLocation(CERT_URI);
         subject.validate(CERT_URI.toString(), context, crlLocator, result);
 
         verify(crlLocator);

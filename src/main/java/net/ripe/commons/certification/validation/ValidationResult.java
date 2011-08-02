@@ -53,7 +53,7 @@ public class ValidationResult implements Serializable {
 	private String currentLocation;
 	private Set<ValidationCheck> currentCheckList;
 
-	public void push(URI location) {
+	public void setLocation(URI location) {
 	    setLocation(location.toString());
 	}
 

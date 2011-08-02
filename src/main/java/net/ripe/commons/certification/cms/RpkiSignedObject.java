@@ -129,7 +129,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     @Override
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
         String savedCurrentLocation = result.getCurrentLocation();
-        result.push(getCrlUri());
+        result.setLocation(getCrlUri());
 
         X509Crl crl = crlLocator.getCrl(getCrlUri(), context, result);
 
