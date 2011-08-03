@@ -168,6 +168,6 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
 
     @Override
     public String toString() {
-        return notValidBefore + " - " + notValidAfter;
+        return getNotValidBefore() + " - " + getNotValidAfter();
     }
 }

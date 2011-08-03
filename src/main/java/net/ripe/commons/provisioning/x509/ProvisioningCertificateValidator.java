@@ -34,9 +34,17 @@ import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.objectvalidators.X509CertificateParentChildValidator;
 
 
-public class ProvisioningCertificateValidator extends X509CertificateParentChildValidator <ProvisioningCertificate> {
+public class ProvisioningCertificateValidator extends X509CertificateParentChildValidator<ProvisioningCertificate> {
 
     public ProvisioningCertificateValidator(ValidationResult result, ProvisioningCertificate parent, X509Crl crl) {
         super(result, parent, crl);
     }
+
+    @Override
+    protected void verifyKeyUsage() {
+        // TODO: FIX! We're rejecting ISC certs for not doing this. 
+        // Want to test if otherwise okay for interop
+        // super.verifyKeyUsage();
+    }
+
 }

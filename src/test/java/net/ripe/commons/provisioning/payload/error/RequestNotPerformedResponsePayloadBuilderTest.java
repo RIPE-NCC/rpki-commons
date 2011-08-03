@@ -29,21 +29,15 @@
  */
 package net.ripe.commons.provisioning.payload.error;
 
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.commons.provisioning.payload.error.NotPerformedError;
-import net.ripe.commons.provisioning.payload.error.RequestNotPerformedResponsePayload;
-import net.ripe.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadBuilder;
-import net.ripe.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializerBuilder;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
+
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 public class RequestNotPerformedResponsePayloadBuilderTest {
     
@@ -51,31 +45,29 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
 
     private static final NotPerformedError TEST_ERROR = NotPerformedError.INTERNAL_SERVER_ERROR;
     
-    private RequestNotPerformedResponsePayloadBuilder builder;
-    private RequestNotPerformedResponsePayload payload;
-    
     private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
+    
+    public static RequestNotPerformedResponsePayload NOT_PERFORMED_PAYLOAD = createRequestNotPerformedResponsePayload();
 
-    @Before
-    public void given() {
-        builder = new RequestNotPerformedResponsePayloadBuilder();
+    public static RequestNotPerformedResponsePayload createRequestNotPerformedResponsePayload() {
+        RequestNotPerformedResponsePayloadBuilder builder = new RequestNotPerformedResponsePayloadBuilder();
         builder.withError(TEST_ERROR);
         builder.withDescription(TEST_ERROR_DESCRIPTION);
-        payload = builder.build();
+        return builder.build();
     }
     
     @Test
     public void shouldBuildValidListResponsePayload() throws Exception {
-        assertEquals("sender", payload.getSender());
-        assertEquals("recipient", payload.getRecipient());
+        assertEquals("sender", NOT_PERFORMED_PAYLOAD.getSender());
+        assertEquals("recipient", NOT_PERFORMED_PAYLOAD.getRecipient());
 
-        assertEquals(TEST_ERROR, payload.getStatus());
-        assertEquals(TEST_ERROR_DESCRIPTION, payload.getDescription());
+        assertEquals(TEST_ERROR, NOT_PERFORMED_PAYLOAD.getStatus());
+        assertEquals(TEST_ERROR_DESCRIPTION, NOT_PERFORMED_PAYLOAD.getDescription());
     }
     
     @Test
     public void shouldProduceXmlConformDraft() {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
         
         String expectedXml =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
@@ -89,7 +81,7 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
 
     @Test
     public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
-        String actualXml = SERIALIZER.serialize(payload);
+        String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

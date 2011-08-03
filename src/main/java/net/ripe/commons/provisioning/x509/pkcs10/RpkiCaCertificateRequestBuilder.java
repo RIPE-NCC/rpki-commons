@@ -37,10 +37,17 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 
 
@@ -94,7 +101,7 @@ public class RpkiCaCertificateRequestBuilder {
 
     public PKCS10CertificationRequest build(KeyPair keyPair) {
         try {
-            X509Extensions extensions = createSiaExtensions();
+            X509Extensions extensions = createExtensions();
 
             Attribute attribute = new Attribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, new DERSet(extensions));
 
@@ -110,7 +117,7 @@ public class RpkiCaCertificateRequestBuilder {
         }
     }
 
-    private X509Extensions createSiaExtensions() {
+    private X509Extensions createExtensions() {
         // Make extension for SIA in request. See here:
         // http://www.bouncycastle.org/wiki/display/JA1/X.509+Public+Key+Certificate+and+Certification+Request+Generation
         Vector<DERObjectIdentifier> oids = new Vector<DERObjectIdentifier>();
@@ -126,6 +133,15 @@ public class RpkiCaCertificateRequestBuilder {
         X509Extension siaExtension = new X509Extension(false, new DEROctetString(derSequence.getDEREncoded()));
         values.add(siaExtension);
 
+        KeyUsage keyUsage = new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
+        X509Extension keyUsageExtension = new X509Extension(true, new DEROctetString(keyUsage));
+        oids.add(X509Extensions.KeyUsage);
+        values.add(keyUsageExtension);
+        
+        X509Extension basicConstraintsExtension = new X509Extension(true, new DEROctetString(new BasicConstraints(true)));
+        oids.add(X509Extensions.BasicConstraints);
+        values.add(basicConstraintsExtension);
+        
         return new X509Extensions(oids, values);
     }
 }

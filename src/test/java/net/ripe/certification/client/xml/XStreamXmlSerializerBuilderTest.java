@@ -103,7 +103,7 @@ public class XStreamXmlSerializerBuilderTest {
         DateTime dateTime = new DateTime(2011, 1, 31, 13, 59, 59, 0, DateTimeZone.UTC);
 
         String serializedData = serializer.serialize(dateTime);
-        assertEquals("<datetime>2011-01-31T13:59:59.000Z</datetime>", serializedData);
+        assertEquals("<datetime>2011-01-31T13:59:59Z</datetime>", serializedData);
         assertEquals(dateTime, serializer.deserialize(serializedData));
     }
 

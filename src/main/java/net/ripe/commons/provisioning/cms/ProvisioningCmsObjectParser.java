@@ -139,7 +139,7 @@ public class ProvisioningCmsObjectParser {
 
     public ProvisioningCmsObject getProvisioningCmsObject() {
         if (validationResult.hasFailures()) {
-            throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed");
+            throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed: " + validationResult.getFailuresForCurrentLocation());
         }
         return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl, payload);
     }
@@ -195,33 +195,6 @@ public class ProvisioningCmsObjectParser {
             validationResult.isTrue(false, CMS_CONTENT_PARSING);
         }
     }
-    
-//    private void parseContent() {
-//        InputStream signedContentStream = sp.getSignedContent().getContentStream();
-//        ASN1InputStream asn1InputStream = new ASN1InputStream(signedContentStream);
-//        
-//        try {
-//            decodeContent(asn1InputStream.readObject());
-//        } catch (IOException e) {
-//            validationResult.isTrue(false, DECODE_CONTENT);
-//            return;
-//        }
-//        validationResult.isTrue(true, DECODE_CONTENT);
-//        
-//        try {
-//            validationResult.isTrue(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
-//            asn1InputStream.close();
-//        } catch (IOException e) {
-//            validationResult.isTrue(false, CMS_CONTENT_PARSING);
-//        }
-//        validationResult.isTrue(true, CMS_CONTENT_PARSING);
-//    }
-//
-//    private void decodeContent(DEREncodable encoded) throws IOException {
-//        DEROctetString octetString = (DEROctetString) encoded;
-//        String payloadXml = new String(octetString.getEncoded(), Charset.forName("UTF-8"));
-//        payload = PayloadParser.parse(payloadXml, validationResult);
-//    }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
@@ -308,10 +281,12 @@ public class ProvisioningCmsObjectParser {
         if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
-        validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED);
-
+        
+        if (!validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED)) {
+            return;
+        }
+        
         CRL x509Crl = certificates.iterator().next();
-
         if (validationResult.isTrue(x509Crl instanceof X509CRL, CRL_IS_X509CRL)) {
             crl = (X509CRL) x509Crl;
         }

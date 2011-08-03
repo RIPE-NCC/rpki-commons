@@ -97,7 +97,6 @@ public class ParentIdentitySerializerTest {
         
         assertNotNull(parentId.getParentIdCertificate());
         assertNotNull(parentId.getChildIdCertificate());
-        assertEquals("offer", parentId.getRepositoryDefinition().getType());
     }
     
     @Test
@@ -107,8 +106,7 @@ public class ParentIdentitySerializerTest {
         String childHandle = "child";
         ProvisioningIdentityCertificate parentIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
         ProvisioningIdentityCertificate childIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT_2;
-        RepositoryDefinition repositoryDefinition = null;
-        ParentIdentity parentIdentity = new ParentIdentity(upDownUrl, parentHandle, childHandle, parentIdCertificate, childIdCertificate, repositoryDefinition);
+        ParentIdentity parentIdentity = new ParentIdentity(upDownUrl, parentHandle, childHandle, parentIdCertificate, childIdCertificate);
         
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
         

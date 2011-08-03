@@ -37,33 +37,60 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.QNameMap;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
+import com.thoughtworks.xstream.mapper.Mapper;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
+
 
 public abstract class IdentitySerializer<T> {
-    
+
     protected XStream xStream;
-    
+
     protected IdentitySerializer() {
-        
+
         QNameMap qNameMap = new QNameMap();
-        
+
         QName parentIdQName = new QName(ParentIdentity.XMLNS, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
         qNameMap.registerMapping(parentIdQName, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
-        
+
         QName childIdQName = new QName(ChildIdentity.XMLNS, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
         qNameMap.registerMapping(childIdQName, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
-        
+
         XmlFriendlyReplacer replacer = new XmlFriendlyReplacer("_-", "_");
-        
-        xStream = new XStream(new StaxDriver(qNameMap, replacer));
+
+        xStream = new XStream(new StaxDriver(qNameMap, replacer)) {
+            @Override
+            protected MapperWrapper wrapMapper(MapperWrapper next) {
+                return new IgnoreUnknownFieldsMapperWrapper(next);
+            }
+        };
         xStream.autodetectAnnotations(true);
         xStream.processAnnotations(ParentIdentity.class);
         xStream.processAnnotations(ChildIdentity.class);
         xStream.registerConverter(new ProvisioningIdentityCertificateConverterForIdExchange());
         xStream.registerConverter(new URIConverter());
     }
-    
+
     public abstract T deserialize(String xml);
-    
+
     public abstract String serialize(T object);
+
+    /**
+     * Used to ignore unknown fields when deserialising XML. See <a
+     * href="http://pvoss.wordpress.com/2009/01/08/xstream/">Omit Unexpected XML Elements With
+     * XStream</a>.
+     */
+    private final static class IgnoreUnknownFieldsMapperWrapper extends MapperWrapper {
+        private IgnoreUnknownFieldsMapperWrapper(Mapper wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public boolean shouldSerializeMember(@SuppressWarnings("rawtypes") Class definedIn, String fieldName) {
+            if (definedIn == Object.class) {
+                return false;
+            }
+            return super.shouldSerializeMember(definedIn, fieldName);
+        }
+    }
 
 }

@@ -127,7 +127,7 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
         result.isTrue(parent.getSubject().equals(child.getIssuer()), PREV_SUBJECT_EQ_ISSUER);
     }
 
-    private void verifyKeyUsage() {
+    protected void verifyKeyUsage() {
         boolean[] keyUsage = child.getCertificate().getKeyUsage();
         if (!result.notNull(keyUsage, KEY_USAGE_EXT_PRESENT)) {
             return;

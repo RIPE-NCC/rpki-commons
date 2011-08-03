@@ -59,12 +59,6 @@ import org.apache.commons.lang.NotImplementedException;
 
 public final class PayloadParser {
 
-
-
-
-
-
-
     private static final Pattern TYPE_PATTERN = Pattern.compile(".*<message[^>]*type=['\"]([a-z|\\_]*)['\"].*", Pattern.DOTALL);
 
     private static final XStreamXmlSerializer<ResourceClassListResponsePayload> LIST_RESPONSE_SERIALIZER = new ResourceClassListResponsePayloadSerializerBuilder().build();

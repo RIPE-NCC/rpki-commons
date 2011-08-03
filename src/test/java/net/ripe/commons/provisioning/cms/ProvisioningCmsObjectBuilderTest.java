@@ -32,14 +32,12 @@ package net.ripe.commons.provisioning.cms;
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
 import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
-import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
 import static org.bouncycastle.cms.CMSSignedGenerator.*;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -47,6 +45,8 @@ import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Set;
@@ -83,7 +83,6 @@ public class ProvisioningCmsObjectBuilderTest {
 
         subject.withCmsCertificate(TEST_CMS_CERT.getCertificate());
         subject.withCrl(CRL);
-        subject.withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         subject.withPayloadContent(payload);
 
@@ -97,7 +96,6 @@ public class ProvisioningCmsObjectBuilderTest {
         ProvisioningCmsObjectBuilder  builder = new ProvisioningCmsObjectBuilder();
         builder.withCmsCertificate(TEST_CMS_CERT.getCertificate());
         builder.withCrl(CRL);
-        builder.withCaCertificate(TEST_IDENTITY_CERT.getCertificate());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         builder.withPayloadContent(payload);
         return builder.build(EE_KEYPAIR.getPrivate());
@@ -118,7 +116,6 @@ public class ProvisioningCmsObjectBuilderTest {
 
     @Test
     public void shouldNotForceIdentityCertificate() throws CMSException {
-        subject.withCaCertificate((X509Certificate[]) null);
         subject.build(EE_KEYPAIR.getPrivate());
     }
 
@@ -189,10 +186,13 @@ public class ProvisioningCmsObjectBuilderTest {
 
         assertNotNull(certificates);
         assertFalse(certificates.isEmpty());
-        assertEquals(2, certificates.size());
-
-        certificates = new ArrayList<Certificate>(certificates);
-        assertTrue(certificates.contains(TEST_IDENTITY_CERT.getCertificate()));
+        assertEquals(1, certificates.size());
+        
+        Certificate cert1 = certificates.iterator().next();
+        ProvisioningIdentityCertificateParser provisioningIdentityCertificateParser = new ProvisioningIdentityCertificateParser();
+        provisioningIdentityCertificateParser.parse("cms", cert1.getEncoded());
+        ProvisioningIdentityCertificate certificate = provisioningIdentityCertificateParser.getCertificate();
+        assertTrue(certificate.isEe());
     }
 
     /**

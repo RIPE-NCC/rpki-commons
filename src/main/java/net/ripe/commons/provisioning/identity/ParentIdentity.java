@@ -48,14 +48,12 @@ public class ParentIdentity extends EqualsSupport {
     public ParentIdentity(URI upDownUrl, String parentHandle,
 			String childHandle,
 			ProvisioningIdentityCertificate parentIdCertificate,
-			ProvisioningIdentityCertificate childIdCertificate,
-			RepositoryDefinition repositoryDefinition) {
+			ProvisioningIdentityCertificate childIdCertificate) {
 		this.upDownUrl = upDownUrl;
 		this.parentHandle = parentHandle;
 		this.childHandle = childHandle;
 		this.parentIdCertificate = parentIdCertificate;
 		this.childIdCertificate = childIdCertificate;
-		this.repositoryDefinition = repositoryDefinition;
 	}
 
 
@@ -82,10 +80,6 @@ public class ParentIdentity extends EqualsSupport {
     @XStreamAlias("bpki_child_ta")
     private ProvisioningIdentityCertificate childIdCertificate;
     
-    @XStreamAlias("repository")
-    private RepositoryDefinition repositoryDefinition;
-
-    
     public String getChildHandle() {
         return childHandle;
     }
@@ -103,10 +97,6 @@ public class ParentIdentity extends EqualsSupport {
         return childIdCertificate;
     }
     
-    public RepositoryDefinition getRepositoryDefinition() {
-        return repositoryDefinition;
-    }
-
     public URI getUpDownUrl() {
         return upDownUrl;
     }

@@ -29,52 +29,54 @@
  */
 package net.ripe.certification.client.xml.converters;
 
+import static org.junit.Assert.*;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-
-import com.thoughtworks.xstream.converters.SingleValueConverter;
+import org.junit.Before;
+import org.junit.Test;
 
 
-public class DateTimeConverter implements SingleValueConverter {
+public class DateTimeConverterTest {
 
-    private static final DateTimeFormatter FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
-
-    private static final DateTimeFormatter FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE = ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC);
-
-    private boolean useMillis = false;
-
-    public DateTimeConverter() {
+    
+    private static final DateTime START_EPOCH_DATE_TIME = new DateTime(0L).withZone(DateTimeZone.UTC);
+    private static final String START_EPOCH_DATE_WITH_MILLIS_AND_ZONE = "1970-01-01T00:00:00.000Z";
+    private static final String START_EPOCH_DATE_NO_MILLIS_AND_ZONE = "1970-01-01T00:00:00Z";
+    
+    private DateTimeConverter converter;
+    
+    @Before
+    public void setUp() {
+        converter = new DateTimeConverter();
     }
 
-    public DateTimeConverter(boolean useMillis) {
-        this.useMillis = useMillis;
+    @Test
+    public void shouldConvertDateToStringWithoutMillisByDefault() {
+        String dateStringFound = converter.toString(START_EPOCH_DATE_TIME);
+        assertEquals(START_EPOCH_DATE_NO_MILLIS_AND_ZONE, dateStringFound);
     }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public boolean canConvert(Class type) {
-        return DateTime.class.equals(type);
+    
+    @Test
+    public void shouldConvertDateToStringWithMillisIfAsked() {
+        converter = new DateTimeConverter(true);
+        String dateStringFound = converter.toString(START_EPOCH_DATE_TIME);
+        assertEquals(START_EPOCH_DATE_WITH_MILLIS_AND_ZONE, dateStringFound);
     }
-
-    @Override
-    public Object fromString(String s) {
-        try {
-            return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.parseDateTime(s);
-        } catch (IllegalArgumentException e) {
-            return FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.parseDateTime(s);
-        }
+    
+    @Test
+    public void shouldUnderstandDateStringWithMillis() {
+        DateTime dateFound = (DateTime) converter.fromString(START_EPOCH_DATE_WITH_MILLIS_AND_ZONE);
+        assertEquals(START_EPOCH_DATE_TIME, dateFound);
     }
-
-    @Override
-    public String toString(Object datetime) {
-        // TODO: Test this! Was failing for me when running unit tests from different time zone
-        DateTime dateTimeWithZone = ((DateTime) datetime).withZone(DateTimeZone.UTC);
-        if (useMillis) {
-            return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.print(dateTimeWithZone);
-        } else {
-            return FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.print(dateTimeWithZone);
-        }
+    
+    @Test
+    public void shouldUnderstandIscDateFormat() {
+        // i.e. without millis
+        String iscDate = START_EPOCH_DATE_NO_MILLIS_AND_ZONE;
+        
+        DateTime dateFound = (DateTime) converter.fromString(iscDate);
+        assertEquals(START_EPOCH_DATE_TIME, dateFound);
     }
+    
 }

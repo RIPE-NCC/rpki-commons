@@ -29,9 +29,9 @@
  */
 package net.ripe.certification.client.xml;
 
-import com.thoughtworks.xstream.XStream;
-
 import java.io.Writer;
+
+import com.thoughtworks.xstream.XStream;
 
 public class XStreamXmlSerializer<T> implements XmlSerializer<T> {
 

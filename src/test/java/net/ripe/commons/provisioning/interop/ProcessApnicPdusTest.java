@@ -27,21 +27,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.commons.provisioning.identity;
+package net.ripe.commons.provisioning.interop;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import static org.junit.Assert.*;
 
-public class RepositoryDefinition {
+import java.io.File;
+import java.io.IOException;
+
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
+
+public class ProcessApnicPdusTest {
     
-    @XStreamAsAttribute
-    private String type;
-
-    public RepositoryDefinition(String type) {
-        this.type = type;
-    }
+    private static final String PATH_TO_TEST_PDUS = "src/test/resources/apnic-interop";
     
-    public String getType() {
-        return type;
+    @Test
+    public void shouldUnderstandApnicResponse() throws IOException {
+        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/A971C-resp"));
+        
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("cms", encoded);
+        ValidationResult validationResult = parser.getValidationResult();
+        assertTrue("OLD APNIC PDU HAS FAULURES", validationResult.hasFailures());
+        
     }
 
 }
