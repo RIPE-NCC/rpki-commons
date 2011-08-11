@@ -32,9 +32,6 @@ package net.ripe.commons.certification.cms.roa;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceRange;
@@ -43,30 +40,14 @@ import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.hibernate.validator.AssertTrue;
-import org.hibernate.validator.NotNull;
 
-@Embeddable
 public class RoaPrefix extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotNull
-    @Column(name = "resource_start", nullable = false)
     private BigInteger resourceStart;
-
-    @NotNull
-    @Column(name = "resource_end", nullable = false)
     private BigInteger resourceEnd;
-
-    @NotNull
-    @Column(name = "resource_type_id", nullable = false)
     private IpResourceType resourceType;
-
-    @Column(name = "maximum_length", nullable = true)
     private Integer maximumLength;
-
-    protected RoaPrefix() {
-
-    }
 
     public RoaPrefix(IpRange prefix) {
         this(prefix, null);
