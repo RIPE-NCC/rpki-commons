@@ -49,13 +49,13 @@ public class PrefixValidatorTest {
 
     @Test
     public void shouldPassWithCorrectPrefix() {
-        ValidationResult result = subject.validate("10/16");
+        FieldValidationResult result = subject.validate("10/16");
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldCheckIfPrefixIsNull() {
-        ValidationResult result = subject.validate(null);
+        FieldValidationResult result = subject.validate(null);
 
         assertTrue(result.hasFailures());
 
@@ -66,7 +66,7 @@ public class PrefixValidatorTest {
 
     @Test
     public void shouldCheckIfPrefixIsBlank() {
-        ValidationResult result = subject.validate(" ");
+        FieldValidationResult result = subject.validate(" ");
 
         assertTrue(result.hasFailures());
 
@@ -77,7 +77,7 @@ public class PrefixValidatorTest {
 
     @Test
     public void shouldCheckIfPrefixIsValid() {
-        ValidationResult result = subject.validate("10/foo");
+        FieldValidationResult result = subject.validate("10/foo");
 
         assertTrue(result.hasFailures());
 
@@ -88,7 +88,7 @@ public class PrefixValidatorTest {
 
     @Test
     public void shouldCheckIfPrefixIsLegal() {
-        ValidationResult result = subject.validate("10/0");
+        FieldValidationResult result = subject.validate("10/0");
 
         assertTrue(result.hasFailures());
 
@@ -99,7 +99,7 @@ public class PrefixValidatorTest {
 
     @Test
     public void shouldCheckIfResourceIsHeldByCa() {
-        ValidationResult result = subject.validate("192.168/16");
+        FieldValidationResult result = subject.validate("192.168/16");
 
         assertTrue(result.hasFailures());
 

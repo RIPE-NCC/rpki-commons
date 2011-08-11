@@ -41,7 +41,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-public class ValidationResult implements Serializable {
+public class FieldValidationResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -49,25 +49,25 @@ public class MaximumLengthValidatorTest {
 
     @Test
     public void shouldPassWithCorrectLength() {
-        ValidationResult result = subject.validate("16");
+        FieldValidationResult result = subject.validate("16");
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldPassWithoutMaxLengthSpecified() {
-        ValidationResult result = subject.validate(null);
+        FieldValidationResult result = subject.validate(null);
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldPassIfMaxLegthIsBlank() {
-        ValidationResult result = subject.validate(" ");
+        FieldValidationResult result = subject.validate(" ");
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldCheckIfMaxLengthIsValid() {
-        ValidationResult result = subject.validate("foo");
+        FieldValidationResult result = subject.validate("foo");
 
         assertTrue(result.hasFailures());
 
@@ -78,7 +78,7 @@ public class MaximumLengthValidatorTest {
 
     @Test
     public void shouldCheckIfMaxLengthIsLegal() {
-        ValidationResult result = subject.validate("7");
+        FieldValidationResult result = subject.validate("7");
 
         assertTrue(result.hasFailures());
 
@@ -89,7 +89,7 @@ public class MaximumLengthValidatorTest {
 
     @Test
     public void shouldCheckIfMaxLengthIsNotMoreSpecificThanBitsizeMinusTwo() {
-        ValidationResult result = subject.validate("31");
+        FieldValidationResult result = subject.validate("31");
 
         assertTrue(result.hasFailures());
 

@@ -49,13 +49,13 @@ public class NameValidatorTest {
 
     @Test
     public void shouldPassWithCorrectName() {
-        ValidationResult result = subject.validate("Sample ROA");
+        FieldValidationResult result = subject.validate("Sample ROA");
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldCheckIfNameIsNull() {
-        ValidationResult result = subject.validate(null);
+        FieldValidationResult result = subject.validate(null);
 
         assertTrue(result.hasFailures());
 
@@ -66,7 +66,7 @@ public class NameValidatorTest {
 
     @Test
     public void shouldCheckIfNameIsBlank() {
-        ValidationResult result = subject.validate(" ");
+        FieldValidationResult result = subject.validate(" ");
 
         assertTrue(result.hasFailures());
 
@@ -77,7 +77,7 @@ public class NameValidatorTest {
 
     @Test
     public void shouldCheckNamePattern() {
-        ValidationResult result = subject.validate("$%");
+        FieldValidationResult result = subject.validate("$%");
 
         assertTrue(result.hasFailures());
 
@@ -88,7 +88,7 @@ public class NameValidatorTest {
 
     @Test
     public void shouldCheckForDuplicates() {
-        ValidationResult result = subject.validate(EXISTING_NAMES.get(0));
+        FieldValidationResult result = subject.validate(EXISTING_NAMES.get(0));
 
         assertTrue(result.hasFailures());
 
@@ -100,7 +100,7 @@ public class NameValidatorTest {
     @Test
     public void shouldSkipDuplicateCheckIfNameListNotSpecified() {
         subject = new NameValidator();
-        ValidationResult result = subject.validate("My Roa");
+        FieldValidationResult result = subject.validate("My Roa");
 
         assertFalse(result.hasFailures());
     }
@@ -111,7 +111,7 @@ public class NameValidatorTest {
         for(int i=0; i<2000; i++) {
             sb.append('x');
         }
-        ValidationResult result = subject.validate(sb.toString());
+        FieldValidationResult result = subject.validate(sb.toString());
 
         assertTrue(result.hasFailures());
 

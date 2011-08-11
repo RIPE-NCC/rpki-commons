@@ -34,5 +34,5 @@ import java.io.Serializable;
 
 public interface FieldValidator extends Serializable {
 
-    ValidationResult validate(String target);
+    FieldValidationResult validate(String target);
 }

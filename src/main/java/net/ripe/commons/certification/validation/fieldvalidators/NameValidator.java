@@ -57,8 +57,8 @@ public class NameValidator implements FieldValidator {
     }
 
     @Override
-    public ValidationResult validate(String name) {
-        ValidationResult result = new ValidationResult();
+    public FieldValidationResult validate(String name) {
+        FieldValidationResult result = new FieldValidationResult();
         if (!result.isFalse(StringUtils.isBlank(name), ROA_SPECIFICATION_NAME_REQUIRED)) {
             return result;
         }

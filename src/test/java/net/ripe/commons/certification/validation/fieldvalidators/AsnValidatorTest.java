@@ -46,13 +46,13 @@ public class AsnValidatorTest {
 
     @Test
     public void shouldPassWithCorrectAsNumber() {
-        ValidationResult result = subject.validate("AS123");
+        FieldValidationResult result = subject.validate("AS123");
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldCheckIfAsnIsNull() {
-        ValidationResult result = subject.validate(null);
+        FieldValidationResult result = subject.validate(null);
 
         assertTrue(result.hasFailures());
 
@@ -63,7 +63,7 @@ public class AsnValidatorTest {
 
     @Test
     public void shouldCheckIfAsnIsBlank() {
-        ValidationResult result = subject.validate(" ");
+        FieldValidationResult result = subject.validate(" ");
 
         assertTrue(result.hasFailures());
 
@@ -74,7 +74,7 @@ public class AsnValidatorTest {
 
     @Test
     public void shouldFailWithMalformedAsNumber() {
-        ValidationResult result = subject.validate("12AS");
+        FieldValidationResult result = subject.validate("12AS");
         assertTrue(result.hasFailures());
 
         List<ValidationCheck> failures = result.getFailures();

@@ -39,8 +39,8 @@ public class DateTimeValidator implements FieldValidator {
 
 
     @Override
-    public ValidationResult validate(String date) {
-        ValidationResult result = new ValidationResult();
+    public FieldValidationResult validate(String date) {
+        FieldValidationResult result = new FieldValidationResult();
 
         // we allow empty dates
         if (StringUtils.isBlank(date)) {

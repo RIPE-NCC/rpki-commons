@@ -40,8 +40,8 @@ public class AsnValidator implements FieldValidator {
 
 
     @Override
-    public ValidationResult validate(String asn) {
-        ValidationResult result = new ValidationResult();
+    public FieldValidationResult validate(String asn) {
+        FieldValidationResult result = new FieldValidationResult();
         if (!result.isFalse(StringUtils.isBlank(asn), ROA_SPECIFICATION_ASN_REQUIRED)) {
             return result;
         }

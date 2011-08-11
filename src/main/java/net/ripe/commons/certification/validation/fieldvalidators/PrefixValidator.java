@@ -47,8 +47,8 @@ public class PrefixValidator implements FieldValidator {
     }
 
     @Override
-    public ValidationResult validate(String prefix) {
-        ValidationResult result = new ValidationResult();
+    public FieldValidationResult validate(String prefix) {
+        FieldValidationResult result = new FieldValidationResult();
         if (!result.isFalse(StringUtils.isBlank(prefix), ROA_SPECIFICATION_PREFIX_REQUIRED)) {
             return result;
         }

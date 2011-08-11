@@ -48,8 +48,8 @@ public class MaximumLengthValidator implements FieldValidator {
     }
 
     @Override
-    public ValidationResult validate(String maxLength) {
-        ValidationResult result = new ValidationResult();
+    public FieldValidationResult validate(String maxLength) {
+        FieldValidationResult result = new FieldValidationResult();
 
         if (StringUtils.isBlank(maxLength)) {
             return result;

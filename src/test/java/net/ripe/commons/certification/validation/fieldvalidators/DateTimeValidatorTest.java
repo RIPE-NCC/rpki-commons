@@ -46,27 +46,27 @@ public class DateTimeValidatorTest {
 
     @Test
     public void shouldPassWithCorrectDateTime() {
-        ValidationResult result = subject.validate("2010-01-31 00:00");
+        FieldValidationResult result = subject.validate("2010-01-31 00:00");
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldCheckIfDateTimeIsNull() {
-        ValidationResult result = subject.validate(null);
+        FieldValidationResult result = subject.validate(null);
 
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldCheckIfNameIsBlank() {
-        ValidationResult result = subject.validate(" ");
+        FieldValidationResult result = subject.validate(" ");
 
         assertFalse(result.hasFailures());
     }
 
     @Test
     public void shouldRejectIncorrectDateTimeFormat() {
-        ValidationResult result = subject.validate("2010/12/31 00:59");
+        FieldValidationResult result = subject.validate("2010/12/31 00:59");
 
         assertTrue(result.hasFailures());
 
