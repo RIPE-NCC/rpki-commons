@@ -30,15 +30,11 @@
 package net.ripe.commons.certification;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
 
 import net.ripe.commons.certification.util.EqualsSupport;
 
-import org.hibernate.validator.AssertTrue;
+import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -49,55 +45,47 @@ import org.joda.time.ReadableInstant;
  * have up-to second accuracy with validity fields, this class truncates not
  * before and not after to second accuracy.
  */
-@Embeddable
 public class ValidityPeriod extends EqualsSupport implements Serializable {
+    private static final long serialVersionUID = 2L;
 
-    private static final long serialVersionUID = 1L;
-
-    @Column(name = "validity_not_before", nullable = true)
-    private Timestamp notValidBefore;
-
-    @Column(name = "validity_not_after", nullable = true)
-    private Timestamp notValidAfter;
+    private final DateTime notValidBefore;
+    private final DateTime notValidAfter;
 
     public ValidityPeriod() {
-        this.notValidBefore = null;
-        this.notValidAfter = null;
+        this((Date)null,(Date)null);
     }
-
+    
     public ValidityPeriod(ReadableInstant notValidBefore, ReadableInstant notValidAfter) {
-        setNotValidBefore(notValidBefore);
-        setNotValidAfter(notValidAfter);
+        this.notValidBefore = (notValidBefore == null) ? null : new DateTime(truncatedMillis(notValidBefore.getMillis()), DateTimeZone.UTC);
+        this.notValidAfter = (notValidAfter == null) ? null : new DateTime(truncatedMillis(notValidAfter.getMillis()), DateTimeZone.UTC);
+        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter));
     }
 
     public ValidityPeriod(Date notValidBefore, Date notValidAfter) {
-        setNotValidBefore(notValidBefore == null ? null : new DateTime(notValidBefore.getTime(), DateTimeZone.UTC));
-        setNotValidAfter(notValidAfter == null ? null : new DateTime(notValidAfter.getTime(), DateTimeZone.UTC));
+        this.notValidBefore = (notValidBefore == null) ? null : new DateTime(truncatedMillis(notValidBefore.getTime()), DateTimeZone.UTC);
+        this.notValidAfter = (notValidAfter == null) ? null : new DateTime(truncatedMillis(notValidAfter.getTime()), DateTimeZone.UTC);
+        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter));
     }
 
-    private void setNotValidBefore(ReadableInstant notValidBefore) {
-        this.notValidBefore = notValidBefore == null ? null : new Timestamp(truncatedMillis(notValidBefore));
-    }
-
-    private void setNotValidAfter(ReadableInstant notValidAfter) {
-        this.notValidAfter = notValidAfter == null ? null : new Timestamp(truncatedMillis(notValidAfter));
+    private static boolean isDateOrderingValid(DateTime notValidBefore, DateTime notValidAfter) {
+        return (notValidBefore == null || notValidAfter == null || notValidBefore.isEqual(notValidAfter) || notValidBefore.isBefore(notValidAfter));
     }
 
     /**
      * Match resolution of certificate validity period (seconds)
      */
-    private long truncatedMillis(ReadableInstant notValidBefore) {
-        // CHECKSTYLE:OFF – 1000 is not a "magic number" in this case
-        return notValidBefore.getMillis() / 1000 * 1000;
+    private long truncatedMillis(long millisec) {
+        // CHECKSTYLE:OFF  1000 is not a "magic number" in this case
+        return millisec / 1000 * 1000;
         // CHECKSTYLE:ON
     }
 
     public DateTime getNotValidAfter() {
-        return notValidAfter == null ? null : new DateTime(notValidAfter.getTime(), DateTimeZone.UTC);
+        return notValidAfter;
     }
 
     public DateTime getNotValidBefore() {
-        return notValidBefore == null ? null : new DateTime(notValidBefore.getTime(), DateTimeZone.UTC);
+        return notValidBefore;
     }
 
     public ValidityPeriod withNotValidBefore(ReadableInstant notValidBefore) {
@@ -150,20 +138,27 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
      * @return the intersection of this and the other validity period, or null
      *         if there is no overlap.
      */
-    public ValidityPeriod intersect(ValidityPeriod other) {
-        ValidityPeriod result = this;
-        if (getNotValidBefore() == null || (other.getNotValidBefore() != null && getNotValidBefore().isBefore(other.getNotValidBefore()))) {
-            result = result.withNotValidBefore(other.getNotValidBefore());
+    public ValidityPeriod intersectedWith(ValidityPeriod other) {
+        DateTime latestNotValidBefore = latestDateTimeOf(notValidBefore, other.notValidBefore);
+        DateTime earliestNotValidAfter = earliestDateTimeOf(notValidAfter, other.notValidAfter);
+        if (isDateOrderingValid(latestNotValidBefore, earliestNotValidAfter)) {
+            return new ValidityPeriod(latestNotValidBefore, earliestNotValidAfter);
+        } else {
+            // we got disjoint time intervals
+            return null;
         }
-        if (getNotValidAfter() == null || (other.getNotValidAfter() != null && getNotValidAfter().isAfter(other.getNotValidAfter()))) {
-            result = result.withNotValidAfter(other.getNotValidAfter());
-        }
-        return result.isValid() ? result : null;
+    }
+    
+    private DateTime earliestDateTimeOf(DateTime date1, DateTime date2) {
+        if (date1 == null) return date2;
+        if (date2 == null) return date1;
+        return (date1.isBefore(date2) ? date1 : date2);
     }
 
-    @AssertTrue
-    public boolean isValid() {
-        return notValidBefore == null || notValidAfter == null || notValidBefore.compareTo(notValidAfter) <= 0;
+    private DateTime latestDateTimeOf(DateTime date1, DateTime date2) {
+        if (date1 == null) return date2;
+        if (date2 == null) return date1;
+        return (date1.isAfter(date2) ? date1 : date2);
     }
 
     @Override

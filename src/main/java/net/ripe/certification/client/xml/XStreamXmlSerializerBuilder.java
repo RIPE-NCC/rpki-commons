@@ -41,7 +41,7 @@ import net.ripe.certification.client.xml.converters.RoaCmsConverter;
 import net.ripe.certification.client.xml.converters.VersionedIdConverter;
 import net.ripe.certification.client.xml.converters.X500PrincipalConverter;
 import net.ripe.certification.client.xml.converters.X509ResourceCertificateConverter;
-import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.util.VersionedId;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
@@ -70,7 +70,7 @@ public class XStreamXmlSerializerBuilder<T> {
     private void createDefaultXStream() {
         xStream = new MyXStream(getStreamDriver());
         xStream.setMode(XStream.NO_REFERENCES);
-        xStream.aliasPackage("commons", ValidityPeriod.class.getPackage().getName());
+        xStream.aliasPackage("commons", CertificateRepositoryObject.class.getPackage().getName());
 
         registerIpResourceRelated();
         registerDateTimeRelated();

@@ -50,17 +50,17 @@ public class ValidityPeriodTest {
 
 	@Test
 	public void testWrongValidityPeriod() {
-		ValidityPeriod validityPeriod = new ValidityPeriod(new DateTime(), new DateTime().minus(Period.millis(1)));
-
-		assertFalse(validityPeriod.isValid());
+	    try {
+	        new ValidityPeriod(new DateTime(), new DateTime().minus(Period.millis(1)));
+	        fail("IllegalArgumentException expected");
+	    } catch (IllegalArgumentException expected) {
+	    }
 	}
 
 	@Test
 	public void singleInstantShouldBeOK() {
 		DateTime now = new DateTime();
-		ValidityPeriod validityPeriod = new ValidityPeriod(now, now);
-
-		assertTrue(validityPeriod.isValid());
+		new ValidityPeriod(now, now);
 	}
 
 	@Test
@@ -70,7 +70,6 @@ public class ValidityPeriodTest {
 
         assertTrue(closed.isClosed());
         assertFalse(open.isClosed());
-        assertTrue(open.isValid());
 	    assertTrue("open should contain closed", open.contains(closed));
 	    assertFalse("closed should not contain open", closed.contains(open));
 	    assertTrue(open.isValidAt(date(2008, 1, 1)));
@@ -85,7 +84,6 @@ public class ValidityPeriodTest {
 
         assertTrue(closed.isClosed());
         assertFalse(open.isClosed());
-        assertTrue(open.isValid());
         assertTrue("open should contain closed", open.contains(closed));
         assertFalse("closed should not contain open", closed.contains(open));
         assertTrue(open.isValidAt(date(2008, 1, 1)));
@@ -122,14 +120,14 @@ public class ValidityPeriodTest {
         DateTime t3 = new DateTime(2008, 11, 1, 0, 0, 0, 0);
         DateTime t4 = new DateTime(2008, 12, 1, 0, 0, 0, 0);
 
-        assertEquals(null, new ValidityPeriod(t1, t2).intersect(new ValidityPeriod(t3, t4)));
-        assertEquals(new ValidityPeriod(), new ValidityPeriod().intersect(new ValidityPeriod()));
-        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod(t1, t3).intersect(new ValidityPeriod()));
-        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod().intersect(new ValidityPeriod(t1, t3)));
-        assertEquals(new ValidityPeriod(t2, t3), new ValidityPeriod(t1, t3).intersect(new ValidityPeriod(t2, t4)));
-        assertEquals(new ValidityPeriod(t2, t3), new ValidityPeriod(t2, t4).intersect(new ValidityPeriod(t1, t3)));
-        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod(t1, t4).intersect(new ValidityPeriod(t1, t3)));
-        assertEquals(new ValidityPeriod(t2, t4), new ValidityPeriod(t2, t4).intersect(new ValidityPeriod(t1, t4)));
+        assertEquals(null, new ValidityPeriod(t1, t2).intersectedWith(new ValidityPeriod(t3, t4)));
+        assertEquals(new ValidityPeriod(), new ValidityPeriod().intersectedWith(new ValidityPeriod()));
+        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod(t1, t3).intersectedWith(new ValidityPeriod()));
+        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod().intersectedWith(new ValidityPeriod(t1, t3)));
+        assertEquals(new ValidityPeriod(t2, t3), new ValidityPeriod(t1, t3).intersectedWith(new ValidityPeriod(t2, t4)));
+        assertEquals(new ValidityPeriod(t2, t3), new ValidityPeriod(t2, t4).intersectedWith(new ValidityPeriod(t1, t3)));
+        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod(t1, t4).intersectedWith(new ValidityPeriod(t1, t3)));
+        assertEquals(new ValidityPeriod(t2, t4), new ValidityPeriod(t2, t4).intersectedWith(new ValidityPeriod(t1, t4)));
     }
 
     @Test
