@@ -45,7 +45,7 @@ public class RouteOriginValidationPolicy {
     /**
      * Precondition: roas are valid
      */
-    public RouteValidityState determineRouteValidityState(AnnouncedRoute route, List<Roa> roas) {
+    public RouteValidityState determineRouteValidityState(AnnouncedRoute route, List<? extends Roa> roas) {
         RouteValidityState result = RouteValidityState.UNKNOWN;
         for (Roa roa : roas) {
             switch (determineRouteValidityState(route, roa)) {
