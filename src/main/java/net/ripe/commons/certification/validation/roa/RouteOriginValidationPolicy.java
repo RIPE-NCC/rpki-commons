@@ -29,12 +29,64 @@
  */
 package net.ripe.commons.certification.validation.roa;
 
+import java.util.List;
+
+import net.ripe.commons.certification.cms.roa.Roa;
+import net.ripe.commons.certification.cms.roa.RoaPrefix;
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpRange;
+
+
 /**
  * See http://tools.ietf.org/html/draft-ietf-sidr-roa-validation-10
  */
 public class RouteOriginValidationPolicy {
 
-    public RouteValidityState validate() {
-        throw new UnsupportedOperationException();
+    /**
+     * Precondition: roas are valid
+     */
+    public RouteValidityState determineRouteValidityState(AnnouncedRoute route, List<Roa> roas) {
+        RouteValidityState result = RouteValidityState.UNKNOWN;
+        for (Roa roa : roas) {
+            switch (determineRouteValidityState(route, roa)) {
+            case VALID:
+                return RouteValidityState.VALID;
+            case INVALID:
+                result = RouteValidityState.INVALID;
+                break;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Precondition: roa is valid
+     */
+    public RouteValidityState determineRouteValidityState(AnnouncedRoute route, Roa roa) {
+        RouteValidityState result = RouteValidityState.UNKNOWN;
+        for(RoaPrefix roaPrefix: roa.getPrefixes()) {
+            RouteValidityState prefixValidationResult = validateRoaPrefix(route, roaPrefix, roa.getAsn());
+            if (prefixValidationResult == RouteValidityState.VALID) {
+                return RouteValidityState.VALID;
+            } else if (prefixValidationResult == RouteValidityState.INVALID) {
+                result = prefixValidationResult;
+            }
+        }
+        return result;
+    }
+
+    private RouteValidityState validateRoaPrefix(AnnouncedRoute route, RoaPrefix roaPrefix, Asn roaAsn) {
+        IpRange announcedPrefix = route.getPrefix();
+        IpRange roaIpPrefix = roaPrefix.getPrefix();
+        if (!roaIpPrefix.contains(announcedPrefix)) {   // non-intersecting or covering-aggregate
+            return RouteValidityState.UNKNOWN;
+        } else if (announcedPrefix.getPrefixLength() <= roaPrefix.getEffectiveMaximumLength()) {
+            if (route.getOriginAsn()!=null && roaAsn.equals(route.getOriginAsn())) {
+                return RouteValidityState.VALID;
+            } else {
+                return RouteValidityState.INVALID;
+            }
+        }
+        return RouteValidityState.INVALID;
     }
 }

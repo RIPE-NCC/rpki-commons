@@ -68,6 +68,10 @@ public class RoaPrefix extends EqualsSupport implements Serializable {
     public Integer getMaximumLength() {
         return maximumLength;
     }
+    
+    public int getEffectiveMaximumLength() {
+        return maximumLength != null ? maximumLength : getPrefix().getPrefixLength();
+    }
 
     @AssertTrue
     public boolean isMaximumLengthValid() {
