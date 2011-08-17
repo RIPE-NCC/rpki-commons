@@ -29,26 +29,28 @@
  */
 package net.ripe.commons.certification.validation.roa;
 
+import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 
 import org.apache.commons.lang.Validate;
 
-public class AnnouncedRoute {
+public class AnnouncedRoute extends EqualsSupport {
 
     private final IpRange prefix;
     private final Asn originAsn;
 
     public AnnouncedRoute(Asn originAsn, IpRange prefix) {
+        Validate.notNull(originAsn, "origin is required");
         Validate.isTrue(prefix.isLegalPrefix(), "Prefix must be legal");
         this.prefix = prefix;
         this.originAsn = originAsn;
     }
-    
+
     public Asn getOriginAsn() {
         return originAsn;
     }
-    
+
     public IpRange getPrefix() {
         return prefix;
     }

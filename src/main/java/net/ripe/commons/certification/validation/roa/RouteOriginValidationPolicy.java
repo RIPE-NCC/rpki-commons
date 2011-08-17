@@ -54,11 +54,13 @@ public class RouteOriginValidationPolicy {
             case INVALID:
                 result = RouteValidityState.INVALID;
                 break;
+            case UNKNOWN:
+                break;
             }
         }
         return result;
     }
-    
+
     /**
      * Precondition: roa is valid
      */
