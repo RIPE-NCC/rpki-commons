@@ -33,26 +33,53 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
+import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.cms.CMSException;
 import org.junit.Test;
 
+
 public class ProcessApnicPdusTest {
-    
+
     private static final String PATH_TO_TEST_PDUS = "src/test/resources/apnic-interop";
-    
+
     @Test
-    public void shouldUnderstandApnicResponse() throws IOException {
-        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/A971C-resp"));
-        
+    public void apnic_pdu_2011_08_15_1_has_errors() throws IOException, CMSException {
+        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/A971C.1"));
+
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("cms", encoded);
         ValidationResult validationResult = parser.getValidationResult();
-        assertTrue("OLD APNIC PDU HAS FAULURES", validationResult.hasFailures());
-        
+        Set<ValidationCheck> failures = validationResult.getFailuresForCurrentLocation();
+        assertTrue("Should have 1 failure", failures.size() == 1);
+        assertEquals(ValidationString.ONLY_ONE_CRL_ALLOWED, failures.iterator().next().getKey());
+    }
+
+    @Test
+    public void apnic_pdu_2011_08_15_3_has_errors() throws IOException, CMSException {
+        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/A971C.3"));
+
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("cms", encoded);
+        ValidationResult validationResult = parser.getValidationResult();
+        Set<ValidationCheck> failures = validationResult.getFailuresForCurrentLocation();
+        assertTrue("Should have 1 failure", failures.size() == 1);
+        assertEquals(ValidationString.ONLY_ONE_CRL_ALLOWED, failures.iterator().next().getKey());
+    }
+
+    @SuppressWarnings("unused")
+    private void prettyPrintFailures(ValidationResult validationResult) {
+        for (String location : validationResult.getValidatedLocations()) {
+            for (ValidationCheck failure : validationResult.getFailures(location)) {
+                System.err.println(location + "\t" + failure + "\n");
+            }
+        }
     }
 
 }
