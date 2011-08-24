@@ -30,12 +30,9 @@
 package net.ripe.commons.certification.cms.roa;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.IpRange;
-import net.ripe.ipresource.IpResourceRange;
-import net.ripe.ipresource.IpResourceType;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -44,31 +41,26 @@ import org.hibernate.validator.AssertTrue;
 public class RoaPrefix extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private BigInteger resourceStart;
-    private BigInteger resourceEnd;
-    private IpResourceType resourceType;
-    private Integer maximumLength;
+    private final IpRange prefix;
+    private final Integer maximumLength;
 
     public RoaPrefix(IpRange prefix) {
         this(prefix, null);
     }
 
     public RoaPrefix(IpRange prefix, Integer maximumLength) {
-        this.resourceType = prefix.getType();
-        this.resourceStart = prefix.getStart().getValue();
-        this.resourceEnd = prefix.getEnd().getValue();
+        this.prefix = prefix;
         this.maximumLength = maximumLength;
-
     }
 
     public IpRange getPrefix() {
-        return (IpRange) IpResourceRange.range(resourceType.fromBigInteger(resourceStart), resourceType.fromBigInteger(resourceEnd));
+        return prefix;
     }
 
     public Integer getMaximumLength() {
         return maximumLength;
     }
-    
+
     public int getEffectiveMaximumLength() {
         return maximumLength != null ? maximumLength : getPrefix().getPrefixLength();
     }
