@@ -32,8 +32,6 @@ package net.ripe.commons.certification.validation.roa;
 import java.util.List;
 
 import net.ripe.commons.certification.cms.roa.Roa;
-import net.ripe.commons.certification.cms.roa.RoaPrefix;
-import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 
 
@@ -46,9 +44,13 @@ public class RouteOriginValidationPolicy {
      * Precondition: roas are valid
      */
     public RouteValidityState determineRouteValidityState(AnnouncedRoute route, List<? extends Roa> roas) {
+        return determineRouteValidityState(RtrPrefix.getAll(roas), route);
+    }
+
+    public RouteValidityState determineRouteValidityState(List<RtrPrefix> rtrPrefixes, AnnouncedRoute route) {
         RouteValidityState result = RouteValidityState.UNKNOWN;
-        for (Roa roa : roas) {
-            switch (determineRouteValidityState(route, roa)) {
+        for (RtrPrefix rtrPrefix : rtrPrefixes) {
+            switch (validateForRtrPrefix(route, rtrPrefix)) {
             case VALID:
                 return RouteValidityState.VALID;
             case INVALID:
@@ -64,26 +66,31 @@ public class RouteOriginValidationPolicy {
     /**
      * Precondition: roa is valid
      */
-    public RouteValidityState determineRouteValidityState(AnnouncedRoute route, Roa roa) {
-        RouteValidityState result = RouteValidityState.UNKNOWN;
-        for(RoaPrefix roaPrefix: roa.getPrefixes()) {
-            RouteValidityState prefixValidationResult = validateRoaPrefix(route, roaPrefix, roa.getAsn());
-            if (prefixValidationResult == RouteValidityState.VALID) {
-                return RouteValidityState.VALID;
-            } else if (prefixValidationResult == RouteValidityState.INVALID) {
-                result = prefixValidationResult;
-            }
-        }
-        return result;
-    }
+    // public RouteValidityState determineRouteValidityState(AnnouncedRoute
+    // route, Roa roa) {
+    // RouteValidityState result = RouteValidityState.UNKNOWN;
+    // for(RoaPrefix roaPrefix: roa.getPrefixes()) {
+    // RouteValidityState prefixValidationResult = validateRoaPrefix(route,
+    // roaPrefix, roa.getAsn());
+    // if (prefixValidationResult == RouteValidityState.VALID) {
+    // return RouteValidityState.VALID;
+    // } else if (prefixValidationResult == RouteValidityState.INVALID) {
+    // result = prefixValidationResult;
+    // }
+    // }
+    // return result;
+    // }
 
-    private RouteValidityState validateRoaPrefix(AnnouncedRoute route, RoaPrefix roaPrefix, Asn roaAsn) {
+    private RouteValidityState validateForRtrPrefix(AnnouncedRoute route, RtrPrefix rtrPrefix) {
+        
         IpRange announcedPrefix = route.getPrefix();
-        IpRange roaIpPrefix = roaPrefix.getPrefix();
-        if (!roaIpPrefix.contains(announcedPrefix)) {   // non-intersecting or covering-aggregate
+        
+        if (!rtrPrefix.prefix.contains(announcedPrefix)) { // non-intersecting
+                                                           // or
+                                                           // covering-aggregate
             return RouteValidityState.UNKNOWN;
-        } else if (announcedPrefix.getPrefixLength() <= roaPrefix.getEffectiveMaximumLength()) {
-            if (route.getOriginAsn()!=null && roaAsn.equals(route.getOriginAsn())) {
+        } else if (announcedPrefix.getPrefixLength() <= rtrPrefix.maxLength) {
+            if (route.getOriginAsn() != null && rtrPrefix.asn.equals(route.getOriginAsn())) {
                 return RouteValidityState.VALID;
             } else {
                 return RouteValidityState.INVALID;
@@ -91,4 +98,5 @@ public class RouteOriginValidationPolicy {
         }
         return RouteValidityState.INVALID;
     }
+
 }

@@ -29,34 +29,30 @@
  */
 package net.ripe.commons.certification.validation.roa;
 
-import static junit.framework.Assert.*;
-import static net.ripe.commons.certification.cms.roa.RoaCmsParserTest.*;
+import static junit.framework.Assert.assertEquals;
+import static net.ripe.commons.certification.cms.roa.RoaCmsParserTest.TEST_ASN;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import net.ripe.commons.certification.cms.roa.Roa;
+import net.ripe.commons.certification.cms.roa.RoaCms;
 import net.ripe.commons.certification.cms.roa.RoaCmsTest;
 import net.ripe.commons.certification.cms.roa.RoaPrefix;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class RouteOriginValidationPolicyTest {
+
     private RouteOriginValidationPolicy subject;
 
-    @BeforeClass
-    public static void should_verify_assumptions() {
-        Roa roa = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20));
-        assertEquals(TEST_ASN, roa.getAsn());
-    }
-
-    static Roa roa(RoaPrefix... roaPrefixes) {
-        return RoaCmsTest.createRoaCms(Arrays.asList(roaPrefixes));
+    static List<RtrPrefix> roa(RoaPrefix... roaPrefixes) {
+        RoaCms roa = RoaCmsTest.createRoaCms(Arrays.asList(roaPrefixes));
+        return RtrPrefix.getAll(Collections.singletonList(roa));
     }
 
     @Before
@@ -66,82 +62,91 @@ public class RouteOriginValidationPolicyTest {
 
     @Test
     public void routes_with_non_intersecting_prefix_and_matching_ASN_should_be_UNKNOWN() {
-        assertEquals(RouteValidityState.UNKNOWN, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.169.0.0/20")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.169.0.0/20", RouteValidityState.UNKNOWN);
     }
 
     @Test
     public void routes_with_non_intersecting_prefix_and_non_matching_ASN_should_be_UNKNOWN() {
-        assertEquals(RouteValidityState.UNKNOWN, subject.determineRouteValidityState(
-                new AnnouncedRoute(Asn.parse("AS124"), IpRange.parse("192.169.0.0/20")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"),  "192.169.0.0/20", RouteValidityState.UNKNOWN);
     }
 
     @Test
     public void routes_with_covering_aggregate_prefix_and_matching_ASN_should_be_UNKNOWN() {
-        assertEquals(RouteValidityState.UNKNOWN, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/15")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN,  "192.168.0.0/15", RouteValidityState.UNKNOWN);
     }
 
     @Test
     public void routes_with_covering_aggregate_prefix_and_non_matching_ASN_should_be_UNKNOWN() {
-        assertEquals(RouteValidityState.UNKNOWN, subject.determineRouteValidityState(
-                new AnnouncedRoute(Asn.parse("AS124"), IpRange.parse("192.168.0.0/15")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"),  "192.168.0.0/15", RouteValidityState.UNKNOWN);
     }
 
     @Test
     public void routes_with_matching_prefix_and_ASN_should_be_VALID() {
-        assertEquals(RouteValidityState.VALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.168.0.0/20", RouteValidityState.VALID);
     }
 
     @Test
     public void routes_with_precise_matching_prefix_and_ASN_should_be_VALID() {
-        assertEquals(RouteValidityState.VALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/16")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16")))));
+        testValidatityDetermination("192.168.0.0/16", 16, TEST_ASN, "192.168.0.0/16", RouteValidityState.VALID);
     }
 
     @Test
     public void routes_with_matching_prefix_but_non_matching_ASN_should_be_INVALID() {
-        assertEquals(RouteValidityState.INVALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(Asn.parse("AS124"), IpRange.parse("192.168.0.0/20")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/20", RouteValidityState.INVALID);
     }
 
     @Test
     public void routes_with_more_specific_prefix_and_matching_ASN_should_be_INVALID() {
-        assertEquals(RouteValidityState.INVALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/21")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.168.0.0/21", RouteValidityState.INVALID);
     }
 
     @Test
     public void routes_with_more_specific_prefix_and_non_matching_ASN_should_be_INVALID() {
-        assertEquals(RouteValidityState.INVALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(Asn.parse("AS124"), IpRange.parse("192.168.0.0/21")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20))));
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/21", RouteValidityState.INVALID);
     }
 
     @Test
     public void routes_with_more_specific_prefix_and_roa_with_default_maxlength_and_matching_ASN_should_be_INVALID() {
-        assertEquals(RouteValidityState.INVALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16")))));
+        testValidatityDetermination("192.168.0.0/16", 16, TEST_ASN, "192.168.0.0/20", RouteValidityState.INVALID);
     }
 
     @Test
     public void routes_with_any_matching_prefix_and_ASN_should_be_VALID() {
-        assertEquals(RouteValidityState.VALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20")), roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("192.169.0.0/16"), 20))));
+        List<RtrPrefix> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("192.169.0.0/16"), 20));
+        
+        AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20"));
+        RouteValidityState validityStateFound = subject.determineRouteValidityState(prefixes, route);
+        assertEquals(RouteValidityState.VALID, validityStateFound);
+        
     }
 
     @Test
     public void routes_with_at_least_one_valid_roa_should_be_VALID() {
-        List<Roa> roaList = Arrays.asList(roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20)), roa(new RoaPrefix(IpRange.parse("10.10.0.0/16"), 20)));
-        assertEquals(RouteValidityState.VALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20")), roaList));
+        
+        List<RtrPrefix> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
+        
+        AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20"));
+        RouteValidityState validityStateFound = subject.determineRouteValidityState(prefixes, route);
+        assertEquals(RouteValidityState.VALID, validityStateFound);
     }
 
     @Test
     public void routes_with_at_least_one_invalid_roa_and_without_valid_roas_should_be_INVALID() {
-        List<Roa> roaList = Arrays.asList(roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20)), roa(new RoaPrefix(IpRange.parse("10.10.0.0/16"), 20)));
-        assertEquals(RouteValidityState.INVALID, subject.determineRouteValidityState(
-                new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/24")), roaList));
+        
+        List<RtrPrefix> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
+        
+        AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/24"));
+        RouteValidityState validityStateFound = subject.determineRouteValidityState(prefixes, route);
+        assertEquals(RouteValidityState.INVALID, validityStateFound);
+        
     }
+    
+    private void testValidatityDetermination(String roaIpPrefix, int roaMaxLength, Asn routeAsn, String routePrefix, RouteValidityState expectedResult) {
+        List<RtrPrefix> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
+        AnnouncedRoute route = new AnnouncedRoute(routeAsn, IpRange.parse(routePrefix));
+        RouteValidityState validityStateFound = subject.determineRouteValidityState(rtrPrefixes,route);
+        assertEquals(expectedResult, validityStateFound);
+    }
+
 
 }
