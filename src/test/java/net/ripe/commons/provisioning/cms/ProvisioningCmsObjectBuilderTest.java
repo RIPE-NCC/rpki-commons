@@ -49,6 +49,7 @@ import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -154,7 +155,7 @@ public class ProvisioningCmsObjectBuilderTest {
     @Test
     public void shouldCmsObjectHaveCorrectContentType() throws Exception {
         CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        assertEquals("1.2.840.113549.1.9.16.1.28", sp.getSignedContent().getContentType());
+        assertEquals(new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28"), sp.getSignedContent().getContentType());
     }
 
     /**

@@ -31,6 +31,7 @@ package net.ripe.commons.certification.cms;
 
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.joda.time.DateTime;
 
 /**
@@ -40,13 +41,13 @@ public class RpkiSignedObjectInfo {
 	
     private byte[] encoded;
     private X509ResourceCertificate resourceCertificate;
-    private String contentType;
+    private ASN1ObjectIdentifier contentType;
     private DateTime signingTime;
     
-	public RpkiSignedObjectInfo(byte[] encoded, X509ResourceCertificate resourceCertificate, String contentType, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
+	public RpkiSignedObjectInfo(byte[] encoded, X509ResourceCertificate resourceCertificate, ASN1ObjectIdentifier oid, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
 		this.encoded = encoded;
 		this.resourceCertificate = resourceCertificate;
-		this.contentType = contentType;
+		this.contentType = oid;
 		this.signingTime = signingTime;
 	}
 
@@ -58,7 +59,7 @@ public class RpkiSignedObjectInfo {
 		return resourceCertificate;
 	}
 
-	public String getContentType() {
+	public ASN1ObjectIdentifier getContentType() {
 		return contentType;
 	}
 

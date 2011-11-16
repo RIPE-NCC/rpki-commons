@@ -45,6 +45,7 @@ import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCe
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTime;
 
@@ -64,7 +65,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     private X509ResourceCertificate certificate;
 
-    private String contentType;
+    private ASN1ObjectIdentifier contentType;
 
     private DateTime signingTime;
 
@@ -72,11 +73,10 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         this(cmsObjectData.getEncoded(), cmsObjectData.getCertificate(), cmsObjectData.getContentType(), cmsObjectData.getSigningTime());
     }
 
-
-    protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, String contentType, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
+    protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, ASN1ObjectIdentifier oid, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
         this.certificate = certificate;
-        this.contentType = contentType;
+        this.contentType = oid;
         this.signingTime = signingTime;
     }
 
@@ -89,7 +89,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         return signingTime;
     }
 
-    public String getContentType() {
+    public ASN1ObjectIdentifier getContentType() {
         return contentType;
     }
 

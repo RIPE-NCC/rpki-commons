@@ -33,6 +33,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+
 import net.ripe.commons.certification.cms.RpkiSignedObject;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
@@ -41,7 +43,7 @@ import net.ripe.ipresource.IpResourceSet;
 
 public class RoaCms extends RpkiSignedObject implements Roa {
 
-    public static final String CONTENT_TYPE = "1.2.840.113549.1.9.16.1.24";
+    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.24");
 
     private static final long serialVersionUID = 1L;
 
@@ -76,7 +78,7 @@ public class RoaCms extends RpkiSignedObject implements Roa {
 
     public static RoaCms parseDerEncoded(byte[] encoded) {
         RoaCmsParser parser = new RoaCmsParser();
-        parser.parse("<unknown>", encoded);
+        parser.parse("unknown.roa", encoded);
         return parser.getRoaCms();
     }
 

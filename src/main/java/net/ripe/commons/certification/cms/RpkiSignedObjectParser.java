@@ -49,6 +49,7 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -68,7 +69,7 @@ public abstract class RpkiSignedObjectParser {
 
     private X509ResourceCertificate certificate;
 
-    private String contentType;
+    private ASN1ObjectIdentifier contentType;
 
     private DateTime signingTime;
 
@@ -107,7 +108,7 @@ public abstract class RpkiSignedObjectParser {
         return certificate;
     }
 
-    protected String getContentType() {
+    protected ASN1ObjectIdentifier getContentType() {
         return contentType;
     }
 
@@ -127,9 +128,9 @@ public abstract class RpkiSignedObjectParser {
         }
         validationResult.isTrue(true, CMS_DATA_PARSING);
 
-        parseContent(sp);
-        parseCmsCertificate(sp);
-        verifyCmsSigning(sp, certificate.getCertificate());
+        if (!validationResult.hasFailures()) { parseContent(sp); }
+        if (!validationResult.hasFailures()) { parseCmsCertificate(sp); }
+        if (!validationResult.hasFailures()) { verifyCmsSigning(sp, certificate.getCertificate()); }
     }
 
     private void parseContent(CMSSignedDataParser sp) {
@@ -161,7 +162,9 @@ public abstract class RpkiSignedObjectParser {
         if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
-        validationResult.isTrue(certificates.size() == 1, ONLY_ONE_EE_CERT_ALLOWED);
+        if (!validationResult.isTrue(certificates.size() == 1, ONLY_ONE_EE_CERT_ALLOWED)) {
+            return;
+        }
         if (!validationResult.isTrue(certificates.iterator().next() instanceof X509Certificate, CERT_IS_X509CERT)) {
             return;
         }

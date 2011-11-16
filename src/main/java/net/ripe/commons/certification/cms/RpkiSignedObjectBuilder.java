@@ -47,6 +47,7 @@ import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -61,7 +62,7 @@ import org.joda.time.DateTimeUtils;
 
 public abstract class RpkiSignedObjectBuilder {
 
-    protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, String contentTypeOid, ASN1Encodable encodableContent) {
+    protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) {
         byte[] result;
         try {
             result = doGenerate(signingCertificate, privateKey, signatureProvider, contentTypeOid, encodableContent);
@@ -81,7 +82,7 @@ public abstract class RpkiSignedObjectBuilder {
         return result;
     }
 
-    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, String contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException {
+    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException {
         byte[] subjectKeyIdentifier = X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate);
         Validate.notNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
 
@@ -93,7 +94,7 @@ public abstract class RpkiSignedObjectBuilder {
         generator.addCertificatesAndCRLs(certStore);
 
         byte[] content = Asn1Util.encode(encodableContent);
-        CMSSignedData data = generator.generate(contentTypeOid, new CMSProcessableByteArray(content), true, signatureProvider);
+        CMSSignedData data = generator.generate(contentTypeOid.getId(), new CMSProcessableByteArray(content), true, signatureProvider);
         return data.getEncoded();
     }
 

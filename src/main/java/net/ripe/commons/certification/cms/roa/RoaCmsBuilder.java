@@ -83,7 +83,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
 
     public RoaCms build(PrivateKey privateKey) {
     	RoaCmsParser parser = new RoaCmsParser();
-    	parser.parse("<generated>", generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
+    	parser.parse("generated.roa", generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
         return parser.getRoaCms();
     }
 

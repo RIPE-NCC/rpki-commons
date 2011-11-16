@@ -59,6 +59,7 @@ import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -82,7 +83,7 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 public class ProvisioningCmsObjectParser {
 
-    private static final String PROVISIONING_OBJECT_OID_STRING = "1.2.840.113549.1.9.16.1.28";
+    private static final ASN1ObjectIdentifier PROVISIONING_OBJECT_OID_STRING = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28");
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
     private static final int CMS_OBJECT_VERSION = 3;
 
@@ -394,7 +395,7 @@ public class ProvisioningCmsObjectParser {
         if(!validationResult.isTrue(contentType.getAttrValues().size() == 1, CONTENT_TYPE_VALUE_COUNT)) {
             return;
         }
-        validationResult.isTrue(new DERObjectIdentifier(PROVISIONING_OBJECT_OID_STRING).equals(contentType.getAttrValues().getObjectAt(0)), CONTENT_TYPE_VALUE);
+        validationResult.isTrue(PROVISIONING_OBJECT_OID_STRING.equals(contentType.getAttrValues().getObjectAt(0)), CONTENT_TYPE_VALUE);
     }
 
     /**

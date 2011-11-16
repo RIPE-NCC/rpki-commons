@@ -44,11 +44,13 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
 import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
 import net.ripe.commons.certification.rfc3779.AddressFamily;
+import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
@@ -60,7 +62,7 @@ import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERSequence;
 
 public class RoaCmsParser extends RpkiSignedObjectParser {
-
+	
 	private Asn asn;
 
 	private List<RoaPrefix> prefixes;
@@ -81,8 +83,9 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 	}
 
 	public RoaCms getRoaCms() {
-		if (getValidationResult().hasFailures()) {
-			throw new IllegalArgumentException("Roa validation failed");
+		Set<ValidationCheck> failuresForCurrentLocation = getValidationResult().getFailuresForCurrentLocation();
+		if (failuresForCurrentLocation.size() > 0) {
+			throw new IllegalArgumentException("Roa validation failed " + failuresForCurrentLocation);
 		}
 
 		RpkiSignedObjectInfo cmsObjectInfo = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
@@ -91,7 +94,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 
 	private void validateRoa() {
 		ValidationResult validationResult = getValidationResult();
-        if (!validationResult.isTrue(RoaCms.CONTENT_TYPE.equals(getContentType()), ROA_CONTENT_TYPE)) {
+        if (!validationResult.isTrue(RoaCms.CONTENT_TYPE.equals(getContentType()), ROA_CONTENT_TYPE, getContentType())) {
 			return;
 		}
 
@@ -99,7 +102,11 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		for (RoaPrefix prefix : Collections.unmodifiableList(prefixes)) {
 			roaPrefixes.add(prefix.getPrefix());
 		}
-		validationResult.isTrue(getResourceCertificate().getResources().contains(roaPrefixes), ROA_RESOURCES);
+        try {
+		    validationResult.isTrue(getResourceCertificate().getResources().contains(roaPrefixes), ROA_RESOURCES);
+        } catch (Exception e) {
+            validationResult.isTrue(false, ROA_RESOURCES);
+        }
 	}
 
 	RoaPrefix parseRoaIpAddressFamily(IpResourceType type, DEREncodable der) {

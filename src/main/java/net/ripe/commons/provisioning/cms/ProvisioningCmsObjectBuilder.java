@@ -56,6 +56,7 @@ import net.ripe.commons.provisioning.payload.PayloadParser;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -73,7 +74,7 @@ public class ProvisioningCmsObjectBuilder {
 
     private static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
 
-    private static final String CONTENT_TYPE = "1.2.840.113549.1.9.16.1.28";
+    private static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28");
 
     private X509Certificate cmsCertificate;
 
@@ -112,7 +113,7 @@ public class ProvisioningCmsObjectBuilder {
         Validate.notNull(crl, "crl is required");
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-        parser.parseCms("<generated>", generateCms(privateKey));
+        parser.parseCms("generated.cms", generateCms(privateKey));
 
         ValidationResult validationResult = parser.getValidationResult();
         if (validationResult.hasFailures()) {
@@ -153,7 +154,7 @@ public class ProvisioningCmsObjectBuilder {
         addCertificateAndCrl(generator);
         generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
 
-        CMSSignedData data = generator.generate(CONTENT_TYPE, new CMSProcessableByteArray(payloadContent.getBytes(Charset.forName("UTF-8"))), true, signatureProvider);
+        CMSSignedData data = generator.generate(CONTENT_TYPE.getId(), new CMSProcessableByteArray(payloadContent.getBytes(Charset.forName("UTF-8"))), true, signatureProvider);
 
         return data.getEncoded();
     }
