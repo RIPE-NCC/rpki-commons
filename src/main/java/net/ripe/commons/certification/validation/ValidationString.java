@@ -133,6 +133,7 @@ public final class ValidationString {
     public static final String ROA_CONTENT_TYPE = "roa.content.type";
     public static final String ROA_RESOURCES = "roa.resources";
     public static final String ASN_AND_PREFIXES_IN_DER_SEQ = "roa.seq.has.asn.and.prefixes";
+    public static final String ROA_ATTESTATION_VERSION = "roa.attestation.version";
     public static final String ROA_PREFIX_LIST = "roa.prefix.list.not.empty";
     public static final String ADDR_FAMILY_AND_ADDR_IN_DER_SEQ = "roa.seq.has.addr.family.and.addressed";
     public static final String ADDR_FAMILY = "roa.addr.family.valid";

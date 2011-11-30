@@ -36,6 +36,7 @@ import static net.ripe.commons.certification.validation.ValidationString.ADDR_FA
 import static net.ripe.commons.certification.validation.ValidationString.ASN_AND_PREFIXES_IN_DER_SEQ;
 import static net.ripe.commons.certification.validation.ValidationString.PREFIX_IN_ADDR_FAMILY;
 import static net.ripe.commons.certification.validation.ValidationString.PREFIX_LENGTH;
+import static net.ripe.commons.certification.validation.ValidationString.ROA_ATTESTATION_VERSION;
 import static net.ripe.commons.certification.validation.ValidationString.ROA_CONTENT_TYPE;
 import static net.ripe.commons.certification.validation.ValidationString.ROA_PREFIX_LIST;
 import static net.ripe.commons.certification.validation.ValidationString.ROA_RESOURCES;
@@ -65,7 +66,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 	
 	private Asn asn;
 
-	private List<RoaPrefix> prefixes;
+	private List<RoaPrefix> prefixes = new ArrayList<RoaPrefix>();
 
 
 	public RoaCmsParser() {
@@ -129,8 +130,15 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 	}
 
 	void parseRouteOriginAttestation(DEREncodable der) {
+		
 		expect(der, DERSequence.class);
 		DERSequence seq = (DERSequence) der;
+		
+		if (!getValidationResult().isFalse(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0))) {
+			// eContent seems to contain non-standard version (default 0 is omitted in structure)
+			return;
+		}
+		
 		if (!getValidationResult().isTrue(seq.size() == 2, ASN_AND_PREFIXES_IN_DER_SEQ)) {
 			return;
 		}

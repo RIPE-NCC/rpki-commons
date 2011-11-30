@@ -41,23 +41,46 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class BbnRoaCornerCasesTest {
 
     private static final String PATH_TO_BBN_ROAS = "src/test/resources/bbn-psycho-cases/root";
 
 
-    @Ignore
     @Test
     public void shouldRejectBadRoaVersionV2Roa() throws IOException {
         byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_BBN_ROAS + "/badROAVersionV2.roa"));
 
+
+//        System.err.println(ASN1Dump.dumpAsString(Asn1Util.decode(encoded)));
+        
         RoaCmsParser parser = new RoaCmsParser();
         parser.parse("roa", encoded);
         ValidationResult validationResult = parser.getValidationResult();
         
+        for (String location: validationResult.getValidatedLocations()) {
+        	System.err.println(location + "  ->  " + validationResult.getFailures(location));
+        }
+        
         assertFalse(validationResult.hasFailures());
-
-
+    }
+    
+    @Test
+    public void shouldAcceptGoodRoa() throws IOException {
+    	byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_BBN_ROAS + "/goodROANothingWrong.roa"));
+    	
+    	
+//        System.err.println(ASN1Dump.dumpAsString(Asn1Util.decode(encoded)));
+    	
+    	RoaCmsParser parser = new RoaCmsParser();
+    	parser.parse("roa", encoded);
+    	ValidationResult validationResult = parser.getValidationResult();
+    	
+    	for (String location: validationResult.getValidatedLocations()) {
+    		System.err.println(location + "  ->  " + validationResult.getFailures(location));
+    	}
+    	
+    	assertFalse(validationResult.hasFailures());
     }
 
 }
