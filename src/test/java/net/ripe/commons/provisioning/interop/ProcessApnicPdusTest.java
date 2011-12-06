@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
@@ -75,7 +76,7 @@ public class ProcessApnicPdusTest {
 
     @SuppressWarnings("unused")
     private void prettyPrintFailures(ValidationResult validationResult) {
-        for (String location : validationResult.getValidatedLocations()) {
+        for (ValidationLocation location : validationResult.getValidatedLocations()) {
             for (ValidationCheck failure : validationResult.getFailures(location)) {
                 System.err.println(location + "\t" + failure + "\n");
             }

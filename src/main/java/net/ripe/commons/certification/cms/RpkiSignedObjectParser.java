@@ -43,6 +43,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
@@ -88,7 +89,7 @@ public abstract class RpkiSignedObjectParser {
     public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
         this.location = location;
         this.encoded = encoded;
-        validationResult.setLocation(location);
+        validationResult.setLocation(new ValidationLocation(location));
         parseCms();
     }
 

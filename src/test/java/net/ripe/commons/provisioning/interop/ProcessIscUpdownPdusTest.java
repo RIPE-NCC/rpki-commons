@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
@@ -63,7 +64,7 @@ public class ProcessIscUpdownPdusTest {
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("cms", encoded);
         ValidationResult validationResult = parser.getValidationResult();
-        for (ValidationCheck check : validationResult.getFailures("cms")) {
+        for (ValidationCheck check : validationResult.getFailures(new ValidationLocation("cms"))) {
             System.err.println("Failure: " + check);
         }
         ProvisioningCmsObject provisioningCmsObject = parser.getProvisioningCmsObject();
@@ -115,7 +116,7 @@ public class ProcessIscUpdownPdusTest {
         ValidationResult result = new ValidationResult();
         validator.validate(result);
 
-        for (String location : result.getValidatedLocations()) {
+        for (ValidationLocation location : result.getValidatedLocations()) {
             for (ValidationCheck check : result.getFailures(location)) {
                 System.err.println(location + " : " + check);
             }

@@ -37,6 +37,7 @@ import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -131,8 +132,8 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
         X509Crl crl = null;
         if (!isRoot()) {
-            String savedCurrentLocation = result.getCurrentLocation();
-            result.setLocation(getCrlUri());
+            ValidationLocation savedCurrentLocation = result.getCurrentLocation();
+            result.setLocation(new ValidationLocation(getCrlUri()));
             crl = crlLocator.getCrl(getCrlUri(), context, result);
             result.setLocation(savedCurrentLocation);
             result.notNull(crl, ValidationString.OBJECTS_CRL_VALID, this);

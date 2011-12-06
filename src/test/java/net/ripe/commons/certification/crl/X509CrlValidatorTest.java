@@ -43,7 +43,9 @@ import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactory;
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationStatus;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;
@@ -85,7 +87,7 @@ public class X509CrlValidatorTest {
 
         result = subject.getValidationResult();
         assertFalse(result.hasFailures());
-        assertEquals("location", result.getCurrentLocation());
+        assertEquals(new ValidationLocation("location"), result.getCurrentLocation());
     }
 
     @Test
@@ -95,7 +97,7 @@ public class X509CrlValidatorTest {
 
         result = subject.getValidationResult();
         assertTrue(result.hasFailures());
-        assertEquals(new ValidationCheck(false, CRL_SIGNATURE_VALID), result.getResult("location", CRL_SIGNATURE_VALID));
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_SIGNATURE_VALID), result.getResult(new ValidationLocation("location"), CRL_SIGNATURE_VALID));
     }
 
     @Test
@@ -106,7 +108,7 @@ public class X509CrlValidatorTest {
 
         result = subject.getValidationResult();
         assertTrue(result.hasFailures());
-        assertEquals(new ValidationCheck(false, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime), result.getResult("location", CRL_NEXT_UPDATE_BEFORE_NOW));
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
     }
 
 

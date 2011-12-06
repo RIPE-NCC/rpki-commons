@@ -71,6 +71,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	private static final KeyPair FIRST_CHILD_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
 	private static final KeyPair SECOND_CHILD_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
 
+	private static final ValidationLocation CHILD_VALIDATION_LOCATION = new ValidationLocation("child");
 
 	private X509ResourceCertificate root;
 	private X509ResourceCertificate child;
@@ -109,8 +110,8 @@ public class X509ResourceCertificateParentChildValidatorTest {
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
-    	assertTrue(result.hasFailureForLocation("child"));
-    	assertTrue(ValidationString.SIGNATURE_VALID.equals(result.getFailures("child").get(0).getKey()));
+    	assertTrue(result.hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.SIGNATURE_VALID.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
 	}
 
 	@Test
@@ -130,7 +131,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
-    	assertTrue(ValidationString.CERT_NOT_REVOKED.equals(result.getFailures("child").get(0).getKey()));
+    	assertTrue(ValidationString.CERT_NOT_REVOKED.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
 	}
 
 	@Test
@@ -151,7 +152,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
-    	assertTrue(ValidationString.NOT_VALID_AFTER.equals(result.getFailures("child").get(0).getKey()));
+    	assertTrue(ValidationString.NOT_VALID_AFTER.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
 
 	}
 
@@ -163,7 +164,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
-    	assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(result.getFailures("child").get(0).getKey()));
+    	assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
 
 	}
 
@@ -175,7 +176,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.KEY_CERT_SIGN.equals(result.getFailures("child").get(0).getKey()));
+		assertTrue(ValidationString.KEY_CERT_SIGN.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
 	}
 
     @Test
@@ -186,7 +187,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.KEY_USAGE_EXT_PRESENT.equals(result.getFailures("child").get(0).getKey()));
+		assertTrue(ValidationString.KEY_USAGE_EXT_PRESENT.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -197,7 +198,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     	validate(validator, child);
 
 		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.AKI_PRESENT.equals(result.getFailures("child").get(0).getKey()));
+		assertTrue(ValidationString.AKI_PRESENT.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test

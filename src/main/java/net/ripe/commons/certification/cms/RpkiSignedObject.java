@@ -38,6 +38,7 @@ import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -128,8 +129,8 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     @Override
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
-        String savedCurrentLocation = result.getCurrentLocation();
-        result.setLocation(getCrlUri());
+        ValidationLocation savedCurrentLocation = result.getCurrentLocation();
+        result.setLocation(new ValidationLocation(getCrlUri()));
 
         X509Crl crl = crlLocator.getCrl(getCrlUri(), context, result);
 

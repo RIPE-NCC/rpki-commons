@@ -31,6 +31,7 @@ package net.ripe.commons.certification.crl;
 
 import java.security.SignatureException;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidator;
@@ -57,7 +58,7 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
 
     @Override
     public void validate(String location, X509Crl crl) {
-        result.setLocation(location);
+        result.setLocation(new ValidationLocation(location));
         checkSignature(crl);
         checkNextUpdate(crl);
     }

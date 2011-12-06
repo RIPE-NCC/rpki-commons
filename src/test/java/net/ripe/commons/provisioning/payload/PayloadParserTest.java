@@ -31,6 +31,7 @@
 package net.ripe.commons.provisioning.payload;
 import static org.junit.Assert.*;
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
@@ -44,7 +45,7 @@ public class PayloadParserTest {
         String message = createIssueResponseMessage(1);
 
         ValidationResult result = new ValidationResult();
-        result.setLocation("a");
+        result.setLocation(new ValidationLocation("a"));
 
         AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
         assertFalse(result.getFailuresForCurrentLocation().toString(), result.hasFailures());
@@ -56,7 +57,7 @@ public class PayloadParserTest {
         String message = createIssueResponseMessage(2);
         
         ValidationResult result = new ValidationResult();
-        result.setLocation("a");
+        result.setLocation(new ValidationLocation(("a")));
         PayloadParser.parse(message, result);
         
         assertTrue(result.hasFailures());
@@ -70,7 +71,7 @@ public class PayloadParserTest {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"unknown\" />";
 
         ValidationResult result = new ValidationResult();
-        result.setLocation("a");
+        result.setLocation(new ValidationLocation("a"));
         AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
 
         assertTrue(result.hasFailures());
@@ -85,7 +86,7 @@ public class PayloadParserTest {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\"  />";
 
         ValidationResult result = new ValidationResult();
-        result.setLocation("a");
+        result.setLocation(new ValidationLocation("a"));
         AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
 
         assertTrue(result.hasFailures());

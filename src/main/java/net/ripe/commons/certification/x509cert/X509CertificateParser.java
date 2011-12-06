@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.security.cert.*;
 
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 
 import org.apache.commons.io.IOUtils;
@@ -60,11 +61,12 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
 	public void parse(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
-
-        result.setLocation(location);
+        
+        ValidationLocation validationLocation = new ValidationLocation(location);
+		result.setLocation(validationLocation);
 
         parse();
-        if (!result.hasFailureForLocation(location)) {
+        if (!result.hasFailureForLocation(validationLocation)) {
             validateSignatureAlgorithm();
             doTypeSpecificValidation();
         }

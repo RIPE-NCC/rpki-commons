@@ -29,8 +29,36 @@
  */
 package net.ripe.commons.provisioning.cms;
 
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_HAS_SKI;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_EE_CERT;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_X509CERT;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_CONTENT_PARSING;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_CONTENT_TYPE;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_DATA_PARSING;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNED_DATA_DIGEST_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNED_DATA_VERSION;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_DIGEST_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_SKI;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_SKI_ONLY;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_VERSION;
+import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_VALUE;
+import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_VALUE_COUNT;
+import static net.ripe.commons.certification.validation.ValidationString.CRL_IS_X509CRL;
+import static net.ripe.commons.certification.validation.ValidationString.ENCRYPTION_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.GET_CERTS_AND_CRLS;
+import static net.ripe.commons.certification.validation.ValidationString.GET_SIGNER_INFO;
+import static net.ripe.commons.certification.validation.ValidationString.MSG_DIGEST_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.MSG_DIGEST_VALUE_COUNT;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_CRL_ALLOWED;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_EE_CERT_ALLOWED;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNER;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNING_TIME_ATTR;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNATURE_VERIFICATION;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNED_ATTRS_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNING_TIME_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.UNSIGNED_ATTRS_OMITTED;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -50,6 +78,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
@@ -62,7 +91,6 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -118,7 +146,7 @@ public class ProvisioningCmsObjectParser {
     public void parseCms(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
         this.location = location;
         this.encoded = encoded;
-        validationResult.setLocation(location);
+        validationResult.setLocation(new ValidationLocation(location));
 
         try {
             sp = new CMSSignedDataParser(encoded);

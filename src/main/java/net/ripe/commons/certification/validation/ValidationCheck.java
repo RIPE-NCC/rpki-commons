@@ -37,14 +37,11 @@ public class ValidationCheck extends EqualsSupport implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    private boolean status;
-
+    private ValidationStatus status;
 	private String key;
-
 	private Object[] params;
 
-
-	public ValidationCheck(boolean status, String key, Object... params) {
+	public ValidationCheck(ValidationStatus status, String key, Object... params) {
 		this.status = status;
 		this.key = key;
 		this.params = params;
@@ -55,11 +52,14 @@ public class ValidationCheck extends EqualsSupport implements Serializable {
 	}
 
 	public boolean isOk() {
+		return status != ValidationStatus.ERROR;
+	}
+	
+	public ValidationStatus getStatus() {
 		return status;
 	}
 
 	public Object[] getParams() {
 		return params;
 	}
-
 }

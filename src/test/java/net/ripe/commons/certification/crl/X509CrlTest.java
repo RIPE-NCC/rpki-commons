@@ -42,6 +42,7 @@ import java.security.KeyPair;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.util.KeyPairUtil;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -118,7 +119,8 @@ public class X509CrlTest {
 
     	assertTrue(result.hasFailures());
     	assertTrue(result.getValidatedLocations().size() ==1);
-    	assertTrue(result.hasFailureForLocation(ROOT_MANIFEST_CRL_LOCATION.toString()));
-    	assertEquals(ValidationString.CRL_SIGNATURE_VALID, result.getFailures(ROOT_MANIFEST_CRL_LOCATION.toString()).get(0).getKey());
+    	ValidationLocation rootMftCrlValidationLocation = new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION);
+		assertTrue(result.hasFailureForLocation(rootMftCrlValidationLocation));
+    	assertEquals(ValidationString.CRL_SIGNATURE_VALID, result.getFailures(rootMftCrlValidationLocation).get(0).getKey());
     }
 }

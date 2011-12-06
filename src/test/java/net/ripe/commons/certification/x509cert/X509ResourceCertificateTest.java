@@ -48,6 +48,7 @@ import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlTest;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -64,7 +65,10 @@ import org.junit.Test;
 public class X509ResourceCertificateTest {
 
 	private static final URI CERT_URI = URI.create("rsync://host.foo/bar/ta.cer");
+	private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(CERT_URI);
+	
 	private static final URI CRL_DP = URI.create("rsync://host/foo/crl");
+	private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(CRL_DP);
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
     private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private CrlLocator crlLocator;
@@ -242,20 +246,21 @@ public class X509ResourceCertificateTest {
         expect(crlLocator.getCrl(CRL_DP, context, result)).andAnswer(new IAnswer<X509Crl>() {
            @Override
         public X509Crl answer() throws Throwable {
-               assertEquals(CRL_DP.toString(), result.getCurrentLocation());
+               
+			assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
                result.isTrue(false, ValidationString.CRL_SIGNATURE_VALID);
                return null;
             }
         });
         replay(crlLocator);
 
-        result.setLocation(CERT_URI);
+        result.setLocation(new ValidationLocation(CERT_URI));
         subject.validate(CERT_URI.toString(), context, crlLocator, result);
 
         verify(crlLocator);
-        assertEquals(CERT_URI.toString(), result.getCurrentLocation());
+        assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());
         assertTrue("certificate should have errors", result.hasFailureForCurrentLocation());
-        assertTrue("crl should have errors", result.hasFailureForLocation(CRL_DP.toString()));
+        assertTrue("crl should have errors", result.hasFailureForLocation(CRL_DP_VALIDATION_LOCATION));
     }
 
     @Test
@@ -276,8 +281,8 @@ public class X509ResourceCertificateTest {
         subject.validate(CERT_URI.toString(), context, crlLocator, result);
 
         verify(crlLocator);
-        assertEquals(CERT_URI.toString(), result.getCurrentLocation());
+        assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());
         assertEquals("[]", result.getFailuresForCurrentLocation().toString());
-        assertFalse(result.hasFailureForLocation(CERT_URI.toString()));
+        assertFalse(result.hasFailureForLocation(CERT_URI_VALIDATION_LOCATION));
     }
 }

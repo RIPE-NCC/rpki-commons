@@ -37,6 +37,7 @@ import static org.junit.Assert.*;
 
 import java.util.Set;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 
@@ -67,12 +68,12 @@ public class ProvisioningCmsObjectValidatorTest {
         ValidationResult validationResult = new ValidationResult();
         subject.validate(validationResult);
 
-        Set<String> validatedLocations = validationResult.getValidatedLocations();
+        Set<ValidationLocation> validatedLocations = validationResult.getValidatedLocations();
 
-        assertTrue(validatedLocations.contains("<cms>"));
-        assertTrue(validatedLocations.contains("<crl>"));
-        assertTrue(validatedLocations.contains("<cms-cert>"));
-        assertTrue(validatedLocations.contains("<identity-cert>"));
+        assertTrue(validatedLocations.contains(new ValidationLocation("<cms>")));
+        assertTrue(validatedLocations.contains(new ValidationLocation("<crl>")));
+        assertTrue(validatedLocations.contains(new ValidationLocation("<cms-cert>")));
+        assertTrue(validatedLocations.contains(new ValidationLocation("<identity-cert>")));
     }
 
     @Test

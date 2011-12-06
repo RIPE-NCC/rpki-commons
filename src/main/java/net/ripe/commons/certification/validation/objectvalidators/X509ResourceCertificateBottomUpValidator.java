@@ -40,6 +40,7 @@ import java.util.List;
 
 import net.ripe.commons.certification.CertificateRepositoryObjectFile;
 import net.ripe.commons.certification.crl.X509Crl;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
@@ -55,7 +56,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     private ResourceCertificateLocator locator;
     private List<CertificateWithLocation> certificates = new LinkedList<CertificateWithLocation>();
     private ValidationResult result;
-    private String location;
+    private ValidationLocation location;
 
 
     public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, X509ResourceCertificate... trustAnchors) {
@@ -68,7 +69,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
     public X509ResourceCertificateBottomUpValidator(ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
         this.result = result;
-        this.location = "<unknown>";
+        this.location = new ValidationLocation("<unknown>");
         this.locator = locator;
         this.trustAnchors = trustAnchors;
     }
@@ -80,7 +81,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
     @Override
     public void validate(String location, X509ResourceCertificate certificate) {
-        this.location = location;
+        this.location = new ValidationLocation(location);
     	this.certificate = certificate;
 
         buildCertificationList();
@@ -97,7 +98,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
         IpResourceSet resources = parent.getResources();
         
         for (CertificateWithLocation certificateWithLocation : certificates) {
-        	String childLocation = certificateWithLocation.getLocation();
+        	String childLocation = certificateWithLocation.getLocation().getName();
         	X509ResourceCertificate child = certificateWithLocation.getCertificate();
 
         	X509Crl crl = getCRL(child);
@@ -135,8 +136,9 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
             }
 
             cert = parser.getCertificate();
-            certificates.add(0, new CertificateWithLocation(cert, parent.getName()));
-            result.setLocation(parent.getName());
+            ValidationLocation parentLocation = new ValidationLocation(parent.getName());
+			certificates.add(0, new CertificateWithLocation(cert, parentLocation));
+            result.setLocation(parentLocation);
             if (!result.isTrue(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, MAX_CHAIN_LENGTH)) {
                 return;
             }
@@ -161,10 +163,9 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     private class CertificateWithLocation {
 
         private final X509ResourceCertificate certificate;
-        private final String location;
+        private final ValidationLocation location;
 
-        public CertificateWithLocation(X509ResourceCertificate certificate, String location) {
-            super();
+        public CertificateWithLocation(X509ResourceCertificate certificate, ValidationLocation location) {
             this.location = location;
             this.certificate = certificate;
         }
@@ -173,7 +174,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
             return certificate;
         }
 
-        public String getLocation() {
+        public ValidationLocation getLocation() {
             return location;
         }
     }

@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 import net.ripe.commons.certification.cms.roa.RoaCmsParser;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 
 import org.apache.commons.io.FileUtils;
@@ -58,7 +59,7 @@ public class BbnRoaCornerCasesTest {
         parser.parse("roa", encoded);
         ValidationResult validationResult = parser.getValidationResult();
         
-        for (String location: validationResult.getValidatedLocations()) {
+        for (ValidationLocation location: validationResult.getValidatedLocations()) {
         	System.err.println(location + "  ->  " + validationResult.getFailures(location));
         }
         
@@ -76,7 +77,7 @@ public class BbnRoaCornerCasesTest {
     	parser.parse("roa", encoded);
     	ValidationResult validationResult = parser.getValidationResult();
     	
-    	for (String location: validationResult.getValidatedLocations()) {
+    	for (ValidationLocation location: validationResult.getValidatedLocations()) {
     		System.err.println(location + "  ->  " + validationResult.getFailures(location));
     	}
     	

@@ -78,6 +78,9 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 	private static final KeyPair SECOND_CHILD_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
 
 
+	private static final ValidationLocation CHILD_VALIDATION_LOCATION = new ValidationLocation("child");
+	private static final ValidationLocation GRAND_CHILD_VALIDATION_LOCATION = new ValidationLocation("grandchild");
+	
 	private X509ResourceCertificate root;
 	private X509ResourceCertificate child;
 	private X509ResourceCertificate grandchild;
@@ -119,8 +122,9 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("child"));
-    	assertTrue(ValidationString.RESOURCE_RANGE.equals(validator.getValidationResult().getFailures("child").get(0).getKey()));
+    	
+		assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.RESOURCE_RANGE.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -131,8 +135,9 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("grandchild", grandchild);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("grandchild"));
-    	assertTrue(ValidationString.RESOURCE_RANGE.equals(validator.getValidationResult().getFailures("grandchild").get(0).getKey()));
+    	
+		assertTrue(validator.getValidationResult().hasFailureForLocation(GRAND_CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.RESOURCE_RANGE.equals(validator.getValidationResult().getFailures(GRAND_CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -142,8 +147,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("child"));
-    	assertTrue(ValidationString.SIGNATURE_VALID.equals(validator.getValidationResult().getFailures("child").get(0).getKey()));
+    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.SIGNATURE_VALID.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -153,8 +158,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("child"));
-    	assertTrue(ValidationString.NOT_VALID_AFTER.equals(validator.getValidationResult().getFailures("child").get(0).getKey()));
+    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.NOT_VALID_AFTER.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -164,8 +169,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("child"));
-    	assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(validator.getValidationResult().getFailures("child").get(0).getKey()));
+    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -175,8 +180,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("child"));
-    	assertTrue(ValidationString.KEY_USAGE_EXT_PRESENT.equals(validator.getValidationResult().getFailures("child").get(0).getKey()));
+    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.KEY_USAGE_EXT_PRESENT.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -186,8 +191,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("child"));
-    	assertTrue(ValidationString.KEY_CERT_SIGN.equals(validator.getValidationResult().getFailures("child").get(0).getKey()));
+    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.KEY_CERT_SIGN.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -197,8 +202,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
     	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation("child"));
-    	assertTrue(ValidationString.AKI_PRESENT.equals(validator.getValidationResult().getFailures("child").get(0).getKey()));
+    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.AKI_PRESENT.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -212,8 +217,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     	ValidationResult validationResult = validator.getValidationResult();
         assertTrue(validationResult.hasFailures());
-    	assertTrue(validationResult.hasFailureForLocation("child"));
-    	assertTrue(ValidationString.CERT_NOT_REVOKED.equals(validationResult.getFailures("child").get(0).getKey()));
+    	assertTrue(validationResult.hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+    	assertTrue(ValidationString.CERT_NOT_REVOKED.equals(validationResult.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     @Test
@@ -226,7 +231,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         ValidationResult validationResult = validator.getValidationResult();
         assertTrue(validationResult.hasFailures());
-        assertTrue(ValidationString.CRL_SIGNATURE_VALID.equals(validationResult.getFailures("child").get(0).getKey()));
+        assertTrue(ValidationString.CRL_SIGNATURE_VALID.equals(validationResult.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
 
     private X509ResourceCertificate getRootResourceCertificate() {

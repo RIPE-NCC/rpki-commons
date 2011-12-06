@@ -49,6 +49,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
@@ -118,7 +119,7 @@ public class ProvisioningCmsObjectBuilder {
         ValidationResult validationResult = parser.getValidationResult();
         if (validationResult.hasFailures()) {
             List<String> failureMessages = new ArrayList<String>();
-            List<ValidationCheck> failures = validationResult.getFailures("<generated>");
+            List<ValidationCheck> failures = validationResult.getFailures(new ValidationLocation("<generated>"));
             for (ValidationCheck check : failures) {
                 failureMessages.add(check.getKey());
             }

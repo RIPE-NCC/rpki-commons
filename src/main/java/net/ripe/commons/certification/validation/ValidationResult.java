@@ -30,15 +30,12 @@
 package net.ripe.commons.certification.validation;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -48,28 +45,38 @@ public class ValidationResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Map<String, Set<ValidationCheck>> validationCheck = new LinkedHashMap<String, Set<ValidationCheck>>();
+	private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new HashMap<ValidationLocation, Map<ValidationStatus,List<ValidationCheck>>>();  
 
-	private String currentLocation;
-	private Set<ValidationCheck> currentCheckList;
+	private ValidationLocation currentLocation = new ValidationLocation("<unknown>");
 
-	public void setLocation(URI location) {
-	    setLocation(location.toString());
-	}
-
-	public void setLocation(String location) {
+	
+	// Modifiers
+	
+	public void setLocation(ValidationLocation location) {
 		currentLocation = location;
-		currentCheckList = validationCheck.get(currentLocation);
-
-		if (currentCheckList == null) {
-			currentCheckList = new LinkedHashSet<ValidationCheck>();
-			validationCheck.put(currentLocation, currentCheckList);
+		
+		if (!results.containsKey(currentLocation)) {
+			Map<ValidationStatus, List<ValidationCheck>> locationResults = new HashMap<ValidationStatus, List<ValidationCheck>>();
+			locationResults.put(ValidationStatus.ERROR, new ArrayList<ValidationCheck>());
+			locationResults.put(ValidationStatus.WARNING, new ArrayList<ValidationCheck>());
+			locationResults.put(ValidationStatus.PASSED, new ArrayList<ValidationCheck>());
+			results.put(currentLocation, locationResults);
 		}
 	}
 
+	private void setValidationCheckForCurrentLocation(ValidationStatus status, String key, Object... param) {
+		Map<ValidationStatus, List<ValidationCheck>> currentResults = results.get(currentLocation);
+		List<ValidationCheck> checksForStatus = currentResults.get(status);
+		checksForStatus.add(new ValidationCheck(status, key, param));
+	}
+	
 	public boolean isTrue(boolean condition, String key, Object... param) {
 	    Validate.notNull(key, "key is required");
-		currentCheckList.add(new ValidationCheck(condition, key, param));
+	    if (condition) {
+	    	setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+	    } else {
+	    	setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
+	    }
 		return condition;
 	}
 
@@ -81,91 +88,111 @@ public class ValidationResult implements Serializable {
 	    return isTrue(object != null, key, param);
 	}
 
+
+	// Getters
+	
+	public Set<ValidationLocation> getValidatedLocations() {
+		return results.keySet();
+	}
+
+	
 	public boolean hasFailures() {
-		for (Set<ValidationCheck> list : validationCheck.values()) {
-			for (ValidationCheck vc : list) {
-				if (!vc.isOk()) {
-					return true;
-				}
+		for (ValidationLocation location: getValidatedLocations()) {
+			if (hasFailureForLocation(location)) {
+				return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean hasFailureForLocation(String location) {
-		if (validationCheck.containsKey(location)) {
-			for (ValidationCheck vc : validationCheck.get(location)) {
-				if (!vc.isOk()) {
-					return true;
-				}
-			}
+	public boolean hasFailureForCurrentLocation() {
+		return hasFailureForLocation(currentLocation);
+	}
+	
+	public boolean hasFailureForLocation(ValidationLocation location) {
+		return getFailures(location).size() > 0;
+	}
+
+
+    public List<ValidationCheck> getFailures(ValidationLocation location) {
+		if (results.containsKey(location)) {
+			return results.get(location).get(ValidationStatus.ERROR);
+		} else {
+			return new ArrayList<ValidationCheck>();
 		}
-		return false;
+	}
+    
+	public Set<ValidationCheck> getFailuresForCurrentLocation() {
+		return new LinkedHashSet<ValidationCheck>(getFailures(currentLocation));
 	}
 
-    public boolean hasFailureForCurrentLocation() {
-        return hasFailureForLocation(currentLocation);
-    }
-
-    public boolean hasFailuresForLocationAndKey(String location, String key) {
-        ValidationCheck check = getResult(location, key);
-        return check != null && !check.isOk();
-    }
-
-	public List<ValidationCheck> getFailures(String location) {
-	    Validate.isTrue(validationCheck.containsKey(location));
-		List<ValidationCheck> failedList = new ArrayList<ValidationCheck>();
-		for (ValidationCheck vc : validationCheck.get(location)) {
-			if (!vc.isOk()) {
-				failedList.add(vc);
-			}
+	public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
+		ArrayList<ValidationCheck> allChecks = new ArrayList<ValidationCheck>();
+		if (results.containsKey(location)) {
+			Map<ValidationStatus, List<ValidationCheck>> locationChecksMap = results.get(location);
+			allChecks.addAll(locationChecksMap.get(ValidationStatus.ERROR));
+			allChecks.addAll(locationChecksMap.get(ValidationStatus.WARNING));
+			allChecks.addAll(locationChecksMap.get(ValidationStatus.PASSED));
 		}
-		return failedList;
+		
+		return allChecks;
 	}
 
-	public ValidationCheck getResult(String location, String key) {
-	    Validate.isTrue(validationCheck.containsKey(location));
-	    Validate.notNull(key);
-	    for (ValidationCheck result: validationCheck.get(location)) {
-	        if (key.equals(result.getKey())) {
-	            return result;
-	        }
-	    }
-	    return null;
-	}
 
-    public ValidationCheck getResult(URI uri, String key) {
-        return getResult(uri.toString(), key);
+	
+	
+	
+//    public boolean hasFailuresForLocationAndKey(ValidationLocation location, String key) {
+//        ValidationCheck check = getResult(location, key);
+//        return check != null && !check.isOk();
+//    }
+
+	
+//	public ValidationCheck getResult(ValidationLocation location, String key) {
+//	    Validate.isTrue(validationCheck.containsKey(location.getName()));
+//	    Validate.notNull(key);
+//	    for (ValidationCheck result: validationCheck.get(location.getName())) {
+//	        if (key.equals(result.getKey())) {
+//	            return result;
+//	        }
+//	    }
+//	    return null;
+//	}
+//
+//    public ValidationCheck getResult(URI uri, String key) {
+//        return getResult(new ValidationLocation(uri), key);
+//    }
+//
+//	public Set<ValidationCheck> getResults(ValidationLocation location) {
+//        Validate.isTrue(validationCheck.containsKey(location.getName()));
+//		return validationCheck.get(location.getName());
+//	}
+//
+
+
+
+//    public Set<ValidationCheck> getResultsForCurrentLocation() {
+//        return getResults(currentLocation);
+//    }
+
+    public ValidationLocation getCurrentLocation() {
+        return currentLocation;
     }
-
-	public Set<ValidationCheck> getResults(String location) {
-        Validate.isTrue(validationCheck.containsKey(location));
-		return validationCheck.get(location);
-	}
-
-	public Set<String> getValidatedLocations() {
-		return validationCheck.keySet();
-	}
-
-	public Iterator<ValidationCheck> iterator(String location) {
-        Validate.isTrue(validationCheck.containsKey(location));
-		return validationCheck.get(location).iterator();
-	}
-
+    
+    
 	@Override
 	public String toString() {
 	    return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 
-	public Set<ValidationCheck> getFailuresForCurrentLocation() {
-		return new LinkedHashSet<ValidationCheck>(getFailures(currentLocation));
+	public ValidationCheck getResult(ValidationLocation location, String checkKey) {
+		List<ValidationCheck> allChecks = getAllValidationChecksForLocation(location);
+		for (ValidationCheck check: allChecks) {
+			if (check.getKey().equals(checkKey)) {
+				return check;
+			}
+		}
+		return null;
 	}
-
-    public Set<ValidationCheck> getResultsForCurrentLocation() {
-        return getResults(currentLocation);
-    }
-
-    public String getCurrentLocation() {
-        return currentLocation;
-    }
+    
 }

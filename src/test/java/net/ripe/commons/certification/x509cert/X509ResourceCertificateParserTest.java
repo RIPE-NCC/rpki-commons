@@ -29,20 +29,24 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static org.junit.Assert.*;
+import static net.ripe.commons.certification.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
+import static net.ripe.commons.certification.util.KeyPairFactoryTest.TEST_KEY_PAIR;
+import static net.ripe.commons.certification.validation.ValidationString.CERTIFICATE_PARSED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationStatus;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.ipresource.IpResourceSet;
 
@@ -99,7 +103,7 @@ public class X509ResourceCertificateParserTest {
         byte[] badlyEncoded = { 0x01, 0x03, 0x23 };
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse("badly", badlyEncoded);
-        assertEquals(Arrays.asList(new ValidationCheck(false, CERTIFICATE_PARSED)), parser.getValidationResult().getFailures("badly"));
+        assertTrue(parser.getValidationResult().getFailures(new ValidationLocation("badly")).contains(new ValidationCheck(ValidationStatus.ERROR, CERTIFICATE_PARSED)));
     }
 
     @Test
@@ -118,6 +122,6 @@ public class X509ResourceCertificateParserTest {
         subject.parse("certificate", certificate.getEncoded());
 
         assertTrue(subject.getValidationResult().hasFailures());
-        assertTrue(subject.getValidationResult().hasFailuresForLocationAndKey("certificate", ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM));
+        assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
     }
 }

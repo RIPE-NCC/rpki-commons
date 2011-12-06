@@ -29,30 +29,29 @@
  */
 package net.ripe.commons.certification.validation;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
+import java.net.URI;
 
-import org.junit.Test;
+import net.ripe.commons.certification.util.EqualsSupport;
 
-public class ValidationStringTest {
 
-    @Test
-    public void shouldHaveMessageForEachField() throws Exception {
-        Class<?> c = ValidationString.class;
-        List<String> missingFields = new ArrayList<String>();
-        for (Field f: c.getFields()) {
-            String key = (String) f.get(null);
-            ValidationCheck validationCheck = new ValidationCheck(ValidationStatus.PASSED, key);
-            try {
-                ValidationMessage.getMessage(validationCheck);
-            } catch (MissingResourceException e) {
-                missingFields.add(key);
-            }
-        }
-        if (missingFields.size() > 0) {
-            org.junit.Assert.fail("Missing fields in BundleResource file (check ValidationMessage class for location): " + missingFields.toString());
-        }
-    }
+/**
+ * The validation location key that is used to associate validation checks with
+ * a specific object or step. Typically the URI is used as the key.
+ */
+public class ValidationLocation extends EqualsSupport {
+
+	private final String name;
+	
+	public ValidationLocation(String name) {
+		this.name = name;
+	}
+	
+	public ValidationLocation(URI objectUri) {
+		this.name = objectUri.toString();
+	}
+
+	public String getName() {
+		return name;
+	}
+	
 }

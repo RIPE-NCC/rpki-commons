@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationStatus;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -50,7 +51,11 @@ public class FieldValidationResult implements Serializable {
 
     public boolean isTrue(boolean condition, String key, Object... param) {
         Validate.notNull(key, "key is required");
-        checkList.add(new ValidationCheck(condition, key, param));
+        if (condition) {
+        	checkList.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
+        } else {
+        	checkList.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
+        }
         return condition;
     }
 

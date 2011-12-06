@@ -36,6 +36,7 @@ import java.security.SignatureException;
 import java.util.Arrays;
 
 import net.ripe.commons.certification.crl.X509Crl;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper;
 
@@ -66,7 +67,7 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
 
     public void validate(String location, T certificate) {
         this.child = certificate;
-        result.setLocation(location);
+        result.setLocation(new ValidationLocation(location));
 
         verifySignature();
         verifyValidity();

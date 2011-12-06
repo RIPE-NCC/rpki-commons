@@ -29,16 +29,18 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-
-import static org.junit.Assert.*;
-
-import static org.easymock.EasyMock.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
-import java.util.Collections;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -49,7 +51,9 @@ import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationStatus;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
@@ -144,7 +148,7 @@ public class ManifestCmsTest{
 
     	verify(crlLocator);
 
-    	assertEquals(Collections.emptyList(), result.getFailures(result.getCurrentLocation()));
+    	assertEquals(0, result.getFailuresForCurrentLocation().size());
     	assertFalse(result.hasFailures());
     }
 
@@ -154,12 +158,13 @@ public class ManifestCmsTest{
 
     	CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
     	final ValidationResult result = new ValidationResult();
-    	result.setLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+    	result.setLocation(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION));
+    	final ValidationLocation rootMftCrlValidationLocation = new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION);
 
     	expect(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).andAnswer(new IAnswer<X509Crl>() {
     	    @Override
             public X509Crl answer() throws Throwable {
-    	        assertEquals(ROOT_MANIFEST_CRL_LOCATION.toString(), result.getCurrentLocation());
+    	        assertEquals(rootMftCrlValidationLocation, result.getCurrentLocation());
     	        result.isTrue(false, ValidationString.CRL_SIGNATURE_VALID);
     	        return null;
     	    }
@@ -171,9 +176,9 @@ public class ManifestCmsTest{
     	verify(crlLocator);
 
     	assertTrue(result.hasFailureForCurrentLocation());
-    	assertEquals(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), result.getCurrentLocation());
-    	assertTrue(result.hasFailureForLocation(ROOT_MANIFEST_CRL_LOCATION.toString()));
-    	assertEquals(new ValidationCheck(false, ValidationString.CRL_SIGNATURE_VALID), result.getResult(ROOT_MANIFEST_CRL_LOCATION, ValidationString.CRL_SIGNATURE_VALID));
+    	assertEquals(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), result.getCurrentLocation());
+		assertTrue(result.hasFailureForLocation(rootMftCrlValidationLocation));
+		assertTrue(result.getAllValidationChecksForLocation(new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION)).contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_SIGNATURE_VALID)));
     }
 
     private X509Crl getRootCrl() {
