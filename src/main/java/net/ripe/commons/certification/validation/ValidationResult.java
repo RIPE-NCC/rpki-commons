@@ -70,7 +70,26 @@ public class ValidationResult implements Serializable {
 		checksForStatus.add(new ValidationCheck(status, key, param));
 	}
 	
-	public boolean isTrue(boolean condition, String key, Object... param) {
+	public boolean warnIfFalse(boolean condition, String key, Object... param) {
+		Validate.notNull(key, "key is required");
+		if (condition) {
+			setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+		} else {
+			setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
+		}
+		return condition;
+	}
+	
+	public boolean warnIfTrue(boolean condition, String key, Object... param) {
+		return warnIfFalse(!condition, key, param);
+	}
+	
+	public boolean warnIfNull(Object object, String key, Object... param) {
+		return warnIfTrue(object == null, key, param);
+	}
+
+	
+	public boolean rejectIfFalse(boolean condition, String key, Object... param) {
 	    Validate.notNull(key, "key is required");
 	    if (condition) {
 	    	setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
@@ -80,12 +99,12 @@ public class ValidationResult implements Serializable {
 		return condition;
 	}
 
-	public boolean isFalse(boolean condition, String key, Object... param) {
-	    return isTrue(!condition, key, param);
+	public boolean rejectIfTrue(boolean condition, String key, Object... param) {
+	    return rejectIfFalse(!condition, key, param);
 	}
 
-	public boolean notNull(Object object, String key, Object... param) {
-	    return isTrue(object != null, key, param);
+	public boolean rejectIfNull(Object object, String key, Object... param) {
+	    return rejectIfTrue(object == null, key, param);
 	}
 
 
@@ -94,7 +113,10 @@ public class ValidationResult implements Serializable {
 	public Set<ValidationLocation> getValidatedLocations() {
 		return results.keySet();
 	}
-
+	
+    public ValidationLocation getCurrentLocation() {
+        return currentLocation;
+    }
 	
 	public boolean hasFailures() {
 		for (ValidationLocation location: getValidatedLocations()) {
@@ -138,53 +160,6 @@ public class ValidationResult implements Serializable {
 		return allChecks;
 	}
 
-
-	
-	
-	
-//    public boolean hasFailuresForLocationAndKey(ValidationLocation location, String key) {
-//        ValidationCheck check = getResult(location, key);
-//        return check != null && !check.isOk();
-//    }
-
-	
-//	public ValidationCheck getResult(ValidationLocation location, String key) {
-//	    Validate.isTrue(validationCheck.containsKey(location.getName()));
-//	    Validate.notNull(key);
-//	    for (ValidationCheck result: validationCheck.get(location.getName())) {
-//	        if (key.equals(result.getKey())) {
-//	            return result;
-//	        }
-//	    }
-//	    return null;
-//	}
-//
-//    public ValidationCheck getResult(URI uri, String key) {
-//        return getResult(new ValidationLocation(uri), key);
-//    }
-//
-//	public Set<ValidationCheck> getResults(ValidationLocation location) {
-//        Validate.isTrue(validationCheck.containsKey(location.getName()));
-//		return validationCheck.get(location.getName());
-//	}
-//
-
-
-
-//    public Set<ValidationCheck> getResultsForCurrentLocation() {
-//        return getResults(currentLocation);
-//    }
-
-    public ValidationLocation getCurrentLocation() {
-        return currentLocation;
-    }
-    
-    
-	@Override
-	public String toString() {
-	    return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	}
-
 	public ValidationCheck getResult(ValidationLocation location, String checkKey) {
 		List<ValidationCheck> allChecks = getAllValidationChecksForLocation(location);
 		for (ValidationCheck check: allChecks) {
@@ -194,5 +169,11 @@ public class ValidationResult implements Serializable {
 		}
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
+
     
 }

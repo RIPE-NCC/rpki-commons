@@ -151,10 +151,10 @@ public class ProvisioningCmsObjectParser {
         try {
             sp = new CMSSignedDataParser(encoded);
         } catch (CMSException e) {
-            validationResult.isTrue(false, CMS_DATA_PARSING);
+            validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
             return;
         }
-        validationResult.isTrue(true, CMS_DATA_PARSING);
+        validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
 
         verifyVersionNumber();
         verifyDigestAlgorithm(encoded);
@@ -177,14 +177,14 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
      */
     private void verifyVersionNumber() {
-        validationResult.isTrue(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
+        validationResult.rejectIfFalse(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.2
      */
     private void verifyDigestAlgorithm(byte[] data) {
-        validationResult.isTrue(CMSSignedGenerator.DIGEST_SHA256.equals(getDigestAlgorithmOidFromEncodedCmsObject(data).getObjectId().getId()), CMS_SIGNED_DATA_DIGEST_ALGORITHM);
+        validationResult.rejectIfFalse(CMSSignedGenerator.DIGEST_SHA256.equals(getDigestAlgorithmOidFromEncodedCmsObject(data).getObjectId().getId()), CMS_SIGNED_DATA_DIGEST_ALGORITHM);
     }
 
     private AlgorithmIdentifier getDigestAlgorithmOidFromEncodedCmsObject(byte[] data) {
@@ -205,7 +205,7 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.1
      */
     private void verifyContentType() {
-        validationResult.isTrue(PROVISIONING_OBJECT_OID_STRING.equals(sp.getSignedContent().getContentType()), CMS_CONTENT_TYPE);
+        validationResult.rejectIfFalse(PROVISIONING_OBJECT_OID_STRING.equals(sp.getSignedContent().getContentType()), CMS_CONTENT_TYPE);
     }
 
     /**
@@ -219,9 +219,9 @@ public class ProvisioningCmsObjectParser {
             String payloadXml = IOUtils.toString(signedContentStream, "UTF-8");
             payload = PayloadParser.parse(payloadXml, validationResult);
             
-            validationResult.isTrue(true, CMS_CONTENT_PARSING);
+            validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
         } catch (IOException e) {
-            validationResult.isTrue(false, CMS_CONTENT_PARSING);
+            validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
         }
     }
 
@@ -230,12 +230,12 @@ public class ProvisioningCmsObjectParser {
      */
     private void parseCertificates() {
         Collection<? extends Certificate> certificates = extractCertificates(sp);
-        if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
+        if (!validationResult.rejectIfNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
 
         for (Certificate cert : certificates) {
-            if (!validationResult.isTrue(cert instanceof X509Certificate, CERT_IS_X509CERT)) {
+            if (!validationResult.rejectIfFalse(cert instanceof X509Certificate, CERT_IS_X509CERT)) {
                 continue;
             }
             processX509Certificate((X509Certificate)cert);
@@ -246,10 +246,10 @@ public class ProvisioningCmsObjectParser {
         if (isEndEntityCertificate(certificate)) {
             if (cmsCertificate == null) {
                 cmsCertificate = parseCmsCertificate(certificate);
-                validationResult.isTrue(true, CERT_IS_EE_CERT);
-                validationResult.notNull(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate) != null, CERT_HAS_SKI);
+                validationResult.rejectIfFalse(true, CERT_IS_EE_CERT);
+                validationResult.rejectIfNull(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate) != null, CERT_HAS_SKI);
             } else {
-                validationResult.isTrue(false, ONLY_ONE_EE_CERT_ALLOWED);
+                validationResult.rejectIfFalse(false, ONLY_ONE_EE_CERT_ALLOWED);
             }
         } else {
             caCertificates.add(certificate);
@@ -307,16 +307,16 @@ public class ProvisioningCmsObjectParser {
      */
     private void parseCmsCrl() {
         Collection<? extends CRL> certificates = extractCrl(sp);
-        if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
+        if (!validationResult.rejectIfNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
         
-        if (!validationResult.isTrue(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED)) {
+        if (!validationResult.rejectIfFalse(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED)) {
             return;
         }
         
         CRL x509Crl = certificates.iterator().next();
-        if (validationResult.isTrue(x509Crl instanceof X509CRL, CRL_IS_X509CRL)) {
+        if (validationResult.rejectIfFalse(x509Crl instanceof X509CRL, CRL_IS_X509CRL)) {
             crl = (X509CRL) x509Crl;
         }
     }
@@ -344,12 +344,12 @@ public class ProvisioningCmsObjectParser {
      */
     private void verifySignerInfos() {
         SignerInformationStore signerStore = getSignerStore();
-        if (!validationResult.notNull(signerStore, GET_SIGNER_INFO)) {
+        if (!validationResult.rejectIfNull(signerStore, GET_SIGNER_INFO)) {
             return;
         }
 
         Collection<?> signers = signerStore.getSigners();
-        validationResult.isTrue(signers.size() == 1, ONLY_ONE_SIGNER);
+        validationResult.rejectIfFalse(signers.size() == 1, ONLY_ONE_SIGNER);
 
         SignerInformation signer =  (SignerInformation) signers.iterator().next();
         verifySignerVersion(signer);
@@ -375,7 +375,7 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.1
      */
     private void verifySignerVersion(SignerInformation signer) {
-        validationResult.isTrue(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
+        validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
     }
 
     /**
@@ -384,18 +384,18 @@ public class ProvisioningCmsObjectParser {
     private void verifySubjectKeyIdentifier(SignerInformation signer) {
         SignerId sid = signer.getSID();
         try {
-            validationResult.isTrue(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate)).getEncoded(), sid.getSubjectKeyIdentifier()), CMS_SIGNER_INFO_SKI);
+            validationResult.rejectIfFalse(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate)).getEncoded(), sid.getSubjectKeyIdentifier()), CMS_SIGNER_INFO_SKI);
         } catch (IOException e) {
-            validationResult.isTrue(false, CMS_SIGNER_INFO_SKI);
+            validationResult.rejectIfFalse(false, CMS_SIGNER_INFO_SKI);
         }
-        validationResult.isTrue(sid.getIssuer() == null && sid.getSerialNumber() == null, CMS_SIGNER_INFO_SKI_ONLY);
+        validationResult.rejectIfFalse(sid.getIssuer() == null && sid.getSerialNumber() == null, CMS_SIGNER_INFO_SKI_ONLY);
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.3
      */
     private void verifyDigestAlgorithm(SignerInformation signer) {
-        validationResult.isTrue(CMSSignedGenerator.DIGEST_SHA256.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
+        validationResult.rejectIfFalse(CMSSignedGenerator.DIGEST_SHA256.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
     }
 
     /**
@@ -403,7 +403,7 @@ public class ProvisioningCmsObjectParser {
      */
     private void verifySignedAttributes(SignerInformation signer) {
         AttributeTable attributeTable = signer.getSignedAttributes();
-        if (!validationResult.notNull(attributeTable, SIGNED_ATTRS_PRESENT)) {
+        if (!validationResult.rejectIfNull(attributeTable, SIGNED_ATTRS_PRESENT)) {
             return;
         }
 
@@ -417,13 +417,13 @@ public class ProvisioningCmsObjectParser {
      */
     private void verifyContentType(AttributeTable attributeTable) {
         Attribute contentType = attributeTable.get(CMSAttributes.contentType);
-        if (!validationResult.notNull(contentType, CONTENT_TYPE_ATTR_PRESENT)) {
+        if (!validationResult.rejectIfNull(contentType, CONTENT_TYPE_ATTR_PRESENT)) {
             return;
         }
-        if(!validationResult.isTrue(contentType.getAttrValues().size() == 1, CONTENT_TYPE_VALUE_COUNT)) {
+        if(!validationResult.rejectIfFalse(contentType.getAttrValues().size() == 1, CONTENT_TYPE_VALUE_COUNT)) {
             return;
         }
-        validationResult.isTrue(PROVISIONING_OBJECT_OID_STRING.equals(contentType.getAttrValues().getObjectAt(0)), CONTENT_TYPE_VALUE);
+        validationResult.rejectIfFalse(PROVISIONING_OBJECT_OID_STRING.equals(contentType.getAttrValues().getObjectAt(0)), CONTENT_TYPE_VALUE);
     }
 
     /**
@@ -431,10 +431,10 @@ public class ProvisioningCmsObjectParser {
      */
     private void verifyMessageDigest(AttributeTable attributeTable) {
         Attribute messageDigest = attributeTable.get(CMSAttributes.messageDigest);
-        if (!validationResult.notNull(messageDigest, MSG_DIGEST_ATTR_PRESENT)) {
+        if (!validationResult.rejectIfNull(messageDigest, MSG_DIGEST_ATTR_PRESENT)) {
             return;
         }
-        if (!validationResult.isTrue(messageDigest.getAttrValues().size() == 1, MSG_DIGEST_VALUE_COUNT)) {
+        if (!validationResult.rejectIfFalse(messageDigest.getAttrValues().size() == 1, MSG_DIGEST_VALUE_COUNT)) {
             return;
         }
     }
@@ -444,10 +444,10 @@ public class ProvisioningCmsObjectParser {
      */
     private void verifySigningTime(AttributeTable attributeTable) {
         Attribute signingTime = attributeTable.get(CMSAttributes.signingTime);
-        if (!validationResult.notNull(signingTime, SIGNING_TIME_ATTR_PRESENT)) {
+        if (!validationResult.rejectIfNull(signingTime, SIGNING_TIME_ATTR_PRESENT)) {
             return;
         }
-        if (!validationResult.isTrue(signingTime.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
+        if (!validationResult.rejectIfFalse(signingTime.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
             return;
         }
     }
@@ -457,7 +457,7 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
      */
     private void verifyEncryptionAlgorithm(SignerInformation signer) {
-        validationResult.isTrue(CMSSignedGenerator.ENCRYPTION_RSA.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
+        validationResult.rejectIfFalse(CMSSignedGenerator.ENCRYPTION_RSA.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
     }
 
     /**
@@ -466,7 +466,7 @@ public class ProvisioningCmsObjectParser {
     private void verifySignature(SignerInformation signer) {
         boolean errorOccured = false;
         try {
-            validationResult.isTrue(signer.verify(cmsCertificate, DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
+            validationResult.rejectIfFalse(signer.verify(cmsCertificate, DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
         } catch (CertificateExpiredException e) {
             errorOccured = true;
         } catch (CertificateNotYetValidException e) {
@@ -480,7 +480,7 @@ public class ProvisioningCmsObjectParser {
         }
 
         if (errorOccured) {
-            validationResult.isTrue(false, SIGNATURE_VERIFICATION);
+            validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION);
         }
     }
 
@@ -488,6 +488,6 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.7
      */
     private void verifyUnsignedAttributes(SignerInformation signer) {
-        validationResult.isTrue(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);
+        validationResult.rejectIfFalse(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);
     }
 }

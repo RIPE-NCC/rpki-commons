@@ -248,7 +248,7 @@ public class X509ResourceCertificateTest {
         public X509Crl answer() throws Throwable {
                
 			assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
-               result.isTrue(false, ValidationString.CRL_SIGNATURE_VALID);
+               result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
                return null;
             }
         });

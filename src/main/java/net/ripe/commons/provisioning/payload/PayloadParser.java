@@ -85,13 +85,13 @@ public final class PayloadParser {
 
     public static AbstractProvisioningPayload parse(String payloadXml, ValidationResult validationResult) {
         Matcher matcher = TYPE_PATTERN.matcher(payloadXml);
-        validationResult.isTrue(matcher.matches(), ValidationString.FOUND_PAYLOAD_TYPE);
+        validationResult.rejectIfFalse(matcher.matches(), ValidationString.FOUND_PAYLOAD_TYPE);
         if (validationResult.hasFailures()) {
             return null;
         }
         
         String type = matcher.group(1);
-        validationResult.isTrue(PayloadMessageType.containsAsEnum(type), VALID_PAYLOAD_TYPE);
+        validationResult.rejectIfFalse(PayloadMessageType.containsAsEnum(type), VALID_PAYLOAD_TYPE);
         if (validationResult.hasFailures()) {
             return null;
         }
@@ -99,7 +99,7 @@ public final class PayloadParser {
         PayloadMessageType messageType = PayloadMessageType.valueOf(type);
         XStreamXmlSerializer<? extends AbstractProvisioningPayload> serializer = TYPE_MAP.get(messageType);
         AbstractProvisioningPayload payload = serializer.deserialize(payloadXml);
-        validationResult.isTrue(AbstractProvisioningPayload.SUPPORTED_VERSION.equals(payload.getVersion()), ValidationString.VALID_PAYLOAD_VERSION);
+        validationResult.rejectIfFalse(AbstractProvisioningPayload.SUPPORTED_VERSION.equals(payload.getVersion()), ValidationString.VALID_PAYLOAD_VERSION);
         if (validationResult.hasFailures()) {
             return null;
         }

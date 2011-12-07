@@ -43,9 +43,9 @@ public class ValidationResultTest {
 		final ValidationLocation validatedObjectLocation = new ValidationLocation(validatedObject);
 
 		result.setLocation(validatedObjectLocation);
-		assertTrue(result.isTrue(true, "A"));
-		assertTrue(result.isFalse(false, "B"));
-		assertTrue(result.notNull("", "C"));
+		assertTrue(result.rejectIfFalse(true, "A"));
+		assertTrue(result.rejectIfTrue(false, "B"));
+		assertTrue(result.rejectIfNull("", "C"));
 
 		assertFalse(result.hasFailures());
 		assertFalse(result.hasFailureForLocation(validatedObjectLocation));
@@ -69,18 +69,18 @@ public class ValidationResultTest {
 		ValidationLocation secondValidatedObjectLocation = new ValidationLocation(secondValidatedObject);
 
 		result.setLocation(firstValidatedObjectLocation);
-		assertTrue(result.isTrue(true, "A"));
-		assertTrue(result.isFalse(false, "B"));
+		assertTrue(result.rejectIfFalse(true, "A"));
+		assertTrue(result.rejectIfTrue(false, "B"));
 
 		result.setLocation(secondValidatedObjectLocation);
-		assertFalse(result.isTrue(false, "A"));
-		assertFalse(result.isFalse(true, "B"));
+		assertFalse(result.rejectIfFalse(false, "A"));
+		assertFalse(result.rejectIfTrue(true, "B"));
 
 		result.setLocation(firstValidatedObjectLocation);
-		assertTrue(result.notNull("", "C"));
+		assertTrue(result.rejectIfNull("", "C"));
 
 		result.setLocation(secondValidatedObjectLocation);
-		assertFalse(result.notNull(null, "C"));
+		assertFalse(result.rejectIfNull(null, "C"));
 
 		assertTrue(result.hasFailures());
 		assertFalse(result.hasFailureForLocation(firstValidatedObjectLocation));

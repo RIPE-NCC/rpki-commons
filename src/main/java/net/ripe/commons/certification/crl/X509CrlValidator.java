@@ -65,7 +65,7 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
 
     private void checkNextUpdate(X509Crl crl) {
         DateTime nextUpdateTime = crl.getNextUpdateTime();
-        result.isTrue(nextUpdateTime.isAfterNow(), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime);
+        result.rejectIfFalse(nextUpdateTime.isAfterNow(), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime);
 
     }
 
@@ -77,6 +77,6 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
         } catch (SignatureException e) {
             signatureValid = false;
         }
-        result.isTrue(signatureValid, ValidationString.CRL_SIGNATURE_VALID);
+        result.rejectIfFalse(signatureValid, ValidationString.CRL_SIGNATURE_VALID);
     }
 }

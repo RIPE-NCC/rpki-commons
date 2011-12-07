@@ -136,7 +136,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
             result.setLocation(new ValidationLocation(getCrlUri()));
             crl = crlLocator.getCrl(getCrlUri(), context, result);
             result.setLocation(savedCurrentLocation);
-            result.notNull(crl, ValidationString.OBJECTS_CRL_VALID, this);
+            result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, this);
             if (crl == null) {
                 return;
             }

@@ -70,35 +70,35 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     private void validateCertificatePolicy() {
-        if (!result.notNull(certificate.getCriticalExtensionOIDs(), CRITICAL_EXT_PRESENT)) {
+        if (!result.rejectIfNull(certificate.getCriticalExtensionOIDs(), CRITICAL_EXT_PRESENT)) {
             return;
         }
 
-        result.isTrue(certificate.getCriticalExtensionOIDs().contains(X509Extensions.CertificatePolicies.getId()), POLICY_EXT_CRITICAL);
+        result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(X509Extensions.CertificatePolicies.getId()), POLICY_EXT_CRITICAL);
 
         try {
             byte[] extensionValue = certificate.getExtensionValue(X509Extensions.CertificatePolicies.getId());
-            if (!result.notNull(extensionValue, POLICY_EXT_VALUE)) {
+            if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
                 return;
             }
             ASN1Sequence policies = ASN1Sequence.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
-            if (!result.isTrue(policies.size() == 1, SINGLE_CERT_POLICY)) {
+            if (!result.rejectIfFalse(policies.size() == 1, SINGLE_CERT_POLICY)) {
                 return;
             }
             PolicyInformation policy = PolicyInformation.getInstance(policies.getObjectAt(0));
-            result.isTrue(policy.getPolicyQualifiers() == null, POLICY_QUALIFIER);
-            if (!result.notNull(policy.getPolicyIdentifier(), POLICY_ID_PRESENT)) {
+            result.rejectIfFalse(policy.getPolicyQualifiers() == null, POLICY_QUALIFIER);
+            if (!result.rejectIfNull(policy.getPolicyIdentifier(), POLICY_ID_PRESENT)) {
                 return;
             }
-            result.isTrue(POLICY_OID.equals(policy.getPolicyIdentifier()), POLICY_ID_VERSION);
+            result.rejectIfFalse(POLICY_OID.equals(policy.getPolicyIdentifier()), POLICY_ID_VERSION);
         } catch (IOException e) {
-            result.isTrue(false, POLICY_VALIDATION);
+            result.rejectIfFalse(false, POLICY_VALIDATION);
         }
     }
 
     private void validateResourceExtensionsForResourceCertificates() {
-        if (result.isTrue(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
-            result.isTrue(true, AS_OR_IP_RESOURCE_PRESENT);
+        if (result.rejectIfFalse(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
+            result.rejectIfFalse(true, AS_OR_IP_RESOURCE_PRESENT);
             parseResourceExtensions();
         }
     }
@@ -121,6 +121,6 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 asInherited = true;
             }
         }
-        result.isTrue(ipInherited == asInherited, PARTIAL_INHERITANCE);
+        result.rejectIfFalse(ipInherited == asInherited, PARTIAL_INHERITANCE);
     }
 }

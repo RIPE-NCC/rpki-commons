@@ -96,13 +96,13 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         } finally {
             IOUtils.closeQuietly(input);
         }
-        result.notNull(certificate, CERTIFICATE_PARSED);
+        result.rejectIfNull(certificate, CERTIFICATE_PARSED);
     }
 
 
 
     private void validateSignatureAlgorithm() {
-        result.isTrue(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM);
+        result.rejectIfFalse(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM);
     }
     
     protected boolean isResourceExtensionPresent() {

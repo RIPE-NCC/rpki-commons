@@ -165,7 +165,7 @@ public class ManifestCmsTest{
     	    @Override
             public X509Crl answer() throws Throwable {
     	        assertEquals(rootMftCrlValidationLocation, result.getCurrentLocation());
-    	        result.isTrue(false, ValidationString.CRL_SIGNATURE_VALID);
+    	        result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
     	        return null;
     	    }
     	});

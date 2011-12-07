@@ -53,6 +53,6 @@ public class ProvisioningCmsCertificateParser extends X509CertificateParser<Prov
     
     @Override
     protected void doTypeSpecificValidation() {
-        result.isFalse(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
+        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
     }
 }

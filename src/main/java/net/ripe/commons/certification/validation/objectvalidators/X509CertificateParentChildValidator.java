@@ -86,7 +86,7 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
     }
 
     private void verifySignature() {
-        result.isTrue(parent.isCa(), ISSUER_IS_CA);
+        result.rejectIfFalse(parent.isCa(), ISSUER_IS_CA);
 
         boolean errorOccured = false;
         try {
@@ -97,12 +97,12 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
             errorOccured = true;
         }
 
-        result.isFalse(errorOccured, SIGNATURE_VALID);
+        result.rejectIfTrue(errorOccured, SIGNATURE_VALID);
     }
 
     private void verifyCrl() {
         if (crl == null) {
-            result.isTrue(child.isRoot(), CRL_REQUIRED);
+            result.rejectIfFalse(child.isRoot(), CRL_REQUIRED);
             return;
         }
 
@@ -113,32 +113,32 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
             errorOccured = true;
         }
 
-        result.isFalse(errorOccured, CRL_SIGNATURE_VALID);
-        result.isFalse(crl.isRevoked(child.getCertificate()), CERT_NOT_REVOKED);
+        result.rejectIfTrue(errorOccured, CRL_SIGNATURE_VALID);
+        result.rejectIfTrue(crl.isRevoked(child.getCertificate()), CERT_NOT_REVOKED);
     }
 
     private void verifyValidity() {
         DateTime now = new DateTime();
 
-        result.isFalse(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore());
-        result.isFalse(now.isAfter(child.getValidityPeriod().getNotValidAfter()), NOT_VALID_AFTER, child.getValidityPeriod().getNotValidAfter());
+        result.rejectIfTrue(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore());
+        result.rejectIfTrue(now.isAfter(child.getValidityPeriod().getNotValidAfter()), NOT_VALID_AFTER, child.getValidityPeriod().getNotValidAfter());
     }
 
     private void verifyIssuer() {
-        result.isTrue(parent.getSubject().equals(child.getIssuer()), PREV_SUBJECT_EQ_ISSUER);
+        result.rejectIfFalse(parent.getSubject().equals(child.getIssuer()), PREV_SUBJECT_EQ_ISSUER);
     }
 
     protected void verifyKeyUsage() {
         boolean[] keyUsage = child.getCertificate().getKeyUsage();
-        if (!result.notNull(keyUsage, KEY_USAGE_EXT_PRESENT)) {
+        if (!result.warnIfNull(keyUsage, KEY_USAGE_EXT_PRESENT)) {
             return;
         }
 
         if (child.isCa()) {
-            result.isTrue(keyUsage[KEYCERTSIGN_INDEX], KEY_CERT_SIGN);
-            result.isTrue(keyUsage[CRLSIGN_INDEX], CRL_SIGN);
+            result.warnIfFalse(keyUsage[KEYCERTSIGN_INDEX], KEY_CERT_SIGN);
+            result.warnIfFalse(keyUsage[CRLSIGN_INDEX], CRL_SIGN);
         } else {
-            result.isTrue(keyUsage[DIG_SIGN_INDEX], DIG_SIGN);
+            result.warnIfFalse(keyUsage[DIG_SIGN_INDEX], DIG_SIGN);
         }
     }
 
@@ -149,10 +149,10 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
         }
         byte[] ski = parent.getSubjectKeyIdentifier();
         byte[] aki = child.getAuthorityKeyIdentifier();
-        if ((!result.notNull(ski, SKI_PRESENT)) || (!result.notNull(aki, AKI_PRESENT))) {
+        if ((!result.rejectIfNull(ski, SKI_PRESENT)) || (!result.rejectIfNull(aki, AKI_PRESENT))) {
             return;
         }
-        result.isTrue(Arrays.equals(ski, aki), PREV_SKI_EQ_AKI);
+        result.rejectIfFalse(Arrays.equals(ski, aki), PREV_SKI_EQ_AKI);
     }
 
 }

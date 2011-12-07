@@ -169,25 +169,25 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	}
 
 	@Test
-	public void shouldRejectInvalidKeyUsage() {
+	public void shouldWarnOnInvalidKeyUsage() {
 		child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
-		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.KEY_CERT_SIGN.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+		assertFalse(result.hasFailures());
+		assertEquals(result.getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_CERT_SIGN), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_CERT_SIGN));
 	}
 
     @Test
-    public void shouldRejectOnMisingKeyUsage() {
+    public void shouldWarnOnMisingKeyUsage() {
 		child = createChildCertificateBuilder().withKeyUsage(0).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
-		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.KEY_USAGE_EXT_PRESENT.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+		assertFalse(result.hasFailures());
+		assertEquals(result.getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_USAGE_EXT_PRESENT), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_USAGE_EXT_PRESENT));
     }
 
     @Test

@@ -174,25 +174,25 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     }
 
     @Test
-    public void testShouldFailOnMisingKeyUsage() {
+    public void testShouldWarnOnMisingKeyUsage() {
 		child = createChildBuilder().withKeyUsage(0).build();
 
 		X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
-    	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-    	assertTrue(ValidationString.KEY_USAGE_EXT_PRESENT.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+    	assertFalse(validator.getValidationResult().hasFailures());
+    	
+		assertEquals(validator.getValidationResult().getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_USAGE_EXT_PRESENT), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_USAGE_EXT_PRESENT));
     }
 
     @Test
-    public void testShouldFailOnInvalidKeyUsage() {
+    public void testShouldWarnOnInvalidKeyUsage() {
 		child = createChildBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
 
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
-    	assertTrue(validator.getValidationResult().hasFailures());
-    	assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-    	assertTrue(ValidationString.KEY_CERT_SIGN.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+    	assertFalse(validator.getValidationResult().hasFailures());
+    	
+		assertEquals(validator.getValidationResult().getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_CERT_SIGN), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_CERT_SIGN));
     }
 
     @Test

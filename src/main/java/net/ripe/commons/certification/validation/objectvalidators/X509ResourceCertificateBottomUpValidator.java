@@ -117,7 +117,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     private void buildCertificationList() {
         certificates.add(0, new CertificateWithLocation(this.certificate, this.location));
         result.setLocation(this.location);
-        if (!result.isTrue(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, MAX_CHAIN_LENGTH)) {
+        if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, MAX_CHAIN_LENGTH)) {
             return;
         }
 
@@ -125,7 +125,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
         while (!cert.isRoot()) {
             CertificateRepositoryObjectFile<X509ResourceCertificate> parent = locator.findParent(cert);
 
-            if (!result.notNull(parent, CERT_CHAIN_COMPLETE)) {
+            if (!result.rejectIfNull(parent, CERT_CHAIN_COMPLETE)) {
                 return;
             }
 
@@ -139,7 +139,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
             ValidationLocation parentLocation = new ValidationLocation(parent.getName());
 			certificates.add(0, new CertificateWithLocation(cert, parentLocation));
             result.setLocation(parentLocation);
-            if (!result.isTrue(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, MAX_CHAIN_LENGTH)) {
+            if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, MAX_CHAIN_LENGTH)) {
                 return;
             }
         }
@@ -156,7 +156,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
     private void checkTrustAnchor() {
     	if ((trustAnchors != null) && (trustAnchors.size() > 0)) {
-    		result.isTrue(trustAnchors.contains(certificates.get(0).getCertificate()), ROOT_IS_TA);
+    		result.rejectIfFalse(trustAnchors.contains(certificates.get(0).getCertificate()), ROOT_IS_TA);
     	}
     }
 

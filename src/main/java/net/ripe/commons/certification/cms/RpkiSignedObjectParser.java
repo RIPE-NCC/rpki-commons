@@ -124,10 +124,10 @@ public abstract class RpkiSignedObjectParser {
         try {
             sp = new CMSSignedDataParser(encoded);
         } catch (CMSException e) {
-            validationResult.isTrue(false, CMS_DATA_PARSING);
+            validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
             return;
         }
-        validationResult.isTrue(true, CMS_DATA_PARSING);
+        validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
 
         if (!validationResult.hasFailures()) { parseContent(sp); }
         if (!validationResult.hasFailures()) { parseCmsCertificate(sp); }
@@ -143,37 +143,37 @@ public abstract class RpkiSignedObjectParser {
         try {
             decodeContent(asn1InputStream.readObject());
         } catch (IOException e) {
-            validationResult.isTrue(false, DECODE_CONTENT);
+            validationResult.rejectIfFalse(false, DECODE_CONTENT);
             return;
         }
-        validationResult.isTrue(true, DECODE_CONTENT);
+        validationResult.rejectIfFalse(true, DECODE_CONTENT);
 
         try {
-            validationResult.isTrue(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
+            validationResult.rejectIfFalse(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
             asn1InputStream.close();
         } catch (IOException e) {
-            validationResult.isTrue(false, CMS_CONTENT_PARSING);
+            validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
         }
-        validationResult.isTrue(true, CMS_CONTENT_PARSING);
+        validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
     }
 
     private void parseCmsCertificate(CMSSignedDataParser sp) {
         Collection<? extends Certificate> certificates = extractCertificate(sp);
 
-        if (!validationResult.notNull(certificates, GET_CERTS_AND_CRLS)) {
+        if (!validationResult.rejectIfNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
-        if (!validationResult.isTrue(certificates.size() == 1, ONLY_ONE_EE_CERT_ALLOWED)) {
+        if (!validationResult.rejectIfFalse(certificates.size() == 1, ONLY_ONE_EE_CERT_ALLOWED)) {
             return;
         }
-        if (!validationResult.isTrue(certificates.iterator().next() instanceof X509Certificate, CERT_IS_X509CERT)) {
+        if (!validationResult.rejectIfFalse(certificates.iterator().next() instanceof X509Certificate, CERT_IS_X509CERT)) {
             return;
         }
 
         certificate = parseCertificate(certificates);
 
-        validationResult.isTrue(certificate.isEe(), CERT_IS_EE_CERT);
-        validationResult.notNull(certificate.getSubjectKeyIdentifier(), CERT_HAS_SKI);
+        validationResult.rejectIfFalse(certificate.isEe(), CERT_IS_EE_CERT);
+        validationResult.rejectIfNull(certificate.getSubjectKeyIdentifier(), CERT_HAS_SKI);
     }
 
     private X509ResourceCertificate parseCertificate(Collection<? extends Certificate> certificates) {
@@ -226,12 +226,12 @@ public abstract class RpkiSignedObjectParser {
 
     private SignerInformation extractSingleCmsSigner(CMSSignedDataParser sp) {
         SignerInformationStore signerStore = getSignerStore(sp);
-        if (!validationResult.notNull(signerStore, GET_SIGNER_INFO)) {
+        if (!validationResult.rejectIfNull(signerStore, GET_SIGNER_INFO)) {
             return null;
         }
 
         Collection<?> signers = signerStore.getSigners();
-        validationResult.isTrue(signers.size() == 1, ONLY_ONE_SIGNER);
+        validationResult.rejectIfFalse(signers.size() == 1, ONLY_ONE_SIGNER);
 
         return (SignerInformation) signers.iterator().next();
     }
@@ -245,25 +245,25 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
-        validationResult.isTrue(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
-        validationResult.isTrue(ENCRYPTION_ALGORITHM_OID.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
-        if (!validationResult.notNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
+        validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
+        validationResult.rejectIfFalse(ENCRYPTION_ALGORITHM_OID.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
+        if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
             return false;
         }
-        validationResult.notNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
-        validationResult.notNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
+        validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
+        validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
         SignerId signerId = signer.getSID();
-        validationResult.isTrue(signerId.match(certificate), SIGNER_ID_MATCH);
+        validationResult.rejectIfFalse(signerId.match(certificate), SIGNER_ID_MATCH);
 
         return true;
     }
 
     private boolean verifyAndStoreSigningTime(SignerInformation signer) {
         Attribute signingTimeAttibute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
-        if (!validationResult.notNull(signingTimeAttibute, SIGNING_TIME_ATTR_PRESENT)) {
+        if (!validationResult.rejectIfNull(signingTimeAttibute, SIGNING_TIME_ATTR_PRESENT)) {
             return false;
         }
-        if (!validationResult.isTrue(signingTimeAttibute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
+        if (!validationResult.rejectIfFalse(signingTimeAttibute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
             return false;
         }
 
@@ -275,7 +275,7 @@ public abstract class RpkiSignedObjectParser {
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
         boolean errorOccured = false;
         try {
-            validationResult.isTrue(signer.verify(certificate.getPublicKey(), (String) null), SIGNATURE_VERIFICATION);
+            validationResult.rejectIfFalse(signer.verify(certificate.getPublicKey(), (String) null), SIGNATURE_VERIFICATION);
         } catch (NoSuchAlgorithmException e) {
             errorOccured = true;
         } catch (NoSuchProviderException e) {
@@ -285,7 +285,7 @@ public abstract class RpkiSignedObjectParser {
         }
 
         if (errorOccured) {
-            validationResult.isTrue(false, SIGNATURE_VERIFICATION);
+            validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION);
         }
     }
 }

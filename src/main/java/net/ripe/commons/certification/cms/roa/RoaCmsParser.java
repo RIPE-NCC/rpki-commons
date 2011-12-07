@@ -95,7 +95,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 
 	private void validateRoa() {
 		ValidationResult validationResult = getValidationResult();
-        if (!validationResult.isTrue(RoaCms.CONTENT_TYPE.equals(getContentType()), ROA_CONTENT_TYPE, getContentType())) {
+        if (!validationResult.rejectIfFalse(RoaCms.CONTENT_TYPE.equals(getContentType()), ROA_CONTENT_TYPE, getContentType())) {
 			return;
 		}
 
@@ -104,9 +104,9 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 			roaPrefixes.add(prefix.getPrefix());
 		}
         try {
-		    validationResult.isTrue(getResourceCertificate().getResources().contains(roaPrefixes), ROA_RESOURCES);
+		    validationResult.rejectIfFalse(getResourceCertificate().getResources().contains(roaPrefixes), ROA_RESOURCES);
         } catch (Exception e) {
-            validationResult.isTrue(false, ROA_RESOURCES);
+            validationResult.rejectIfFalse(false, ROA_RESOURCES);
         }
 	}
 
@@ -114,7 +114,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		expect(der, DERSequence.class);
 		DERSequence seq = (DERSequence) der;
 		ValidationResult validationResult = getValidationResult();
-		if (!validationResult.isTrue((seq.size() > 0) && (seq.size() <= 2), PREFIX_IN_ADDR_FAMILY)) {
+		if (!validationResult.rejectIfFalse((seq.size() > 0) && (seq.size() <= 2), PREFIX_IN_ADDR_FAMILY)) {
 			throw new IllegalArgumentException("ip address family sequence length invalid");
 		}
 		IpRange prefix = parseIpAddressAsPrefix(type, seq.getObjectAt(0));
@@ -122,7 +122,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		if (seq.size() > 1) {
 			expect(seq.getObjectAt(1), DERInteger.class);
 			maxLength = ((DERInteger) seq.getObjectAt(1)).getValue();
-			if (!validationResult.isTrue((maxLength.compareTo(BigInteger.ZERO) >= 0) && (maxLength.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0), PREFIX_LENGTH)) {
+			if (!validationResult.rejectIfFalse((maxLength.compareTo(BigInteger.ZERO) >= 0) && (maxLength.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0), PREFIX_LENGTH)) {
 				throw new IllegalArgumentException("prefix max length invalid");
 			}
 		}
@@ -134,12 +134,12 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		expect(der, DERSequence.class);
 		DERSequence seq = (DERSequence) der;
 		
-		if (!getValidationResult().isFalse(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0))) {
+		if (!getValidationResult().rejectIfTrue(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0))) {
 			// eContent seems to contain non-standard version (default 0 is omitted in structure)
 			return;
 		}
 		
-		if (!getValidationResult().isTrue(seq.size() == 2, ASN_AND_PREFIXES_IN_DER_SEQ)) {
+		if (!getValidationResult().rejectIfFalse(seq.size() == 2, ASN_AND_PREFIXES_IN_DER_SEQ)) {
 			return;
 		}
 		asn = Asn1Util.parseAsId(seq.getObjectAt(0));
@@ -151,12 +151,12 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		DERSequence seq = (DERSequence) der;
 		ValidationResult validationResult = getValidationResult();
 		if (seq.size() != 2) {
-			validationResult.isTrue(false, ADDR_FAMILY_AND_ADDR_IN_DER_SEQ);
+			validationResult.rejectIfFalse(false, ADDR_FAMILY_AND_ADDR_IN_DER_SEQ);
 			throw new IllegalArgumentException("ROA sequence does not contain address family and addresses");
 		}
 		AddressFamily addressFamily = AddressFamily.fromDer(seq.getObjectAt(0));
 		if (!(addressFamily.equals(AddressFamily.IPV4) || addressFamily.equals(AddressFamily.IPV6))) {
-			validationResult.isTrue(false, ADDR_FAMILY);
+			validationResult.rejectIfFalse(false, ADDR_FAMILY);
 			throw new IllegalArgumentException("Address family is neither IPv4 nor IPv6");
 		}
 		expect(seq.getObjectAt(1), DERSequence.class);
@@ -191,11 +191,11 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		}
 		ValidationResult validationResult = getValidationResult();
 		if (!errorOccured) {
-			validationResult.isTrue(true, ADDR_FAMILY_AND_ADDR_IN_DER_SEQ);
-			validationResult.isTrue(true, ADDR_FAMILY);
+			validationResult.rejectIfFalse(true, ADDR_FAMILY_AND_ADDR_IN_DER_SEQ);
+			validationResult.rejectIfFalse(true, ADDR_FAMILY);
 		}
 
-		validationResult.isTrue(roaPrefixList.size() > 0, ROA_PREFIX_LIST);
+		validationResult.rejectIfFalse(roaPrefixList.size() > 0, ROA_PREFIX_LIST);
 		return roaPrefixList;
 	}
 

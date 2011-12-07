@@ -53,6 +53,6 @@ public class ProvisioningIdentityCertificateParser extends X509CertificateParser
     
     @Override
     protected void doTypeSpecificValidation() {
-        result.isFalse(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
+        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
     }
 }

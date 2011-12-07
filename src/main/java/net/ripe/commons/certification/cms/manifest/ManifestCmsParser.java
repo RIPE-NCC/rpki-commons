@@ -107,18 +107,18 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 	private void validateManifest() {
 	    ValidationResult validationResult = getValidationResult();
 
-	    if (!validationResult.isTrue(ManifestCms.CONTENT_TYPE.equals(getContentType()), MANIFEST_CONTENT_TYPE)) {
+	    if (!validationResult.rejectIfFalse(ManifestCms.CONTENT_TYPE.equals(getContentType()), MANIFEST_CONTENT_TYPE)) {
             return;
         }
 
-        validationResult.isTrue(getResourceCertificate().isResourceSetInherited(), MANIFEST_RESOURCE_INHERIT);
+        validationResult.rejectIfFalse(getResourceCertificate().isResourceSetInherited(), MANIFEST_RESOURCE_INHERIT);
     }
 
     void decodeManifest(DEREncodable encoded) {
         ValidationResult validationResult = getValidationResult();
         try {
             DERSequence seq = expect(encoded, DERSequence.class);
-            if (!validationResult.isTrue(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE)) {
+            if (!validationResult.rejectIfFalse(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE)) {
             	return;
             }
             version = ManifestCms.DEFAULT_VERSION;
@@ -126,13 +126,13 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
             thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), DERGeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
             nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), DERGeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
             fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), DERObjectIdentifier.class).getId();
-            validationResult.isTrue(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
+            validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
             files = new TreeMap<String, byte[]>();
             decodeFileList(files, seq.getObjectAt(FILE_LIST_INDEX));
         } catch (IllegalArgumentException e) {
-            validationResult.isTrue(false, MANIFEST_CONTENT_STRUCTURE);
+            validationResult.rejectIfFalse(false, MANIFEST_CONTENT_STRUCTURE);
         } catch (ParseException e) {
-            validationResult.isTrue(false, MANIFEST_TIME_FORMAT);
+            validationResult.rejectIfFalse(false, MANIFEST_TIME_FORMAT);
         }
     }
 
@@ -155,7 +155,7 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
         		break;
         	}
         }
-        getValidationResult().isFalse(errorOccured, MANIFEST_DECODE_FILELIST);
+        getValidationResult().rejectIfTrue(errorOccured, MANIFEST_DECODE_FILELIST);
     }
 
 	@Override
