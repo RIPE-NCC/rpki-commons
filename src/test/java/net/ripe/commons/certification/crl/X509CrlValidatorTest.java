@@ -101,14 +101,14 @@ public class X509CrlValidatorTest {
     }
 
     @Test
-    public void shouldRejectWhenNextUpdatePassed() {
+    public void shouldWarnWhenNextUpdatePassed() {
         DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
         result = subject.getValidationResult();
-        assertTrue(result.hasFailures());
-        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+        assertFalse(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
     }
 
 

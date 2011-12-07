@@ -117,7 +117,6 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         return findFirstAuthorityInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS);
     }
     
-    @Override
     public void validate(String location, X509ResourceCertificateValidator validator) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse(location, getEncoded());
@@ -136,7 +135,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
             result.setLocation(new ValidationLocation(getCrlUri()));
             crl = crlLocator.getCrl(getCrlUri(), context, result);
             result.setLocation(savedCurrentLocation);
-            result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, this);
+            result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri());
             if (crl == null) {
                 return;
             }

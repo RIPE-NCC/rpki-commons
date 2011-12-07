@@ -29,7 +29,7 @@
  */
 package net.ripe.commons.certification.crl;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -59,7 +59,6 @@ import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 
 import org.apache.commons.io.IOUtils;
@@ -171,10 +170,6 @@ public class X509Crl implements CertificateRepositoryObject {
 
     public X500Principal getIssuer() {
         return getCrl().getIssuerX500Principal();
-    }
-
-    @Override
-    public void validate(String location, X509ResourceCertificateValidator validator) {
     }
 
     @Override

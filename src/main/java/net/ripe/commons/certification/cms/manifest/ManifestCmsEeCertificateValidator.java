@@ -27,58 +27,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.commons.certification.cms.roa;
+package net.ripe.commons.certification.cms.manifest;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
+import static net.ripe.commons.certification.validation.ValidationString.NOT_VALID_AFTER;
+import static net.ripe.commons.certification.validation.ValidationString.NOT_VALID_BEFORE;
 
-import net.ripe.commons.certification.cms.RpkiSignedObject;
-import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
-import net.ripe.ipresource.Asn;
+import org.joda.time.DateTime;
+
+import net.ripe.commons.certification.crl.X509Crl;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.IpResourceSet;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+public class ManifestCmsEeCertificateValidator extends X509ResourceCertificateParentChildValidator {
 
-public class RoaCms extends RpkiSignedObject implements Roa {
+	public ManifestCmsEeCertificateValidator(ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
+		super(result, parent, crl, resources);
+	}
 
-    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.24");
+	@Override
+	protected void verifyValidity() {
+        DateTime now = new DateTime();
 
-    private static final long serialVersionUID = 1L;
+        result.rejectIfTrue(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore());
+        result.warnIfTrue(now.isAfter(child.getValidityPeriod().getNotValidAfter()), NOT_VALID_AFTER, child.getValidityPeriod().getNotValidAfter());
+	}
 
-    private Asn asn;
-
-    private List<RoaPrefix> prefixes;
-
-    protected RoaCms(RpkiSignedObjectInfo cmsObjectInfo, Asn asn, List<RoaPrefix> prefixes) {
-        super(cmsObjectInfo);
-        this.asn = asn;
-        this.prefixes = prefixes;
-    }
-
-    @Override
-    public Asn getAsn() {
-        return asn;
-    }
-
-    public IpResourceSet getResources() {
-        return getCertificate().getResources();
-    }
-
-    @Override
-    public List<RoaPrefix> getPrefixes() {
-        return Collections.unmodifiableList(prefixes);
-    }
-
-    @Override
-    public URI getParentCertificateUri() {
-        return getCertificate().getParentCertificateUri();
-    }
-
-    public static RoaCms parseDerEncoded(byte[] encoded) {
-        RoaCmsParser parser = new RoaCmsParser();
-        parser.parse("unknown.roa", encoded);
-        return parser.getRoaCms();
-    }
+	
 
 }

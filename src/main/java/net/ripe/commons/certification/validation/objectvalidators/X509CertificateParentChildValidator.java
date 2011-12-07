@@ -52,11 +52,11 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
 
     private T parent;
 
-    private T child;
+    protected T child;
 
     private X509Crl crl;
 
-    private ValidationResult result;
+    protected ValidationResult result;
 
 
     public X509CertificateParentChildValidator(ValidationResult result, T parent, X509Crl crl) {
@@ -117,7 +117,7 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
         result.rejectIfTrue(crl.isRevoked(child.getCertificate()), CERT_NOT_REVOKED);
     }
 
-    private void verifyValidity() {
+    protected void verifyValidity() {
         DateTime now = new DateTime();
 
         result.rejectIfTrue(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore());

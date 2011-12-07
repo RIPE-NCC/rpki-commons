@@ -36,10 +36,16 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
+import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.cms.RpkiSignedObject;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
+import net.ripe.commons.certification.crl.CrlLocator;
+import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.util.Specification;
-import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationString;
+import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
@@ -123,8 +129,33 @@ public class ManifestCms extends RpkiSignedObject {
     public URI getParentCertificateUri() {
         return getCertificate().getParentCertificateUri();
     }
+    
+    @Override
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
+        ValidationLocation savedCurrentLocation = result.getCurrentLocation();
+        result.setLocation(new ValidationLocation(getCrlUri()));
 
-    /**
+        X509Crl crl = crlLocator.getCrl(getCrlUri(), context, result);
+
+        result.setLocation(savedCurrentLocation);
+        result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri());
+        if (crl == null) {
+            return;
+        }
+        
+        checkManifestAndEeCertificateValidityTimes(result);
+        ManifestCmsEeCertificateValidator validator = new ManifestCmsEeCertificateValidator(result, context.getCertificate(), crl, context.getResources());
+        validator.validate(location, getCertificate());
+    }
+    
+
+    private void checkManifestAndEeCertificateValidityTimes(ValidationResult result) {
+		ValidityPeriod certificateValidity = getCertificate().getValidityPeriod();
+		result.warnIfFalse(certificateValidity.getNotValidBefore().equals(getThisUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
+		result.warnIfFalse(certificateValidity.getNotValidAfter().equals(getNextUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
+	}
+
+	/**
      * @deprecated use {@link #verifyFileContents(String, byte[])} or {@link #getFileContentSpecification(String)}.
      */
     @Deprecated
@@ -145,17 +176,6 @@ public class ManifestCms extends RpkiSignedObject {
         ManifestCmsParser parser = new ManifestCmsParser();
         parser.parse("<null>", encoded);
         return parser.getManifestCms();
-    }
-
-    @Override
-    public void validate(String location, X509ResourceCertificateValidator validator) {
-        ManifestCmsParser parser = new ManifestCmsParser(validator.getValidationResult());
-        parser.parse(location, getEncoded());
-        if (parser.getValidationResult().hasFailures()) {
-            return;
-        }
-
-        validator.validate(location, getCertificate());
     }
 
     public static byte[] hashContents(byte[] contents) {
