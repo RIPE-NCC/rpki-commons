@@ -39,6 +39,7 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
@@ -100,7 +101,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
 
     public ManifestCms build(PrivateKey privateKey) {
     	ManifestCmsParser parser = new ManifestCmsParser();
-    	parser.parse("<generated>", generateCms(certificate.getCertificate(), privateKey, signatureProvider, ManifestCms.CONTENT_TYPE, encodeManifest()));
+    	parser.parse("<generated>", generateCms(certificate.getCertificate(), privateKey, signatureProvider, new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID), encodeManifest()));
         return parser.getManifestCms();
     }
 

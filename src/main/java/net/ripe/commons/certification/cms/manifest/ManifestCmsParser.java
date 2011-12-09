@@ -42,6 +42,7 @@ import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
 import net.ripe.commons.certification.validation.ValidationResult;
 
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERGeneralizedTime;
@@ -107,7 +108,7 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 	private void validateManifest() {
 	    ValidationResult validationResult = getValidationResult();
 
-	    if (!validationResult.rejectIfFalse(ManifestCms.CONTENT_TYPE.equals(getContentType()), MANIFEST_CONTENT_TYPE)) {
+	    if (!validationResult.rejectIfFalse(new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID).equals(getContentType()), MANIFEST_CONTENT_TYPE)) {
             return;
         }
 

@@ -66,7 +66,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     private X509ResourceCertificate certificate;
 
-    private ASN1ObjectIdentifier contentType;
+    private String oid; // Storing oid as String  so that this class is serializable
 
     private DateTime signingTime;
 
@@ -77,7 +77,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, ASN1ObjectIdentifier oid, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
         this.certificate = certificate;
-        this.contentType = oid;
+        this.oid = oid.getId();
         this.signingTime = signingTime;
     }
 
@@ -91,7 +91,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     }
 
     public ASN1ObjectIdentifier getContentType() {
-        return contentType;
+        return new ASN1ObjectIdentifier(oid);
     }
 
     public X509ResourceCertificate getCertificate() {
