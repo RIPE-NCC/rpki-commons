@@ -39,9 +39,9 @@ public class ValidationCheck extends EqualsSupport implements Serializable {
 
     private ValidationStatus status;
 	private String key;
-	private Object[] params;
+	private String[] params;
 
-	public ValidationCheck(ValidationStatus status, String key, Object... params) {
+	public ValidationCheck(ValidationStatus status, String key, String... params) {
 		this.status = status;
 		this.key = key;
 		this.params = params;
@@ -59,7 +59,7 @@ public class ValidationCheck extends EqualsSupport implements Serializable {
 		return status;
 	}
 
-	public Object[] getParams() {
+	public String[] getParams() {
 		return params;
 	}
 }

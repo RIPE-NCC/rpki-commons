@@ -203,7 +203,7 @@ public class ManifestCmsTest{
     	assertEquals(0, result.getFailuresForCurrentLocation().size());
     	
     	assertEquals(
-    		new ValidationCheck(ValidationStatus.WARNING, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME),
+    		new ValidationCheck(ValidationStatus.WARNING, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME.toString()),
     		result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
 		);
     }

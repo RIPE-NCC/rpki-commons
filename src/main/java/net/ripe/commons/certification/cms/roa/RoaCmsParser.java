@@ -95,7 +95,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 
 	private void validateRoa() {
 		ValidationResult validationResult = getValidationResult();
-        if (!validationResult.rejectIfFalse(RoaCms.CONTENT_TYPE.equals(getContentType()), ROA_CONTENT_TYPE, getContentType())) {
+        if (!validationResult.rejectIfFalse(RoaCms.CONTENT_TYPE.equals(getContentType()), ROA_CONTENT_TYPE, getContentType().toString())) {
 			return;
 		}
 
@@ -134,7 +134,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		expect(der, DERSequence.class);
 		DERSequence seq = (DERSequence) der;
 		
-		if (!getValidationResult().rejectIfTrue(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0))) {
+		if (!getValidationResult().rejectIfTrue(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0).toString())) {
 			// eContent seems to contain non-standard version (default 0 is omitted in structure)
 			return;
 		}

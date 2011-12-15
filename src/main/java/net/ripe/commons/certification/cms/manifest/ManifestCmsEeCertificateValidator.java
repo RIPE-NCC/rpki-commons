@@ -50,8 +50,8 @@ public class ManifestCmsEeCertificateValidator extends X509ResourceCertificatePa
 	protected void verifyValidity() {
         DateTime now = new DateTime();
 
-        result.rejectIfTrue(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore());
-        result.warnIfTrue(now.isAfter(child.getValidityPeriod().getNotValidAfter()), NOT_VALID_AFTER, child.getValidityPeriod().getNotValidAfter());
+        result.rejectIfTrue(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore().toString());
+        result.warnIfTrue(now.isAfter(child.getValidityPeriod().getNotValidAfter()), NOT_VALID_AFTER, child.getValidityPeriod().getNotValidAfter().toString());
 	}
 
 	

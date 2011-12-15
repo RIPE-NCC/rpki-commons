@@ -65,7 +65,7 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
 
     private void checkNextUpdate(X509Crl crl) {
         DateTime nextUpdateTime = crl.getNextUpdateTime();
-        result.warnIfFalse(nextUpdateTime.isAfterNow(), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime);
+        result.warnIfFalse(nextUpdateTime.isAfterNow(), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
 
     }
 

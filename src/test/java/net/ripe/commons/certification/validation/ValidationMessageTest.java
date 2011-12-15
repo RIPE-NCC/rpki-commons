@@ -29,9 +29,7 @@
  */
 package net.ripe.commons.certification.validation;
 
-import static org.junit.Assert.*;
-
-import java.net.URI;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -46,7 +44,7 @@ public class ValidationMessageTest {
 
     @Test
     public void shouldFormatMessageArguments() {
-        ValidationCheck validationCheck = new ValidationCheck(ValidationStatus.PASSED, ValidationString.VALIDATOR_URI_HOST, URI.create("rsync://localhost/path/"));
+        ValidationCheck validationCheck = new ValidationCheck(ValidationStatus.PASSED, ValidationString.VALIDATOR_URI_HOST, "rsync://localhost/path/");
         assertEquals("URI 'rsync://localhost/path/' contains a host", ValidationMessage.getMessage(validationCheck));
     }
 }

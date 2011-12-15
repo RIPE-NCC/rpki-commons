@@ -63,7 +63,7 @@ public class NameValidator implements FieldValidator {
             return result;
         }
         result.isTrue(NAME_PATTERN.matcher(name).matches(), ROA_SPECIFICATION_NAME_PATTERN);
-        result.isTrue(name.length() < MAX_NAME_LENGTH, ROA_SPECIFICATION_NAME_LENGTH, MAX_NAME_LENGTH);
+        result.isTrue(name.length() < MAX_NAME_LENGTH, ROA_SPECIFICATION_NAME_LENGTH, Integer.valueOf(MAX_NAME_LENGTH).toString());
         result.isFalse(existingNames.contains(name), ROA_SPECIFICATION_NAME_ALREADY_EXISTS);
         return result;
     }

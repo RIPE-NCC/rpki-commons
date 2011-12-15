@@ -49,7 +49,7 @@ public class FieldValidationResult implements Serializable {
     private Set<ValidationCheck> checkList =  new HashSet<ValidationCheck>();
 
 
-    public boolean isTrue(boolean condition, String key, Object... param) {
+    public boolean isTrue(boolean condition, String key, String... param) {
         Validate.notNull(key, "key is required");
         if (condition) {
         	checkList.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
@@ -59,11 +59,11 @@ public class FieldValidationResult implements Serializable {
         return condition;
     }
 
-    public boolean isFalse(boolean condition, String key, Object... param) {
+    public boolean isFalse(boolean condition, String key, String... param) {
         return isTrue(!condition, key, param);
     }
 
-    public boolean notNull(Object object, String key, Object... param) {
+    public boolean notNull(Object object, String key, String... param) {
         return isTrue(object != null, key, param);
     }
 

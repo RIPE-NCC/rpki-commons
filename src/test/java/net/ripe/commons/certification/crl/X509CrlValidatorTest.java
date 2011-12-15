@@ -108,7 +108,7 @@ public class X509CrlValidatorTest {
 
         result = subject.getValidationResult();
         assertFalse(result.hasFailures());
-        assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+        assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
     }
 
 

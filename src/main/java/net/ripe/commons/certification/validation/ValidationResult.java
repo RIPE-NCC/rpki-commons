@@ -64,13 +64,13 @@ public class ValidationResult implements Serializable {
 		}
 	}
 
-	private void setValidationCheckForCurrentLocation(ValidationStatus status, String key, Object... param) {
+	private void setValidationCheckForCurrentLocation(ValidationStatus status, String key, String... param) {
 		Map<ValidationStatus, List<ValidationCheck>> currentResults = results.get(currentLocation);
 		List<ValidationCheck> checksForStatus = currentResults.get(status);
 		checksForStatus.add(new ValidationCheck(status, key, param));
 	}
 	
-	public boolean warnIfFalse(boolean condition, String key, Object... param) {
+	public boolean warnIfFalse(boolean condition, String key, String... param) {
 		Validate.notNull(key, "key is required");
 		if (condition) {
 			setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
@@ -80,16 +80,16 @@ public class ValidationResult implements Serializable {
 		return condition;
 	}
 	
-	public boolean warnIfTrue(boolean condition, String key, Object... param) {
+	public boolean warnIfTrue(boolean condition, String key, String... param) {
 		return warnIfFalse(!condition, key, param);
 	}
 	
-	public boolean warnIfNull(Object object, String key, Object... param) {
+	public boolean warnIfNull(Object object, String key, String... param) {
 		return warnIfTrue(object == null, key, param);
 	}
 
 	
-	public boolean rejectIfFalse(boolean condition, String key, Object... param) {
+	public boolean rejectIfFalse(boolean condition, String key, String... param) {
 	    Validate.notNull(key, "key is required");
 	    if (condition) {
 	    	setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
@@ -99,11 +99,11 @@ public class ValidationResult implements Serializable {
 		return condition;
 	}
 
-	public boolean rejectIfTrue(boolean condition, String key, Object... param) {
+	public boolean rejectIfTrue(boolean condition, String key, String... param) {
 	    return rejectIfFalse(!condition, key, param);
 	}
 
-	public boolean rejectIfNull(Object object, String key, Object... param) {
+	public boolean rejectIfNull(Object object, String key, String... param) {
 	    return rejectIfTrue(object == null, key, param);
 	}
 
