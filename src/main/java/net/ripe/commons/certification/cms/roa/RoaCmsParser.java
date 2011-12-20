@@ -95,6 +95,10 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 
 	private void validateRoa() {
 		ValidationResult validationResult = getValidationResult();
+		
+		if (!validationResult.rejectIfFalse(getContentType() != null, ROA_CONTENT_TYPE)) {
+			return;
+		}
         if (!validationResult.rejectIfFalse(RoaCms.CONTENT_TYPE.equals(getContentType()), ROA_CONTENT_TYPE, getContentType().toString())) {
 			return;
 		}
