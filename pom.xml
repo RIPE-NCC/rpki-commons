@@ -8,7 +8,7 @@
     <inceptionYear>2008</inceptionYear>
 
     <scm>
-        <connection>scm:svn:https://svn.ripe.net/svn/ba/certification/rpki-commons/trunk</connection>
+        <connection>scm:svn:https://localhost:10443/svn/ba/certification/rpki-commons/trunk</connection>
     </scm>
 
     <distributionManagement>
@@ -27,7 +27,7 @@
     </distributionManagement>
 
     <properties>
-        <net.ripe.commons.internet-resources.version>1.38-SNAPSHOT</net.ripe.commons.internet-resources.version>
+        <net.ripe.commons.internet-resources.version>1.38</net.ripe.commons.internet-resources.version>
 
         <dist.repo.url>nexus.ripe.net</dist.repo.url>
         <dist.repo.snapshot.url>nexus.ripe.net</dist.repo.snapshot.url>
