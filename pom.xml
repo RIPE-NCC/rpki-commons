@@ -209,6 +209,8 @@
                     <excludes>
                         <exclude>**/*.txt</exclude>
                         <exclude>src/test/resources/**</exclude>
+			<exclude>.idea/**</exclude>
+			<exclude>.gitignore</exclude>
                     </excludes>
                 </configuration>
                 <executions>

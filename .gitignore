@@ -1,0 +1,13 @@
+certification.properties
+rpki-ripe-ncc-war/logs/
+.classpath
+.project
+.settings
+target
+velocity.log
+
+# Intellj
+*.iml
+*.ipr
+*.iws
+.idea/
