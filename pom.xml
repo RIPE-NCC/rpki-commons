@@ -38,7 +38,8 @@
         <hibernate.version>3.4.0.GA</hibernate.version>
         <hibernate-validator.version>3.1.0.GA</hibernate-validator.version>
 
-        <bouncycastle.version>1.46</bouncycastle.version>
+        <bouncycastle.version>1.46</bouncycastle.version> 
+        <joda-time.version>1.6.2</joda-time.version> 
 
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.clover.reportPath>target/site/clover/clover.xml</sonar.clover.reportPath>
@@ -50,7 +51,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>1.5</version>
+            <version>${joda-time.version}</version>
         </dependency>
 
         <dependency>
@@ -288,4 +289,5 @@
         </pluginManagement>
     </build>
 </project>
-
+ 
+ 
