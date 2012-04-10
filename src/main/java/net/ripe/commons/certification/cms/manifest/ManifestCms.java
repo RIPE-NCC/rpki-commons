@@ -29,13 +29,6 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.cms.RpkiSignedObject;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
@@ -46,7 +39,6 @@ import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang.Validate;
@@ -57,6 +49,13 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.io.DigestOutputStream;
 import org.joda.time.DateTime;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A manifest of files published by a CA certificate.
@@ -234,10 +233,7 @@ public class ManifestCms extends RpkiSignedObject {
                 return false;
             }
             final FileContentSpecification other = (FileContentSpecification) obj;
-            if (!Arrays.equals(hash, other.hash)) {
-                return false;
-            }
-            return true;
+            return Arrays.equals(hash, other.hash);
         }
 
         @Override

@@ -29,10 +29,10 @@
  */
 package net.ripe.commons.certification.util;
 
+import org.apache.commons.lang.Validate;
+
 import java.io.Serializable;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang.Validate;
 
 /**
  * A versioned identifier to uniquely identify a specific version of an entity.
@@ -80,18 +80,20 @@ public class VersionedId implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final VersionedId other = (VersionedId) obj;
-        if (id != other.id)
+        if (id != other.id) {
             return false;
-        if (version != other.version)
-            return false;
-        return true;
+        }
+        return version == other.version;
     }
 
     @Override

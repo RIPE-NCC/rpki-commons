@@ -29,12 +29,9 @@
  */
 package net.ripe.commons.provisioning.payload.issue.request;
 
-import java.util.Iterator;
-
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
@@ -94,9 +91,7 @@ public class CertificateIssuanceRequestElement {
         if (resourceSet == null) {
             return;
         }
-        Iterator<IpResource> iterator = resourceSet.iterator();
-        while(iterator.hasNext()) {
-            IpResource resource = iterator.next();
+        for (IpResource resource : resourceSet) {
             Validate.isTrue(resource.getType().equals(type), "Can only add resources of type: " + type);
         }
     }

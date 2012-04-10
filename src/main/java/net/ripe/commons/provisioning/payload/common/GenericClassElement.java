@@ -29,24 +29,21 @@
  */
 package net.ripe.commons.provisioning.payload.common;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.serialization.CertificateUrlListConverter;
 import net.ripe.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class GenericClassElement {
@@ -140,19 +137,17 @@ public class GenericClassElement {
         IpResourceSet ipv4 = new IpResourceSet();
         IpResourceSet ipv6 = new IpResourceSet();
 
-        Iterator<IpResource> iterator = ipResourceSet.iterator();
-        while (iterator.hasNext()) {
-            IpResource resource = iterator.next();
+        for (IpResource resource : ipResourceSet) {
             switch (resource.getType()) {
-            case ASN:
-                asns.add(resource);
-                break;
-            case IPv4:
-                ipv4.add(resource);
-                break;
-            case IPv6:
-                ipv6.add(resource);
-                break;
+                case ASN:
+                    asns.add(resource);
+                    break;
+                case IPv4:
+                    ipv4.add(resource);
+                    break;
+                case IPv6:
+                    ipv6.add(resource);
+                    break;
             }
         }
 

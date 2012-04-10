@@ -29,39 +29,31 @@
  */
 package net.ripe.commons.certification.cms;
 
-import static net.ripe.commons.certification.cms.RpkiSignedObject.*;
-import static net.ripe.commons.certification.validation.ValidationString.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertStore;
-import java.security.cert.CertStoreException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
-
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedDataParser;
-import org.bouncycastle.cms.SignerId;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.*;
+import java.util.Collection;
+
+import static net.ripe.commons.certification.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
+import static net.ripe.commons.certification.cms.RpkiSignedObject.ENCRYPTION_ALGORITHM_OID;
+import static net.ripe.commons.certification.validation.ValidationString.*;
 
 
 public abstract class RpkiSignedObjectParser {
@@ -120,7 +112,7 @@ public abstract class RpkiSignedObjectParser {
     public abstract void decodeContent(DEREncodable encoded);
 
     private void parseCms() {
-        CMSSignedDataParser sp = null;
+        CMSSignedDataParser sp;
         try {
             sp = new CMSSignedDataParser(encoded);
         } catch (CMSException e) {

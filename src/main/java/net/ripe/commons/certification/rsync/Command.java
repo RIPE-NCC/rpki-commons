@@ -140,7 +140,7 @@ public class Command extends Thread {
 	}
 
 	public String[] getOutputLines() {
-		return outputLines == null ? null : outputLines.toArray(new String[0]);
+		return outputLines == null ? null : outputLines.toArray(new String[outputLines.size()]);
 	}
 
 	public List<String> getOutputs() {
@@ -148,7 +148,7 @@ public class Command extends Thread {
 	}
 
 	public String[] getErrorLines() {
-		return errorLines == null ? null : errorLines.toArray(new String[0]);
+		return errorLines == null ? null : errorLines.toArray(new String[errorLines.size()]);
 	}
 
 	public List<String> getErrors() {

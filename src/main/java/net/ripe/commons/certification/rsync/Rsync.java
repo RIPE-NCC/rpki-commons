@@ -64,9 +64,9 @@ public class Rsync {
     }
 
     public void addOptions(String... options) {
-        for (int i = 0; i < options.length; i++) {
-            if (options[i] != null) {
-                this.options.add(options[i]);
+        for (String option : options) {
+            if(option != null) {
+                this.options.add(option);
             }
         }
     }
@@ -115,7 +115,7 @@ public class Rsync {
     }
 
     public boolean isCompleted() {
-        return command == null ? false : command.isCompleted();
+        return command != null && command.isCompleted();
     }
 
     public int getExitStatus() {
