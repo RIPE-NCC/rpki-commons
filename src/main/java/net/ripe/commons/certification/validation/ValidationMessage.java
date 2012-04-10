@@ -44,6 +44,6 @@ public final class ValidationMessage {
 
     public static String getMessage(ValidationCheck validationCheck) {
         ResourceBundle messages = ResourceBundle.getBundle(MESSAGE_BUNDLE_NAME, DEFAULT_LOCALE);
-        return MessageFormat.format(messages.getString(validationCheck.getKey()), validationCheck.getParams());
+        return MessageFormat.format(messages.getString(validationCheck.getKey() + "." +  validationCheck.getStatus().toString().toLowerCase()), validationCheck.getParams());
     }
 }
