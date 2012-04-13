@@ -36,6 +36,7 @@ import java.io.IOException;
 
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
@@ -112,7 +113,7 @@ public class ProcessIscUpdownPdusTest {
 
         ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
 
-        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(provisioningCmsObject, childCert);
+        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), provisioningCmsObject, childCert);
         ValidationResult result = new ValidationResult();
         validator.validate(result);
 

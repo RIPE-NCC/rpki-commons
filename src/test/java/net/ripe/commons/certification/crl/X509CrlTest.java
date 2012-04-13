@@ -43,6 +43,7 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.util.KeyPairUtil;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -53,6 +54,8 @@ import org.junit.Test;
 public class X509CrlTest {
 
 	private static final URI ROOT_MANIFEST_CRL_LOCATION = URI.create("rsync://foo.host/bar/bar%20space.crl");
+	
+	private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
 
 
     public static X509Crl createCrl() {
@@ -96,7 +99,7 @@ public class X509CrlTest {
 
     	replay(crlLocator);
 
-    	subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, result);
+    	subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
     	verify(crlLocator);
 
@@ -113,7 +116,7 @@ public class X509CrlTest {
 
     	replay(crlLocator);
 
-    	subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, result);
+    	subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
     	verify(crlLocator);
 

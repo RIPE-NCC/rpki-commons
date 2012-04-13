@@ -38,6 +38,7 @@ import static org.junit.Assert.*;
 import java.util.Set;
 
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 
@@ -47,11 +48,13 @@ import org.junit.Test;
 public class ProvisioningCmsObjectValidatorTest {
 
     private ProvisioningCmsObjectValidator subject;
+    
+    private ValidationOptions options = new ValidationOptions();
 
 
     @Before
     public void setUp() throws Exception {
-        subject = new ProvisioningCmsObjectValidator(ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject(), TEST_IDENTITY_CERT);
+        subject = new ProvisioningCmsObjectValidator(options, ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject(), TEST_IDENTITY_CERT);
     }
 
 
@@ -79,7 +82,7 @@ public class ProvisioningCmsObjectValidatorTest {
     @Test
     public void shouldStopIfCmsObjectIsBadlyFormatted() {
         ValidationResult validationResult = new ValidationResult();
-        subject = new ProvisioningCmsObjectValidator(new ProvisioningCmsObject(new byte[] {0}, null, null, null, null), TEST_IDENTITY_CERT);
+        subject = new ProvisioningCmsObjectValidator(options, new ProvisioningCmsObject(new byte[] {0}, null, null, null, null), TEST_IDENTITY_CERT);
         subject.validate(validationResult);
 
         assertTrue(validationResult.hasFailures());
@@ -93,7 +96,7 @@ public class ProvisioningCmsObjectValidatorTest {
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL);
 
-        subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()), TEST_IDENTITY_CERT);
+        subject = new ProvisioningCmsObjectValidator(options, builder.build(EE_KEYPAIR.getPrivate()), TEST_IDENTITY_CERT);
         subject.validate(validationResult);
 
         assertTrue(validationResult.hasFailures());
@@ -107,7 +110,7 @@ public class ProvisioningCmsObjectValidatorTest {
                                                         .withCmsCertificate(TEST_CMS_CERT.getCertificate())
                                                         .withCrl(CRL);
 
-        subject = new ProvisioningCmsObjectValidator(builder.build(EE_KEYPAIR.getPrivate()), TEST_IDENTITY_CERT);
+        subject = new ProvisioningCmsObjectValidator(options, builder.build(EE_KEYPAIR.getPrivate()), TEST_IDENTITY_CERT);
         subject.validate(validationResult);
     }
 

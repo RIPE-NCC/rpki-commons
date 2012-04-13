@@ -41,6 +41,7 @@ import java.util.List;
 import net.ripe.commons.certification.CertificateRepositoryObjectFile;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
@@ -55,6 +56,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     private Collection<X509ResourceCertificate> trustAnchors;
     private ResourceCertificateLocator locator;
     private List<CertificateWithLocation> certificates = new LinkedList<CertificateWithLocation>();
+    private ValidationOptions options;
     private ValidationResult result;
     private ValidationLocation location;
 
@@ -64,10 +66,11 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     }
 
     public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
-        this(new ValidationResult(), locator, trustAnchors);
+        this(new ValidationOptions(), new ValidationResult(), locator, trustAnchors);
     }
 
-    public X509ResourceCertificateBottomUpValidator(ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
+    public X509ResourceCertificateBottomUpValidator(ValidationOptions options, ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
+    	this.options = options;
         this.result = result;
         this.location = new ValidationLocation("<unknown>");
         this.locator = locator;
@@ -103,7 +106,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
         	X509Crl crl = getCRL(child);
 
-        	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, parent, crl, resources);
+        	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, parent, crl, resources);
         	validator.validate(childLocation, child);
 
         	IpResourceSet childResources = child.getResources();

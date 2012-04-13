@@ -38,6 +38,7 @@ import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -128,7 +129,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         X509Crl crl = null;
         if (!isRoot()) {
             ValidationLocation savedCurrentLocation = result.getCurrentLocation();
@@ -140,7 +141,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
                 return;
             }
         }
-        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(result, context.getCertificate(), crl, context.getResources());
+        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, this);
     }
 

@@ -35,6 +35,7 @@ import static net.ripe.commons.certification.validation.ValidationString.NOT_VAL
 import org.joda.time.DateTime;
 
 import net.ripe.commons.certification.crl.X509Crl;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
@@ -42,8 +43,8 @@ import net.ripe.ipresource.IpResourceSet;
 
 public class ManifestCmsEeCertificateValidator extends X509ResourceCertificateParentChildValidator {
 
-	public ManifestCmsEeCertificateValidator(ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
-		super(result, parent, crl, resources);
+	public ManifestCmsEeCertificateValidator(ValidationOptions options, ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
+		super(options, result, parent, crl, resources);
 	}
 
 	@Override

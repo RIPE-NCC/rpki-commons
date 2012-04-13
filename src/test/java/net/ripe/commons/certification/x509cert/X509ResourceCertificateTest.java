@@ -49,6 +49,7 @@ import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlTest;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -75,6 +76,8 @@ public class X509ResourceCertificateTest {
 
     private static final ValidityPeriod TEST_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(100));
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
+    
+    private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
 
     public static X509ResourceCertificateBuilder createSelfSignedCaCertificateBuilder() {
         X509ResourceCertificateBuilder builder = createBasicBuilder();
@@ -227,7 +230,7 @@ public class X509ResourceCertificateTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, selfSignedCert);
         replay(crlLocator);
 
-        selfSignedCert.validate(CERT_URI.toString(), context, crlLocator, result);
+        selfSignedCert.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
         verify(crlLocator);
     }
@@ -255,7 +258,7 @@ public class X509ResourceCertificateTest {
         replay(crlLocator);
 
         result.setLocation(new ValidationLocation(CERT_URI));
-        subject.validate(CERT_URI.toString(), context, crlLocator, result);
+        subject.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
         verify(crlLocator);
         assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());
@@ -278,7 +281,7 @@ public class X509ResourceCertificateTest {
         expect(crlLocator.getCrl(CRL_DP, context, result)).andReturn(crl);
         replay(crlLocator);
 
-        subject.validate(CERT_URI.toString(), context, crlLocator, result);
+        subject.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
         verify(crlLocator);
         assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());

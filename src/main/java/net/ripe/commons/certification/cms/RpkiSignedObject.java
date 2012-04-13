@@ -39,6 +39,7 @@ import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -128,7 +129,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         ValidationLocation savedCurrentLocation = result.getCurrentLocation();
         result.setLocation(new ValidationLocation(getCrlUri()));
 
@@ -140,7 +141,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
             return;
         }
 
-        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(result, context.getCertificate(), crl, context.getResources());
+        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, getCertificate());
     }
 

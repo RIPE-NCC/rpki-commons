@@ -37,6 +37,7 @@ import java.util.Arrays;
 
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper;
 
@@ -56,10 +57,12 @@ public abstract class X509CertificateParentChildValidator <T extends AbstractX50
 
     private X509Crl crl;
 
-    protected ValidationResult result;
+    protected final ValidationOptions options;
+    protected final ValidationResult result;
 
 
-    public X509CertificateParentChildValidator(ValidationResult result, T parent, X509Crl crl) {
+    public X509CertificateParentChildValidator(ValidationOptions options, ValidationResult result, T parent, X509Crl crl) {
+    	this.options = options;
         this.result = result;
         this.parent = parent;
         this.crl = crl;

@@ -31,6 +31,7 @@ package net.ripe.commons.certification.validation.objectvalidators;
 
 import static net.ripe.commons.certification.validation.ValidationString.*;
 import net.ripe.commons.certification.crl.X509Crl;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.InheritedIpResourceSet;
@@ -42,8 +43,8 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
     private IpResourceSet resources;
 
 
-    public X509ResourceCertificateParentChildValidator(ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
-        super(result, parent, crl);
+    public X509ResourceCertificateParentChildValidator(ValidationOptions options, ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
+        super(options, result, parent, crl);
         this.resources = resources;
     }
 

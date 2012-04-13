@@ -52,6 +52,7 @@ import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationStatus;
 import net.ripe.commons.certification.validation.ValidationString;
@@ -100,6 +101,8 @@ public class ManifestCmsTest{
     private ManifestCms subject;
     private X509ResourceCertificate rootCertificate;
 
+    private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
+    
     public static ManifestCms getRootManifestCms() {
 	    return getRootManifestBuilder().build(MANIFEST_KEY_PAIR.getPrivate());
 	}
@@ -144,7 +147,7 @@ public class ManifestCmsTest{
     	expect(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).andReturn(crl);
     	replay(crlLocator);
 
-    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, result);
+    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
     	verify(crlLocator);
 
@@ -171,7 +174,7 @@ public class ManifestCmsTest{
     	});
     	replay(crlLocator);
 
-    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, result);
+    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
     	verify(crlLocator);
 
@@ -195,7 +198,7 @@ public class ManifestCmsTest{
     	expect(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).andReturn(crl);
     	replay(crlLocator);
 
-    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, result);
+    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
     	verify(crlLocator);
 
@@ -222,7 +225,7 @@ public class ManifestCmsTest{
     	expect(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).andReturn(crl);
     	replay(crlLocator);
 
-    	mft.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, result);
+    	mft.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
     	verify(crlLocator);
 

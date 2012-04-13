@@ -27,23 +27,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.commons.certification;
+package net.ripe.commons.certification.validation;
 
-import java.io.Serializable;
-import java.net.URI;
 
-import net.ripe.commons.certification.crl.CrlLocator;
-import net.ripe.commons.certification.validation.ValidationOptions;
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-
-public interface CertificateRepositoryObject extends Serializable {
-
-    URI getCrlUri();
-
-    URI getParentCertificateUri();
-
-    void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result);
-
-    byte[] getEncoded();
+/**
+ * User controlled options to use when validating objects.
+ */
+public class ValidationOptions {
+	
+	private Integer maxStaleDays = 0;
+	
+	public void setMaxStaleDays(Integer maxStaleDays) {
+		this.maxStaleDays = maxStaleDays;
+	}
+	
+	public Integer getMaxStaleDays() {
+		return maxStaleDays;
+	}
+	
 }

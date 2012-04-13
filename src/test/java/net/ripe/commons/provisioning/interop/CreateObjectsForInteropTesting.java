@@ -42,6 +42,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectValidator;
@@ -82,7 +83,7 @@ public class CreateObjectsForInteropTesting {
     }
 
     public void validateCmsObject(ProvisioningCmsObject resourceClassListQueryCms) {
-        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(resourceClassListQueryCms, TEST_IDENTITY_CERT);
+        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), resourceClassListQueryCms, TEST_IDENTITY_CERT);
         ValidationResult result = new ValidationResult();
         validator.validate(result);
         assertTrue(!result.hasFailures());

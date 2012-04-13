@@ -36,6 +36,7 @@ import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.util.Specification;
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -129,7 +130,7 @@ public class ManifestCms extends RpkiSignedObject {
     }
     
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         ValidationLocation savedCurrentLocation = result.getCurrentLocation();
         result.setLocation(new ValidationLocation(getCrlUri()));
 
@@ -142,7 +143,7 @@ public class ManifestCms extends RpkiSignedObject {
         }
         
         checkManifestAndEeCertificateValidityTimes(result);
-        ManifestCmsEeCertificateValidator validator = new ManifestCmsEeCertificateValidator(result, context.getCertificate(), crl, context.getResources());
+        ManifestCmsEeCertificateValidator validator = new ManifestCmsEeCertificateValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, getCertificate());
     }
     

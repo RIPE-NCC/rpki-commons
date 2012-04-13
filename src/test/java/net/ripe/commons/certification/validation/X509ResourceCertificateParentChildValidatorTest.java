@@ -79,6 +79,8 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	private X509Crl rootCrl;
 
 	private ValidationResult result;
+	
+	private ValidationOptions options;
 
 	@Before
 	public void setUp() {
@@ -86,6 +88,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
         child = createChildCertificateBuilder().build();
         rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
         result = new ValidationResult();
+        options = new ValidationOptions();
 	}
 
 	private void validate(X509ResourceCertificateParentChildValidator validator, X509ResourceCertificate certificate) {
@@ -95,7 +98,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
 	@Test
 	public void shouldAcceptHappyFlowChildCertificate() {
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 
 		validate(validator, child);
 
@@ -106,7 +109,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	public void shouldRejectInvalidSignature() {
 		child = createChildCertificateBuilder().withSigningKeyPair(SECOND_CHILD_KEY_PAIR).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
@@ -116,7 +119,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
 	@Test
 	public void shouldAcceptSelfSignedSignature() {
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 
 		validate(validator, root);
 
@@ -127,7 +130,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	public void shouldRejectRevokedCertificate() {
 		rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plusDays(2)).build(ROOT_KEY_PAIR.getPrivate());
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
@@ -138,7 +141,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	public void shouldRejectIfCrlAbsentForNonRootCertificate() {
 		rootCrl = null;
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
@@ -148,7 +151,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	public void shouldRejectCertificateWithWrongValidity() {
 		child = createChildCertificateBuilder().withValidityPeriod(EXPIRED_VALIDITY_PERIOD).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
@@ -160,7 +163,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	public void shouldRejectInvalidIssuer() {
 		child = createChildCertificateBuilder().withIssuerDN(SECOND_CHILD_CERTIFICATE_NAME).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
@@ -172,7 +175,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	public void shouldWarnOnInvalidKeyUsage() {
 		child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertFalse(result.hasFailures());
@@ -183,7 +186,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     public void shouldWarnOnMisingKeyUsage() {
 		child = createChildCertificateBuilder().withKeyUsage(0).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertFalse(result.hasFailures());
@@ -194,7 +197,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     public void shouldRejectMissingAuthorityKeyIdentifier() {
     	child = createChildCertificateBuilder().withAuthorityKeyIdentifier(false).build();
 
-    	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+    	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
     	validate(validator, child);
 
 		assertTrue(result.hasFailures());
@@ -205,7 +208,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     public void shouldRejectInvalidResorceSet() {
 		child = createChildCertificateBuilder().withResources(INVALID_CHILD_RESOURCE_SET).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
 
 		assertTrue(result.hasFailures());
@@ -216,7 +219,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     	root = getRootResourceCertificateWithInheritedResources();
     	child = getRootResourceCertificateWithInheritedResources();
 
-    	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(result, root, rootCrl, root.getResources());
+    	X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
     	validate(validator, child);
 
     	assertTrue(result.hasFailures());

@@ -31,6 +31,7 @@ package net.ripe.commons.certification.crl;
 
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.util.EqualsSupport;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
@@ -155,7 +156,7 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationResult result) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         X509CrlValidator crlValidator = new X509CrlValidator(result, context.getCertificate());
         crlValidator.validate(location, this);
     }
