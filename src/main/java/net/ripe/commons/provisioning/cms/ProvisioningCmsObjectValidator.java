@@ -71,7 +71,7 @@ public class ProvisioningCmsObjectValidator {
     }
 
     private void validateCrl() {
-        X509CrlValidator crlValidator = new X509CrlValidator(validationResult, identityCertificate);
+        X509CrlValidator crlValidator = new X509CrlValidator(new ValidationOptions(), validationResult, identityCertificate);
         crlValidator.validate("<crl>", crl);
     }
 

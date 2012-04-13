@@ -141,17 +141,31 @@ public class ManifestCms extends RpkiSignedObject {
         if (crl == null) {
             return;
         }
-        
-        checkManifestAndEeCertificateValidityTimes(result);
+
+        result.setLocation(new ValidationLocation(location));
+        checkManifestAndEeCertificateValidityTimes(options, result);
         ManifestCmsEeCertificateValidator validator = new ManifestCmsEeCertificateValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, getCertificate());
     }
     
 
-    private void checkManifestAndEeCertificateValidityTimes(ValidationResult result) {
+    private void checkManifestAndEeCertificateValidityTimes(ValidationOptions options, ValidationResult result) {
 		ValidityPeriod certificateValidity = getCertificate().getValidityPeriod();
 		result.warnIfFalse(certificateValidity.getNotValidBefore().equals(getThisUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
 		result.warnIfFalse(certificateValidity.getNotValidAfter().equals(getNextUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
+
+        DateTime now = new DateTime();
+        DateTime nextUpdateTime = getNextUpdateTime();
+
+        if (now.isAfter(nextUpdateTime)) {
+            if (nextUpdateTime.plusDays(options.getMaxStaleDays()).isAfter(now)) {
+                 result.warnIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
+            } else {
+                result.rejectIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
+            }
+        }
+
+
 	}
 
 	/**

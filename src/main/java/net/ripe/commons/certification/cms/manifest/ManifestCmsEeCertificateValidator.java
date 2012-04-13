@@ -51,8 +51,21 @@ public class ManifestCmsEeCertificateValidator extends X509ResourceCertificatePa
 	protected void verifyValidity() {
         DateTime now = new DateTime();
 
+        // Reject certificates that are not yet valid
         result.rejectIfTrue(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore().toString());
-        result.warnIfTrue(now.isAfter(child.getValidityPeriod().getNotValidAfter()), NOT_VALID_AFTER, child.getValidityPeriod().getNotValidAfter().toString());
+
+        // Warn about expired (aka stale) manifest ee certs, unless the max stale time has passed
+        DateTime notValidAfter = child.getValidityPeriod().getNotValidAfter();
+
+        if (now.isAfter(notValidAfter)) {
+            if (notValidAfter.plus(options.getMaxStaleDays()).isAfter(now)) {
+                result.warnIfTrue(true, NOT_VALID_AFTER, notValidAfter.toString());
+            } else {
+                result.rejectIfTrue(true, NOT_VALID_AFTER, notValidAfter.toString());
+            }
+        }
+
+
 	}
 
 	

@@ -41,6 +41,7 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -193,12 +194,15 @@ public class ManifestCmsTest{
     	IpResourceSet resources = rootCertificate.getResources();
 
     	CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
-    	ValidationResult result = new ValidationResult();
+
+        ValidationOptions options = new ValidationOptions();
+        options.setMaxStaleDays(Integer.MAX_VALUE);
+        ValidationResult result = new ValidationResult();
 
     	expect(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).andReturn(crl);
     	replay(crlLocator);
 
-    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+    	subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
 
     	verify(crlLocator);
 
@@ -210,6 +214,42 @@ public class ManifestCmsTest{
     		result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
 		);
     }
+
+
+    @Test
+    public void shouldRejectWhenManifestIsTooStale() {
+        X509Crl crl = getRootCrl();
+
+        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
+
+        IpResourceSet resources = rootCertificate.getResources();
+
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
+
+        ValidationOptions options = new ValidationOptions();
+        options.setMaxStaleDays(0);
+        ValidationResult result = new ValidationResult();
+
+        expect(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).andReturn(crl);
+        replay(crlLocator);
+
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+
+        verify(crlLocator);
+
+        assertTrue(result.hasFailures());
+
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
+        );
+
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
+        );
+    }
+
     
     @Test
     public void shouldWarnAboutInconsistentValidityTimes() {

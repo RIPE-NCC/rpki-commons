@@ -42,10 +42,7 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactory;
-import net.ripe.commons.certification.validation.ValidationCheck;
-import net.ripe.commons.certification.validation.ValidationLocation;
-import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.commons.certification.validation.ValidationStatus;
+import net.ripe.commons.certification.validation.*;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;
@@ -70,14 +67,17 @@ public class X509CrlValidatorTest {
 
     private X509CrlValidator subject;
     private X509ResourceCertificate parent;
+
+    private ValidationOptions options;
     private ValidationResult result;
 
 
     @Before
     public void setUp() {
         parent = getRootResourceCertificate();
+        options = new ValidationOptions();
         result = new ValidationResult();
-        subject = new X509CrlValidator(result, parent);
+        subject = new X509CrlValidator(options, result, parent);
     }
 
     @Test
@@ -101,7 +101,10 @@ public class X509CrlValidatorTest {
     }
 
     @Test
-    public void shouldWarnWhenNextUpdatePassed() {
+    public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
+
+        options.setMaxStaleDays(1);
+
         DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
@@ -109,6 +112,17 @@ public class X509CrlValidatorTest {
         result = subject.getValidationResult();
         assertFalse(result.hasFailures());
         assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+    }
+
+    @Test
+    public void shouldRejectWhenNextUpdateTooLongAgo() {
+        DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
+        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
     }
 
 

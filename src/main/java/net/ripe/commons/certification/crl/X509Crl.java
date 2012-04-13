@@ -157,7 +157,7 @@ public class X509Crl implements CertificateRepositoryObject {
 
     @Override
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
-        X509CrlValidator crlValidator = new X509CrlValidator(result, context.getCertificate());
+        X509CrlValidator crlValidator = new X509CrlValidator(options, result, context.getCertificate());
         crlValidator.validate(location, this);
     }
 

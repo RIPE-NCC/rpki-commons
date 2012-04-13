@@ -32,6 +32,7 @@ package net.ripe.commons.certification.crl;
 import java.security.SignatureException;
 
 import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidator;
@@ -43,10 +44,12 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
 
     private AbstractX509CertificateWrapper parent;
 
+    private ValidationOptions options;
     private ValidationResult result;
 
 
-    public X509CrlValidator(ValidationResult result, AbstractX509CertificateWrapper parent) {
+    public X509CrlValidator(ValidationOptions options, ValidationResult result, AbstractX509CertificateWrapper parent) {
+        this.options = options;
         this.result = result;
         this.parent = parent;
     }
@@ -64,8 +67,18 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
     }
 
     private void checkNextUpdate(X509Crl crl) {
+        DateTime now = new DateTime();
         DateTime nextUpdateTime = crl.getNextUpdateTime();
-        result.warnIfFalse(nextUpdateTime.isAfterNow(), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+
+        if (now.isAfter(nextUpdateTime)) {
+            if (nextUpdateTime.plusDays(options.getMaxStaleDays()).isAfter(now)) {
+                result.warnIfTrue(true, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+            } else {
+                result.rejectIfTrue(true, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+            }
+        }
+
+
 
     }
 
