@@ -35,13 +35,13 @@ package net.ripe.commons.certification.validation;
  */
 public class ValidationOptions {
 	
-	private Integer maxStaleDays = 0;
+	private int maxStaleDays = 0;
 	
-	public void setMaxStaleDays(Integer maxStaleDays) {
+	public void setMaxStaleDays(int maxStaleDays) {
 		this.maxStaleDays = maxStaleDays;
 	}
 	
-	public Integer getMaxStaleDays() {
+	public int getMaxStaleDays() {
 		return maxStaleDays;
 	}
 	
