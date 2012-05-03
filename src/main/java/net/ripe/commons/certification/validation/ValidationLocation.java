@@ -29,6 +29,7 @@
  */
 package net.ripe.commons.certification.validation;
 
+import java.io.Serializable;
 import java.net.URI;
 
 import net.ripe.commons.certification.util.EqualsSupport;
@@ -38,14 +39,16 @@ import net.ripe.commons.certification.util.EqualsSupport;
  * The validation location key that is used to associate validation checks with
  * a specific object or step. Typically the URI is used as the key.
  */
-public class ValidationLocation extends EqualsSupport {
+public class ValidationLocation extends EqualsSupport implements Serializable {
 
-	private final String name;
-	
+    private static final long serialVersionUID = 1L;
+
+    private final String name;
+
 	public ValidationLocation(String name) {
 		this.name = name;
 	}
-	
+
 	public ValidationLocation(URI objectUri) {
 		this.name = objectUri.toString();
 	}
@@ -53,5 +56,5 @@ public class ValidationLocation extends EqualsSupport {
 	public String getName() {
 		return name;
 	}
-	
+
 }

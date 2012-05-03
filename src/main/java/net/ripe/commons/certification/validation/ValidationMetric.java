@@ -29,21 +29,36 @@
  */
 package net.ripe.commons.certification.validation;
 
-import java.text.MessageFormat;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.io.Serializable;
 
+import net.ripe.commons.certification.util.EqualsSupport;
 
-public final class ValidationMessage {
+/**
+ * Captures interesting statistics related to validation.
+ */
+public class ValidationMetric extends EqualsSupport implements Serializable {
 
-    private static final String MESSAGE_BUNDLE_NAME = "validation";
-    private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+    private static final long serialVersionUID = 1L;
 
-    private ValidationMessage() {
+    private final String name;
+    private final String value;
+    private final long measuredAt;
+
+    public ValidationMetric(String name, String value, long measuredAt) {
+        this.name = name;
+        this.value = value;
+        this.measuredAt = measuredAt;
     }
 
-    public static String getMessage(ValidationCheck validationCheck) {
-        ResourceBundle messages = ResourceBundle.getBundle(MESSAGE_BUNDLE_NAME, DEFAULT_LOCALE);
-        return MessageFormat.format(messages.getString(validationCheck.getKey() + "." +  validationCheck.getStatus().toString().toLowerCase()), (Object[]) validationCheck.getParams());
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public long getMeasuredAt() {
+        return measuredAt;
     }
 }

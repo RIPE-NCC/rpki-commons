@@ -31,6 +31,7 @@ package net.ripe.commons.certification.validation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -40,21 +41,23 @@ import java.util.Set;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.joda.time.DateTimeUtils;
 
 public class ValidationResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new HashMap<ValidationLocation, Map<ValidationStatus,List<ValidationCheck>>>();  
+	private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new HashMap<ValidationLocation, Map<ValidationStatus,List<ValidationCheck>>>();
 
 	private ValidationLocation currentLocation = new ValidationLocation("<unknown>");
 
-	
-	// Modifiers
-	
+	private List<ValidationMetric> metrics = new ArrayList<ValidationMetric>();
+
+	// Mutators
+
 	public void setLocation(ValidationLocation location) {
 		currentLocation = location;
-		
+
 		if (!results.containsKey(currentLocation)) {
 			Map<ValidationStatus, List<ValidationCheck>> locationResults = new HashMap<ValidationStatus, List<ValidationCheck>>();
 			locationResults.put(ValidationStatus.ERROR, new ArrayList<ValidationCheck>());
@@ -69,7 +72,7 @@ public class ValidationResult implements Serializable {
 		List<ValidationCheck> checksForStatus = currentResults.get(status);
 		checksForStatus.add(new ValidationCheck(status, key, param));
 	}
-	
+
 	public boolean warnIfFalse(boolean condition, String key, String... param) {
 		Validate.notNull(key, "key is required");
 		if (condition) {
@@ -79,16 +82,16 @@ public class ValidationResult implements Serializable {
 		}
 		return condition;
 	}
-	
+
 	public boolean warnIfTrue(boolean condition, String key, String... param) {
 		return warnIfFalse(!condition, key, param);
 	}
-	
+
 	public boolean warnIfNull(Object object, String key, String... param) {
 		return warnIfTrue(object == null, key, param);
 	}
 
-	
+
 	public boolean rejectIfFalse(boolean condition, String key, String... param) {
 	    Validate.notNull(key, "key is required");
 	    if (condition) {
@@ -107,17 +110,20 @@ public class ValidationResult implements Serializable {
 	    return rejectIfTrue(object == null, key, param);
 	}
 
+	public void addMetric(String name, String value) {
+	    metrics.add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+	}
 
-	// Getters
-	
+	// Accessors
+
 	public Set<ValidationLocation> getValidatedLocations() {
 		return results.keySet();
 	}
-	
+
     public ValidationLocation getCurrentLocation() {
         return currentLocation;
     }
-	
+
 	public boolean hasFailures() {
 		for (ValidationLocation location: getValidatedLocations()) {
 			if (hasFailureForLocation(location)) {
@@ -130,7 +136,7 @@ public class ValidationResult implements Serializable {
 	public boolean hasFailureForCurrentLocation() {
 		return hasFailureForLocation(currentLocation);
 	}
-	
+
 	public boolean hasFailureForLocation(ValidationLocation location) {
 		return getFailures(location).size() > 0;
 	}
@@ -143,7 +149,7 @@ public class ValidationResult implements Serializable {
 			return new ArrayList<ValidationCheck>();
 		}
 	}
-    
+
 	public Set<ValidationCheck> getFailuresForCurrentLocation() {
 		return new LinkedHashSet<ValidationCheck>(getFailures(currentLocation));
 	}
@@ -156,7 +162,7 @@ public class ValidationResult implements Serializable {
 			allChecks.addAll(locationChecksMap.get(ValidationStatus.WARNING));
 			allChecks.addAll(locationChecksMap.get(ValidationStatus.PASSED));
 		}
-		
+
 		return allChecks;
 	}
 
@@ -169,11 +175,15 @@ public class ValidationResult implements Serializable {
 		}
 		return null;
 	}
-	
+
+	public List<ValidationMetric> getMetrics() {
+        return Collections.unmodifiableList(metrics);
+    }
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 
-    
+
 }

@@ -31,14 +31,28 @@ package net.ripe.commons.certification.validation;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import net.ripe.commons.certification.FixedDateRule;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.junit.Rule;
 import org.junit.Test;
 
 
 public class ValidationResultTest {
 
+    private static final DateTime NOW = new DateTime(2008, 04, 05, 0, 0, 0, 0, DateTimeZone.UTC);
+
+    @Rule
+    public FixedDateRule fixedDateRule = new FixedDateRule(NOW);
+
+    private ValidationResult result = new ValidationResult();
+
 	@Test
 	public void shouldValidateWithoutFailures() {
-		ValidationResult result = new ValidationResult();
 		final String validatedObject = "validatedObject";
 		final ValidationLocation validatedObjectLocation = new ValidationLocation(validatedObject);
 
@@ -60,11 +74,9 @@ public class ValidationResultTest {
 
 	@Test
 	public void shouldValidateWithFailures() {
-		ValidationResult result = new ValidationResult();
-		
 		final String firstValidatedObject = "firstValidatedObject";
 		ValidationLocation firstValidatedObjectLocation = new ValidationLocation(firstValidatedObject);
-		
+
 		final String secondValidatedObject = "secondValidatedObject";
 		ValidationLocation secondValidatedObjectLocation = new ValidationLocation(secondValidatedObject);
 
@@ -97,4 +109,16 @@ public class ValidationResultTest {
 		assertNotNull(result.getFailures(secondValidatedObjectLocation));
 		assertTrue(result.getFailures(secondValidatedObjectLocation).size() == 3);
 	}
+
+    @Test
+    public void shouldHaveNoMetricsInitially() {
+        assertEquals(Collections.emptyList(), result.getMetrics());
+    }
+
+    @Test
+    public void shouldTrackValidationMetrics() {
+        result.addMetric("name", "value");
+
+        assertEquals(Arrays.asList(new ValidationMetric("name", "value", NOW.getMillis())), result.getMetrics());
+    }
 }
