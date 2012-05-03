@@ -51,7 +51,7 @@ public class ValidationResult implements Serializable {
 
 	private ValidationLocation currentLocation = new ValidationLocation("<unknown>");
 
-	private List<ValidationMetric> metrics = new ArrayList<ValidationMetric>();
+	private Map<ValidationLocation, List<ValidationMetric>> metrics = new HashMap<ValidationLocation, List<ValidationMetric>>();
 
 	// Mutators
 
@@ -111,7 +111,10 @@ public class ValidationResult implements Serializable {
 	}
 
 	public void addMetric(String name, String value) {
-	    metrics.add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+	    if (!metrics.containsKey(currentLocation)) {
+	        metrics.put(currentLocation, new ArrayList<ValidationMetric>());
+	    }
+	    metrics.get(currentLocation).add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
 	}
 
 	// Accessors
@@ -176,8 +179,12 @@ public class ValidationResult implements Serializable {
 		return null;
 	}
 
-	public List<ValidationMetric> getMetrics() {
-        return Collections.unmodifiableList(metrics);
+    public List<ValidationMetric> getMetrics(ValidationLocation location) {
+        if (metrics.containsKey(location)) {
+            return Collections.unmodifiableList(metrics.get(location));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
 	@Override

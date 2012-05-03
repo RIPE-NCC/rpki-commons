@@ -44,6 +44,10 @@ import org.junit.Test;
 
 public class ValidationResultTest {
 
+    private static final ValidationLocation SECOND_LOCATION = new ValidationLocation("secondValidatedObject");
+
+    private static final ValidationLocation FIRST_LOCATION = new ValidationLocation("firstValidatedObject");
+
     private static final DateTime NOW = new DateTime(2008, 04, 05, 0, 0, 0, 0, DateTimeZone.UTC);
 
     @Rule
@@ -51,74 +55,67 @@ public class ValidationResultTest {
 
     private ValidationResult result = new ValidationResult();
 
-	@Test
-	public void shouldValidateWithoutFailures() {
-		final String validatedObject = "validatedObject";
-		final ValidationLocation validatedObjectLocation = new ValidationLocation(validatedObject);
+    @Test
+    public void shouldValidateWithoutFailures() {
+        result.setLocation(FIRST_LOCATION);
+        assertTrue(result.rejectIfFalse(true, "A"));
+        assertTrue(result.rejectIfTrue(false, "B"));
+        assertTrue(result.rejectIfNull("", "C"));
 
-		result.setLocation(validatedObjectLocation);
-		assertTrue(result.rejectIfFalse(true, "A"));
-		assertTrue(result.rejectIfTrue(false, "B"));
-		assertTrue(result.rejectIfNull("", "C"));
+        assertFalse(result.hasFailures());
+        assertFalse(result.hasFailureForLocation(FIRST_LOCATION));
+        assertFalse(result.hasFailureForLocation(new ValidationLocation("invalid object")));
+        assertTrue(result.getValidatedLocations().size() == 1);
+        assertTrue(result.getValidatedLocations().contains(FIRST_LOCATION));
+        assertNotNull(result.getAllValidationChecksForLocation(FIRST_LOCATION));
+        assertEquals(3, result.getAllValidationChecksForLocation(FIRST_LOCATION).size());
+        assertNotNull(result.getFailures(FIRST_LOCATION));
+        assertTrue(result.getFailures(FIRST_LOCATION).size() == 0);
+    }
 
-		assertFalse(result.hasFailures());
-		assertFalse(result.hasFailureForLocation(validatedObjectLocation));
-		assertFalse(result.hasFailureForLocation(new ValidationLocation("invalid object")));
-		assertTrue(result.getValidatedLocations().size() == 1);
-		assertTrue(result.getValidatedLocations().contains(validatedObjectLocation));
-		assertNotNull(result.getAllValidationChecksForLocation(validatedObjectLocation));
-		assertEquals(3, result.getAllValidationChecksForLocation(validatedObjectLocation).size());
-		assertNotNull(result.getFailures(validatedObjectLocation));
-		assertTrue(result.getFailures(validatedObjectLocation).size() == 0);
-	}
+    @Test
+    public void shouldValidateWithFailures() {
+        result.setLocation(FIRST_LOCATION);
+        assertTrue(result.rejectIfFalse(true, "A"));
+        assertTrue(result.rejectIfTrue(false, "B"));
 
-	@Test
-	public void shouldValidateWithFailures() {
-		final String firstValidatedObject = "firstValidatedObject";
-		ValidationLocation firstValidatedObjectLocation = new ValidationLocation(firstValidatedObject);
+        result.setLocation(SECOND_LOCATION);
+        assertFalse(result.rejectIfFalse(false, "A"));
+        assertFalse(result.rejectIfTrue(true, "B"));
 
-		final String secondValidatedObject = "secondValidatedObject";
-		ValidationLocation secondValidatedObjectLocation = new ValidationLocation(secondValidatedObject);
+        result.setLocation(FIRST_LOCATION);
+        assertTrue(result.rejectIfNull("", "C"));
 
-		result.setLocation(firstValidatedObjectLocation);
-		assertTrue(result.rejectIfFalse(true, "A"));
-		assertTrue(result.rejectIfTrue(false, "B"));
+        result.setLocation(SECOND_LOCATION);
+        assertFalse(result.rejectIfNull(null, "C"));
 
-		result.setLocation(secondValidatedObjectLocation);
-		assertFalse(result.rejectIfFalse(false, "A"));
-		assertFalse(result.rejectIfTrue(true, "B"));
-
-		result.setLocation(firstValidatedObjectLocation);
-		assertTrue(result.rejectIfNull("", "C"));
-
-		result.setLocation(secondValidatedObjectLocation);
-		assertFalse(result.rejectIfNull(null, "C"));
-
-		assertTrue(result.hasFailures());
-		assertFalse(result.hasFailureForLocation(firstValidatedObjectLocation));
-		assertTrue(result.hasFailureForLocation(secondValidatedObjectLocation));
-		assertTrue(result.getValidatedLocations().size() == 2);
-		assertTrue(result.getValidatedLocations().contains(firstValidatedObjectLocation));
-		assertTrue(result.getValidatedLocations().contains(secondValidatedObjectLocation));
-		assertNotNull(result.getAllValidationChecksForLocation(firstValidatedObjectLocation));
-		assertTrue(result.getAllValidationChecksForLocation(firstValidatedObjectLocation).size() == 3);
-		assertNotNull(result.getAllValidationChecksForLocation(secondValidatedObjectLocation));
-		assertTrue(result.getAllValidationChecksForLocation(secondValidatedObjectLocation).size() == 3);
-		assertNotNull(result.getFailures(firstValidatedObjectLocation));
-		assertTrue(result.getFailures(firstValidatedObjectLocation).size() == 0);
-		assertNotNull(result.getFailures(secondValidatedObjectLocation));
-		assertTrue(result.getFailures(secondValidatedObjectLocation).size() == 3);
-	}
+        assertTrue(result.hasFailures());
+        assertFalse(result.hasFailureForLocation(FIRST_LOCATION));
+        assertTrue(result.hasFailureForLocation(SECOND_LOCATION));
+        assertTrue(result.getValidatedLocations().size() == 2);
+        assertTrue(result.getValidatedLocations().contains(FIRST_LOCATION));
+        assertTrue(result.getValidatedLocations().contains(SECOND_LOCATION));
+        assertNotNull(result.getAllValidationChecksForLocation(FIRST_LOCATION));
+        assertTrue(result.getAllValidationChecksForLocation(FIRST_LOCATION).size() == 3);
+        assertNotNull(result.getAllValidationChecksForLocation(SECOND_LOCATION));
+        assertTrue(result.getAllValidationChecksForLocation(SECOND_LOCATION).size() == 3);
+        assertNotNull(result.getFailures(FIRST_LOCATION));
+        assertTrue(result.getFailures(FIRST_LOCATION).size() == 0);
+        assertNotNull(result.getFailures(SECOND_LOCATION));
+        assertTrue(result.getFailures(SECOND_LOCATION).size() == 3);
+    }
 
     @Test
     public void shouldHaveNoMetricsInitially() {
-        assertEquals(Collections.emptyList(), result.getMetrics());
+        assertEquals(Collections.emptyList(), result.getMetrics(FIRST_LOCATION));
     }
 
     @Test
     public void shouldTrackValidationMetrics() {
+        result.setLocation(FIRST_LOCATION);
         result.addMetric("name", "value");
 
-        assertEquals(Arrays.asList(new ValidationMetric("name", "value", NOW.getMillis())), result.getMetrics());
+        assertEquals(Arrays.asList(new ValidationMetric("name", "value", NOW.getMillis())), result.getMetrics(FIRST_LOCATION));
+        assertEquals(Collections.emptyList(), result.getMetrics(SECOND_LOCATION));
     }
 }

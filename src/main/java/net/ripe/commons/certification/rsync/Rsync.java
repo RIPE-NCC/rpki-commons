@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.joda.time.DateTimeUtils;
+
 
 public class Rsync {
 
@@ -43,9 +45,16 @@ public class Rsync {
     private Command command;
 
     private String source;
+
     private String destination;
+
     private List<String> options = new ArrayList<String>();
+
     private int timeoutInSeconds = DEFAULT_TIMEOUT_IN_SECONDS;
+
+    private long startedAt;
+
+    private long finishedAt;
 
     public Rsync() {
     }
@@ -59,13 +68,14 @@ public class Rsync {
      * @param timeoutInSeconds the rsync(1) communication timeout in seconds.
      */
     public void setTimeoutInSeconds(int timeoutInSeconds) {
-        if (timeoutInSeconds < 0) throw new IllegalArgumentException("timeout must be non-negative");
+        if (timeoutInSeconds < 0)
+            throw new IllegalArgumentException("timeout must be non-negative");
         this.timeoutInSeconds = timeoutInSeconds;
     }
 
     public void addOptions(String... options) {
         for (String option : options) {
-            if(option != null) {
+            if (option != null) {
                 this.options.add(option);
             }
         }
@@ -88,6 +98,8 @@ public class Rsync {
         options.clear();
         source = null;
         destination = null;
+        startedAt = 0;
+        finishedAt = 0;
     }
 
     public String getSource() {
@@ -137,8 +149,17 @@ public class Rsync {
         }
 
         Command rsync = new Command(args);
-        rsync.execute();
-        command = rsync;
-        return rsync.getExitStatus();
+        startedAt = DateTimeUtils.currentTimeMillis();
+        try {
+            rsync.execute();
+            command = rsync;
+            return rsync.getExitStatus();
+        } finally {
+            finishedAt = DateTimeUtils.currentTimeMillis();
+        }
+    }
+
+    public long elapsedTime() {
+        return finishedAt - startedAt;
     }
 }
