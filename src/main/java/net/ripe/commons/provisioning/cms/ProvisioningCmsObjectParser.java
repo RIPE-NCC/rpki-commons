@@ -29,6 +29,55 @@
  */
 package net.ripe.commons.provisioning.cms;
 
+import static net.ripe.commons.certification.validation.ValidationString.CERT_HAS_SKI;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_EE_CERT;
+import static net.ripe.commons.certification.validation.ValidationString.CERT_IS_X509CERT;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_CONTENT_PARSING;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_CONTENT_TYPE;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_DATA_PARSING;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNED_DATA_DIGEST_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNED_DATA_VERSION;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_DIGEST_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_SKI;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_SKI_ONLY;
+import static net.ripe.commons.certification.validation.ValidationString.CMS_SIGNER_INFO_VERSION;
+import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_VALUE;
+import static net.ripe.commons.certification.validation.ValidationString.CONTENT_TYPE_VALUE_COUNT;
+import static net.ripe.commons.certification.validation.ValidationString.CRL_IS_X509CRL;
+import static net.ripe.commons.certification.validation.ValidationString.ENCRYPTION_ALGORITHM;
+import static net.ripe.commons.certification.validation.ValidationString.GET_CERTS_AND_CRLS;
+import static net.ripe.commons.certification.validation.ValidationString.GET_SIGNER_INFO;
+import static net.ripe.commons.certification.validation.ValidationString.MSG_DIGEST_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.MSG_DIGEST_VALUE_COUNT;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_CRL_ALLOWED;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_EE_CERT_ALLOWED;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNER;
+import static net.ripe.commons.certification.validation.ValidationString.ONLY_ONE_SIGNING_TIME_ATTR;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNATURE_VERIFICATION;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNED_ATTRS_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.SIGNING_TIME_ATTR_PRESENT;
+import static net.ripe.commons.certification.validation.ValidationString.UNSIGNED_ATTRS_OMITTED;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CRL;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
@@ -36,27 +85,29 @@ import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.PayloadParser;
 import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
+
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.CMSSignedGenerator;
+import org.bouncycastle.cms.CMSTypedStream;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public class ProvisioningCmsObjectParser {
 

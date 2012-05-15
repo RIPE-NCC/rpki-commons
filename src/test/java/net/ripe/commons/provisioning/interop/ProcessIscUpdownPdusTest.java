@@ -29,11 +29,13 @@
  */
 package net.ripe.commons.provisioning.interop;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
+import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationOptions;
@@ -50,7 +52,10 @@ import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestParser;
 import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestParserException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.HexDump;
+import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.junit.Test;
 
@@ -85,8 +90,7 @@ public class ProcessIscUpdownPdusTest {
         ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
         assertNotNull(childCert);
     }
-    
-    
+
     @Test
     public void shouldReadIscIssuerXml() throws IOException {
         String parentXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), "UTF-8");
@@ -94,7 +98,6 @@ public class ProcessIscUpdownPdusTest {
         ParentIdentity parentId = serializer.deserialize(parentXml);
         assertNotNull(parentId);
     }
-    
 
     public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException {
         String childIdXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), "UTF-8");
@@ -135,17 +138,56 @@ public class ProcessIscUpdownPdusTest {
             byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
             ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
             parser.parseCms("cms", encoded);
+            System.err.println("\nDumping: " + fileName + "\n");
+            HexDump.dump(encoded, 0, System.err, 0);
+            System.err.println("\n");
             assertTrue("Error parsing file: " + fileName + " and giving up!", !parser.getValidationResult().hasFailures());
         }
     }
-    
+
     @Test
     public void shouldParseRpkidParentResponseXml() throws IOException {
         String xml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), "UTF-8");
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
-        
+
         ParentIdentity parentId = serializer.deserialize(xml);
         assertNotNull(parentId);
     }
 
+    @Test
+    public void shouldParseRpkidMessageFromDeutscheTelekom() throws IOException {
+        // dtag-outbound-1.der
+
+        String[] Files = new String[] {"dtag-outbound-1.der", "dtag-outbound-9.der" };
+
+        for (String fileName : Files) {
+
+            String base64Encoded = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/" + fileName));
+
+            byte[] encoded = Base64.decodeBase64(base64Encoded);
+
+            ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+            parser.parseCms("cms", encoded);
+            ValidationResult validationResult = parser.getValidationResult();
+
+//            System.err.println("\nDumping: " + fileName + "\n");
+//            HexDump.dump(encoded, 0, System.err, 0);
+//            System.err.println("\n");
+//
+//            DERObject decodedObject = Asn1Util.decode(encoded);
+//            System.err.println(ASN1Dump.dumpAsString(decodedObject));
+//
+//            for (ValidationLocation location : validationResult.getValidatedLocations()) {
+//                for (ValidationCheck check : validationResult.getAllValidationChecksForLocation(location)) {
+//                    System.err.println(check);
+//                }
+//            }
+            assertTrue("Error parsing file: " + fileName + " and giving up!", !validationResult.hasFailures());
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void dumpAsn1StructureToStdErr(byte[] encoded) {
+        System.err.println(ASN1Dump.dumpAsString(Asn1Util.decode(encoded)));
+    }
 }
