@@ -41,7 +41,6 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
-import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -92,8 +91,6 @@ public class ManifestCmsTest{
 	// Manifest data
 	private static byte[] FOO_CONTENTS = { 'a', 'b', 'c' };
 	private static byte[] BAR_CONTENTS = { 'd', 'e', 'f' };
-	private static byte[] FOO_HASH = ManifestCms.hashContents(FOO_CONTENTS);
-	private static byte[] BAR_HASH = ManifestCms.hashContents(BAR_CONTENTS);
 
 	private static final DateTime THIS_UPDATE_TIME = new DateTime(2008, 9, 1, 22, 43, 29, 0, DateTimeZone.UTC);
 	private static final DateTime NEXT_UPDATE_TIME = new DateTime(2008, 9, 2, 6, 43, 29, 0, DateTimeZone.UTC);
@@ -103,9 +100,12 @@ public class ManifestCmsTest{
     private X509ResourceCertificate rootCertificate;
 
     private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
-    
+
     public static ManifestCms getRootManifestCms() {
-	    return getRootManifestBuilder().build(MANIFEST_KEY_PAIR.getPrivate());
+        ManifestCmsBuilder builder = getRootManifestBuilder();
+        builder.addFile("foo1", FOO_CONTENTS);
+        builder.addFile("BaR", BAR_CONTENTS);
+        return builder.build(MANIFEST_KEY_PAIR.getPrivate());
 	}
 
     @Before
@@ -184,13 +184,13 @@ public class ManifestCmsTest{
 		assertTrue(result.hasFailureForLocation(rootMftCrlValidationLocation));
 		assertTrue(result.getAllValidationChecksForLocation(new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION)).contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_SIGNATURE_VALID)));
     }
-    
+
     @Test
     public void shouldWarnWhenManifestIsStale() {
         X509Crl crl = getRootCrl();
-        
+
         DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
-        
+
     	IpResourceSet resources = rootCertificate.getResources();
 
     	CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
@@ -208,7 +208,7 @@ public class ManifestCmsTest{
 
     	assertFalse(result.hasFailures());
     	assertEquals(0, result.getFailuresForCurrentLocation().size());
-    	
+
     	assertEquals(
     		new ValidationCheck(ValidationStatus.WARNING, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME.toString()),
     		result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
@@ -250,11 +250,11 @@ public class ManifestCmsTest{
         );
     }
 
-    
+
     @Test
     public void shouldWarnAboutInconsistentValidityTimes() {
     	ManifestCms mft = getManifestWithInconsistentValidityTimes();
-    	
+
         X509Crl crl = getRootCrl();
     	IpResourceSet resources = rootCertificate.getResources();
 
@@ -271,12 +271,12 @@ public class ManifestCmsTest{
 
     	assertEquals(0, result.getFailuresForCurrentLocation().size());
     	assertFalse(result.hasFailures());
-    	
+
     	assertEquals(
         		new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT),
         		result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT)
     		);
-    	
+
     }
 
     private X509Crl getRootCrl() {
@@ -314,15 +314,12 @@ public class ManifestCmsTest{
     	builder.withCertificate(getManifestEEResourceCertificateBuilder(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME.plusDays(1))).build());
     	return builder.build(MANIFEST_KEY_PAIR.getPrivate());
     }
-    
-	@SuppressWarnings("deprecation")
-    private static ManifestCmsBuilder getRootManifestBuilder() {
+
+    public static ManifestCmsBuilder getRootManifestBuilder() {
 		ManifestCmsBuilder builder = new ManifestCmsBuilder();
 		builder.withCertificate(getManifestEEResourceCertificateBuilder(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME)).build());
 		builder.withManifestNumber(BigInteger.valueOf(68));
 		builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
-		builder.putFile("foo1", FOO_HASH);
-		builder.putFile("BaR", BAR_HASH);
 		builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
 		return builder;
 	}

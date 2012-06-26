@@ -61,15 +61,6 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     public ManifestCmsBuilder() {
     }
 
-    /**
-     * This is exposed for Unit Test Support only!
-     * @deprecated
-     */
-    public ManifestCmsBuilder putFile(String fileName, byte[] hash) {
-        files.put(fileName, hash);
-        return this;
-    }
-
     public boolean containsFile(String fileName) {
         return files.containsKey(fileName);
     }
@@ -107,7 +98,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
 
     public void addFile(String fileName, byte[] contents) {
         byte[] digestValue = ManifestCms.hashContents(contents);
-        putFile(fileName, digestValue);
+        files.put(fileName, digestValue);
     }
 
     ASN1Encodable encodeFileAndHash(String fileName, byte[] hash) {

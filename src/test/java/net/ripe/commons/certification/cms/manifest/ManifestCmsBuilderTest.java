@@ -63,12 +63,11 @@ public class ManifestCmsBuilderTest {
     }
 
 
-    @SuppressWarnings("deprecation")
     @Test
     public void shouldTrackFilenameAndHash() {
-        byte[] hash = { 1, 2, 3, 4 };
-        subject.putFile("foo1", hash);
-        subject.putFile("foo3", hash);
+        byte[] content = { 1, 2, 3, 4 };
+        subject.addFile("foo1", content);
+        subject.addFile("foo3", content);
 
         ManifestCms result = subject.build(TEST_KEY_PAIR.getPrivate());
         assertEquals(2, result.size());
@@ -97,7 +96,7 @@ public class ManifestCmsBuilderTest {
 
     @Test
     public void shouldEncodeFileAndHash() {
-        assertEncoded(ENCODED_FILE_AND_HASH_1, subject.encodeFileAndHash("foo1", HASH_1));
+        assertEncoded(ENCODED_FILE_AND_HASH_1, subject.encodeFileAndHash("foo1", FOO_HASH));
     }
 
     @Test
@@ -105,19 +104,17 @@ public class ManifestCmsBuilderTest {
         assertEncoded(ENCODED_EMPTY_FILE_LIST, subject.encodeFileList());
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public void shouldEncodeFileList() {
-        subject.putFile("foo1", HASH_1);
-        subject.putFile("BaR", HASH_2);
+        subject.addFile("foo1", FOO_CONTENT);
+        subject.addFile("BaR", BAR_CONTENT);
         assertEncoded(ENCODED_FILE_LIST, subject.encodeFileList());
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public void shouldEncodeManifest() {
-        subject.putFile("foo1", HASH_1);
-        subject.putFile("BaR", HASH_2);
+        subject.addFile("foo1", FOO_CONTENT);
+        subject.addFile("BaR", BAR_CONTENT);
         assertEncoded(ENCODED_MANIFEST, subject.encodeManifest());
     }
 }

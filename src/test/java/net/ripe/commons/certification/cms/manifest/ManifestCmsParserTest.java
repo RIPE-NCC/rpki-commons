@@ -64,14 +64,22 @@ public class ManifestCmsParserTest {
     public static final DateTime THIS_UPDATE_TIME = new DateTime(2008, 9, 1, 22, 43, 29, 0, DateTimeZone.UTC);
     public static final DateTime NEXT_UPDATE_TIME = new DateTime(2008, 9, 2, 6, 43, 29, 0, DateTimeZone.UTC);
 
-    public static final byte[] HASH_1 = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
-    public static final byte[] HASH_2 = { 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+    public static final byte[] FOO_CONTENT = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
+
+    public static final byte[] FOO_HASH = {-82, 33, 108, 46, -11, 36, 122, 55, -126, -63, 53, -17, -94, 121, -93, -28, -51, -58, 16, -108, 39, 15,
+            93, 43, -27, -116, 98, 4, -73, -90, 18, -55};
+
+    public static final byte[] BAR_CONTENT = { 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+
+    public static final byte[] BAR_HASH = {77, -99, -39, 69, 30, -61, 10, -3, -84, 18, 112, 23, -70, -73, 109, 38, -41, 79, 6, -17, -49, -88, -14,
+            119, 85, -72, -77, 26, -93, -65, -28, -88};
 
 	public static final byte[] ENCODED_FILE_AND_HASH_1 = {
 		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x29,
 		DERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
 		DERTags.BIT_STRING, 0x21, 0x00,
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
+ -82, 33, 108, 46, -11, 36, 122, 55, -126, -63, 53, -17, -94, 121,
+            -93, -28, -51, -58, 16, -108, 39, 15, 93, 43, -27, -116, 98, 4, -73, -90, 18, -55
 	};
 
 	public static final byte[] ENCODED_EMPTY_FILE_LIST = {
@@ -83,11 +91,13 @@ public class ManifestCmsParserTest {
 		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x28,
 		DERTags.IA5_STRING, 0x03, (byte) 'B', (byte) 'a', (byte) 'R',
 		DERTags.BIT_STRING, 0x21, 0x00,
-		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+ 77, -99, -39, 69, 30, -61, 10, -3, -84, 18,
+            112, 23, -70, -73, 109, 38, -41, 79, 6, -17, -49, -88, -14, 119, 85, -72, -77, 26, -93, -65, -28, -88,
 		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x29,
 		DERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
 		DERTags.BIT_STRING, 0x21, 0x00,
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+ -82, 33, 108, 46, -11, 36, 122, 55, -126, -63, 53, -17, -94, 121, -93, -28, -51, -58, 16, -108, 39, 15,
+            93, 43, -27, -116, 98, 4, -73, -90, 18, -55
 	};
 
 	public static final byte[] ENCODED_MANIFEST = {
@@ -103,11 +113,13 @@ public class ManifestCmsParserTest {
 		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x28,
 		DERTags.IA5_STRING, 0x03, (byte) 'B', (byte) 'a', (byte) 'R',
 		DERTags.BIT_STRING, 0x21, 0x00,
-		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+ 77, -99, -39, 69, 30, -61, 10, -3, -84, 18,
+            112, 23, -70, -73, 109, 38, -41, 79, 6, -17, -49, -88, -14, 119, 85, -72, -77, 26, -93, -65, -28, -88,
 		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x29,
 		DERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
 		DERTags.BIT_STRING, 0x21, 0x00,
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+ -82, 33, 108, 46, -11, 36, 122, 55, -126, -63, 53, -17, -94, 121, -93, -28, -51, -58, 16, -108, 39, 15,
+            93, 43, -27, -116, 98, 4, -73, -90, 18, -55,
 	};
 
 	private ManifestCmsParser parser;
@@ -133,7 +145,6 @@ public class ManifestCmsParserTest {
 	    return builder.build();
 	}
 
-	@SuppressWarnings("deprecation")
     @Before
     public void setUp() {
         parser = new ManifestCmsParser();
@@ -142,8 +153,8 @@ public class ManifestCmsParserTest {
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
         builder.withCertificate(createValidManifestEECertificate()).withManifestNumber(BigInteger.valueOf(68));
         builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
-        builder.putFile("foo1", HASH_1);
-        builder.putFile("BaR", HASH_2);
+        builder.addFile("foo1", FOO_CONTENT);
+        builder.addFile("BaR", BAR_CONTENT);
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
 
         parser.parse("test", builder.build(TEST_KEY_PAIR.getPrivate()).getEncoded());
@@ -160,7 +171,7 @@ public class ManifestCmsParserTest {
     	parser.decodeFileAndHash(actual, decode(ENCODED_FILE_AND_HASH_1));
     	assertEquals(1, actual.size());
     	assertTrue(actual.containsKey("foo1"));
-    	assertArrayEquals(HASH_1, actual.get("foo1"));
+        assertArrayEquals(FOO_HASH, actual.get("foo1"));
     }
 
     @Test
@@ -176,9 +187,9 @@ public class ManifestCmsParserTest {
     	parser.decodeFileList(actual, decode(ENCODED_FILE_LIST));
     	assertEquals(2, actual.size());
     	assertTrue(actual.containsKey("foo1"));
-    	assertArrayEquals(HASH_1, actual.get("foo1"));
+        assertArrayEquals(FOO_HASH, actual.get("foo1"));
     	assertTrue(actual.containsKey("BaR"));
-    	assertArrayEquals(HASH_2, actual.get("BaR"));
+        assertArrayEquals(BAR_HASH, actual.get("BaR"));
     }
 
     @Test
@@ -191,7 +202,6 @@ public class ManifestCmsParserTest {
     	assertEquals(NEXT_UPDATE_TIME, manifest.getNextUpdateTime());
     }
 
-    @SuppressWarnings("deprecation")
     @Test(expected=IllegalArgumentException.class)
     public void shouldRejectManifestWithNonInheritEECert() {
         DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());
@@ -200,8 +210,8 @@ public class ManifestCmsParserTest {
         // Use 10/8 EE cert
         builder.withCertificate(createTenSlashEightResourceCertificate()).withManifestNumber(BigInteger.valueOf(68));
         builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
-        builder.putFile("foo1", HASH_1);
-        builder.putFile("BaR", HASH_2);
+        builder.addFile("foo1", FOO_CONTENT);
+        builder.addFile("BaR", BAR_CONTENT);
 
         /* Now when we try to *build* we will be rejected.
          *
