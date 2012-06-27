@@ -54,7 +54,7 @@ import org.junit.Test;
 public class X509CrlTest {
 
 	private static final URI ROOT_MANIFEST_CRL_LOCATION = URI.create("rsync://foo.host/bar/bar%20space.crl");
-	
+
 	private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
 
 
@@ -70,8 +70,6 @@ public class X509CrlTest {
         builder.withNextUpdateTime(new DateTime().plusHours(8));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic());
-        builder.addEntry(BigInteger.TEN, new DateTime().minusDays(1));
-        builder.addEntry(BigInteger.valueOf(42), new DateTime().minusDays(3));
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
 		return builder;
 	}

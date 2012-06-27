@@ -33,7 +33,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,12 +73,16 @@ public class ValidationResult implements Serializable {
 		checksForStatus.add(new ValidationCheck(status, key, param));
 	}
 
+    public void warn(String key, String... param) {
+        setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
+    }
+
 	public boolean warnIfFalse(boolean condition, String key, String... param) {
 		Validate.notNull(key, "key is required");
 		if (condition) {
 			setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
 		} else {
-			setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
+            warn(key, param);
 		}
 		return condition;
 	}
@@ -136,26 +140,38 @@ public class ValidationResult implements Serializable {
 		return false;
 	}
 
+    public Set<ValidationCheck> getFailuresForCurrentLocation() {
+        return new HashSet<ValidationCheck>(getFailures(currentLocation));
+    }
+
 	public boolean hasFailureForCurrentLocation() {
 		return hasFailureForLocation(currentLocation);
 	}
 
 	public boolean hasFailureForLocation(ValidationLocation location) {
-		return getFailures(location).size() > 0;
+        return !getFailures(location).isEmpty();
 	}
-
 
     public List<ValidationCheck> getFailures(ValidationLocation location) {
-		if (results.containsKey(location)) {
-			return results.get(location).get(ValidationStatus.ERROR);
-		} else {
-			return new ArrayList<ValidationCheck>();
-		}
+        return getChecks(location, ValidationStatus.ERROR);
 	}
 
-	public Set<ValidationCheck> getFailuresForCurrentLocation() {
-		return new LinkedHashSet<ValidationCheck>(getFailures(currentLocation));
-	}
+    public List<ValidationCheck> getWarnings() {
+        List<ValidationCheck> warnings = new ArrayList<ValidationCheck>();
+        for (ValidationLocation location : getValidatedLocations()) {
+            warnings.addAll(getChecks(location, ValidationStatus.WARNING));
+        }
+        return warnings;
+    }
+
+    private List<ValidationCheck> getChecks(ValidationLocation location, ValidationStatus status) {
+        if (results.containsKey(location)) {
+            return results.get(location).get(status);
+        } else {
+            return new ArrayList<ValidationCheck>();
+        }
+    }
+
 
 	public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
 		ArrayList<ValidationCheck> allChecks = new ArrayList<ValidationCheck>();

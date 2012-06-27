@@ -67,7 +67,7 @@ public class X509ResourceCertificateTest {
 
 	private static final URI CERT_URI = URI.create("rsync://host.foo/bar/ta.cer");
 	private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(CERT_URI);
-	
+
 	private static final URI CRL_DP = URI.create("rsync://host/foo/crl");
 	private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(CRL_DP);
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
@@ -76,7 +76,7 @@ public class X509ResourceCertificateTest {
 
     private static final ValidityPeriod TEST_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(100));
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
-    
+
     private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
 
     public static X509ResourceCertificateBuilder createSelfSignedCaCertificateBuilder() {
@@ -86,7 +86,7 @@ public class X509ResourceCertificateTest {
         return builder;
     }
 
-    private static X509ResourceCertificateBuilder createBasicBuilder() {
+    public static X509ResourceCertificateBuilder createBasicBuilder() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withSubjectDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
         builder.withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
@@ -95,6 +95,14 @@ public class X509ResourceCertificateTest {
         builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         builder.withAuthorityKeyIdentifier(true);
+
+        X509CertificateInformationAccessDescriptor[] descriptors = {
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY,
+                        URI.create("rsync://foo.host/bar/")),
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY,
+                        URI.create("http://foo.host/bar/"))};
+        builder.withSubjectInformationAccess(descriptors);
+
         return builder;
     }
 
@@ -249,7 +257,7 @@ public class X509ResourceCertificateTest {
         expect(crlLocator.getCrl(CRL_DP, context, result)).andAnswer(new IAnswer<X509Crl>() {
            @Override
         public X509Crl answer() throws Throwable {
-               
+
 			assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
                result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
                return null;

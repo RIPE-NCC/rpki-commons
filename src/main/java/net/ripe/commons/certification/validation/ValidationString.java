@@ -163,6 +163,11 @@ public final class ValidationString {
     public static final String VALIDATOR_FETCHED_OBJECT_IS_CRL = "validator.fetched.object.is.crl";
     public static final String VALIDATOR_MANIFEST_DOES_NOT_CONTAIN_FILE = "validator.manifest.does.not.contain.file";
 
+    // Problems with repository
+    public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
+    public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconcistent";
+    public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unkown";
+
 
     ////////////////////////////////
     // FIELD VALIDATION

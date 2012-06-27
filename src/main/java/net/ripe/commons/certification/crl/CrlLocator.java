@@ -37,5 +37,5 @@ import net.ripe.commons.certification.validation.objectvalidators.CertificateRep
 
 public interface CrlLocator {
 
-	X509Crl getCrl(URI uri, CertificateRepositoryObjectValidationContext context, ValidationResult result);
+    X509Crl getCrl(URI uri, CertificateRepositoryObjectValidationContext context, ValidationResult result);
 }

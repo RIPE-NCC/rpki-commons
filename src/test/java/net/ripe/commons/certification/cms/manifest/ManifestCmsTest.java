@@ -85,7 +85,7 @@ public class ManifestCmsTest{
 	private static final KeyPair ROOT_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
 
 	// Manifest EE certificate
-	private static final KeyPair MANIFEST_KEY_PAIR = KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
+    public static final KeyPair MANIFEST_KEY_PAIR = KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
 	private static final X500Principal MANIFEST_DN = new X500Principal("CN=manifest");
 
 	// Manifest data
