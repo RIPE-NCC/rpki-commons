@@ -68,8 +68,9 @@ public class Rsync {
      * @param timeoutInSeconds the rsync(1) communication timeout in seconds.
      */
     public void setTimeoutInSeconds(int timeoutInSeconds) {
-        if (timeoutInSeconds < 0)
+        if (timeoutInSeconds < 0) {
             throw new IllegalArgumentException("timeout must be non-negative");
+        }
         this.timeoutInSeconds = timeoutInSeconds;
     }
 

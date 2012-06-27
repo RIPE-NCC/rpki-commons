@@ -150,15 +150,23 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
     }
     
     private DateTime earliestDateTimeOf(DateTime date1, DateTime date2) {
-        if (date1 == null) return date2;
-        if (date2 == null) return date1;
-        return (date1.isBefore(date2) ? date1 : date2);
+        if (date1 == null) {
+            return date2;
+        }
+        if (date2 == null) {
+            return date1;
+        }
+        return date1.isBefore(date2) ? date1 : date2;
     }
 
     private DateTime latestDateTimeOf(DateTime date1, DateTime date2) {
-        if (date1 == null) return date2;
-        if (date2 == null) return date1;
-        return (date1.isAfter(date2) ? date1 : date2);
+        if (date1 == null) {
+            return date2;
+        }
+        if (date2 == null) {
+            return date1;
+        }
+        return date1.isAfter(date2) ? date1 : date2;
     }
 
     @Override

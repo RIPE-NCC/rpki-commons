@@ -79,7 +79,7 @@ public abstract class IdentitySerializer<T> {
      * href="http://pvoss.wordpress.com/2009/01/08/xstream/">Omit Unexpected XML Elements With
      * XStream</a>.
      */
-    private final static class IgnoreUnknownFieldsMapperWrapper extends MapperWrapper {
+    private static final class IgnoreUnknownFieldsMapperWrapper extends MapperWrapper {
         private IgnoreUnknownFieldsMapperWrapper(Mapper wrapped) {
             super(wrapped);
         }

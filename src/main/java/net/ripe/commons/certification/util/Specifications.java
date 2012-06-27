@@ -29,7 +29,7 @@
  */
 package net.ripe.commons.certification.util;
 
-public class Specifications {
+public final class Specifications {
 
     private Specifications() {
     }
