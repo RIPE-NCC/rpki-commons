@@ -167,6 +167,7 @@ public final class ValidationString {
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
     public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconcistent";
     public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unkown";
+    public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_IN_CACHE = "validator.repository.object.not.in.cache";
 
 
     ////////////////////////////////

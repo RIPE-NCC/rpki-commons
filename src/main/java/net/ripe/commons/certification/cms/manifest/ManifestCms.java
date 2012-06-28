@@ -219,8 +219,12 @@ public class ManifestCms extends RpkiSignedObject {
     public static class FileContentSpecification implements Specification<byte[]> {
         private byte[] hash;
 
-        public FileContentSpecification(byte[] hash) { //NOPMD - ArrayIsStoredDirectly
-            this.hash = hash;
+        public FileContentSpecification(byte[] hash) {
+            this.hash = Arrays.copyOf(hash, hash.length);
+        }
+
+        public byte[] getHash() {
+            return Arrays.copyOf(hash, hash.length);
         }
 
         @Override
