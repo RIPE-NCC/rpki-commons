@@ -3,12 +3,12 @@
     <name>RPKI Commmons</name>
     <groupId>net.ripe.rpki-commons</groupId>
     <artifactId>rpki-commons</artifactId>
-    <version>1.0.17-SNAPSHOT</version>
+    <version>1.0.17</version>
     <packaging>jar</packaging>
     <inceptionYear>2008</inceptionYear>
 
     <scm>
-        <connection>scm:svn:https://localhost:10443/svn/ba/certification/rpki-commons/trunk</connection>
+        <connection>scm:svn:https://localhost:10443/svn/ba/certification/rpki-commons/tags/RELEASE-1.0.17-20120702</connection>
     </scm>
 
     <distributionManagement>
