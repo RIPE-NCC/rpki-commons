@@ -139,16 +139,23 @@ public class ValidationResult implements Serializable {
     }
 
 	public boolean hasFailures() {
-		for (ValidationLocation location: getValidatedLocations()) {
-			if (hasFailureForLocation(location)) {
-				return true;
-			}
-		}
-		return false;
+        return getFailuresForAllLocations().size() > 0;
 	}
 
     public Set<ValidationCheck> getFailuresForCurrentLocation() {
         return new HashSet<ValidationCheck>(getFailures(currentLocation));
+    }
+
+    public List<ValidationCheck> getFailuresForAllLocations() {
+        List<ValidationCheck> failures = new ArrayList<ValidationCheck>();
+        for (ValidationLocation location : getValidatedLocations()) {
+            failures.addAll(getChecks(location, ValidationStatus.ERROR));
+        }
+        return failures;
+    }
+
+    public List<ValidationCheck> getFailures(ValidationLocation location) {
+        return getChecks(location, ValidationStatus.ERROR);
     }
 
 	public boolean hasFailureForCurrentLocation() {
@@ -157,10 +164,6 @@ public class ValidationResult implements Serializable {
 
 	public boolean hasFailureForLocation(ValidationLocation location) {
         return !getFailures(location).isEmpty();
-	}
-
-    public List<ValidationCheck> getFailures(ValidationLocation location) {
-        return getChecks(location, ValidationStatus.ERROR);
 	}
 
     public List<ValidationCheck> getWarnings() {

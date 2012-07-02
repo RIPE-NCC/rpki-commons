@@ -29,17 +29,20 @@
  */
 package net.ripe.commons.provisioning.interop;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationStatus;
+import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectValidator;
@@ -57,6 +60,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.HexDump;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.junit.Test;
 
 
@@ -109,6 +114,8 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldValidateRequest() throws IOException {
+
+        // Note this object expired 30 June 2012. Maybe get a new one sometime?
         byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("cms", encoded);
@@ -126,7 +133,13 @@ public class ProcessIscUpdownPdusTest {
             }
         }
 
-        assertTrue(!result.hasFailures());
+        List<ValidationCheck> failures = result.getFailuresForAllLocations();
+
+        assertEquals(3, failures.size());
+
+        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:08:03.000Z"));
+        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, "2012-06-30T04:07:24.000Z"));
+        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:07:24.000Z"));
 
     }
 
