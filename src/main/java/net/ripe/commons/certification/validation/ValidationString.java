@@ -154,11 +154,13 @@ public final class ValidationString {
     //validator
     public static final String VALIDATOR_URI_SAFETY = "validator.uri.safety";
     public static final String VALIDATOR_URI_RSYNC_SCHEME = "validator.uri.rsync.scheme";
+    public static final String VALIDATOR_URI_HTTP_SCHEME = "validator.uri.http.scheme";
     public static final String VALIDATOR_URI_HOST = "validator.uri.host";
     public static final String VALIDATOR_URI_PATH = "validator.uri.path";
     public static final String VALIDATOR_FILE_CONTENT = "validator.file.content";
     public static final String VALIDATOR_READ_FILE = "validator.read.file";
     public static final String VALIDATOR_RSYNC_COMMAND = "validator.rsync.command";
+    public static final String VALIDATOR_HTTP_DOWNLOAD = "validator.http.download";
     public static final String VALIDATOR_FETCHED_OBJECT_IS_MANIFEST = "validator.fetched.object.is.manifest";
     public static final String VALIDATOR_FETCHED_OBJECT_IS_CRL = "validator.fetched.object.is.crl";
     public static final String VALIDATOR_MANIFEST_DOES_NOT_CONTAIN_FILE = "validator.manifest.does.not.contain.file";

@@ -29,19 +29,13 @@
  */
 package net.ripe.commons.certification.validation;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.joda.time.DateTimeUtils;
+
+import java.io.Serializable;
+import java.util.*;
 
 public class ValidationResult implements Serializable {
 
@@ -73,8 +67,16 @@ public class ValidationResult implements Serializable {
 		checksForStatus.add(new ValidationCheck(status, key, param));
 	}
 
+    public void pass(String key, String... param) {
+        setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+    }
+
     public void warn(String key, String... param) {
         setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
+    }
+
+    public void error(String key, String... param) {
+        setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
     }
 
 	public boolean warnIfFalse(boolean condition, String key, String... param) {
@@ -94,7 +96,6 @@ public class ValidationResult implements Serializable {
 	public boolean warnIfNull(Object object, String key, String... param) {
 		return warnIfTrue(object == null, key, param);
 	}
-
 
     public void rejectForLocation(ValidationLocation location, String key, String... param) {
         ValidationLocation locationBefore = currentLocation;
