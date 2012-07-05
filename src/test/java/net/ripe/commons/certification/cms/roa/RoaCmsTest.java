@@ -34,6 +34,7 @@ import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelp
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +43,9 @@ import javax.security.auth.x500.X500Principal;
 
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;
 
 import org.joda.time.DateTime;
@@ -57,6 +59,7 @@ public class RoaCmsTest {
 
     public static final X500Principal TEST_DN = new X500Principal("CN=Test");
     public static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
+    public static final URI TEST_ROA_LOCATION = URI.create("rsync://certificate/repository/filename.roa");
 
     private List<RoaPrefix> ipv4Prefixes;
     private List<RoaPrefix> allPrefixes;
@@ -111,6 +114,9 @@ public class RoaCmsTest {
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         builder.withValidityPeriod(new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1)));
         builder.withResources(resources);
+        builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor[] {
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, TEST_ROA_LOCATION)
+        });
         return builder;
     }
 
