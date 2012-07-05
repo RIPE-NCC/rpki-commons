@@ -29,37 +29,14 @@
  */
 package net.ripe.commons.provisioning.cms;
 
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
-import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.*;
-import static org.bouncycastle.cms.CMSSignedGenerator.*;
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayInputStream;
-import java.security.cert.CertStore;
-import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
-
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.cms.*;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
@@ -68,6 +45,20 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertStore;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.commons.provisioning.ProvisioningObjectMother.CRL;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR;
+import static net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT;
+import static org.bouncycastle.cms.CMSSignedGenerator.DIGEST_SHA256;
+import static org.bouncycastle.cms.CMSSignedGenerator.ENCRYPTION_RSA;
+import static org.junit.Assert.*;
 
 public class ProvisioningCmsObjectBuilderTest {
 
@@ -146,7 +137,7 @@ public class ProvisioningCmsObjectBuilderTest {
         DEREncodable derObject = digestAlgorithms.getObjectAt(0);
         AlgorithmIdentifier algorithmId = AlgorithmIdentifier.getInstance(derObject.getDERObject());
 
-        assertEquals(DIGEST_SHA256, algorithmId.getObjectId().getId());
+        assertEquals(DIGEST_SHA256, algorithmId.getAlgorithm().getId());
     }
 
     /**

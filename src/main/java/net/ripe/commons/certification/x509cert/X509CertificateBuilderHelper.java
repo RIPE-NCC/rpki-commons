@@ -29,42 +29,25 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-
-import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
+
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.*;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
@@ -301,7 +284,7 @@ public final class X509CertificateBuilderHelper {
 
 	private void addSubjectKeyIdentifier(X509V3CertificateGenerator generator) {
 		try {
-			generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(publicKey));
+			generator.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(publicKey));
 		} catch (InvalidKeyException e) {
 			throw new X509ResourceCertificateBuilderException(e);
 		}
@@ -310,46 +293,39 @@ public final class X509CertificateBuilderHelper {
 	private void addAuthorityKeyIdentifier(X509V3CertificateGenerator generator) {
 		try {
 			generator.addExtension(
-					X509Extensions.AuthorityKeyIdentifier,
+					X509Extension.authorityKeyIdentifier,
 					false,
-					new AuthorityKeyIdentifierStructure(signingKeyPair
-							.getPublic()));
+					new AuthorityKeyIdentifierStructure(signingKeyPair.getPublic()));
 		} catch (InvalidKeyException e) {
 			throw new X509ResourceCertificateBuilderException(e);
 		}
 	}
 
 	private void addCaBit(X509V3CertificateGenerator generator) {
-		generator.addExtension(X509Extensions.BasicConstraints, true,
-				new BasicConstraints(ca));
+		generator.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(ca));
 	}
 
 	private void addKeyUsage(X509V3CertificateGenerator generator) {
-		generator.addExtension(X509Extensions.KeyUsage, true, new KeyUsage(
-				keyUsage));
+		generator.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
 	}
 
 	private void addAIA(X509V3CertificateGenerator generator) {
-		generator.addExtension(X509Extensions.AuthorityInfoAccess, false,
-				new AuthorityInformationAccess(new DERSequence(
-						authorityInformationAccess)));
+		generator.addExtension(X509Extension.authorityInfoAccess, false,
+				new AuthorityInformationAccess(new DERSequence(authorityInformationAccess)));
 	}
 
 	private void addSIA(X509V3CertificateGenerator generator) {
-		generator.addExtension(X509Extensions.SubjectInfoAccess, false,
-				new AuthorityInformationAccess(new DERSequence(
-						subjectInformationAccess)));
+		generator.addExtension(X509Extension.subjectInfoAccess, false,
+				new AuthorityInformationAccess(new DERSequence(subjectInformationAccess)));
 	}
 
 	private void addCrlDistributionPoints(X509V3CertificateGenerator generator) {
 		CRLDistPoint crldp = convertToCrlDistributionPoint(crlDistributionPoints);
-		generator.addExtension(X509Extensions.CRLDistributionPoints, false,
-				crldp);
+		generator.addExtension(X509Extension.cRLDistributionPoints, false, crldp);
 	}
 
 	private void addPolicies(X509V3CertificateGenerator generator) {
-		generator.addExtension(X509Extensions.CertificatePolicies, true,
-				new DERSequence(policies));
+		generator.addExtension(X509Extension.certificatePolicies, true, new DERSequence(policies));
 	}
 
 	private void addResourceExtensions(X509V3CertificateGenerator generator) {
@@ -367,9 +343,7 @@ public final class X509CertificateBuilderHelper {
 
 		byte[] encodedASNs = encoder.encodeAsIdentifiers(inherit, resources);
 		if (encodedASNs != null) {
-			generator.addExtension(
-					ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true,
-					encodedASNs);
+			generator.addExtension(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true,encodedASNs);
 		}
 	}
 
@@ -379,15 +353,12 @@ public final class X509CertificateBuilderHelper {
 	private CRLDistPoint convertToCrlDistributionPoint(URI[] uris) {
 		ASN1Encodable[] seq = new ASN1Encodable[uris.length];
 		for (int i = 0; i < uris.length; ++i) {
-			seq[i] = new GeneralName(GeneralName.uniformResourceIdentifier,
-					uris[i].toString());
+			seq[i] = new GeneralName(GeneralName.uniformResourceIdentifier, uris[i].toString());
 		}
 		GeneralNames names = new GeneralNames(new DERSequence(seq));
 		DistributionPointName distributionPoint = new DistributionPointName(
 				names);
-		DistributionPoint[] dps = { new DistributionPoint(distributionPoint,
-				null, null) };
+		DistributionPoint[] dps = { new DistributionPoint(distributionPoint, null, null) };
 		return new CRLDistPoint(dps);
 	}
-
 }

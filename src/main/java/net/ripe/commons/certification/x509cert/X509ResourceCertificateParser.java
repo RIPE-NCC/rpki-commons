@@ -29,20 +29,19 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper.*;
-
-import java.io.IOException;
-
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
+
+import java.io.IOException;
+
+import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
 
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
@@ -74,10 +73,10 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             return;
         }
 
-        result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(X509Extensions.CertificatePolicies.getId()), POLICY_EXT_CRITICAL);
+        result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(X509Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
 
         try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.CertificatePolicies.getId());
+            byte[] extensionValue = certificate.getExtensionValue(X509Extension.certificatePolicies.getId());
             if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
                 return;
             }

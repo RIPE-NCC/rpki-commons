@@ -38,7 +38,7 @@ import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -188,7 +188,7 @@ public class X509Crl implements CertificateRepositoryObject {
     public BigInteger getNumber() {
         DERInteger number;
         try {
-            byte[] extensionValue = getCrl().getExtensionValue(X509Extensions.CRLNumber.getId());
+            byte[] extensionValue = getCrl().getExtensionValue(X509Extension.cRLNumber.getId());
             if (extensionValue == null) {
                 return null;
             }

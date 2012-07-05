@@ -29,23 +29,20 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Extension;
-
-import java.security.cert.X509Certificate;
-
 import net.ripe.commons.certification.Asn1Util;
-
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509Extension;
 
 public final class X509CertificateUtil {
 
@@ -55,7 +52,7 @@ public final class X509CertificateUtil {
 
     public static byte[] getSubjectKeyIdentifier(X509Extension certificate) {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.SubjectKeyIdentifier.getId());
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.subjectKeyIdentifier.getId());
             if (extensionValue == null) {
                 return null;
             }
@@ -67,7 +64,7 @@ public final class X509CertificateUtil {
 
     public static byte[] getAuthorityKeyIdentifier(X509Extension certificate) {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.AuthorityKeyIdentifier.getId());
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.authorityKeyIdentifier.getId());
             if (extensionValue == null) {
                 return null;
             }

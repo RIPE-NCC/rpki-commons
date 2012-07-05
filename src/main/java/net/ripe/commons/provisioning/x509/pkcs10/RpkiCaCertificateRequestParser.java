@@ -29,12 +29,7 @@
  */
 package net.ripe.commons.provisioning.x509.pkcs10;
 
-import java.net.URI;
-import java.security.PublicKey;
-import java.util.Enumeration;
-
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
-
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
@@ -45,6 +40,10 @@ import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
+
+import java.net.URI;
+import java.security.PublicKey;
+import java.util.Enumeration;
 
 
 /**
@@ -107,7 +106,7 @@ public class RpkiCaCertificateRequestParser {
     private void extractSiaUris() throws RpkiCaCertificateRequestParserException {
         try {
             X509Extensions extensions = getPkcs9Extensions();
-            X509Extension extension = extensions.getExtension(X509Extensions.SubjectInfoAccess);
+            X509Extension extension = extensions.getExtension(X509Extension.subjectInfoAccess);
 
             DERSequence accessDescriptorSequence = (DERSequence) DERSequence.fromByteArray(extension.getValue().getOctets());
 

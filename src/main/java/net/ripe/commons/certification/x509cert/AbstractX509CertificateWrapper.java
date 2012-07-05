@@ -35,16 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import javax.security.auth.x500.X500Principal;
@@ -118,7 +109,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public boolean isCa() {
         try {
-            byte[] basicConstraintsExtension = certificate.getExtensionValue(X509Extensions.BasicConstraints.getId());
+            byte[] basicConstraintsExtension = certificate.getExtensionValue(X509Extension.basicConstraints.getId());
             if (basicConstraintsExtension == null) {
                 /**
                  * The Basic Constraints extension field [...] MUST be present when
@@ -180,7 +171,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public X509CertificateInformationAccessDescriptor[] getAuthorityInformationAccess() {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.AuthorityInfoAccess.getId());
+            byte[] extensionValue = certificate.getExtensionValue(X509Extension.authorityInfoAccess.getId());
             if (extensionValue == null) {
                 return null;
             }
@@ -210,7 +201,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public X509CertificateInformationAccessDescriptor[] getSubjectInformationAccess() {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.SubjectInfoAccess.getId());
+            byte[] extensionValue = certificate.getExtensionValue(X509Extension.subjectInfoAccess.getId());
             if (extensionValue == null) {
                 return null;
             }
@@ -228,7 +219,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public URI[] getCrlDistributionPoints() {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extensions.CRLDistributionPoints.getId());
+            byte[] extensionValue = certificate.getExtensionValue(X509Extension.cRLDistributionPoints.getId());
             if (extensionValue == null) {
                 return null;
             }
