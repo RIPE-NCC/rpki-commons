@@ -29,11 +29,12 @@
  */
 package net.ripe.commons.provisioning.payload;
 
+import net.ripe.certification.client.xml.XStreamXmlSerializer;
+import net.ripe.certification.client.xml.XStreamXmlSerializerBuilder;
+
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
 import com.thoughtworks.xstream.io.xml.XppDriver;
-import net.ripe.certification.client.xml.XStreamXmlSerializer;
-import net.ripe.certification.client.xml.XStreamXmlSerializerBuilder;
 
 public class ProvisioningPayloadXmlSerializerBuilder<T extends AbstractProvisioningPayload> extends XStreamXmlSerializerBuilder<T> {
 
@@ -41,6 +42,7 @@ public class ProvisioningPayloadXmlSerializerBuilder<T extends AbstractProvision
         super(objectType);
     }
 
+    @Override
     public XStreamXmlSerializer<T> build() {
         getXStream().processAnnotations(getObjectType());
 

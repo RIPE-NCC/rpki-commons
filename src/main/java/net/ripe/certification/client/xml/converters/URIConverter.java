@@ -36,18 +36,21 @@ import org.apache.commons.lang.StringUtils;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
+
 public class URIConverter extends AbstractSingleValueConverter {
 
-	@SuppressWarnings("rawtypes") 
+    @Override
+    @SuppressWarnings("rawtypes")
     public boolean canConvert(Class type) {
         return type.equals(URI.class);
     }
 
+    @Override
     public Object fromString(String str) {
-    	if (StringUtils.isEmpty(str)) {
-    		return null;
-    	} else {
-    		return URI.create(str);
-    	}
+        if (StringUtils.isEmpty(str)) {
+            return null;
+        } else {
+            return URI.create(str);
+        }
     }
 }

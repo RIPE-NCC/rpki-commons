@@ -29,12 +29,9 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import static net.ripe.commons.certification.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
-import static net.ripe.commons.certification.util.KeyPairFactoryTest.TEST_KEY_PAIR;
-import static net.ripe.commons.certification.validation.ValidationString.CERTIFICATE_PARSED;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
+import static net.ripe.commons.certification.validation.ValidationString.*;
+import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
@@ -94,7 +91,6 @@ public class X509ResourceCertificateParserTest {
         subject.parse("certificate", certificate.getEncoded());
         X509ResourceCertificate parsed = subject.getCertificate();
 
-        assertTrue(parsed instanceof X509ResourceCertificate);
         assertEquals(certificate, parsed);
     }
 

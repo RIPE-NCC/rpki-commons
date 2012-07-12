@@ -38,7 +38,8 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity>{
     public ChildIdentitySerializer() {
         super();
     }
-    
+
+    @Override
     public ChildIdentity deserialize(String xml) {
         return (ChildIdentity) xStream.fromXML(xml);
     }

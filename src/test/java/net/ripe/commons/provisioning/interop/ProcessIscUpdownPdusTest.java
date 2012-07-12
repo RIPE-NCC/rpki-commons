@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.ripe.commons.certification.Asn1Util;
@@ -60,8 +59,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.HexDump;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
 import org.junit.Test;
 
 

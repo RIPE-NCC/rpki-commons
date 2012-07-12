@@ -74,7 +74,7 @@ public class ProvisioningCmsObject {
     public X509Certificate getCmsCertificate() {
         return cmsCertificate;
     }
-    
+
     public AbstractProvisioningPayload getPayload() {
         return payload;
     }
@@ -107,11 +107,11 @@ public class ProvisioningCmsObject {
             SignerInformationStore sis = cmsSignedData.getSignerInfos();
 
             @SuppressWarnings("unchecked")
-            Collection<SignerInformation> signers = (Collection<SignerInformation>) sis.getSigners();
+            Collection<SignerInformation> signers = sis.getSigners();
             for (SignerInformation signerInformation : signers) {
                 AttributeTable signedAttributes = signerInformation.getSignedAttributes();
                 Attribute signingTime = signedAttributes.get(CMSAttributes.signingTime);
-                
+
                 @SuppressWarnings("unchecked")
                 Enumeration<Object> en = signingTime.getAttrValues().getObjects();
                 while (en.hasMoreElements()) {
