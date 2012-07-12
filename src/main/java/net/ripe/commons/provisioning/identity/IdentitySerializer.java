@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import net.ripe.certification.client.xml.converters.URIConverter;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.Sun14ReflectionProvider;
 import com.thoughtworks.xstream.io.xml.QNameMap;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
@@ -57,7 +58,7 @@ public abstract class IdentitySerializer<T> {
 
         XmlFriendlyReplacer replacer = new XmlFriendlyReplacer("_-", "_");
 
-        xStream = new XStream(new StaxDriver(qNameMap, replacer)) {
+        xStream = new XStream(new Sun14ReflectionProvider(), new StaxDriver(qNameMap, replacer)) {
             @Override
             protected MapperWrapper wrapMapper(MapperWrapper next) {
                 return new IgnoreUnknownFieldsMapperWrapper(next);
