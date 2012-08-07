@@ -29,9 +29,6 @@
  */
 package net.ripe.commons.certification.validation.roa;
 
-import java.util.List;
-
-import net.ripe.commons.certification.cms.roa.Roa;
 import net.ripe.ipresource.IpRange;
 
 
@@ -40,17 +37,10 @@ import net.ripe.ipresource.IpRange;
  */
 public class RouteOriginValidationPolicy {
 
-    /**
-     * Precondition: roas are valid
-     */
-    public RouteValidityState determineRouteValidityState(AnnouncedRoute route, List<? extends Roa> roas) {
-        return determineRouteValidityState(RtrPrefix.getAll(roas), route);
-    }
-
-    public RouteValidityState determineRouteValidityState(List<RtrPrefix> rtrPrefixes, AnnouncedRoute route) {
+    public RouteValidityState validateAnnouncedRoute(Iterable<? extends AllowedRoute> allowedRoutes, AnnouncedRoute announcedRoute) {
         RouteValidityState result = RouteValidityState.UNKNOWN;
-        for (RtrPrefix rtrPrefix : rtrPrefixes) {
-            switch (validateForRtrPrefix(route, rtrPrefix)) {
+        for (AllowedRoute allowedRoute : allowedRoutes) {
+            switch (validate(allowedRoute, announcedRoute)) {
             case VALID:
                 return RouteValidityState.VALID;
             case INVALID:
@@ -63,34 +53,14 @@ public class RouteOriginValidationPolicy {
         return result;
     }
 
-    /**
-     * Precondition: roa is valid
-     */
-    // public RouteValidityState determineRouteValidityState(AnnouncedRoute
-    // route, Roa roa) {
-    // RouteValidityState result = RouteValidityState.UNKNOWN;
-    // for(RoaPrefix roaPrefix: roa.getPrefixes()) {
-    // RouteValidityState prefixValidationResult = validateRoaPrefix(route,
-    // roaPrefix, roa.getAsn());
-    // if (prefixValidationResult == RouteValidityState.VALID) {
-    // return RouteValidityState.VALID;
-    // } else if (prefixValidationResult == RouteValidityState.INVALID) {
-    // result = prefixValidationResult;
-    // }
-    // }
-    // return result;
-    // }
+    private RouteValidityState validate(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
+        IpRange announcedPrefix = announcedRoute.getPrefix();
 
-    private RouteValidityState validateForRtrPrefix(AnnouncedRoute route, RtrPrefix rtrPrefix) {
-        
-        IpRange announcedPrefix = route.getPrefix();
-        
-        if (!rtrPrefix.prefix.contains(announcedPrefix)) { // non-intersecting
-                                                           // or
-                                                           // covering-aggregate
+        if (!allowedRoute.getPrefix().contains(announcedPrefix)) {
+            // non-intersecting or covering-aggregate
             return RouteValidityState.UNKNOWN;
-        } else if (announcedPrefix.getPrefixLength() <= rtrPrefix.maxLength) {
-            if (route.getOriginAsn() != null && rtrPrefix.asn.equals(route.getOriginAsn())) {
+        } else if (announcedPrefix.getPrefixLength() <= allowedRoute.getMaximumLength()) {
+            if (allowedRoute.getAsn().equals(announcedRoute.getOriginAsn())) {
                 return RouteValidityState.VALID;
             } else {
                 return RouteValidityState.INVALID;

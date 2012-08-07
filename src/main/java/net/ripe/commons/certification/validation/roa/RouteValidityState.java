@@ -30,7 +30,5 @@
 package net.ripe.commons.certification.validation.roa;
 
 public enum RouteValidityState {
-
     VALID, INVALID, UNKNOWN
-    
 }

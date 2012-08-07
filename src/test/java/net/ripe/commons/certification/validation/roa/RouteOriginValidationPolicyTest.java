@@ -50,9 +50,9 @@ public class RouteOriginValidationPolicyTest {
 
     private RouteOriginValidationPolicy subject;
 
-    static List<RtrPrefix> roa(RoaPrefix... roaPrefixes) {
+    static List<AllowedRoute> roa(RoaPrefix... roaPrefixes) {
         RoaCms roa = RoaCmsTest.createRoaCms(Arrays.asList(roaPrefixes));
-        return RtrPrefix.getAll(Collections.singletonList(roa));
+        return AllowedRoute.fromRoas(Collections.singletonList(roa));
     }
 
     @Before
@@ -112,10 +112,10 @@ public class RouteOriginValidationPolicyTest {
 
     @Test
     public void routes_with_any_matching_prefix_and_ASN_should_be_VALID() {
-        List<RtrPrefix> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("192.169.0.0/16"), 20));
+        List<AllowedRoute> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("192.169.0.0/16"), 20));
         
         AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20"));
-        RouteValidityState validityStateFound = subject.determineRouteValidityState(prefixes, route);
+        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(prefixes, route);
         assertEquals(RouteValidityState.VALID, validityStateFound);
         
     }
@@ -123,28 +123,28 @@ public class RouteOriginValidationPolicyTest {
     @Test
     public void routes_with_at_least_one_valid_roa_should_be_VALID() {
         
-        List<RtrPrefix> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
+        List<AllowedRoute> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
         
         AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20"));
-        RouteValidityState validityStateFound = subject.determineRouteValidityState(prefixes, route);
+        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(prefixes, route);
         assertEquals(RouteValidityState.VALID, validityStateFound);
     }
 
     @Test
     public void routes_with_at_least_one_invalid_roa_and_without_valid_roas_should_be_INVALID() {
         
-        List<RtrPrefix> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
+        List<AllowedRoute> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
         
         AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/24"));
-        RouteValidityState validityStateFound = subject.determineRouteValidityState(prefixes, route);
+        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(prefixes, route);
         assertEquals(RouteValidityState.INVALID, validityStateFound);
         
     }
     
     private void testValidatityDetermination(String roaIpPrefix, int roaMaxLength, Asn routeAsn, String routePrefix, RouteValidityState expectedResult) {
-        List<RtrPrefix> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
+        List<AllowedRoute> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
         AnnouncedRoute route = new AnnouncedRoute(routeAsn, IpRange.parse(routePrefix));
-        RouteValidityState validityStateFound = subject.determineRouteValidityState(rtrPrefixes,route);
+        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(rtrPrefixes,route);
         assertEquals(expectedResult, validityStateFound);
     }
 

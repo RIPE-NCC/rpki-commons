@@ -29,22 +29,28 @@
  */
 package net.ripe.commons.certification.validation.roa;
 
+import java.io.Serializable;
+
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 
 import org.apache.commons.lang.Validate;
 
-public class AnnouncedRoute extends EqualsSupport {
+/**
+ * A route announced on BGP.
+ */
+public class AnnouncedRoute extends EqualsSupport implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private final IpRange prefix;
     private final Asn originAsn;
+    private final IpRange prefix;
 
     public AnnouncedRoute(Asn originAsn, IpRange prefix) {
         Validate.notNull(originAsn, "origin is required");
         Validate.isTrue(prefix.isLegalPrefix(), "Prefix must be legal");
-        this.prefix = prefix;
         this.originAsn = originAsn;
+        this.prefix = prefix;
     }
 
     public Asn getOriginAsn() {
