@@ -34,6 +34,7 @@ import java.io.Serializable;
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.IpRange;
 
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.hibernate.validator.AssertTrue;
@@ -49,6 +50,7 @@ public class RoaPrefix extends EqualsSupport implements Serializable {
     }
 
     public RoaPrefix(IpRange prefix, Integer maximumLength) {
+        Validate.notNull(prefix, "prefix is required");
         this.prefix = prefix;
         this.maximumLength = maximumLength;
     }
@@ -72,7 +74,7 @@ public class RoaPrefix extends EqualsSupport implements Serializable {
 
     @AssertTrue
     public boolean isValidPrefix() {
-        return getPrefix().isLegalPrefix();
+        return prefix.isLegalPrefix();
     }
 
     @Override
