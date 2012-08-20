@@ -39,21 +39,47 @@ public class RoaPrefixTest {
 
     @Test
     public void shouldEnsureIpAddressIsValidPrefix() {
-        assertTrue(new RoaPrefix(IpRange.parse("10.0.0.0/8"), null).isValidPrefix());
-        assertFalse(new RoaPrefix(IpRange.parse("10.0.0.0-10.0.2.1"), null).isValidPrefix());
+        new RoaPrefix(IpRange.parse("10.0.0.0/8"), null);
+        try {
+            new RoaPrefix(IpRange.parse("10.0.0.0-10.0.2.1"), null);
+            fail("ROA prefix requires legal prefix");
+        } catch (IllegalArgumentException expected) {
+        }
     }
 
     @Test
     public void shouldEnsureMaximumLengthValidity() {
-        assertTrue(new RoaPrefix(IpRange.parse("10.0.0.0/8"), null).isMaximumLengthValid());
-        assertFalse(new RoaPrefix(IpRange.parse("10.0.0.0/8"), -1).isMaximumLengthValid());
-        assertTrue(new RoaPrefix(IpRange.parse("10.0.0.0/8"), 8).isMaximumLengthValid());
-        assertTrue(new RoaPrefix(IpRange.parse("10.0.0.0/8"), 17).isMaximumLengthValid());
-        assertTrue(new RoaPrefix(IpRange.parse("10.0.0.0/8"), 32).isMaximumLengthValid());
-        assertTrue(new RoaPrefix(IpRange.parse("ffe0::/16"), 128).isMaximumLengthValid());
-        assertFalse(new RoaPrefix(IpRange.parse("10.0.0.0/8"), 0).isMaximumLengthValid());
-        assertFalse(new RoaPrefix(IpRange.parse("10.0.0.0/8"), 7).isMaximumLengthValid());
-        assertFalse(new RoaPrefix(IpRange.parse("10.0.0.0/8"), 33).isMaximumLengthValid());
-        assertFalse(new RoaPrefix(IpRange.parse("ffe0::/16"), 129).isMaximumLengthValid());
+        new RoaPrefix(IpRange.parse("10.0.0.0/8"), null);
+        try {
+            new RoaPrefix(IpRange.parse("10.0.0.0/8"), -1);
+            fail("maximum length invalid");
+        } catch (IllegalArgumentException expected) {
+        }
+
+        new RoaPrefix(IpRange.parse("10.0.0.0/8"), 8);
+        new RoaPrefix(IpRange.parse("10.0.0.0/8"), 17);
+        new RoaPrefix(IpRange.parse("10.0.0.0/8"), 32);
+        new RoaPrefix(IpRange.parse("ffe0::/16"), 128);
+
+        try {
+            new RoaPrefix(IpRange.parse("10.0.0.0/8"), 0);
+            fail("maximum length invalid");
+        } catch (IllegalArgumentException expected) {
+        }
+        try {
+            new RoaPrefix(IpRange.parse("10.0.0.0/8"), 7);
+            fail("maximum length invalid");
+        } catch (IllegalArgumentException expected) {
+        }
+        try {
+            new RoaPrefix(IpRange.parse("10.0.0.0/8"), 33);
+            fail("maximum length invalid");
+        } catch (IllegalArgumentException expected) {
+        }
+        try {
+            new RoaPrefix(IpRange.parse("ffe0::/16"), 129);
+            fail("maximum length invalid");
+        } catch (IllegalArgumentException expected) {
+        }
     }
 }

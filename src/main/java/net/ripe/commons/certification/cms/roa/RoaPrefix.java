@@ -37,7 +37,6 @@ import net.ripe.ipresource.IpRange;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.hibernate.validator.AssertTrue;
 
 public class RoaPrefix extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -51,6 +50,10 @@ public class RoaPrefix extends EqualsSupport implements Serializable {
 
     public RoaPrefix(IpRange prefix, Integer maximumLength) {
         Validate.notNull(prefix, "prefix is required");
+        Validate.isTrue(prefix.isLegalPrefix(), "prefix is not a legal prefix");
+        Validate.isTrue(maximumLength == null || (maximumLength >= prefix.getPrefixLength() && maximumLength <= prefix.getType().getBitSize()),
+                "maximum length not in range");
+
         this.prefix = prefix;
         this.maximumLength = maximumLength;
     }
@@ -65,16 +68,6 @@ public class RoaPrefix extends EqualsSupport implements Serializable {
 
     public int getEffectiveMaximumLength() {
         return maximumLength != null ? maximumLength : getPrefix().getPrefixLength();
-    }
-
-    @AssertTrue
-    public boolean isMaximumLengthValid() {
-        return maximumLength == null || (maximumLength >= getPrefix().getPrefixLength() && maximumLength <= getPrefix().getType().getBitSize());
-    }
-
-    @AssertTrue
-    public boolean isValidPrefix() {
-        return prefix.isLegalPrefix();
     }
 
     @Override
