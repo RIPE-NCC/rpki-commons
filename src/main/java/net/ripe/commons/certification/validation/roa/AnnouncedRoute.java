@@ -30,6 +30,7 @@
 package net.ripe.commons.certification.validation.roa;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.Asn;
@@ -42,6 +43,15 @@ import org.apache.commons.lang.Validate;
  */
 public class AnnouncedRoute extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final Comparator<AnnouncedRoute> ASN_PREFIX_COMPARATOR = new Comparator<AnnouncedRoute>() {
+        @Override
+        public int compare(AnnouncedRoute o1, AnnouncedRoute o2) {
+            int rc = o1.getOriginAsn().compareTo(o2.getOriginAsn());
+            if (rc != 0) return rc;
+            return o1.getPrefix().compareTo(o2.getPrefix());
+        }
+    };
 
     private final Asn originAsn;
     private final IpRange prefix;
@@ -60,5 +70,4 @@ public class AnnouncedRoute extends EqualsSupport implements Serializable {
     public IpRange getPrefix() {
         return prefix;
     }
-
 }
