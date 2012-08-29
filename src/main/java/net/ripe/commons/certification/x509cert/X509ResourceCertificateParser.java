@@ -85,7 +85,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 return;
             }
             PolicyInformation policy = PolicyInformation.getInstance(policies.getObjectAt(0));
-            result.rejectIfFalse(policy.getPolicyQualifiers() == null, POLICY_QUALIFIER);
+
             if (!result.rejectIfNull(policy.getPolicyIdentifier(), POLICY_ID_PRESENT)) {
                 return;
             }
