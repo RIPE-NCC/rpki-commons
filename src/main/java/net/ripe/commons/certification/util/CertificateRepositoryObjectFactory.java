@@ -54,12 +54,6 @@ public final class CertificateRepositoryObjectFactory {
             return result;
         }
 
-        // Try to parse as ROA
-        result = tryParseAsROA(encoded);
-        if (result != null) {
-            return result;
-        }
-
         // Try to parse as manifest
         result = tryParseAsManifest(encoded);
         if (result != null) {
@@ -67,6 +61,12 @@ public final class CertificateRepositoryObjectFactory {
         }
 
         result = tryParseAsCrl(encoded);
+        if (result != null) {
+            return result;
+        }
+
+        // Try to parse as ROA
+        result = tryParseAsROA(encoded);
         if (result != null) {
             return result;
         }
