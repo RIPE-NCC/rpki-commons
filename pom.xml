@@ -27,7 +27,7 @@
     </distributionManagement>
 
     <properties>
-        <net.ripe.commons.internet-resources.version>1.41-SNAPSHOT</net.ripe.commons.internet-resources.version>
+        <net.ripe.commons.internet-resources.version>1.41</net.ripe.commons.internet-resources.version>
 
         <dist.repo.url>nexus.ripe.net</dist.repo.url>
         <dist.repo.snapshot.url>nexus.ripe.net</dist.repo.snapshot.url>
