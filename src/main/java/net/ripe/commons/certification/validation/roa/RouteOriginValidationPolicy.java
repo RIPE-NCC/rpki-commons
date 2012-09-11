@@ -29,7 +29,13 @@
  */
 package net.ripe.commons.certification.validation.roa;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.etree.IpResourceIntervalStrategy;
+import net.ripe.ipresource.etree.NestedIntervalMap;
 
 
 /**
@@ -37,17 +43,34 @@ import net.ripe.ipresource.IpRange;
  */
 public class RouteOriginValidationPolicy {
 
-    public RouteValidityState validateAnnouncedRoute(Iterable<? extends AllowedRoute> allowedRoutes, AnnouncedRoute announcedRoute) {
+    public static NestedIntervalMap<IpResource, List<AllowedRoute>> allowedRoutesToNestedIntervalMap(Iterable<? extends AllowedRoute> allowedRoutes) {
+        NestedIntervalMap<IpResource, List<AllowedRoute>> result = new NestedIntervalMap<IpResource, List<AllowedRoute>>(IpResourceIntervalStrategy.getInstance());
+        for (AllowedRoute allowedRoute: allowedRoutes) {
+            List<AllowedRoute> allowed  = result.findExact(allowedRoute.getPrefix());
+            if (allowed == null) {
+                List<AllowedRoute> list = new LinkedList<AllowedRoute>();
+                list.add(allowedRoute);
+                result.put(allowedRoute.getPrefix(), list);
+            } else {
+                allowed.add(allowedRoute);
+            }
+        }
+        return result;
+    }
+
+    public RouteValidityState validateAnnouncedRoute(NestedIntervalMap<IpResource, ? extends Iterable<? extends AllowedRoute>> allowedRoutes, AnnouncedRoute announcedRoute) {
         RouteValidityState result = RouteValidityState.UNKNOWN;
-        for (AllowedRoute allowedRoute : allowedRoutes) {
-            switch (validate(allowedRoute, announcedRoute)) {
-            case VALID:
-                return RouteValidityState.VALID;
-            case INVALID:
-                result = RouteValidityState.INVALID;
-                break;
-            case UNKNOWN:
-                break;
+        for (Iterable<? extends AllowedRoute> routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.getPrefix())) {
+            for (AllowedRoute allowedRoute : routes) {
+                switch (validate(allowedRoute, announcedRoute)) {
+                case VALID:
+                    return RouteValidityState.VALID;
+                case INVALID:
+                    result = RouteValidityState.INVALID;
+                    break;
+                case UNKNOWN:
+                    break;
+                }
             }
         }
         return result;
