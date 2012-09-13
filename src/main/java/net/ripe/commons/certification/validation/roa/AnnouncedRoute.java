@@ -32,7 +32,6 @@ package net.ripe.commons.certification.validation.roa;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 
@@ -41,14 +40,16 @@ import org.apache.commons.lang.Validate;
 /**
  * A route announced on BGP.
  */
-public class AnnouncedRoute extends EqualsSupport implements Serializable {
+public final class AnnouncedRoute implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static final Comparator<AnnouncedRoute> ASN_PREFIX_COMPARATOR = new Comparator<AnnouncedRoute>() {
         @Override
         public int compare(AnnouncedRoute o1, AnnouncedRoute o2) {
             int rc = o1.getOriginAsn().compareTo(o2.getOriginAsn());
-            if (rc != 0) return rc;
+            if (rc != 0) {
+                return rc;
+            }
             return o1.getPrefix().compareTo(o2.getPrefix());
         }
     };
@@ -69,5 +70,31 @@ public class AnnouncedRoute extends EqualsSupport implements Serializable {
 
     public IpRange getPrefix() {
         return prefix;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + originAsn.hashCode();
+        result = prime * result + prefix.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        AnnouncedRoute that = (AnnouncedRoute) obj;
+        return this.originAsn.equals(that.originAsn) && this.prefix.equals(that.prefix);
+    }
+
+    @Override
+    public String toString() {
+        return "AnnouncedRoute [originAsn=" + originAsn + ", prefix=" + prefix + "]";
     }
 }
