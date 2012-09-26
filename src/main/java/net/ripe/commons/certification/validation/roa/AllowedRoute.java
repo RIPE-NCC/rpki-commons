@@ -32,13 +32,11 @@ package net.ripe.commons.certification.validation.roa;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.ripe.commons.certification.cms.roa.Roa;
 import net.ripe.commons.certification.cms.roa.RoaPrefix;
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
-
 import org.apache.commons.lang.Validate;
 
 
@@ -81,5 +79,14 @@ public class AllowedRoute extends EqualsSupport implements Serializable {
 
     public int getMaximumLength() {
         return maximumLength;
+    }
+
+    public AnnouncedRoute getAnnouncedRoute() {
+        return new AnnouncedRoute(asn, prefix);
+    }
+
+    public RoaPrefix getRoaPrefix() {
+        Integer maxLen = prefix.getPrefixLength() == maximumLength ? null : maximumLength;
+        return new RoaPrefix(prefix, maxLen);
     }
 }
