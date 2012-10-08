@@ -316,13 +316,17 @@ public class ManifestCmsTest{
     }
 
     public static ManifestCmsBuilder getRootManifestBuilder() {
-		ManifestCmsBuilder builder = new ManifestCmsBuilder();
-		builder.withCertificate(getManifestEEResourceCertificateBuilder(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME)).build());
-		builder.withManifestNumber(BigInteger.valueOf(68));
-		builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
-		builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-		return builder;
+        return getRootManifestBuilder(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
 	}
+
+    public static ManifestCmsBuilder getRootManifestBuilder(ValidityPeriod validityPeriod) {
+        ManifestCmsBuilder builder = new ManifestCmsBuilder();
+        builder.withCertificate(getManifestEEResourceCertificateBuilder(validityPeriod).build());
+        builder.withManifestNumber(BigInteger.valueOf(68));
+        builder.withThisUpdateTime(validityPeriod.getNotValidBefore()).withNextUpdateTime(validityPeriod.getNotValidAfter());
+        builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+        return builder;
+    }
 
 	private static X509ResourceCertificateBuilder getManifestEEResourceCertificateBuilder(ValidityPeriod validityPeriod) {
 		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
