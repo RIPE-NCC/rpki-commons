@@ -33,12 +33,14 @@ import static net.ripe.commons.certification.validation.ValidationString.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.security.cert.*;
-
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -56,23 +58,36 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     protected ValidationResult result;
 
     protected X509CertificateParser(ValidationResult result) {
-		this.result = result;
+        this.result = result;
     }
 
-	public void parse(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
+    public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
-        
+
         ValidationLocation validationLocation = new ValidationLocation(location);
-		result.setLocation(validationLocation);
+        result.setLocation(validationLocation);
 
         parse();
         if (!result.hasFailureForLocation(validationLocation)) {
             validateSignatureAlgorithm();
+            validatePublicKey();
             doTypeSpecificValidation();
         }
     }
 
-	protected void doTypeSpecificValidation() {     
+    private void validatePublicKey() {
+        PublicKey publicKey = certificate.getPublicKey();
+        result.rejectIfFalse(
+                "RSA".equals(publicKey.getAlgorithm()) && publicKey instanceof RSAPublicKey,
+                PUBLIC_KEY_CERT_ALGORITHM,
+                publicKey.getAlgorithm());
+        if (publicKey instanceof RSAPublicKey) {
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
+            result.warnIfFalse(2048 == rsaPublicKey.getModulus().bitLength(), PUBLIC_KEY_CERT_SIZE, String.valueOf(rsaPublicKey.getModulus().bitLength()));
+        }
+    }
+
+    protected void doTypeSpecificValidation() {
     }
 
     public ValidationResult getValidationResult() {
@@ -102,9 +117,9 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
 
     private void validateSignatureAlgorithm() {
-        result.rejectIfFalse(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM);
+        result.rejectIfFalse(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM, certificate.getSigAlgOID());
     }
-    
+
     protected boolean isResourceExtensionPresent() {
         if (certificate.getCriticalExtensionOIDs() == null) {
             return false;

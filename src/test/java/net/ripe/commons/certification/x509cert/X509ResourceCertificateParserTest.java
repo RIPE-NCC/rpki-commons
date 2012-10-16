@@ -36,9 +36,7 @@ import static org.junit.Assert.*;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.validation.ValidationCheck;
@@ -46,7 +44,6 @@ import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationStatus;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -119,5 +116,16 @@ public class X509ResourceCertificateParserTest {
 
         assertTrue(subject.getValidationResult().hasFailures());
         assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
+    }
+
+    @Test
+    public void should_validate_key_algorithm_and_size() {
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        X509ResourceCertificate certificate = builder.build();
+
+        subject.parse("certificate", certificate.getEncoded());
+
+        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
+        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
     }
 }

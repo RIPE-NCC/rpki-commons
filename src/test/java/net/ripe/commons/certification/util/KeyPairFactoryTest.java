@@ -36,9 +36,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
-
-import net.ripe.commons.certification.util.KeyPairFactory;
-
 import org.junit.Test;
 
 
@@ -72,6 +69,10 @@ public class KeyPairFactoryTest {
 
         assertEquals(keyPair.getPublic(), KeyPairFactory.getInstance().decodePublicKey(keyPair.getPublic().getEncoded()));
         assertEquals(keyPair.getPrivate(), KeyPairFactory.getInstance().decodePrivateKey(keyPair.getPrivate().getEncoded()));
+
+        RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
+        assertEquals("RSA", rsaPublicKey.getAlgorithm());
+        assertEquals(512, rsaPublicKey.getModulus().bitLength());
     }
 
     @Test(expected=RuntimeException.class)
