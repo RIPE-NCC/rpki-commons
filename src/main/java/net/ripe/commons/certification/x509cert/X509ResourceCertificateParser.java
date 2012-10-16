@@ -39,7 +39,9 @@ import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.ipresource.IpResourceSet;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -89,9 +91,25 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
     private boolean isValidName(X500Name principal) {
         // RCF6487 section 4.4 and 4.5.
-        RDN[] cns = principal.getRDNs(BCStyle.CN);
+        return hasOneValidCn(principal) && mayHaveOneValidSerialNumber(principal);
+    }
+
+    public boolean mayHaveOneValidSerialNumber(X500Name principal) {
         RDN[] serialNumbers = principal.getRDNs(BCStyle.SERIALNUMBER);
-        return cns.length == 1 && isPrintableString(cns[0].getFirst().getValue().toString()) && serialNumbers.length <= 1;
+        return serialNumbers.length <= 1;
+    }
+
+    private boolean hasOneValidCn(X500Name principal) {
+        RDN[] cns = principal.getRDNs(BCStyle.CN);
+        if (cns.length != 1) {
+            return false;
+        }
+        AttributeTypeAndValue firstCn = cns[0].getFirst();
+        if (firstCn == null) {
+            return false;
+        }
+        ASN1Encodable firstCnValue = firstCn.getValue();
+        return firstCnValue != null && isPrintableString(firstCnValue.toString());
     }
 
     private boolean isPrintableString(String s) {
