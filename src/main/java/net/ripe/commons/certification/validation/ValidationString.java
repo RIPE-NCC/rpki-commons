@@ -91,6 +91,8 @@ public final class ValidationString {
     public static final String RESOURCE_EXT_NOT_PRESENT = "cert.resource.ext.not.present";
     public static final String AS_OR_IP_RESOURCE_PRESENT = "cert.as.or.ip.resource.present";
     public static final String PARTIAL_INHERITANCE = "cert.partial.resource.inheritance";
+    public static final String CERT_ISSUER_CORRECT = "cert.issuer.correct";
+    public static final String CERT_SUBJECT_CORRECT = "cert.subject.correct";
 
     //cms object
     public static final String CMS_DATA_PARSING = "cms.signed.data.parsing";

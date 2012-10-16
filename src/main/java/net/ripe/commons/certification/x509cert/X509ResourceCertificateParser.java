@@ -33,6 +33,8 @@ import static net.ripe.commons.certification.validation.ValidationString.*;
 import static net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper.*;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationResult;
@@ -44,6 +46,9 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
+
+    // ASN.1 PrintableString type
+    private final static Pattern PRINTABLE_STRING = Pattern.compile("[-A-Za-z0-9 '()+,./:=?]+");
 
     public X509ResourceCertificateParser() {
         this(new ValidationResult());
@@ -63,8 +68,24 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
     @Override
     protected void doTypeSpecificValidation() {
+        validateIssuerAndSubjectDN();
         validateCertificatePolicy();
         validateResourceExtensionsForResourceCertificates();
+    }
+
+    private void validateIssuerAndSubjectDN() {
+        getValidationResult().warnIfFalse(isValidName(certificate.getIssuerX500Principal()), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
+        getValidationResult().warnIfFalse(isValidName(certificate.getSubjectX500Principal()), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
+    }
+
+    private boolean isValidName(X500Principal principal) {
+        // RCF6487 section 4.4 and 4.5.
+        // FIXME check correct use of CN and SERIALNUMBER attributes, instead of simple regex match for valid characters.
+        return isPrintableString(principal.toString());
+    }
+
+    private boolean isPrintableString(String s) {
+        return PRINTABLE_STRING.matcher(s).matches();
     }
 
     private void validateCertificatePolicy() {
