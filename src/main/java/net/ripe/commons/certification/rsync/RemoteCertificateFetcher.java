@@ -32,12 +32,11 @@ package net.ripe.commons.certification.rsync;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
-
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.util.CertificateRepositoryObjectFactory;
+import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-
 import org.apache.commons.io.FileUtils;
 
 public class RemoteCertificateFetcher {
@@ -77,7 +76,7 @@ public class RemoteCertificateFetcher {
             int rc = rsync.execute();
             if (rc == 0) {
                 byte[] encoded = FileUtils.readFileToByteArray(tempDestinationFile);
-                return CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded);
+                return CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, new ValidationResult());
             }
             return null;
         } catch (IOException e) {

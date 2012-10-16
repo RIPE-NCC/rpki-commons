@@ -29,6 +29,19 @@
  */
 package net.ripe.commons.certification.cms;
 
+import static net.ripe.commons.certification.cms.RpkiSignedObject.*;
+import static net.ripe.commons.certification.validation.ValidationString.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
@@ -40,20 +53,13 @@ import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.*;
-import java.util.Collection;
-
-import static net.ripe.commons.certification.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
-import static net.ripe.commons.certification.cms.RpkiSignedObject.ENCRYPTION_ALGORITHM_OID;
-import static net.ripe.commons.certification.validation.ValidationString.*;
 
 
 public abstract class RpkiSignedObjectParser {
@@ -68,8 +74,6 @@ public abstract class RpkiSignedObjectParser {
 
     private ValidationResult validationResult;
 
-    private String location;
-
     protected RpkiSignedObjectParser() {
         validationResult = new ValidationResult();
     }
@@ -78,10 +82,14 @@ public abstract class RpkiSignedObjectParser {
         this.validationResult = result;
     }
 
-    public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
-        this.location = location;
+    @Deprecated
+    public final void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
+        parse(new ValidationLocation(location), encoded);
+    }
+
+    public void parse(ValidationLocation location, byte[] encoded) {
         this.encoded = encoded;
-        validationResult.setLocation(new ValidationLocation(location));
+        validationResult.setLocation(location);
         parseCms();
     }
 
@@ -162,21 +170,24 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        certificate = parseCertificate(certificates);
+        certificate = parseCertificate(certificates.iterator().next());
+        if (validationResult.hasFailureForCurrentLocation()) {
+            return;
+        }
 
         validationResult.rejectIfFalse(certificate.isEe(), CERT_IS_EE_CERT);
         validationResult.rejectIfNull(certificate.getSubjectKeyIdentifier(), CERT_HAS_SKI);
     }
 
-    private X509ResourceCertificate parseCertificate(Collection<? extends Certificate> certificates) {
-        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+    private X509ResourceCertificate parseCertificate(Certificate certificate) {
         try {
-            X509Certificate x509certificate = (X509Certificate) certificates.iterator().next();
-            parser.parse(location, x509certificate.getEncoded());
+            X509Certificate x509certificate = (X509Certificate) certificate;
+            X509ResourceCertificateParser parser = new X509ResourceCertificateParser(validationResult);
+            parser.parse(validationResult.getCurrentLocation(), x509certificate.getEncoded());
+            return parser.isSuccess() ? parser.getCertificate() : null;
         } catch (CertificateEncodingException e) {
-            throw new AbstractX509CertificateWrapperException(e);
+            throw new AbstractX509CertificateWrapperException("cannot parse already decoded X509 certificate: " + e, e);
         }
-        return parser.getCertificate();
     }
 
     private Collection<? extends Certificate> extractCertificate(CMSSignedDataParser sp) {
@@ -280,4 +291,5 @@ public abstract class RpkiSignedObjectParser {
             validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION);
         }
     }
+
 }

@@ -31,8 +31,8 @@ package net.ripe.commons.certification.validation;
 
 import java.io.Serializable;
 import java.net.URI;
-
 import net.ripe.commons.certification.util.EqualsSupport;
+import org.apache.commons.lang.Validate;
 
 
 /**
@@ -45,16 +45,17 @@ public class ValidationLocation extends EqualsSupport implements Serializable {
 
     private final String name;
 
-	public ValidationLocation(String name) {
-		this.name = name;
-	}
+    public ValidationLocation(String name) {
+        Validate.notEmpty(name, "name is required");
+        this.name = name;
+    }
 
-	public ValidationLocation(URI objectUri) {
-		this.name = objectUri.toString();
-	}
+    public ValidationLocation(URI objectUri) {
+        this(objectUri.toString());
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
 }

@@ -31,7 +31,6 @@ package net.ripe.commons.certification.x509cert;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
-
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
@@ -46,7 +45,6 @@ import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCe
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.lang.Validate;
 
 /**
@@ -100,14 +98,6 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         return resources instanceof InheritedIpResourceSet;
     }
 
-
-    public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
-        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse("certificate", encoded);
-        return parser.getCertificate();
-    }
-    
-
     @Override
     public URI getCrlUri() {
         return findFirstRsyncCrlDistributionPoint();
@@ -117,7 +107,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
     public URI getParentCertificateUri() {
         return findFirstAuthorityInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS);
     }
-    
+
     public void validate(String location, X509ResourceCertificateValidator validator) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse(location, getEncoded());

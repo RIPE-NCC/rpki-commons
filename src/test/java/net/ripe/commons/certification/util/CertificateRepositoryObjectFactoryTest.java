@@ -29,7 +29,8 @@
  */
 package net.ripe.commons.certification.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.cms.manifest.ManifestCms;
 import net.ripe.commons.certification.cms.manifest.ManifestCmsTest;
@@ -37,45 +38,55 @@ import net.ripe.commons.certification.cms.roa.RoaCms;
 import net.ripe.commons.certification.cms.roa.RoaCmsTest;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlTest;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
-
+import org.junit.Before;
 import org.junit.Test;
 
 
 public class CertificateRepositoryObjectFactoryTest {
 
+    private ValidationResult validationResult;
+
+    @Before
+    public void setUp() {
+        validationResult = new ValidationResult();
+    }
+
     @Test(expected=CertificateRepositoryObjectParserException.class)
     public void shouldNotParseIllegalByteString() {
         byte[] encoded = new byte[] {0};
-        CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded);
+        CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, validationResult);
     }
 
     @Test
     public void shoudParseResourceCertificate() {
         X509ResourceCertificate cert = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
-        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(cert.getEncoded());
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(cert.getEncoded(), validationResult);
         assertEquals(cert, object);
+        assertTrue(validationResult.getResult(validationResult.getCurrentLocation(), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
     }
 
     @Test
     public void shouldParseRoaCms() {
         RoaCms roaCms = RoaCmsTest.getRoaCms();
-        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(roaCms.getEncoded());
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(roaCms.getEncoded(), validationResult);
         assertEquals(roaCms, object);
     }
 
     @Test
     public void shouldParseManifestCms() {
         ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
-        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(manifestCms.getEncoded());
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(manifestCms.getEncoded(), validationResult);
         assertEquals(manifestCms, object);
     }
 
     @Test
     public void shouldParseCrl() {
         X509Crl crl = X509CrlTest.createCrl();
-        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(crl.getEncoded());
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(crl.getEncoded(), validationResult);
         assertEquals(crl, object);
     }
 }

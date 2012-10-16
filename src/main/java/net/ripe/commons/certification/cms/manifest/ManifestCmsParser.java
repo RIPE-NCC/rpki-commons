@@ -36,11 +36,10 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.TreeMap;
-
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
 import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
-
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
@@ -87,23 +86,25 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 		super(result);
 	}
 
-	@Override
-    public void parse(String location, byte[] encoded) {
-		super.parse(location, encoded);
-		validateManifest();
-	}
+    @Override
+    public void parse(ValidationLocation location, byte[] encoded) {
+        super.parse(location, encoded);
+        validateManifest();
+    }
 
-	public ManifestCms getManifestCms() {
-		ValidationResult validationResult = getValidationResult();
-        if (validationResult.hasFailures()) {
-			throw new IllegalArgumentException("Manifest validation failed: " + validationResult.getFailuresForCurrentLocation());
-		}
+    public boolean isSuccess() {
+        return !getValidationResult().hasFailures();
+    }
+
+    public ManifestCms getManifestCms() {
+        if (!isSuccess()) {
+            throw new IllegalArgumentException("Manifest validation failed: " + getValidationResult().getFailuresForCurrentLocation());
+        }
 
         RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
         ManifestCmsGeneralInfo manifestCmsGeneralInfo = new ManifestCmsGeneralInfo(version, number, thisUpdateTime, nextUpdateTime, fileHashAlgorithm);
-
-		return new ManifestCms(cmsObjectData, manifestCmsGeneralInfo, files);
-	}
+        return new ManifestCms(cmsObjectData, manifestCmsGeneralInfo, files);
+    }
 
 	private void validateManifest() {
 	    ValidationResult validationResult = getValidationResult();
@@ -163,4 +164,5 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 	public void decodeContent(DEREncodable encoded) {
 		decodeManifest(encoded);
 	}
+
 }

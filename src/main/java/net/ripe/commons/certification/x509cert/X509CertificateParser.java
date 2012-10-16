@@ -61,14 +61,16 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         this.result = result;
     }
 
+    @Deprecated
     public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
+        parse(new ValidationLocation(location), encoded);
+    }
+
+    public void parse(ValidationLocation location, byte[] encoded) {
         this.encoded = encoded;
-
-        ValidationLocation validationLocation = new ValidationLocation(location);
-        result.setLocation(validationLocation);
-
+        result.setLocation(location);
         parse();
-        if (!result.hasFailureForLocation(validationLocation)) {
+        if (!result.hasFailureForCurrentLocation()) {
             validateSignatureAlgorithm();
             validatePublicKey();
             doTypeSpecificValidation();
@@ -92,6 +94,10 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     public ValidationResult getValidationResult() {
         return result;
+    }
+
+    public boolean isSuccess() {
+        return !result.hasFailures();
     }
 
     public abstract T getCertificate();

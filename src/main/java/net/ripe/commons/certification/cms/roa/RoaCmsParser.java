@@ -29,41 +29,29 @@
  */
 package net.ripe.commons.certification.cms.roa;
 
-import static net.ripe.commons.certification.Asn1Util.expect;
-import static net.ripe.commons.certification.Asn1Util.parseIpAddressAsPrefix;
-import static net.ripe.commons.certification.validation.ValidationString.ADDR_FAMILY;
-import static net.ripe.commons.certification.validation.ValidationString.ADDR_FAMILY_AND_ADDR_IN_DER_SEQ;
-import static net.ripe.commons.certification.validation.ValidationString.ASN_AND_PREFIXES_IN_DER_SEQ;
-import static net.ripe.commons.certification.validation.ValidationString.PREFIX_IN_ADDR_FAMILY;
-import static net.ripe.commons.certification.validation.ValidationString.PREFIX_LENGTH;
-import static net.ripe.commons.certification.validation.ValidationString.ROA_ATTESTATION_VERSION;
-import static net.ripe.commons.certification.validation.ValidationString.ROA_CONTENT_TYPE;
-import static net.ripe.commons.certification.validation.ValidationString.ROA_PREFIX_LIST;
-import static net.ripe.commons.certification.validation.ValidationString.ROA_RESOURCES;
+import static net.ripe.commons.certification.Asn1Util.*;
+import static net.ripe.commons.certification.validation.ValidationString.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
 import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
 import net.ripe.commons.certification.rfc3779.AddressFamily;
-import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERSequence;
 
 public class RoaCmsParser extends RpkiSignedObjectParser {
-	
+
 	private Asn asn;
 
 	private List<RoaPrefix> prefixes = new ArrayList<RoaPrefix>();
@@ -77,25 +65,28 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		super(result);
 	}
 
-	@Override
-    public void parse(String location, byte[] encoded) {
-		super.parse(location, encoded);
-		validateRoa();
-	}
+    @Override
+    public void parse(ValidationLocation location, byte[] encoded) {
+        super.parse(location, encoded);
+        validateRoa();
+    }
 
-	public RoaCms getRoaCms() {
-		Set<ValidationCheck> failuresForCurrentLocation = getValidationResult().getFailuresForCurrentLocation();
-		if (failuresForCurrentLocation.size() > 0) {
-			throw new IllegalArgumentException("Roa validation failed " + failuresForCurrentLocation);
-		}
+    public boolean isSuccess() {
+        return !getValidationResult().hasFailureForCurrentLocation();
+    }
 
-		RpkiSignedObjectInfo cmsObjectInfo = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
+    public RoaCms getRoaCms() {
+        if (!isSuccess()) {
+            throw new IllegalArgumentException("ROA validation failed");
+        }
+
+        RpkiSignedObjectInfo cmsObjectInfo = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
         return new RoaCms(cmsObjectInfo, asn, prefixes);
-	}
+    }
 
 	private void validateRoa() {
 		ValidationResult validationResult = getValidationResult();
-		
+
 		if (!validationResult.rejectIfFalse(getContentType() != null, ROA_CONTENT_TYPE)) {
 			return;
 		}
@@ -134,15 +125,15 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 	}
 
 	void parseRouteOriginAttestation(DEREncodable der) {
-		
+
 		expect(der, DERSequence.class);
 		DERSequence seq = (DERSequence) der;
-		
+
 		if (!getValidationResult().rejectIfTrue(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0).toString())) {
 			// eContent seems to contain non-standard version (default 0 is omitted in structure)
 			return;
 		}
-		
+
 		if (!getValidationResult().rejectIfFalse(seq.size() == 2, ASN_AND_PREFIXES_IN_DER_SEQ)) {
 			return;
 		}
@@ -207,5 +198,6 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 	public void decodeContent(DEREncodable encoded) {
 		parseRouteOriginAttestation(encoded);
 	}
+
 }
 

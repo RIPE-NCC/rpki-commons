@@ -29,6 +29,12 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.cms.RpkiSignedObject;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
@@ -51,13 +57,6 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.io.DigestOutputStream;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * A manifest of files published by a CA certificate.
  * <p/>
@@ -70,7 +69,7 @@ public class ManifestCms extends RpkiSignedObject {
     public static final int DEFAULT_VERSION = 0;
 
     public static final String CONTENT_TYPE_OID = "1.2.840.113549.1.9.16.1.26";
-    
+
     public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
 
     private Map<String, byte[]> files;
@@ -128,7 +127,7 @@ public class ManifestCms extends RpkiSignedObject {
     public URI getParentCertificateUri() {
         return getCertificate().getParentCertificateUri();
     }
-    
+
     @Override
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         ValidationLocation savedCurrentLocation = result.getCurrentLocation();
@@ -147,7 +146,7 @@ public class ManifestCms extends RpkiSignedObject {
         ManifestCmsEeCertificateValidator validator = new ManifestCmsEeCertificateValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, getCertificate());
     }
-    
+
 
     private void checkManifestAndEeCertificateValidityTimes(ValidationOptions options, ValidationResult result) {
 		ValidityPeriod certificateValidity = getCertificate().getValidityPeriod();
@@ -183,12 +182,6 @@ public class ManifestCms extends RpkiSignedObject {
     public FileContentSpecification getFileContentSpecification(String fileName) {
         Validate.isTrue(containsFile(fileName));
         return new FileContentSpecification(getHash(fileName));
-    }
-
-    public static ManifestCms parseDerEncoded(byte[] encoded) {
-        ManifestCmsParser parser = new ManifestCmsParser();
-        parser.parse("<null>", encoded);
-        return parser.getManifestCms();
     }
 
     public static byte[] hashContents(byte[] contents) {

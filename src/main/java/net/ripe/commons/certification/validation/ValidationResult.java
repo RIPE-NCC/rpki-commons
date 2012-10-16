@@ -29,13 +29,19 @@
  */
 package net.ripe.commons.certification.validation;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.joda.time.DateTimeUtils;
-
-import java.io.Serializable;
-import java.util.*;
 
 public class ValidationResult implements Serializable {
 
@@ -219,5 +225,21 @@ public class ValidationResult implements Serializable {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 
-
+    public void addAll(ValidationResult that) {
+        for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> result: that.results.entrySet()) {
+            Map<ValidationStatus, List<ValidationCheck>> map = results.get(result.getKey());
+            if (map == null) {
+                map = new HashMap<ValidationStatus, List<ValidationCheck>>();
+                this.results.put(result.getKey(), map);
+            }
+            for (Entry<ValidationStatus, List<ValidationCheck>> checks: result.getValue().entrySet()) {
+                List<ValidationCheck> list = map.get(checks.getValue());
+                if (list == null) {
+                    list = new ArrayList<ValidationCheck>();
+                    map.put(checks.getKey(), list);
+                }
+                list.addAll(checks.getValue());
+            }
+        }
+    }
 }
