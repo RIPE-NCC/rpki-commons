@@ -33,15 +33,19 @@ import static net.ripe.commons.certification.validation.ValidationString.*;
 import static net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapper.*;
 
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
 import java.util.regex.Pattern;
-import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.ipresource.IpResourceSet;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 
@@ -74,14 +78,20 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     private void validateIssuerAndSubjectDN() {
-        getValidationResult().warnIfFalse(isValidName(certificate.getIssuerX500Principal()), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
-        getValidationResult().warnIfFalse(isValidName(certificate.getSubjectX500Principal()), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
+        try {
+            JcaX509CertificateHolder cert = new JcaX509CertificateHolder(certificate);
+            getValidationResult().warnIfFalse(isValidName(cert.getIssuer()), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
+            getValidationResult().warnIfFalse(isValidName(cert.getSubject()), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
+        } catch (CertificateEncodingException e) {
+            throw new AbstractX509CertificateWrapperException(e);
+        }
     }
 
-    private boolean isValidName(X500Principal principal) {
+    private boolean isValidName(X500Name principal) {
         // RCF6487 section 4.4 and 4.5.
-        // FIXME check correct use of CN and SERIALNUMBER attributes, instead of simple regex match for valid characters.
-        return isPrintableString(principal.toString());
+        RDN[] cns = principal.getRDNs(BCStyle.CN);
+        RDN[] serialNumbers = principal.getRDNs(BCStyle.SERIALNUMBER);
+        return cns.length == 1 && isPrintableString(cns[0].getFirst().getValue().toString()) && serialNumbers.length <= 1;
     }
 
     private boolean isPrintableString(String s) {
