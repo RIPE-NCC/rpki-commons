@@ -29,6 +29,7 @@
  */
 package net.ripe.commons.provisioning.identity;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
@@ -61,7 +62,7 @@ public class ProvisioningIdentityCertificateConverterForIdExchange implements Co
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
         ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-        parser.parse("encoded", encoded);
+        parser.parse(new ValidationLocation("encoded"), encoded);
         
         ValidationResult result = parser.getValidationResult();
         if (result.hasFailureForCurrentLocation()) {

@@ -29,15 +29,6 @@
  */
 package net.ripe.commons.certification.validation.objectvalidators;
 
-import static net.ripe.commons.certification.validation.ValidationString.CERT_CHAIN_COMPLETE;
-import static net.ripe.commons.certification.validation.ValidationString.CERT_CHAIN_LENGTH;
-import static net.ripe.commons.certification.validation.ValidationString.ROOT_IS_TA;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import net.ripe.commons.certification.CertificateRepositoryObjectFile;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.validation.ValidationLocation;
@@ -47,6 +38,13 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+import static net.ripe.commons.certification.validation.ValidationString.*;
 
 
 public class X509ResourceCertificateBottomUpValidator implements X509ResourceCertificateValidator {
@@ -133,7 +131,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
             }
 
             X509ResourceCertificateParser parser = new X509ResourceCertificateParser(result);
-            parser.parse(parent.getName(), parent.getContent());
+            parser.parse(new ValidationLocation(parent.getName()), parent.getContent());
             if (result.hasFailures()) {
                 return;
             }

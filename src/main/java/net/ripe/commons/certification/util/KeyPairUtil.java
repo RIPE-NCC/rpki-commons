@@ -29,15 +29,15 @@
  */
 package net.ripe.commons.certification.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.PublicKey;
-
 import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.util.encoders.HexEncoder;
-import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 
 public final class KeyPairUtil {
 
@@ -79,11 +79,11 @@ public final class KeyPairUtil {
 
 	public static byte[] getKeyIdentifier(PublicKey key) {
 		try {
-			return new SubjectKeyIdentifierStructure(key).getKeyIdentifier();
-		} catch (InvalidKeyException e) {
-			throw new IllegalArgumentException("Could not get SubjectKeyIdentifierStructure from key", e);
-		}
-	}
+			return new JcaX509ExtensionUtils().createSubjectKeyIdentifier(key).getKeyIdentifier();
+		} catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("Could not get SubjectKeyIdentifierStructure from key", e);
+        }
+    }
 
 	public static String base64UrlEncode(byte[] data) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -29,21 +29,19 @@
  */
 package net.ripe.commons.certification.cms.roa;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.List;
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.cms.RpkiSignedObjectBuilder;
 import net.ripe.commons.certification.rfc3779.AddressFamily;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
+
+import java.security.PrivateKey;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates a RoaCms using the DER encoding specified in the ROA format standard.
@@ -81,7 +79,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
 
     public RoaCms build(PrivateKey privateKey) {
     	RoaCmsParser parser = new RoaCmsParser();
-    	parser.parse("generated.roa", generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
+    	parser.parse(new ValidationLocation("generated.roa"), generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
         return parser.getRoaCms();
     }
 

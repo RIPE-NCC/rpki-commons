@@ -29,8 +29,6 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import java.net.URI;
-import java.security.cert.X509Certificate;
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
@@ -46,6 +44,9 @@ import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCe
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.Validate;
+
+import java.net.URI;
+import java.security.cert.X509Certificate;
 
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.
@@ -110,7 +111,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
     public void validate(String location, X509ResourceCertificateValidator validator) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(location, getEncoded());
+        parser.parse(new ValidationLocation(location), getEncoded());
         if (parser.getValidationResult().hasFailures()) {
             return;
         }

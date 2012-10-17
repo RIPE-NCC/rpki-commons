@@ -29,6 +29,7 @@
  */
 package net.ripe.commons.provisioning.serialization;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 
@@ -67,7 +68,7 @@ public class ProvisioningIdentityCertificateXstreamConverter implements Converte
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
         reader.moveUp();
         ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-        parser.parse("encoded", encoded);
+        parser.parse(new ValidationLocation("encoded"), encoded);
         return parser.getCertificate();
     }
 

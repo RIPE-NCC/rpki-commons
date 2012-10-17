@@ -32,6 +32,7 @@ package net.ripe.certification.client.xml.converters;
 import net.ripe.commons.certification.cms.roa.RoaCms;
 import net.ripe.commons.certification.cms.roa.RoaCmsParser;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import org.apache.commons.lang.Validate;
 
 import com.thoughtworks.xstream.converters.Converter;
@@ -63,7 +64,7 @@ public class RoaCmsConverter implements Converter {
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
         reader.moveUp();
         RoaCmsParser parser = new RoaCmsParser();
-        parser.parse("encoded", encoded);
+        parser.parse(new ValidationLocation("encoded"), encoded);
         return parser.getRoaCms();
 	}
 }

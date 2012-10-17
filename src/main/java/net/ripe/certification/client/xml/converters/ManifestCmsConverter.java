@@ -32,6 +32,7 @@ package net.ripe.certification.client.xml.converters;
 import net.ripe.commons.certification.cms.manifest.ManifestCms;
 import net.ripe.commons.certification.cms.manifest.ManifestCmsParser;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import org.apache.commons.lang.Validate;
 
 import com.thoughtworks.xstream.converters.Converter;
@@ -63,7 +64,7 @@ public class ManifestCmsConverter implements Converter {
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
         reader.moveUp();
         ManifestCmsParser parser = new ManifestCmsParser();
-        parser.parse("encoded", encoded);
+        parser.parse(new ValidationLocation("encoded"), encoded);
         return parser.getManifestCms();
 	}
 }

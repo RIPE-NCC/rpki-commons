@@ -29,27 +29,22 @@
  */
 package net.ripe.commons.certification.util;
 
+import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
+import net.ripe.ipresource.IpResourceSet;
+import org.apache.commons.io.output.NullOutputStream;
+import org.joda.time.DateTime;
+
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.Certificate;
-
-import javax.security.auth.x500.X500Principal;
-
-import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
-import net.ripe.ipresource.IpResourceSet;
-
-import org.apache.commons.io.output.NullOutputStream;
-import org.joda.time.DateTime;
 
 
 public final class KeyStoreUtil {
@@ -120,7 +115,7 @@ public final class KeyStoreUtil {
 		try {
 			Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
             X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-            parser.parse("mykeystore", c.getEncoded());
+            parser.parse(new ValidationLocation("mykeystore"), c.getEncoded());
             X509ResourceCertificate certificate = parser.getCertificate();
             PublicKey publicKey = certificate.getPublicKey();
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);

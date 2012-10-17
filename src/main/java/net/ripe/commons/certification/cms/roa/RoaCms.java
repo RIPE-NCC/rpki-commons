@@ -29,16 +29,16 @@
  */
 package net.ripe.commons.certification.cms.roa;
 
+import net.ripe.commons.certification.cms.RpkiSignedObject;
+import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpResourceSet;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-
-import net.ripe.commons.certification.cms.RpkiSignedObject;
-import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
-import net.ripe.ipresource.Asn;
-import net.ripe.ipresource.IpResourceSet;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 public class RoaCms extends RpkiSignedObject implements Roa {
 
@@ -77,7 +77,7 @@ public class RoaCms extends RpkiSignedObject implements Roa {
 
     public static RoaCms parseDerEncoded(byte[] encoded) {
         RoaCmsParser parser = new RoaCmsParser();
-        parser.parse("unknown.roa", encoded);
+        parser.parse(new ValidationLocation("unknown.roa"), encoded);
         return parser.getRoaCms();
     }
 

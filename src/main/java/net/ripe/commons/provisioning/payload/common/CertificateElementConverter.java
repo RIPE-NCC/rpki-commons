@@ -29,6 +29,7 @@
  */
 package net.ripe.commons.provisioning.payload.common;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 import net.ripe.commons.provisioning.serialization.CertificateUrlListConverter;
@@ -91,7 +92,7 @@ public class CertificateElementConverter implements Converter {
         byte[] base64DecodedCertificate = (byte[])context.convertAnother(encodedCertificate.getBytes(), byte[].class);
 
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse("validationLocation", base64DecodedCertificate);
+        parser.parse(new ValidationLocation("validationLocation"), base64DecodedCertificate);
         return parser.getCertificate();
     }
 

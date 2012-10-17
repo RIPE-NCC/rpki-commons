@@ -29,6 +29,7 @@
  */
 package net.ripe.certification.client.xml.converters;
 
+import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
@@ -63,7 +64,7 @@ public class X509ResourceCertificateConverter implements Converter {
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
         reader.moveUp();
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse("encoded", encoded);
+        parser.parse(new ValidationLocation("encoded"), encoded);
         return parser.getCertificate();
     }
 }

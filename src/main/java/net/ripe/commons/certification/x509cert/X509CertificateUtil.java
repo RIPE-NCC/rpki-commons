@@ -29,18 +29,10 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import javax.security.auth.x500.X500Principal;
-import org.bouncycastle.asn1.x500.X500Name;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
 import net.ripe.commons.certification.Asn1Util;
+import net.ripe.commons.certification.validation.ValidationLocation;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -48,6 +40,15 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
+
+import javax.security.auth.x500.X500Principal;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509Extension;
 
 public final class X509CertificateUtil {
 
@@ -96,7 +97,7 @@ public final class X509CertificateUtil {
 
     public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse("certificate", encoded);
+        parser.parse(new ValidationLocation("certificate"), encoded);
         return parser.getCertificate();
     }
 
