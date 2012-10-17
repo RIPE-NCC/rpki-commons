@@ -31,9 +31,8 @@ package net.ripe.commons.provisioning.payload.issue.request;
 
 import net.ripe.commons.provisioning.payload.common.AbstractPayloadBuilder;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 /**
  * Builder for 'Certificate Issuance Request'<br >

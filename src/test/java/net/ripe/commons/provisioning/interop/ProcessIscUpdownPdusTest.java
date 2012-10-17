@@ -58,7 +58,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.HexDump;
 import org.bouncycastle.asn1.util.ASN1Dump;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
 
 

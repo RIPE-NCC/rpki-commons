@@ -32,21 +32,22 @@ package net.ripe.commons.provisioning.x509.pkcs10;
 import java.io.IOException;
 import java.net.URI;
 import java.security.KeyPair;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
 
 /**
@@ -99,27 +100,22 @@ public class RpkiCaCertificateRequestBuilder {
 
     public PKCS10CertificationRequest build(KeyPair keyPair) {
         try {
-            X509Extensions extensions = createExtensions();
+            Extensions extensions = createExtensions();
 
-            Attribute attribute = new Attribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, new DERSet(extensions));
+            ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(signatureProvider).build(keyPair.getPrivate());
 
-            return new PKCS10CertificationRequest(
-                    signatureAlgorithm,
-                    subject,
-                    keyPair.getPublic(),
-                    new DERSet(attribute),
-                    keyPair.getPrivate(),
-                    signatureProvider);
+            JcaPKCS10CertificationRequestBuilder builder = new JcaPKCS10CertificationRequestBuilder(subject, keyPair.getPublic());
+            builder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, extensions);
+            return builder.build(signer);
         } catch (Exception e) {
             throw new RpkiCaCertificateRequestBuilderException(e);
         }
     }
 
-    private X509Extensions createExtensions() throws IOException {
+    private Extensions createExtensions() throws IOException {
         // Make extension for SIA in request. See here:
         // http://www.bouncycastle.org/wiki/display/JA1/X.509+Public+Key+Certificate+and+Certification+Request+Generation
-        Vector<ASN1ObjectIdentifier> oids = new Vector<ASN1ObjectIdentifier>();
-        Vector<X509Extension> values = new Vector<X509Extension>();
+        List<Extension> extensions = new ArrayList<Extension>();
 
         X509CertificateInformationAccessDescriptor[] descriptors = new X509CertificateInformationAccessDescriptor[] {
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri),
@@ -127,19 +123,12 @@ public class RpkiCaCertificateRequestBuilder {
         AccessDescription[] subjectInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(descriptors);
         DERSequence derSequence = new DERSequence(subjectInformationAccess);
 
-        oids.add(X509Extension.subjectInfoAccess);
-        X509Extension siaExtension = new X509Extension(false, new DEROctetString(derSequence.getEncoded()));
-        values.add(siaExtension);
-
+        extensions.add(new Extension(Extension.subjectInfoAccess, false, new DEROctetString(derSequence.getEncoded())));
         KeyUsage keyUsage = new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
-        X509Extension keyUsageExtension = new X509Extension(true, new DEROctetString(keyUsage));
-        oids.add(X509Extension.keyUsage);
-        values.add(keyUsageExtension);
+        extensions.add(new Extension(Extension.keyUsage, true, new DEROctetString(keyUsage)));
 
-        X509Extension basicConstraintsExtension = new X509Extension(true, new DEROctetString(new BasicConstraints(true)));
-        oids.add(X509Extension.basicConstraints);
-        values.add(basicConstraintsExtension);
+        extensions.add(new Extension(Extension.basicConstraints, true, new DEROctetString(new BasicConstraints(true))));
 
-        return new X509Extensions(oids, values);
+        return new Extensions(extensions.toArray(new Extension[extensions.size()]));
     }
 }

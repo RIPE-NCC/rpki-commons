@@ -59,11 +59,15 @@ import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.operator.DigestCalculatorProvider;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 
 public abstract class RpkiSignedObjectParser {
+
+    private static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
 
     private byte[] encoded;
 
@@ -123,7 +127,7 @@ public abstract class RpkiSignedObjectParser {
     private void parseCms() {
         CMSSignedDataParser sp;
         try {
-            sp = new CMSSignedDataParser(encoded);
+            sp = new CMSSignedDataParser(DIGEST_CALCULATOR_PROVIDER, encoded);
         } catch (CMSException e) {
             validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
             return;

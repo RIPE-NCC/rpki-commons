@@ -56,7 +56,7 @@ import net.ripe.commons.provisioning.payload.revocation.request.CertificateRevoc
 import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBuilderParserTest;
 import net.ripe.ipresource.IpResourceSet;
 
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
 
 public class ProvisioningObjectMother {

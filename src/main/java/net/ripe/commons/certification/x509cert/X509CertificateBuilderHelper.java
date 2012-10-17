@@ -29,6 +29,8 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import static net.ripe.commons.certification.x509cert.X509CertificateUtil.*;
+
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.InvalidKeyException;
@@ -46,7 +48,6 @@ import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -57,7 +58,6 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -65,7 +65,6 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
 /**
@@ -79,7 +78,7 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
  */
 public final class X509CertificateBuilderHelper {
 
-	public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
+    public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
 
 	public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
@@ -274,16 +273,21 @@ public final class X509CertificateBuilderHelper {
         }
     }
 
-	private X509v3CertificateBuilder createX509V3CertificateGenerator() {
-		validateCertificateFields();
+    private X509v3CertificateBuilder createX509V3CertificateGenerator() {
+        validateCertificateFields();
 
-		X509v3CertificateBuilder generator = new X509v3CertificateBuilder(X500Name.getInstance(issuerDN.getEncoded()), serial, new Date(validityPeriod.getNotValidBefore()
-                .getMillis()), new Date(validityPeriod.getNotValidAfter()
-                        .getMillis()), X500Name.getInstance(subjectDN.getEncoded()), SubjectPublicKeyInfo.getInstance(publicKey.getEncoded()));
-		return generator;
-	}
+        PublicKey key = publicKey;
+        X509v3CertificateBuilder generator = new X509v3CertificateBuilder(
+                principalToName(issuerDN),
+                serial,
+                new Date(validityPeriod.getNotValidBefore().getMillis()),
+                new Date(validityPeriod.getNotValidAfter().getMillis()),
+                principalToName(subjectDN),
+                createSubjectPublicKeyInfo(key));
+        return generator;
+    }
 
-	private void validateCertificateFields() {
+    private void validateCertificateFields() {
 		Validate.notNull(issuerDN, "no issuerDN");
 		Validate.notNull(subjectDN, "no subjectDN");
 		Validate.notNull(serial, "no serial");
@@ -304,7 +308,7 @@ public final class X509CertificateBuilderHelper {
             generator.addExtension(
                     X509Extension.authorityKeyIdentifier,
                     false,
-                    new AuthorityKeyIdentifierStructure(signingKeyPair.getPublic()));
+                    X509CertificateUtil.createAuthorityKeyIdentifier(signingKeyPair.getPublic()));
     }
 
     private void addCaBit(X509v3CertificateBuilder generator) throws CertIOException {

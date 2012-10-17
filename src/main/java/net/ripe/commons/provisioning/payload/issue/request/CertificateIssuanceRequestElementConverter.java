@@ -31,14 +31,15 @@ package net.ripe.commons.provisioning.payload.issue.request;
 
 import static net.ripe.commons.provisioning.payload.common.CertificateElementConverter.*;
 
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
-
+import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import java.io.IOException;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 public class CertificateIssuanceRequestElementConverter implements Converter {
 
@@ -54,33 +55,41 @@ public class CertificateIssuanceRequestElementConverter implements Converter {
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        CertificateIssuanceRequestElement content = (CertificateIssuanceRequestElement) source;
+        try {
+            CertificateIssuanceRequestElement content = (CertificateIssuanceRequestElement) source;
 
-        writer.addAttribute(CLASS_NAME, content.getClassName());
-        encodeResources(writer, REQ_RESOURCE_SET_AS, content.getAllocatedAsn());
-        encodeResources(writer, REQ_RESOURCE_SET_IPV4, content.getAllocatedIpv4());
-        encodeResources(writer, REQ_RESOURCE_SET_IPV6, content.getAllocatedIpv6());
-        context.convertAnother(content.getCertificateRequest().getEncoded());
+            writer.addAttribute(CLASS_NAME, content.getClassName());
+            encodeResources(writer, REQ_RESOURCE_SET_AS, content.getAllocatedAsn());
+            encodeResources(writer, REQ_RESOURCE_SET_IPV4, content.getAllocatedIpv4());
+            encodeResources(writer, REQ_RESOURCE_SET_IPV6, content.getAllocatedIpv6());
+            context.convertAnother(content.getCertificateRequest().getEncoded());
+        } catch (IOException e) {
+            throw new ConversionException(e);
+        }
     }
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        CertificateIssuanceRequestElement content = new CertificateIssuanceRequestElement();
+        try {
+            CertificateIssuanceRequestElement content = new CertificateIssuanceRequestElement();
 
-        String className = reader.getAttribute(CLASS_NAME);
-        Validate.notNull(className, "class_name attribute is required");
-        content.setClassName(className);
+            String className = reader.getAttribute(CLASS_NAME);
+            Validate.notNull(className, "class_name attribute is required");
+            content.setClassName(className);
 
-        content.setAllocatedAsn(decodeResources(reader, REQ_RESOURCE_SET_AS));
-        content.setAllocatedIpv4(decodeResources(reader, REQ_RESOURCE_SET_IPV4));
-        content.setAllocatedIpv6(decodeResources(reader, REQ_RESOURCE_SET_IPV6));
+            content.setAllocatedAsn(decodeResources(reader, REQ_RESOURCE_SET_AS));
+            content.setAllocatedIpv4(decodeResources(reader, REQ_RESOURCE_SET_IPV4));
+            content.setAllocatedIpv6(decodeResources(reader, REQ_RESOURCE_SET_IPV6));
 
-        content.setCertificateRequest(decodeCertificateRequest(reader, context));
+            content.setCertificateRequest(decodeCertificateRequest(reader, context));
 
-        return content;
+            return content;
+        } catch (IOException e) {
+            throw new ConversionException(e);
+        }
     }
 
-    private PKCS10CertificationRequest decodeCertificateRequest(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    private PKCS10CertificationRequest decodeCertificateRequest(HierarchicalStreamReader reader, UnmarshallingContext context) throws IOException {
         String encodedCertificate = reader.getValue();
         Validate.notNull(encodedCertificate, "No certificate found");
 

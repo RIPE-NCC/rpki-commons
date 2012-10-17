@@ -76,9 +76,12 @@ import org.bouncycastle.cms.CMSTypedStream;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 public class ProvisioningCmsObjectParser {
+
+    private static final BcDigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
 
     private static final ASN1ObjectIdentifier PROVISIONING_OBJECT_OID_STRING = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28");
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
@@ -118,7 +121,7 @@ public class ProvisioningCmsObjectParser {
         validationResult.setLocation(new ValidationLocation(location));
 
         try {
-            sp = new CMSSignedDataParser(encoded);
+            sp = new CMSSignedDataParser(DIGEST_CALCULATOR_PROVIDER, encoded);
         } catch (CMSException e) {
             validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
             return;

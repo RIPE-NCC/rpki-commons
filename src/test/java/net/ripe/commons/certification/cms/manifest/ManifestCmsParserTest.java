@@ -37,17 +37,14 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.util.Map;
 import java.util.TreeMap;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
-
-import org.bouncycastle.asn1.DERTags;
+import org.bouncycastle.asn1.BERTags;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -75,49 +72,49 @@ public class ManifestCmsParserTest {
             119, 85, -72, -77, 26, -93, -65, -28, -88};
 
 	public static final byte[] ENCODED_FILE_AND_HASH_1 = {
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x29,
-		DERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
-		DERTags.BIT_STRING, 0x21, 0x00,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x29,
+		BERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
+		BERTags.BIT_STRING, 0x21, 0x00,
  -82, 33, 108, 46, -11, 36, 122, 55, -126, -63, 53, -17, -94, 121,
             -93, -28, -51, -58, 16, -108, 39, 15, 93, 43, -27, -116, 98, 4, -73, -90, 18, -55
 	};
 
 	public static final byte[] ENCODED_EMPTY_FILE_LIST = {
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x0,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x0,
 	};
 
 	public static final byte[] ENCODED_FILE_LIST = {
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x55,
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x28,
-		DERTags.IA5_STRING, 0x03, (byte) 'B', (byte) 'a', (byte) 'R',
-		DERTags.BIT_STRING, 0x21, 0x00,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x55,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x28,
+		BERTags.IA5_STRING, 0x03, (byte) 'B', (byte) 'a', (byte) 'R',
+		BERTags.BIT_STRING, 0x21, 0x00,
  77, -99, -39, 69, 30, -61, 10, -3, -84, 18,
             112, 23, -70, -73, 109, 38, -41, 79, 6, -17, -49, -88, -14, 119, 85, -72, -77, 26, -93, -65, -28, -88,
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x29,
-		DERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
-		DERTags.BIT_STRING, 0x21, 0x00,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x29,
+		BERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
+		BERTags.BIT_STRING, 0x21, 0x00,
  -82, 33, 108, 46, -11, 36, 122, 55, -126, -63, 53, -17, -94, 121, -93, -28, -51, -58, 16, -108, 39, 15,
             93, 43, -27, -116, 98, 4, -73, -90, 18, -55
 	};
 
 	public static final byte[] ENCODED_MANIFEST = {
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, (byte) 0x81, (byte) 0x87,
-		DERTags.INTEGER, 0x01, 0x44, // manifest number
-		DERTags.GENERALIZED_TIME, 0x0F,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, (byte) 0x81, (byte) 0x87,
+		BERTags.INTEGER, 0x01, 0x44, // manifest number
+		BERTags.GENERALIZED_TIME, 0x0F,
 		(byte) '2', (byte) '0', (byte) '0', (byte) '8', (byte) '0', (byte) '9', (byte) '0', (byte) '1', (byte) '2', (byte) '2', (byte) '4', (byte) '3', (byte) '2', (byte) '9', (byte) 'Z',
-		DERTags.GENERALIZED_TIME, 0x0F,
+		BERTags.GENERALIZED_TIME, 0x0F,
 		(byte) '2', (byte) '0', (byte) '0', (byte) '8', (byte) '0', (byte) '9', (byte) '0', (byte) '2', (byte) '0', (byte) '6', (byte) '4', (byte) '3', (byte) '2', (byte) '9', (byte) 'Z',
-		DERTags.OBJECT_IDENTIFIER, 0x09, // SHA-256 OID
+		BERTags.OBJECT_IDENTIFIER, 0x09, // SHA-256 OID
 		96, -122, 72, 1, 101, 3, 4, 2, 1,
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x55,
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x28,
-		DERTags.IA5_STRING, 0x03, (byte) 'B', (byte) 'a', (byte) 'R',
-		DERTags.BIT_STRING, 0x21, 0x00,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x55,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x28,
+		BERTags.IA5_STRING, 0x03, (byte) 'B', (byte) 'a', (byte) 'R',
+		BERTags.BIT_STRING, 0x21, 0x00,
  77, -99, -39, 69, 30, -61, 10, -3, -84, 18,
             112, 23, -70, -73, 109, 38, -41, 79, 6, -17, -49, -88, -14, 119, 85, -72, -77, 26, -93, -65, -28, -88,
-		DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x29,
-		DERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
-		DERTags.BIT_STRING, 0x21, 0x00,
+		BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x29,
+		BERTags.IA5_STRING, 0x04, (byte) 'f', (byte) 'o', (byte) 'o', (byte) '1',
+		BERTags.BIT_STRING, 0x21, 0x00,
  -82, 33, 108, 46, -11, 36, 122, 55, -126, -63, 53, -17, -94, 121, -93, -28, -51, -58, 16, -108, 39, 15,
             93, 43, -27, -116, 98, 4, -73, -90, 18, -55,
 	};

@@ -60,6 +60,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
@@ -70,6 +71,7 @@ public class ProvisioningCmsObjectBuilderTest {
     private ProvisioningCmsObject cmsObject;
     private long signingTime;
     private ProvisioningCmsObjectBuilder subject;
+    private CMSSignedDataParser signedDataParser;
 
     @Before
     public void setUp() throws Exception {
@@ -87,6 +89,9 @@ public class ProvisioningCmsObjectBuilderTest {
         DateTimeUtils.setCurrentMillisFixed(signingTime);
         cmsObject = subject.build(EE_KEYPAIR.getPrivate());
         DateTimeUtils.setCurrentMillisSystem();
+
+        signedDataParser = new CMSSignedDataParser(new BcDigestCalculatorProvider(), cmsObject.getEncoded());
+        signedDataParser.getSignedContent().drain();
     }
 
     public static ProvisioningCmsObject createProvisioningCmsObjectForPayload(AbstractProvisioningPayload payload) {
@@ -116,18 +121,12 @@ public class ProvisioningCmsObjectBuilderTest {
         subject.build(EE_KEYPAIR.getPrivate());
     }
 
-    @Test
-    public void shouldBuildValidCmsObject() throws Exception {
-        new CMSSignedDataParser(cmsObject.getEncoded());
-    }
-
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
      */
     @Test
     public void shouldCmsObjectHaveCorrectVersionNumber() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        assertEquals(3, sp.getVersion());
+        assertEquals(3, signedDataParser.getVersion());
     }
 
     /**
@@ -150,8 +149,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveCorrectContentType() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        assertEquals(new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28"), sp.getSignedContent().getContentType());
+        assertEquals(new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28"), signedDataParser.getSignedContent().getContentType());
     }
 
     /**
@@ -159,9 +157,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedEECertificate() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        CertStore certificatesAndCRLs = sp.getCertificatesAndCRLs("Collection", (String) null);
+        CertStore certificatesAndCRLs = signedDataParser.getCertificatesAndCRLs("Collection", (String) null);
         Collection<? extends Certificate> certificates = certificatesAndCRLs.getCertificates(null);
 
         assertNotNull(certificates);
@@ -176,9 +172,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedIdentityCertificate() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        CertStore certificatesAndCRLs = sp.getCertificatesAndCRLs("Collection", (String) null);
+        CertStore certificatesAndCRLs = signedDataParser.getCertificatesAndCRLs("Collection", (String) null);
         Collection<? extends Certificate> certificates = certificatesAndCRLs.getCertificates(null);
 
         assertNotNull(certificates);
@@ -197,9 +191,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedCrl() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        CertStore certificatesAndCRLs = sp.getCertificatesAndCRLs("Collection", (String) null);
+        CertStore certificatesAndCRLs = signedDataParser.getCertificatesAndCRLs("Collection", (String) null);
         Collection<? extends java.security.cert.CRL> crls = certificatesAndCRLs.getCRLs(null);
 
         assertNotNull(crls);
@@ -212,9 +204,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveOnlyOneSigner() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
 
         assertNotNull(signers);
         assertEquals(1, signers.size());
@@ -225,9 +215,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectSignerVersionBeCorrect() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
         assertEquals(3, signer.getVersion());
     }
@@ -237,9 +225,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveCorrectSubjectKeyIdentifier() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertArrayEquals(X509CertificateUtil.getSubjectKeyIdentifier(TEST_CMS_CERT.getCertificate()), signer.getSID().getSubjectKeyIdentifier());
@@ -250,9 +236,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveSubjectKeyIdentifierOnly() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNull(signer.getSID().getIssuer());
@@ -264,9 +248,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveCorrectDigestAlgorithmOID() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertEquals(DIGEST_SHA256, signer.getDigestAlgOID());
@@ -277,9 +259,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveSignedAttributes() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignedAttributes());
@@ -290,9 +270,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveCorrectContentTypeSignedAttribute() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute contentType = attributeTable.get(CMSAttributes.contentType);
@@ -307,9 +285,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveCorrectMessageDigestSignedAttribute() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute messageDigest = attributeTable.get(CMSAttributes.messageDigest);
@@ -324,9 +300,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveSigningTimeSignedAttribute() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute signingTimeAttr = attributeTable.get(CMSAttributes.signingTime);
@@ -342,9 +316,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveNoBinarySigningTimeSignedAttribute() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
         AttributeTable attributeTable = signer.getSignedAttributes();
         Attribute contentType = attributeTable.get(new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.2.46"));
@@ -358,9 +330,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveRSASignatureAlgorithm() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertEquals(ENCRYPTION_RSA, signer.getEncryptionAlgOID());
@@ -371,9 +341,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveValidSignature() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignature());
@@ -385,9 +353,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveNoUnsignedAttribute() throws Exception {
-        CMSSignedDataParser sp = new CMSSignedDataParser(cmsObject.getEncoded());
-        sp.getSignedContent().drain();
-        Collection<?> signers = sp.getSignerInfos().getSigners();
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNull(signer.getUnsignedAttributes());

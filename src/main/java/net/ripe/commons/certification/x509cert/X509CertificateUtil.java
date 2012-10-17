@@ -29,8 +29,13 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import javax.security.auth.x500.X500Principal;
+import org.bouncycastle.asn1.x500.X500Name;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509Extension;
@@ -40,13 +45,29 @@ import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 public final class X509CertificateUtil {
 
+    private static final JcaX509ExtensionUtils JCA_X509_EXTENSION_UTILS;
+    static {
+        try {
+            JCA_X509_EXTENSION_UTILS = new JcaX509ExtensionUtils();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     private X509CertificateUtil() {
         //Utility classes should not have a public or default constructor.
+    }
+
+    public static AuthorityKeyIdentifier createAuthorityKeyIdentifier(PublicKey key) {
+        return JCA_X509_EXTENSION_UTILS.createAuthorityKeyIdentifier(key);
     }
 
     public static byte[] getSubjectKeyIdentifier(X509Extension certificate) {
@@ -106,5 +127,13 @@ public final class X509CertificateUtil {
         } catch (IOException e) {
             throw new AbstractX509CertificateWrapperException("Can't encode SubjectPublicKeyInfo for certificate", e);
         }
+    }
+
+    public static X500Name principalToName(X500Principal dn) {
+        return X500Name.getInstance(dn.getEncoded());
+    }
+
+    public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey key) {
+        return SubjectPublicKeyInfo.getInstance(key.getEncoded());
     }
 }

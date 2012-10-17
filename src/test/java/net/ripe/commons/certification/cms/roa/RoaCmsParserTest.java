@@ -34,12 +34,10 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceType;
-
-import org.bouncycastle.asn1.DERTags;
+import org.bouncycastle.asn1.BERTags;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,70 +50,70 @@ public class RoaCmsParserTest {
     public static final RoaPrefix TEST_IPV6_PREFIX = new RoaPrefix(IpRange.parse("2001:0:200::/39"), null);
 
     public static final byte[] ENCODED_ROA_IP_ADDRESS = {
-        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x08,
-            DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-            DERTags.INTEGER, 0x01, 0x18
+        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
+            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
+            BERTags.INTEGER, 0x01, 0x18
     };
 
     public static final byte[] ENCODED_ROA_IP_ADDRESS_2 = {
-        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x05,
-            DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
+        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
     };
 
     public static final byte[] ENCODED_ROA_IP_ADDRESS_FAMILY = {
-        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x17,
-            DERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
-            DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x11,
-                DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x08,
-                    DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-                    DERTags.INTEGER, 0x01, 0x18,
-                DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x05,
-                    DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
+        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
+            BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
+                BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
+                    BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
+                    BERTags.INTEGER, 0x01, 0x18,
+                BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+                    BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
     };
 
     public static final byte[] ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_IPV4 = {
-        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x19,
-            DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x17,
-                DERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
-                DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x11,
-                    DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x08,
-                        DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-                        DERTags.INTEGER, 0x01, 0x18,
-                    DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x05,
-                        DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
+        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x19,
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
+                BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
+                BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
+                    BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
+                        BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
+                        BERTags.INTEGER, 0x01, 0x18,
+                    BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+                        BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
     };
 
     public static final byte[] ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_ALL = {
-        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x2b,
-            DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x17,
-                DERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
-                DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x11,
-                    DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x08,
-                        DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-                        DERTags.INTEGER, 0x01, 0x18,
-                    DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x05,
-                        DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20, // 10.32.0.0/12
-            DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x10,
-                DERTags.OCTET_STRING, 0x02, 0x00, 0x02, // IPv6
-                DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x0a,
-                    DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x08,
-                        DERTags.BIT_STRING, 0x06, 0x01, 0x20, 0x01, 0x00, 0x00, 0x02 // 2001:0:200::/39
+        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x2b,
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
+                BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
+                BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
+                    BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
+                        BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
+                        BERTags.INTEGER, 0x01, 0x18,
+                    BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+                        BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20, // 10.32.0.0/12
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x10,
+                BERTags.OCTET_STRING, 0x02, 0x00, 0x02, // IPv6
+                BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x0a,
+                    BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
+                        BERTags.BIT_STRING, 0x06, 0x01, 0x20, 0x01, 0x00, 0x00, 0x02 // 2001:0:200::/39
     };
 
     public static final byte[] ENCODED_ROUTE_ORIGIN_ATTESTATION = {
-        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x1e,
-//            (byte) (DERTags.TAGGED | DERTags.CONSTRUCTED | 0), 0x03, // Tag 0
-//                DERTags.INTEGER, 0x01, 0x00, // version: 0
-            DERTags.INTEGER, 0x01, 0x2a, // AS42
-            DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x19,
-                DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x17,
-                    DERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
-                    DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x11,
-                        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x08,
-                            DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-                            DERTags.INTEGER, 0x01, 0x18,
-                        DERTags.SEQUENCE | DERTags.CONSTRUCTED, 0x05,
-                            DERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
+        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x1e,
+//            (byte) (BERTags.TAGGED | BERTags.CONSTRUCTED | 0), 0x03, // Tag 0
+//                BERTags.INTEGER, 0x01, 0x00, // version: 0
+            BERTags.INTEGER, 0x01, 0x2a, // AS42
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x19,
+                BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
+                    BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
+                    BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
+                        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
+                            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
+                            BERTags.INTEGER, 0x01, 0x18,
+                        BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+                            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
     };
 
 	private RoaCmsParser parser;

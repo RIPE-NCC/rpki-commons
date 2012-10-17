@@ -38,13 +38,18 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCSException;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
 
 
 /**
@@ -55,7 +60,7 @@ public class RpkiCaCertificateRequestParser {
 
     private static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
-    private PKCS10CertificationRequest pkcs10CertificationRequest;
+    private JcaPKCS10CertificationRequest pkcs10CertificationRequest;
 
     private URI caRepositoryUri;
 
@@ -64,7 +69,7 @@ public class RpkiCaCertificateRequestParser {
     private PublicKey publicKey;
 
     public RpkiCaCertificateRequestParser(PKCS10CertificationRequest pkcs10CertificationRequest) throws RpkiCaCertificateRequestParserException {
-        this.pkcs10CertificationRequest = pkcs10CertificationRequest;
+        this.pkcs10CertificationRequest = new JcaPKCS10CertificationRequest(pkcs10CertificationRequest);
         process();
 
         if (caRepositoryUri == null) {
@@ -98,7 +103,7 @@ public class RpkiCaCertificateRequestParser {
 
     private void extractPublicKey() throws RpkiCaCertificateRequestParserException {
         try {
-            publicKey = pkcs10CertificationRequest.getPublicKey(DEFAULT_SIGNATURE_PROVIDER);
+            publicKey = pkcs10CertificationRequest.getPublicKey();
         } catch (Exception e) {
             throw new RpkiCaCertificateRequestParserException(e);
         }
@@ -106,10 +111,10 @@ public class RpkiCaCertificateRequestParser {
 
     private void extractSiaUris() throws RpkiCaCertificateRequestParserException {
         try {
-            X509Extensions extensions = getPkcs9Extensions();
-            X509Extension extension = extensions.getExtension(X509Extension.subjectInfoAccess);
+            Extensions extensions = getPkcs9Extensions();
+            Extension extension = extensions.getExtension(X509Extension.subjectInfoAccess);
 
-            ASN1Sequence accessDescriptorSequence = (ASN1Sequence) ASN1Sequence.fromByteArray(extension.getValue().getOctets());
+            ASN1Sequence accessDescriptorSequence = (ASN1Sequence) ASN1Sequence.fromByteArray(extension.getExtnValue().getOctets());
 
             @SuppressWarnings("unchecked")
             Enumeration<DERSequence> objects = accessDescriptorSequence.getObjects();
@@ -131,14 +136,14 @@ public class RpkiCaCertificateRequestParser {
 
     }
 
-    private X509Extensions getPkcs9Extensions() throws RpkiCaCertificateRequestParserException {
-        DERSet pkcs9ExtensionRequest = getPkcs9ExtensionRequest();
+    private Extensions getPkcs9Extensions() throws RpkiCaCertificateRequestParserException {
+        ASN1Set pkcs9ExtensionRequest = getPkcs9ExtensionRequest();
 
         Object extensionRequestElement = pkcs9ExtensionRequest.getObjects().nextElement();
-        if (extensionRequestElement instanceof X509Extensions) {
-            return (X509Extensions) extensionRequestElement;
-        } else if (extensionRequestElement instanceof DERSequence) {
-            return new X509Extensions((DERSequence) extensionRequestElement);
+        if (extensionRequestElement instanceof Extensions) {
+            return (Extensions) extensionRequestElement;
+        } else if (extensionRequestElement instanceof ASN1Sequence) {
+            return Extensions.getInstance((ASN1Sequence) extensionRequestElement);
         } else {
             throw new RpkiCaCertificateRequestParserException("Encountered an element I do not understand, type: "
                     + extensionRequestElement.getClass().getSimpleName());
@@ -146,30 +151,13 @@ public class RpkiCaCertificateRequestParser {
 
     }
 
-    private DERSet getPkcs9ExtensionRequest() throws RpkiCaCertificateRequestParserException {
-        ASN1Set attributes = pkcs10CertificationRequest.getCertificationRequestInfo().getAttributes();
+    private ASN1Set getPkcs9ExtensionRequest() throws RpkiCaCertificateRequestParserException {
+        Attribute[] attributes = pkcs10CertificationRequest.getAttributes();
 
-        @SuppressWarnings("unchecked")
-        Enumeration<Object> attributeObjects = attributes.getObjects();
-        while (attributeObjects.hasMoreElements()) {
-            Attribute attr;
-
-            Object nextElement = attributeObjects.nextElement();
-            if (nextElement instanceof DERSequence) {
-                // When the request is encoded and decoded the Attribute shows up as a DERSequence
-                attr = new Attribute((DERSequence) nextElement);
-            } else if (nextElement instanceof Attribute) {
-                // When we pass a PKCS10CertificationRequest object around without encoding/decoding
-                // the type is preserved
-                attr = (Attribute) nextElement;
-            } else {
-                throw new RpkiCaCertificateRequestParserException("Encountered an element I do not understand, type: "
-                        + nextElement.getClass().getSimpleName());
-            }
-
+        for (Attribute attr: attributes) {
             ASN1ObjectIdentifier oid = attr.getAttrType();
             if (oid.equals(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest)) {
-                return (DERSet) attr.getAttrValues();
+                return attr.getAttrValues();
             }
         }
         throw new RpkiCaCertificateRequestParserException("Could not find PKCS 9 Extension Request");
@@ -177,11 +165,14 @@ public class RpkiCaCertificateRequestParser {
 
     private void verifyRequest() throws RpkiCaCertificateRequestParserException {
         try {
-            pkcs10CertificationRequest.verify(publicKey, DEFAULT_SIGNATURE_PROVIDER);
-        } catch (Exception e) {
+            ContentVerifierProvider contentVerifierProvider = new JcaContentVerifierProviderBuilder().setProvider(DEFAULT_SIGNATURE_PROVIDER).build(publicKey);
+            if (!pkcs10CertificationRequest.isSignatureValid(contentVerifierProvider)) {
+                throw new RpkiCaCertificateRequestParserException("signature validation failed");
+            }
+        } catch (OperatorCreationException e) {
+            throw new RpkiCaCertificateRequestParserException("Could not verify request", e);
+        } catch (PKCSException e) {
             throw new RpkiCaCertificateRequestParserException("Could not verify request", e);
         }
     }
-
-
 }

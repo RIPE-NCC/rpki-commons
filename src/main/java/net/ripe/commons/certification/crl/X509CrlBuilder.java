@@ -31,7 +31,6 @@ package net.ripe.commons.certification.crl;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.SortedMap;
@@ -40,8 +39,10 @@ import java.util.TreeMap;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.crl.X509Crl.Entry;
 import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
+import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLNumber;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.CertIOException;
@@ -49,7 +50,6 @@ import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.joda.time.DateTime;
 
 public class X509CrlBuilder {
@@ -59,7 +59,7 @@ public class X509CrlBuilder {
     private X500Principal issuerDN;
     private DateTime thisUpdateTime;
     private DateTime nextUpdateTime;
-    private AuthorityKeyIdentifierStructure authorityKeyIdentifier;
+    private AuthorityKeyIdentifier authorityKeyIdentifier;
     private CRLNumber crlNumber;
     private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
@@ -100,12 +100,8 @@ public class X509CrlBuilder {
     }
 
     public X509CrlBuilder withAuthorityKeyIdentifier(PublicKey authorityKey) {
-        try {
-            this.authorityKeyIdentifier = new AuthorityKeyIdentifierStructure(authorityKey);
-            return this;
-        } catch (InvalidKeyException e) {
-            throw new IllegalArgumentException(e);
-        }
+        this.authorityKeyIdentifier = X509CertificateUtil.createAuthorityKeyIdentifier(authorityKey);
+        return this;
     }
 
     public X509CrlBuilder addEntry(BigInteger serial, DateTime revocationTime) {

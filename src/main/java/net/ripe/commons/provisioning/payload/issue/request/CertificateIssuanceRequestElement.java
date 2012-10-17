@@ -34,13 +34,13 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 /**
  * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
  */
 public class CertificateIssuanceRequestElement {
-    
+
     private String className;
     private IpResourceSet allocatedAsn;
     private IpResourceSet allocatedIpv4;
@@ -74,7 +74,7 @@ public class CertificateIssuanceRequestElement {
         this.allocatedAsn = asns;
         return this;
     }
-    
+
     CertificateIssuanceRequestElement setAllocatedIpv4(IpResourceSet allocatedIpv4) {
         validateResourceSetContainsOnlyType(allocatedIpv4, IpResourceType.IPv4);
         this.allocatedIpv4 = allocatedIpv4;

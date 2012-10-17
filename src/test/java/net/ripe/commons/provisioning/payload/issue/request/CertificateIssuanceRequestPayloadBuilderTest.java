@@ -33,13 +33,11 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
-
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.ipresource.IpResourceSet;
-
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -61,7 +59,7 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
     }
 
     @Test
-    public void shouldBuildValidListResponsePayload() {
+    public void shouldBuildValidListResponsePayload() throws IOException {
         assertEquals("sender", TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD.getSender());
         assertEquals("recipient", TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD.getRecipient());
 
