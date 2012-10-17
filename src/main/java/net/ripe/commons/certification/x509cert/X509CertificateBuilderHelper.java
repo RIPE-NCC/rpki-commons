@@ -29,6 +29,16 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.ipresource.InheritedIpResourceSet;
@@ -36,27 +46,35 @@ import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
-
-import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.*;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.Date;
 
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
  * (delegated to, not extended) specific certificate builders.
- * 
+ *
  * Because we want to maintain the pattern where a specific Certificate builder
  * can be chained like: builder.withValidity(val).withSubjectDn(subject) etc...
  * dynamic typing would be required.. hence delegation.
- * 
+ *
  */
 public final class X509CertificateBuilderHelper {
 
@@ -196,31 +214,27 @@ public final class X509CertificateBuilderHelper {
 		return this;
 	}
 
-	public X509Certificate generateCertificate() {
-		X509V3CertificateGenerator certificateGenerator = createCertificateGenerator();
-		try {
-			return certificateGenerator.generate(signingKeyPair.getPrivate(),
-					signatureProvider);
-		} catch (CertificateEncodingException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		} catch (InvalidKeyException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		} catch (IllegalStateException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		} catch (NoSuchAlgorithmException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		} catch (SignatureException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		} catch (NoSuchProviderException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		}
-	}
+    public X509Certificate generateCertificate() {
+        X509v3CertificateBuilder certificateGenerator = createCertificateGenerator();
+        try {
+            ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(signatureProvider).build(signingKeyPair.getPrivate());
+            return new JcaX509CertificateConverter().getCertificate(certificateGenerator.build(signer));
+        } catch (CertificateEncodingException e) {
+            throw new X509ResourceCertificateBuilderException(e);
+        } catch (IllegalStateException e) {
+            throw new X509ResourceCertificateBuilderException(e);
+        } catch (OperatorCreationException e) {
+            throw new X509ResourceCertificateBuilderException(e);
+        } catch (CertificateException e) {
+            throw new X509ResourceCertificateBuilderException(e);
+        }
+    }
 
 	/**
 	 * Override this to add your extensions to the certificate generator
 	 */
-	protected X509V3CertificateGenerator createCertificateGenerator() {
-		X509V3CertificateGenerator generator = createX509V3CertificateGenerator();
+	protected X509v3CertificateBuilder createCertificateGenerator() {
+		X509v3CertificateBuilder generator = createX509V3CertificateGenerator();
 
 		if (addSubjectKeyIdentifier) {
 			addSubjectKeyIdentifier(generator);
@@ -244,7 +258,7 @@ public final class X509CertificateBuilderHelper {
 			Validate.noNullElements(crlDistributionPoints);
 			addCrlDistributionPoints(generator);
 		}
-		if (policies != null) {
+		if (policies != null && policies.length > 0) {
 			addPolicies(generator);
 		}
 		if (resources != null) {
@@ -253,19 +267,12 @@ public final class X509CertificateBuilderHelper {
 		return generator;
 	}
 
-	private X509V3CertificateGenerator createX509V3CertificateGenerator() {
+	private X509v3CertificateBuilder createX509V3CertificateGenerator() {
 		validateCertificateFields();
 
-		X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
-		generator.setNotBefore(new Date(validityPeriod.getNotValidBefore()
-				.getMillis()));
-		generator.setNotAfter(new Date(validityPeriod.getNotValidAfter()
-				.getMillis()));
-		generator.setIssuerDN(issuerDN);
-		generator.setSerialNumber(serial);
-		generator.setPublicKey(publicKey);
-		generator.setSignatureAlgorithm(signatureAlgorithm);
-		generator.setSubjectDN(subjectDN);
+		X509v3CertificateBuilder generator = new X509v3CertificateBuilder(X500Name.getInstance(issuerDN.getEncoded()), serial, new Date(validityPeriod.getNotValidBefore()
+                .getMillis()), new Date(validityPeriod.getNotValidAfter()
+                        .getMillis()), X500Name.getInstance(subjectDN.getEncoded()), SubjectPublicKeyInfo.getInstance(publicKey.getEncoded()));
 		return generator;
 	}
 
@@ -282,7 +289,7 @@ public final class X509CertificateBuilderHelper {
 		}
 	}
 
-	private void addSubjectKeyIdentifier(X509V3CertificateGenerator generator) {
+	private void addSubjectKeyIdentifier(X509v3CertificateBuilder generator) {
 		try {
 			generator.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(publicKey));
 		} catch (InvalidKeyException e) {
@@ -290,7 +297,7 @@ public final class X509CertificateBuilderHelper {
 		}
 	}
 
-	private void addAuthorityKeyIdentifier(X509V3CertificateGenerator generator) {
+	private void addAuthorityKeyIdentifier(X509v3CertificateBuilder generator) {
 		try {
 			generator.addExtension(
 					X509Extension.authorityKeyIdentifier,
@@ -301,39 +308,39 @@ public final class X509CertificateBuilderHelper {
 		}
 	}
 
-	private void addCaBit(X509V3CertificateGenerator generator) {
+	private void addCaBit(X509v3CertificateBuilder generator) {
 		generator.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(ca));
 	}
 
-	private void addKeyUsage(X509V3CertificateGenerator generator) {
+	private void addKeyUsage(X509v3CertificateBuilder generator) {
 		generator.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
 	}
 
-	private void addAIA(X509V3CertificateGenerator generator) {
+	private void addAIA(X509v3CertificateBuilder generator) {
 		generator.addExtension(X509Extension.authorityInfoAccess, false,
 				new AuthorityInformationAccess(new DERSequence(authorityInformationAccess)));
 	}
 
-	private void addSIA(X509V3CertificateGenerator generator) {
+	private void addSIA(X509v3CertificateBuilder generator) {
 		generator.addExtension(X509Extension.subjectInfoAccess, false,
 				new AuthorityInformationAccess(new DERSequence(subjectInformationAccess)));
 	}
 
-	private void addCrlDistributionPoints(X509V3CertificateGenerator generator) {
+	private void addCrlDistributionPoints(X509v3CertificateBuilder generator) {
 		CRLDistPoint crldp = convertToCrlDistributionPoint(crlDistributionPoints);
 		generator.addExtension(X509Extension.cRLDistributionPoints, false, crldp);
 	}
 
-	private void addPolicies(X509V3CertificateGenerator generator) {
+	private void addPolicies(X509v3CertificateBuilder generator) {
 		generator.addExtension(X509Extension.certificatePolicies, true, new DERSequence(policies));
 	}
 
-	private void addResourceExtensions(X509V3CertificateGenerator generator) {
+	private void addResourceExtensions(X509v3CertificateBuilder generator) {
 		ResourceExtensionEncoder encoder = new ResourceExtensionEncoder();
 
 		boolean inherit = resources instanceof InheritedIpResourceSet;
 
-		byte[] encodedIPAddressBlocks = encoder.encodeIpAddressBlocks(inherit,
+		ASN1Encodable encodedIPAddressBlocks = encoder.encodeIpAddressBlocks(inherit,
 				inherit, resources);
 		if (encodedIPAddressBlocks != null) {
 			generator.addExtension(
@@ -341,7 +348,7 @@ public final class X509CertificateBuilderHelper {
 					encodedIPAddressBlocks);
 		}
 
-		byte[] encodedASNs = encoder.encodeAsIdentifiers(inherit, resources);
+		ASN1Encodable encodedASNs = encoder.encodeAsIdentifiers(inherit, resources);
 		if (encodedASNs != null) {
 			generator.addExtension(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true,encodedASNs);
 		}

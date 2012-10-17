@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpAddress;
@@ -42,9 +41,9 @@ import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERNull;
@@ -74,12 +73,12 @@ public class ResourceExtensionEncoder {
     /**
      * id-pe-ipAddrBlocks OBJECT IDENTIFIER ::= { id-pe 7 }
      */
-    public static final String OID_IP_ADDRESS_BLOCKS = OID_PE + ".7";
+    public static final ASN1ObjectIdentifier OID_IP_ADDRESS_BLOCKS = new ASN1ObjectIdentifier(OID_PE + ".7");
 
     /**
      * id-pe-autonomousSysIds OBJECT IDENTIFIER ::= { id-pe 8 }
      */
-    public static final String OID_AUTONOMOUS_SYS_IDS = OID_PE + ".8";
+    public static final ASN1ObjectIdentifier OID_AUTONOMOUS_SYS_IDS = new ASN1ObjectIdentifier(OID_PE + ".8");
 
     /**
      * Encode the IP Address Block extension for Resource Certificates. This
@@ -93,7 +92,7 @@ public class ResourceExtensionEncoder {
      *            the set of IPv4 and IPv6 resources.
      * @return the DER encoding of the IP Address Block Extension.
      */
-    public byte[] encodeIpAddressBlocks(boolean inheritIpv4, boolean inheritIpv6, IpResourceSet resources) {
+    public ASN1Encodable encodeIpAddressBlocks(boolean inheritIpv4, boolean inheritIpv6, IpResourceSet resources) {
         SortedMap<AddressFamily, IpResourceSet> addressBlocks = new TreeMap<AddressFamily, IpResourceSet>();
 
         if (inheritIpv4) {
@@ -108,7 +107,7 @@ public class ResourceExtensionEncoder {
             addressBlocks.put(AddressFamily.IPV6, resources);
         }
 
-        return addressBlocks.isEmpty() ? null : Asn1Util.encode(ipAddressBlocksToDer(addressBlocks));
+        return addressBlocks.isEmpty() ? null : ipAddressBlocksToDer(addressBlocks);
     }
 
     /**
@@ -122,9 +121,9 @@ public class ResourceExtensionEncoder {
      *            the set of ASNs.
      * @return the DER encoding of the AS Identifier extension.
      */
-    public byte[] encodeAsIdentifiers(boolean inherit, IpResourceSet resources) {
+    public ASN1Encodable encodeAsIdentifiers(boolean inherit, IpResourceSet resources) {
         if (inherit || resources.containsType(IpResourceType.ASN)) {
-            return Asn1Util.encode(asIdentifiersToDer(inherit, resources, false, new IpResourceSet()));
+            return asIdentifiersToDer(inherit, resources, false, new IpResourceSet());
         }
         return null;
     }

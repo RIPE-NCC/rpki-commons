@@ -33,13 +33,11 @@ import static org.junit.Assert.*;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import net.ripe.commons.certification.Asn1UtilTest;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -242,10 +240,10 @@ public class ResourceExtensionEncoderTest {
     @Test
     public void shouldEncodeIpAddressBlocks() {
         IpResourceSet resources = new IpResourceSet(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"), IpRange.parse("2001:0:200::-2001:0:3ff:ffff:ffff:ffff:ffff:ffff"));
-        assertArrayEquals(ENCODED_IP_ADDRESS_BLOCKS, subject.encodeIpAddressBlocks(false, false, resources));
+        assertArrayEquals(ENCODED_IP_ADDRESS_BLOCKS, subject.encodeIpAddressBlocks(false, false, resources).getDEREncoded());
 
         resources = new IpResourceSet(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
-        assertArrayEquals(ENCODED_IPV4_ONLY_ADDRESS_BLOCKS, subject.encodeIpAddressBlocks(false, false, resources));
+        assertArrayEquals(ENCODED_IPV4_ONLY_ADDRESS_BLOCKS, subject.encodeIpAddressBlocks(false, false, resources).getDEREncoded());
     }
 
     @Test
@@ -290,7 +288,7 @@ public class ResourceExtensionEncoderTest {
     @Test
     public void shouldEncodeAsIdentifiers() {
         IpResourceSet resources = new IpResourceSet(ASN_412_233, ASN_127.upTo(ASN_128));
-        assertArrayEquals(ENCODED_AS_IDENTIFIERS, subject.encodeAsIdentifiers(false, resources));
+        assertArrayEquals(ENCODED_AS_IDENTIFIERS, subject.encodeAsIdentifiers(false, resources).getDEREncoded());
     }
 
     @Test

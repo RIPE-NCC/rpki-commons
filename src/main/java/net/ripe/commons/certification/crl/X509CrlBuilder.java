@@ -29,22 +29,27 @@
  */
 package net.ripe.commons.certification.crl;
 
-import net.ripe.commons.certification.crl.X509Crl.Entry;
-import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.x509.CRLNumber;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.x509.X509V2CRLGenerator;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
-import org.joda.time.DateTime;
-
-import javax.security.auth.x500.X500Principal;
+import java.io.IOException;
 import java.math.BigInteger;
-import java.security.*;
-import java.security.cert.CRLException;
+import java.security.InvalidKeyException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import javax.security.auth.x500.X500Principal;
+import net.ripe.commons.certification.crl.X509Crl.Entry;
+import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.CRLNumber;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.X509v2CRLBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
+import org.joda.time.DateTime;
 
 public class X509CrlBuilder {
 
@@ -55,7 +60,7 @@ public class X509CrlBuilder {
     private DateTime nextUpdateTime;
     private AuthorityKeyIdentifierStructure authorityKeyIdentifier;
     private CRLNumber crlNumber;
-    private String signatureProvider;
+    private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
     private SortedMap<BigInteger, X509Crl.Entry> entries = new TreeMap<BigInteger, X509Crl.Entry>();
 
@@ -119,20 +124,13 @@ public class X509CrlBuilder {
 
     public X509Crl build(PrivateKey key) {
         validateCrlFields();
-        X509V2CRLGenerator generator = createCrlGenerator();
+        X509v2CRLBuilder generator = createCrlGenerator();
         try {
-            return new X509Crl(generator.generate(key, signatureProvider));
-        } catch (InvalidKeyException e) {
+            ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(key);
+            return new X509Crl(generator.build(signer).getEncoded());
+        } catch (OperatorCreationException e) {
             throw new X509CrlBuilderException(e);
-        } catch (CRLException e) {
-            throw new X509CrlBuilderException(e);
-        } catch (IllegalStateException e) {
-            throw new X509CrlBuilderException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new X509CrlBuilderException(e);
-        } catch (NoSuchProviderException e) {
-        	throw new X509CrlBuilderException(e);
-        } catch (SignatureException e) {
+        } catch (IOException e) {
             throw new X509CrlBuilderException(e);
         }
     }
@@ -145,12 +143,9 @@ public class X509CrlBuilder {
         Validate.notNull(authorityKeyIdentifier, "authorityKeyIdentifier is null");
     }
 
-    private X509V2CRLGenerator createCrlGenerator() {
-        X509V2CRLGenerator generator = new X509V2CRLGenerator();
-        generator.setIssuerDN(issuerDN);
-        generator.setThisUpdate(thisUpdateTime.toDate());
+    private X509v2CRLBuilder createCrlGenerator() {
+        X509v2CRLBuilder generator = new X509v2CRLBuilder(X500Name.getInstance(issuerDN.getEncoded()), thisUpdateTime.toDate());
         generator.setNextUpdate(nextUpdateTime.toDate());
-        generator.setSignatureAlgorithm(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM);
         generator.addExtension(X509Extension.authorityKeyIdentifier, false, authorityKeyIdentifier);
         generator.addExtension(X509Extension.cRLNumber, false, crlNumber);
         for (X509Crl.Entry entry : entries.values()) {

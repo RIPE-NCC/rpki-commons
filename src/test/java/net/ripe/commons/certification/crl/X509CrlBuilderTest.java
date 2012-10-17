@@ -30,7 +30,6 @@
 package net.ripe.commons.certification.crl;
 
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -42,12 +41,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.util.KeyPairUtil;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -98,7 +94,7 @@ public class X509CrlBuilderTest {
 
     @Test
     public void shouldUseSha256WithRsaEncryption() {
-        assertEquals("1.2.840.113549.1.1.11", emptyCrl.getSigAlgName());
+        assertEquals("SHA256withRSA", emptyCrl.getSigAlgName());
     }
 
     @Test

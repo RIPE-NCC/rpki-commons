@@ -40,9 +40,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
@@ -55,7 +53,6 @@ import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.easymock.IAnswer;
 import org.joda.time.DateTime;
@@ -225,7 +222,7 @@ public class X509ResourceCertificateTest {
     	certificate.getCertificate().verify(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
     }
 
-    @Test(expected=InvalidKeyException.class)
+    @Test(expected=SignatureException.class)
     public void shouldFailOnInvalidSignature() throws InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
         X509ResourceCertificate certificate = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
         certificate.getCertificate().verify(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic());

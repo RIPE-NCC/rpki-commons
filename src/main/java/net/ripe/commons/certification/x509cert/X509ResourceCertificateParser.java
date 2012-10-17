@@ -154,14 +154,14 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         ResourceExtensionParser parser = new ResourceExtensionParser();
         boolean ipInherited = false;
         boolean asInherited = false;
-        byte[] ipAddressBlocksExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS);
+        byte[] ipAddressBlocksExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
         if (ipAddressBlocksExtension != null) {
             IpResourceSet ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
             if (ipResources == null) {
                 ipInherited = true;
             }
         }
-        byte[] asnExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS);
+        byte[] asnExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
         if (asnExtension != null) {
             IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
             if (asResources == null) {

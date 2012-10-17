@@ -67,7 +67,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         IpResourceSet result = new IpResourceSet();
         boolean ipInherited = false;
         boolean asInherited = false;
-        byte[] ipAddressBlocksExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS);
+        byte[] ipAddressBlocksExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
         if (ipAddressBlocksExtension != null) {
             IpResourceSet ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
             if (ipResources == null) {
@@ -76,7 +76,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
                 result.addAll(ipResources);
             }
         }
-        byte[] asnExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS);
+        byte[] asnExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
         if (asnExtension != null) {
             IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
             if (asResources == null) {
