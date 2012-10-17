@@ -39,7 +39,7 @@ import java.util.Map;
 import net.ripe.commons.certification.util.EqualsSupport;
 
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
@@ -48,23 +48,23 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
 
     private static final long serialVersionUID = 1L;
 
-    public static final DERObjectIdentifier ID_CA_CA_ISSUERS = AccessDescription.id_ad_caIssuers;
+    public static final ASN1ObjectIdentifier ID_CA_CA_ISSUERS = AccessDescription.id_ad_caIssuers;
 
-    public static final DERObjectIdentifier ID_AD_CA_REPOSITORY = new DERObjectIdentifier(X509ObjectIdentifiers.id_ad + ".5");
+    public static final ASN1ObjectIdentifier ID_AD_CA_REPOSITORY = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".5");
 
-    public static final DERObjectIdentifier ID_AD_SIGNED_OBJECT_REPOSITORY = new DERObjectIdentifier(X509ObjectIdentifiers.id_ad + ".9");
+    public static final ASN1ObjectIdentifier ID_AD_SIGNED_OBJECT_REPOSITORY = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".9");
 
-    public static final DERObjectIdentifier ID_AD_SIGNED_OBJECT = new DERObjectIdentifier(X509ObjectIdentifiers.id_ad + ".11");
+    public static final ASN1ObjectIdentifier ID_AD_SIGNED_OBJECT = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".11");
 
-    public static final DERObjectIdentifier ID_AD_RPKI_MANIFEST = new DERObjectIdentifier(X509ObjectIdentifiers.id_ad + ".10");
+    public static final ASN1ObjectIdentifier ID_AD_RPKI_MANIFEST = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".10");
 
     private String method;
     private URI location;
 
-    private static final Map<DERObjectIdentifier, String> METHOD_STRING_TABLE;
+    private static final Map<ASN1ObjectIdentifier, String> METHOD_STRING_TABLE;
 
     static {
-        Map<DERObjectIdentifier, String> map = new HashMap<DERObjectIdentifier, String>();
+        Map<ASN1ObjectIdentifier, String> map = new HashMap<ASN1ObjectIdentifier, String>();
         map.put(ID_CA_CA_ISSUERS, "ca issuer");
         map.put(ID_AD_CA_REPOSITORY, "ca repository");
         map.put(ID_AD_SIGNED_OBJECT_REPOSITORY, "signed object repository");
@@ -83,14 +83,14 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
         }
     }
 
-    public X509CertificateInformationAccessDescriptor(DERObjectIdentifier method, URI location) {
+    public X509CertificateInformationAccessDescriptor(ASN1ObjectIdentifier method, URI location) {
         super();
         this.method = method.getId();
         this.location = location;
     }
 
-    public DERObjectIdentifier getMethod() {
-        return new DERObjectIdentifier(method);
+    public ASN1ObjectIdentifier getMethod() {
+        return new ASN1ObjectIdentifier(method);
     }
 
     public URI getLocation() {
@@ -118,19 +118,19 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
         return result;
     }
 
-    public static String methodToString(DERObjectIdentifier method) {
+    public static String methodToString(ASN1ObjectIdentifier method) {
         Validate.notNull(method);
         String result = METHOD_STRING_TABLE.get(method);
         return result == null ? method.toString() : result;
     }
 
-    public static DERObjectIdentifier stringToMethod(String method) {
+    public static ASN1ObjectIdentifier stringToMethod(String method) {
         Validate.notNull(method);
-        for (Map.Entry<DERObjectIdentifier, String> entry: METHOD_STRING_TABLE.entrySet()) {
+        for (Map.Entry<ASN1ObjectIdentifier, String> entry: METHOD_STRING_TABLE.entrySet()) {
             if (entry.getValue().equals(method)) {
                 return entry.getKey();
             }
         }
-        return new DERObjectIdentifier(method);
+        return new ASN1ObjectIdentifier(method);
     }
 }

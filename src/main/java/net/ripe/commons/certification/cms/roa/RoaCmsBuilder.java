@@ -32,19 +32,17 @@ package net.ripe.commons.certification.cms.roa;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.cms.RpkiSignedObjectBuilder;
 import net.ripe.commons.certification.rfc3779.AddressFamily;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceType;
-
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERSequence;
 
 /**
@@ -100,7 +98,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
         if (prefix.getMaximumLength() == null) {
             encodables = new ASN1Encodable[] { address };
         } else {
-            encodables = new ASN1Encodable[] { address, new DERInteger(prefix.getMaximumLength()) };
+            encodables = new ASN1Encodable[] { address, new ASN1Integer(prefix.getMaximumLength()) };
         }
         return new DERSequence(encodables);
     }
@@ -166,7 +164,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
      * NOT be encoded. So the version field should not be present.
      */
     ASN1Encodable encodeRouteOriginAttestation(Asn asn, List<RoaPrefix> prefixes) {
-        ASN1Encodable[] encodables = { new DERInteger(asn.getValue()), encodeRoaIpAddressFamilySequence(prefixes) };
+        ASN1Encodable[] encodables = { new ASN1Integer(asn.getValue()), encodeRoaIpAddressFamilySequence(prefixes) };
         return new DERSequence(encodables);
     }
 }

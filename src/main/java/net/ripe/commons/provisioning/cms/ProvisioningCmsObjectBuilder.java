@@ -47,18 +47,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.PayloadParser;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -119,7 +116,7 @@ public class ProvisioningCmsObjectBuilder {
         ValidationResult validationResult = parser.getValidationResult();
         if (validationResult.hasFailures()) {
             List<String> failureMessages = new ArrayList<String>();
-            List<ValidationCheck> failures = validationResult.getFailures(new ValidationLocation("<generated>"));
+            List<ValidationCheck> failures = validationResult.getFailures(new ValidationLocation("generated.cms"));
             for (ValidationCheck check : failures) {
                 failureMessages.add(check.getKey());
             }
@@ -175,7 +172,7 @@ public class ProvisioningCmsObjectBuilder {
     }
 
     private AttributeTable createSignedAttributes() {
-        Hashtable<DERObjectIdentifier, Attribute> attributes = new Hashtable<DERObjectIdentifier, Attribute>(); // NOPMD
+        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>(); // NOPMD
                                                                                                                 // -
                                                                                                                 // ReplaceHashtableWithMap
         Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));

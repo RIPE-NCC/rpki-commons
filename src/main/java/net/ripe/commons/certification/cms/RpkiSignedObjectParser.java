@@ -47,12 +47,13 @@ import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerId;
@@ -117,7 +118,7 @@ public abstract class RpkiSignedObjectParser {
         return signingTime;
     }
 
-    public abstract void decodeContent(DEREncodable encoded);
+    public abstract void decodeContent(ASN1Encodable encoded);
 
     private void parseCms() {
         CMSSignedDataParser sp;
@@ -129,9 +130,15 @@ public abstract class RpkiSignedObjectParser {
         }
         validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
 
-        if (!validationResult.hasFailures()) { parseContent(sp); }
-        if (!validationResult.hasFailures()) { parseCmsCertificate(sp); }
-        if (!validationResult.hasFailures()) { verifyCmsSigning(sp, certificate.getCertificate()); }
+        if (!validationResult.hasFailures()) {
+            parseContent(sp);
+        }
+        if (!validationResult.hasFailures()) {
+            parseCmsCertificate(sp);
+        }
+        if (!validationResult.hasFailures()) {
+            verifyCmsSigning(sp, certificate.getCertificate());
+        }
     }
 
     private void parseContent(CMSSignedDataParser sp) {
@@ -256,7 +263,11 @@ public abstract class RpkiSignedObjectParser {
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
         SignerId signerId = signer.getSID();
-        validationResult.rejectIfFalse(signerId.match(certificate), SIGNER_ID_MATCH);
+        try {
+            validationResult.rejectIfFalse(signerId.match(new JcaX509CertificateHolder(certificate)), SIGNER_ID_MATCH);
+        } catch (CertificateEncodingException e) {
+            throw new AbstractX509CertificateWrapperException(e);
+        }
 
         return true;
     }

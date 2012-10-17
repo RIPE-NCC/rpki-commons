@@ -46,9 +46,9 @@ import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Sequence;
 
 public class RoaCmsParser extends RpkiSignedObjectParser {
 
@@ -105,9 +105,9 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
         }
 	}
 
-	RoaPrefix parseRoaIpAddressFamily(IpResourceType type, DEREncodable der) {
-		expect(der, DERSequence.class);
-		DERSequence seq = (DERSequence) der;
+	RoaPrefix parseRoaIpAddressFamily(IpResourceType type, ASN1Encodable der) {
+		expect(der, ASN1Sequence.class);
+		ASN1Sequence seq = (ASN1Sequence) der;
 		ValidationResult validationResult = getValidationResult();
 		if (!validationResult.rejectIfFalse((seq.size() > 0) && (seq.size() <= 2), PREFIX_IN_ADDR_FAMILY)) {
 			throw new IllegalArgumentException("ip address family sequence length invalid");
@@ -115,8 +115,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		IpRange prefix = parseIpAddressAsPrefix(type, seq.getObjectAt(0));
 		BigInteger maxLength = null;
 		if (seq.size() > 1) {
-			expect(seq.getObjectAt(1), DERInteger.class);
-			maxLength = ((DERInteger) seq.getObjectAt(1)).getValue();
+		    maxLength = expect(seq.getObjectAt(1), ASN1Integer.class).getValue();
 			if (!validationResult.rejectIfFalse((maxLength.compareTo(BigInteger.ZERO) >= 0) && (maxLength.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0), PREFIX_LENGTH)) {
 				throw new IllegalArgumentException("prefix max length invalid");
 			}
@@ -124,10 +123,9 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		return new RoaPrefix(prefix, maxLength == null ? null : maxLength.intValue());
 	}
 
-	void parseRouteOriginAttestation(DEREncodable der) {
+	void parseRouteOriginAttestation(ASN1Encodable der) {
 
-		expect(der, DERSequence.class);
-		DERSequence seq = (DERSequence) der;
+	    ASN1Sequence seq = expect(der, ASN1Sequence.class);
 
 		if (!getValidationResult().rejectIfTrue(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0).toString())) {
 			// eContent seems to contain non-standard version (default 0 is omitted in structure)
@@ -141,9 +139,9 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		prefixes = parseRoaIpAddressFamilySequence(seq.getObjectAt(1));
 	}
 
-	void parseRoaIpAddressFamily(List<RoaPrefix> roaPrefixList, DEREncodable der) {
-		expect(der, DERSequence.class);
-		DERSequence seq = (DERSequence) der;
+	void parseRoaIpAddressFamily(List<RoaPrefix> roaPrefixList, ASN1Encodable der) {
+		expect(der, ASN1Sequence.class);
+		ASN1Sequence seq = (ASN1Sequence) der;
 		ValidationResult validationResult = getValidationResult();
 		if (seq.size() != 2) {
 			validationResult.rejectIfFalse(false, ADDR_FAMILY_AND_ADDR_IN_DER_SEQ);
@@ -154,8 +152,8 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 			validationResult.rejectIfFalse(false, ADDR_FAMILY);
 			throw new IllegalArgumentException("Address family is neither IPv4 nor IPv6");
 		}
-		expect(seq.getObjectAt(1), DERSequence.class);
-		DERSequence addresses = (DERSequence) seq.getObjectAt(1);
+		expect(seq.getObjectAt(1), ASN1Sequence.class);
+		ASN1Sequence addresses = (ASN1Sequence) seq.getObjectAt(1);
 
 		for (int i = 0; i < addresses.size(); ++i) {
 		    RoaPrefix roaPrefix;
@@ -171,9 +169,9 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 		}
 	}
 
-	List<RoaPrefix> parseRoaIpAddressFamilySequence(DEREncodable der) {
-		expect(der, DERSequence.class);
-		DERSequence seq = (DERSequence) der;
+	List<RoaPrefix> parseRoaIpAddressFamilySequence(ASN1Encodable der) {
+		expect(der, ASN1Sequence.class);
+		ASN1Sequence seq = (ASN1Sequence) der;
 
 		List<RoaPrefix> roaPrefixList = new ArrayList<RoaPrefix>();
 		boolean errorOccured = false;
@@ -195,7 +193,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 	}
 
 	@Override
-	public void decodeContent(DEREncodable encoded) {
+	public void decodeContent(ASN1Encodable encoded) {
 		parseRouteOriginAttestation(encoded);
 	}
 

@@ -29,6 +29,11 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509Extension;
 import net.ripe.commons.certification.Asn1Util;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -37,12 +42,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
 
 public final class X509CertificateUtil {
 
@@ -73,13 +72,13 @@ public final class X509CertificateUtil {
             throw new AbstractX509CertificateWrapperException("Can not get AuthorityKeyIdentifier for certificate", e);
         }
     }
-    
+
     public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse("certificate", encoded);
         return parser.getCertificate();
     }
-    
+
     /**
      * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
      * @throws AbstractX509CertificateWrapperException
@@ -98,7 +97,7 @@ public final class X509CertificateUtil {
         SubjectPublicKeyInfo subjectPublicKeyInfo = tbsCertificateStructure.getSubjectPublicKeyInfo();
 
         try {
-            byte[] data = subjectPublicKeyInfo.getDEREncoded();
+            byte[] data = subjectPublicKeyInfo.getEncoded();
             Base64Encoder encoder = new Base64Encoder();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             encoder.encode(data, 0, data.length, out);

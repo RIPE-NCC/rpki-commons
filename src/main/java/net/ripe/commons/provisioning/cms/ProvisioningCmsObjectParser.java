@@ -29,6 +29,26 @@
  */
 package net.ripe.commons.provisioning.cms;
 
+import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CRL;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
@@ -37,26 +57,26 @@ import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.PayloadParser;
 import net.ripe.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.CMSSignedGenerator;
+import org.bouncycastle.cms.CMSTypedStream;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public class ProvisioningCmsObjectParser {
 
@@ -146,8 +166,8 @@ public class ProvisioningCmsObjectParser {
         }
         SignedData signedData = SignedData.getInstance(info.getContent());
         ASN1Set digestAlgorithms = signedData.getDigestAlgorithms();
-        DEREncodable derObject = digestAlgorithms.getObjectAt(0);
-        return AlgorithmIdentifier.getInstance(derObject.getDERObject());
+        ASN1Encodable object = digestAlgorithms.getObjectAt(0);
+        return AlgorithmIdentifier.getInstance(object.toASN1Primitive());
     }
 
     /**
@@ -164,10 +184,10 @@ public class ProvisioningCmsObjectParser {
         try {
             CMSTypedStream signedContent = sp.getSignedContent();
             InputStream signedContentStream = signedContent.getContentStream();
-            
+
             String payloadXml = IOUtils.toString(signedContentStream, "UTF-8");
             payload = PayloadParser.parse(payloadXml, validationResult);
-            
+
             validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
         } catch (IOException e) {
             validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
@@ -259,11 +279,11 @@ public class ProvisioningCmsObjectParser {
         if (!validationResult.rejectIfNull(certificates, GET_CERTS_AND_CRLS)) {
             return;
         }
-        
+
         if (!validationResult.rejectIfFalse(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED)) {
             return;
         }
-        
+
         CRL x509Crl = certificates.iterator().next();
         if (validationResult.rejectIfFalse(x509Crl instanceof X509CRL, CRL_IS_X509CRL)) {
             crl = (X509CRL) x509Crl;
@@ -332,11 +352,7 @@ public class ProvisioningCmsObjectParser {
      */
     private void verifySubjectKeyIdentifier(SignerInformation signer) {
         SignerId sid = signer.getSID();
-        try {
-            validationResult.rejectIfFalse(Arrays.equals(new DEROctetString(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate)).getEncoded(), sid.getSubjectKeyIdentifier()), CMS_SIGNER_INFO_SKI);
-        } catch (IOException e) {
-            validationResult.rejectIfFalse(false, CMS_SIGNER_INFO_SKI);
-        }
+        validationResult.rejectIfFalse(Arrays.equals(X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), sid.getSubjectKeyIdentifier()), CMS_SIGNER_INFO_SKI);
         validationResult.rejectIfFalse(sid.getIssuer() == null && sid.getSerialNumber() == null, CMS_SIGNER_INFO_SKI_ONLY);
     }
 

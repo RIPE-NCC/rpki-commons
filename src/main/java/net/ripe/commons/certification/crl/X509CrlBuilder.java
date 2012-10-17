@@ -44,6 +44,7 @@ import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CRLNumber;
 import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -124,8 +125,8 @@ public class X509CrlBuilder {
 
     public X509Crl build(PrivateKey key) {
         validateCrlFields();
-        X509v2CRLBuilder generator = createCrlGenerator();
         try {
+            X509v2CRLBuilder generator = createCrlGenerator();
             ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(key);
             return new X509Crl(generator.build(signer).getEncoded());
         } catch (OperatorCreationException e) {
@@ -143,7 +144,7 @@ public class X509CrlBuilder {
         Validate.notNull(authorityKeyIdentifier, "authorityKeyIdentifier is null");
     }
 
-    private X509v2CRLBuilder createCrlGenerator() {
+    private X509v2CRLBuilder createCrlGenerator() throws CertIOException {
         X509v2CRLBuilder generator = new X509v2CRLBuilder(X500Name.getInstance(issuerDN.getEncoded()), thisUpdateTime.toDate());
         generator.setNextUpdate(nextUpdateTime.toDate());
         generator.addExtension(X509Extension.authorityKeyIdentifier, false, authorityKeyIdentifier);

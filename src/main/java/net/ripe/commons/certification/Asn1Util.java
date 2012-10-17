@@ -32,21 +32,18 @@ package net.ripe.commons.certification;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpAddress;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.ipresource.UniqueIpResource;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROutputStream;
 
 public final class Asn1Util {
@@ -82,7 +79,7 @@ public final class Asn1Util {
     /**
      * Decodes the byte array extension using the {@link ASN1InputStream}.
      */
-    public static DERObject decode(byte[] extension) {
+    public static ASN1Primitive decode(byte[] extension) {
         try {
             ASN1InputStream is = new ASN1InputStream(extension);
             return is.readObject();
@@ -99,7 +96,7 @@ public final class Asn1Util {
      *             the instance is null or not an instance of the expected
      *             class.
      */
-    public static <T extends DEREncodable> T expect(DEREncodable value, Class<? extends T> expectedClass) {
+    public static <T extends ASN1Encodable> T expect(ASN1Encodable value, Class<? extends T> expectedClass) {
         Validate.notNull(value, expectedClass.getSimpleName() + " expected, got null");
         Validate.isTrue(expectedClass.isInstance(value), expectedClass.getSimpleName() + " expected, got " + value.getClass().getSimpleName() + " with value: " + value);
         return expectedClass.cast(value);
@@ -108,7 +105,7 @@ public final class Asn1Util {
     /**
      * {@link IpAddress} used as a prefix.
      */
-    public static IpRange parseIpAddressAsPrefix(IpResourceType type, DEREncodable der) {
+    public static IpRange parseIpAddressAsPrefix(IpResourceType type, ASN1Encodable der) {
         expect(der, DERBitString.class);
         DERBitString derBitString = (DERBitString) der;
 
@@ -121,7 +118,7 @@ public final class Asn1Util {
     /**
      * IPAddress ::= BIT STRING
      */
-    public static IpAddress parseIpAddress(IpResourceType type, DEREncodable der, boolean padWithOnes) {
+    public static IpAddress parseIpAddress(IpResourceType type, ASN1Encodable der, boolean padWithOnes) {
         expect(der, DERBitString.class);
         DERBitString derBitString = (DERBitString) der;
 
@@ -149,9 +146,8 @@ public final class Asn1Util {
     /**
      * ASId ::= INTEGER
      */
-    public static Asn parseAsId(DEREncodable der) {
-        expect(der, DERInteger.class);
-        return new Asn(((DERInteger) der).getValue().longValue());
+    public static Asn parseAsId(ASN1Encodable der) {
+        return new Asn(expect(der, ASN1Integer.class).getValue());
     }
 
     /**

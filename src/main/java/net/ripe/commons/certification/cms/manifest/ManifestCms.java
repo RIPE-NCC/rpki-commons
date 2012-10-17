@@ -47,7 +47,6 @@ import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -185,12 +184,10 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     public static byte[] hashContents(byte[] contents) {
-        NullOutputStream fileOut = null;
         DigestOutputStream digestOut = null;
         try {
             Digest digest = new SHA256Digest();
-            fileOut = new NullOutputStream();
-            digestOut = new DigestOutputStream(fileOut, digest);
+            digestOut = new DigestOutputStream(digest);
 
             digestOut.write(contents);
             digestOut.flush();
@@ -203,8 +200,6 @@ public class ManifestCms extends RpkiSignedObject {
         } finally {
             if (digestOut != null) {
                 IOUtils.closeQuietly(digestOut);
-            } else if (fileOut != null) {
-                IOUtils.closeQuietly(fileOut);
             }
         }
     }

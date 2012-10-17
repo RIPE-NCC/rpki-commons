@@ -32,12 +32,12 @@ package net.ripe.commons.certification;
 import static net.ripe.commons.certification.Asn1Util.*;
 import static net.ripe.commons.certification.rfc3779.ResourceExtensionEncoderTest.*;
 import static org.junit.Assert.*;
+
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceType;
-
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.junit.Test;
 
 
@@ -112,7 +112,7 @@ public class Asn1UtilTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldFailOnOutOfRangeAsn() {
-        parseAsId(new DERInteger(-1));
+        parseAsId(new ASN1Integer(-1));
     }
 
     public static void assertEncoded(byte[] expected, ASN1Encodable encodable) {

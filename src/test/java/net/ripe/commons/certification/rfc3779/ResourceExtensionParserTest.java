@@ -34,13 +34,11 @@ import static org.junit.Assert.*;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-
-import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,7 +80,7 @@ public class ResourceExtensionParserTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldFailOnIllegalIpAddressOrRange() {
-        parser.derToIpAddressOrRange(IpResourceType.IPv4, new DERInteger(123));
+        parser.derToIpAddressOrRange(IpResourceType.IPv4, new ASN1Integer(123));
     }
 
     @Test

@@ -29,6 +29,30 @@
  */
 package net.ripe.commons.certification.crl;
 
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
+import java.security.cert.X509CRLEntry;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.commons.certification.validation.ValidationOptions;
@@ -37,23 +61,11 @@ import net.ripe.commons.certification.validation.objectvalidators.CertificateRep
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import javax.security.auth.x500.X500Principal;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.*;
-import java.security.cert.*;
-import java.util.*;
-
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public class X509Crl implements CertificateRepositoryObject {
 
@@ -186,13 +198,12 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     public BigInteger getNumber() {
-        DERInteger number;
         try {
             byte[] extensionValue = getCrl().getExtensionValue(X509Extension.cRLNumber.getId());
             if (extensionValue == null) {
                 return null;
             }
-            number = (DERInteger) X509ExtensionUtil.fromExtensionValue(extensionValue);
+            ASN1Integer number = (ASN1Integer) X509ExtensionUtil.fromExtensionValue(extensionValue);
             return number.getPositiveValue();
         } catch (IOException e) {
             throw new X509CrlException("cannot get CRLNumber extension from CRL", e);

@@ -34,7 +34,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
@@ -61,7 +61,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static final DERObjectIdentifier POLICY_OID = new DERObjectIdentifier("1.3.6.1.5.5.7.14.2");
+    public static final ASN1ObjectIdentifier POLICY_OID = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.14.2");
 
     public static final PolicyInformation POLICY_INFORMATION = new PolicyInformation(POLICY_OID);
 
@@ -77,7 +77,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         return certificate;
     }
 
-    public DERObjectIdentifier getCertificatePolicy() {
+    public ASN1ObjectIdentifier getCertificatePolicy() {
         return POLICY_OID;
     }
 
@@ -182,12 +182,12 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         }
     }
 
-    public URI findFirstAuthorityInformationAccessByMethod(DERObjectIdentifier method) {
+    public URI findFirstAuthorityInformationAccessByMethod(ASN1ObjectIdentifier method) {
         Validate.notNull(method, "method is null");
         return findFirstByMethod(method, "rsync", getAuthorityInformationAccess());
     }
 
-    private URI findFirstByMethod(DERObjectIdentifier method, String scheme, X509CertificateInformationAccessDescriptor[] accessDescriptor) {
+    private URI findFirstByMethod(ASN1ObjectIdentifier method, String scheme, X509CertificateInformationAccessDescriptor[] accessDescriptor) {
         if (accessDescriptor == null) {
             return null;
         }
@@ -212,7 +212,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         }
     }
 
-    public URI findFirstSubjectInformationAccessByMethod(DERObjectIdentifier method) {
+    public URI findFirstSubjectInformationAccessByMethod(ASN1ObjectIdentifier method) {
         Validate.notNull(method, "method is null");
         return findFirstByMethod(method, "rsync", getSubjectInformationAccess());
     }

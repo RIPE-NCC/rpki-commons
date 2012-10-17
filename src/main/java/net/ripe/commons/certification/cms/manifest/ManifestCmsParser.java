@@ -41,14 +41,13 @@ import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -89,7 +88,9 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
     @Override
     public void parse(ValidationLocation location, byte[] encoded) {
         super.parse(location, encoded);
-        validateManifest();
+        if (isSuccess()) {
+            validateManifest();
+        }
     }
 
     public boolean isSuccess() {
@@ -106,48 +107,46 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
         return new ManifestCms(cmsObjectData, manifestCmsGeneralInfo, files);
     }
 
-	private void validateManifest() {
-	    ValidationResult validationResult = getValidationResult();
+    private void validateManifest() {
+        ValidationResult validationResult = getValidationResult();
 
-	    if (!validationResult.rejectIfFalse(new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID).equals(getContentType()), MANIFEST_CONTENT_TYPE)) {
-            return;
-        }
-
+        validationResult.rejectIfFalse(new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID).equals(getContentType()), MANIFEST_CONTENT_TYPE);
         validationResult.rejectIfFalse(getResourceCertificate().isResourceSetInherited(), MANIFEST_RESOURCE_INHERIT);
     }
 
-    void decodeManifest(DEREncodable encoded) {
+    void decodeManifest(ASN1Encodable encoded) {
         ValidationResult validationResult = getValidationResult();
         try {
-            DERSequence seq = expect(encoded, DERSequence.class);
-            if (!validationResult.rejectIfFalse(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE)) {
-            	return;
+            ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
+            validationResult.rejectIfFalse(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE);
+            if (validationResult.hasFailureForCurrentLocation()) {
+                return;
             }
             version = ManifestCms.DEFAULT_VERSION;
-            number = expect(seq.getObjectAt(MANIFEST_NUMBER_INDEX), DERInteger.class).getValue();
-            thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), DERGeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), DERGeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), DERObjectIdentifier.class).getId();
+            number = expect(seq.getObjectAt(MANIFEST_NUMBER_INDEX), ASN1Integer.class).getValue();
+            thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
+            nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
+            fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), ASN1ObjectIdentifier.class).getId();
             validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
             files = new TreeMap<String, byte[]>();
             decodeFileList(files, seq.getObjectAt(FILE_LIST_INDEX));
         } catch (IllegalArgumentException e) {
-            validationResult.rejectIfFalse(false, MANIFEST_CONTENT_STRUCTURE);
+            validationResult.error(MANIFEST_CONTENT_STRUCTURE);
         } catch (ParseException e) {
-            validationResult.rejectIfFalse(false, MANIFEST_TIME_FORMAT);
+            validationResult.error(MANIFEST_TIME_FORMAT);
         }
     }
 
-    void decodeFileAndHash(Map<String, byte[]> result, DEREncodable encoded) {
-        DERSequence seq = expect(encoded, DERSequence.class);
+    void decodeFileAndHash(Map<String, byte[]> result, ASN1Encodable encoded) {
+        ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
         Validate.isTrue(seq.size() == 2, "der sequence does not contain file and hash");
         DERIA5String derFile = expect(seq.getObjectAt(0), DERIA5String.class);
         DERBitString derHash = expect(seq.getObjectAt(1), DERBitString.class);
         result.put(derFile.getString(), derHash.getBytes());
     }
 
-    void decodeFileList(Map<String, byte[]> result, DEREncodable encoded) {
-        DERSequence seq = expect(encoded, DERSequence.class);
+    void decodeFileList(Map<String, byte[]> result, ASN1Encodable encoded) {
+        ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
         boolean errorOccured = false;
         for (int i = 0; i < seq.size(); ++i) {
         	try {
@@ -161,7 +160,7 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
     }
 
 	@Override
-	public void decodeContent(DEREncodable encoded) {
+	public void decodeContent(ASN1Encodable encoded) {
 		decodeManifest(encoded);
 	}
 

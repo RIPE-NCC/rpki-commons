@@ -33,18 +33,15 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.util.Map;
 import java.util.TreeMap;
-
 import net.ripe.commons.certification.cms.RpkiSignedObjectBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.joda.time.DateTime;
 
@@ -120,10 +117,10 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
      */
     ASN1Encodable encodeManifest() {
         ASN1Encodable[] seq = {
-                new DERInteger(number),
-                new DERGeneralizedTime(thisUpdateTime.toDate()),
-                new DERGeneralizedTime(nextUpdateTime.toDate()),
-                new DERObjectIdentifier(ManifestCms.FILE_HASH_ALGORITHM),
+                new ASN1Integer(number),
+                new ASN1GeneralizedTime(thisUpdateTime.toDate()),
+                new ASN1GeneralizedTime(nextUpdateTime.toDate()),
+                new ASN1ObjectIdentifier(ManifestCms.FILE_HASH_ALGORITHM),
                 encodeFileList()
         };
         return new DERSequence(seq);

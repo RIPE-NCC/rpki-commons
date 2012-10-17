@@ -184,7 +184,7 @@ public class ProcessIscUpdownPdusTest {
 //            HexDump.dump(encoded, 0, System.err, 0);
 //            System.err.println("\n");
 //
-//            DERObject decodedObject = Asn1Util.decode(encoded);
+//            ASN1Primitive decodedObject = Asn1Util.decode(encoded);
 //            System.err.println(ASN1Dump.dumpAsString(decodedObject));
 //
 //            for (ValidationLocation location : validationResult.getValidatedLocations()) {

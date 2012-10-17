@@ -30,12 +30,10 @@
 package net.ripe.commons.certification.rfc3779;
 
 import java.io.Serializable;
-
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.ipresource.IpResourceType;
-
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DEROctetString;
 
 /**
@@ -131,7 +129,7 @@ public class AddressFamily extends EqualsSupport implements Comparable<AddressFa
         return new DEROctetString(encoded);
     }
 
-    public static AddressFamily fromDer(DEREncodable der) {
+    public static AddressFamily fromDer(ASN1Encodable der) {
     	Validate.isTrue(der instanceof DEROctetString, "DEROctetString expected");
     	DEROctetString derOctetString = (DEROctetString) der;
 

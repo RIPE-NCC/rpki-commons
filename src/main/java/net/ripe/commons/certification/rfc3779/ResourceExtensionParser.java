@@ -33,23 +33,21 @@ import static net.ripe.commons.certification.Asn1Util.*;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import net.ripe.ipresource.IpAddress;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Null;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
 
 /**
  * Parses the certificate resource extensions as specified in RFC3779. Resource
@@ -72,9 +70,9 @@ public class ResourceExtensionParser {
      * Partial resource inheritance is not yet supported.
      */
     public IpResourceSet parseIpAddressBlocks(byte[] extension) {
-        DERObject octetString = decode(extension);
-        expect(octetString, DEROctetString.class);
-        DEROctetString o = (DEROctetString) octetString;
+        ASN1Primitive octetString = decode(extension);
+        expect(octetString, ASN1OctetString.class);
+        ASN1OctetString o = (ASN1OctetString) octetString;
         SortedMap<AddressFamily, IpResourceSet> map = derToIpAddressBlocks(decode(o.getOctets()));
         IpResourceSet ipResourceSet = new IpResourceSet();
 
@@ -113,9 +111,9 @@ public class ResourceExtensionParser {
      * <code>null</code> if the AS numbers are inherited.
      */
     public IpResourceSet parseAsIdentifiers(byte[] extension) {
-        DERObject octetString = decode(extension);
-        expect(octetString, DEROctetString.class);
-        DEROctetString o = (DEROctetString) octetString;
+        ASN1Primitive octetString = decode(extension);
+        expect(octetString, ASN1OctetString.class);
+        ASN1OctetString o = (ASN1OctetString) octetString;
         IpResourceSet[] resources = derToAsIdentifiers(decode(o.getOctets()));
         Validate.notNull(resources[1], "inheritance of resources has not been implemented yet");
         Validate.isTrue(resources[1].isEmpty(), "routing domain identifiers (RDI) not supported");
@@ -125,9 +123,8 @@ public class ResourceExtensionParser {
     /**
      * IPAddrBlocks ::= SEQUENCE OF IPAddressFamily
      */
-    SortedMap<AddressFamily, IpResourceSet> derToIpAddressBlocks(DEREncodable der) {
-        expect(der, DERSequence.class);
-        DERSequence seq = (DERSequence) der;
+    SortedMap<AddressFamily, IpResourceSet> derToIpAddressBlocks(ASN1Encodable der) {
+        ASN1Sequence seq = expect(der, ASN1Sequence.class);
         SortedMap<AddressFamily, IpResourceSet> map = new TreeMap<AddressFamily, IpResourceSet>();
 
         for (int i = 0; i < seq.size(); i++) {
@@ -140,9 +137,8 @@ public class ResourceExtensionParser {
      * IPAddressFamily ::= SEQUENCE { -- AFI & opt SAFI -- addressFamily OCTET
      * STRING (SIZE (2..3)), ipAddressChoice IPAddressChoice }
      */
-    void derToIpAddressFamily(DEREncodable der, SortedMap<AddressFamily, IpResourceSet> map) {
-        expect(der, DERSequence.class);
-        DERSequence seq = (DERSequence) der;
+    void derToIpAddressFamily(ASN1Encodable der, SortedMap<AddressFamily, IpResourceSet> map) {
+        ASN1Sequence seq = expect(der, ASN1Sequence.class);
         Validate.isTrue(seq.size() == 2, "IpAddressFamily must have exactly two entries: addressFamily and IpAddressChoice");
 
         AddressFamily addressFamily = AddressFamily.fromDer(seq.getObjectAt(0));
@@ -155,18 +151,18 @@ public class ResourceExtensionParser {
      * IPAddressChoice ::= CHOICE { inherit NULL, -- inherit from issuer --
      * addressesOrRanges SEQUENCE OF IPAddressOrRange }
      */
-    IpResourceSet derToIpAddressChoice(IpResourceType type, DEREncodable der) {
-        if (der instanceof DERNull) {
+    IpResourceSet derToIpAddressChoice(IpResourceType type, ASN1Encodable der) {
+        if (der instanceof ASN1Null) {
             return null;
-        } else if (der instanceof DERSequence) {
+        } else if (der instanceof ASN1Sequence) {
             IpResourceSet result = new IpResourceSet();
-            DERSequence seq = (DERSequence) der;
+            ASN1Sequence seq = (ASN1Sequence) der;
             for (int i = 0; i < seq.size(); i++) {
                 result.add(derToIpAddressOrRange(type, seq.getObjectAt(i)));
             }
             return result;
         } else {
-            throw new IllegalArgumentException("DERNull or DERSequence expected, got: " + der);
+            throw new IllegalArgumentException("ASN1Null or ASN1Sequence expected, got: " + der);
         }
     }
 
@@ -174,22 +170,21 @@ public class ResourceExtensionParser {
      * IPAddressOrRange ::= CHOICE { addressPrefix IPAddress, addressRange
      * IPAddressRange }
      */
-    IpResource derToIpAddressOrRange(IpResourceType type, DEREncodable der) {
-        if (der instanceof DERSequence) {
+    IpResource derToIpAddressOrRange(IpResourceType type, ASN1Encodable der) {
+        if (der instanceof ASN1Sequence) {
             return derToIpRange(type, der);
         } else if (der instanceof DERBitString) {
             return parseIpAddressAsPrefix(type, der);
         } else {
-            throw new IllegalArgumentException("DERSequence or DERBitString expected, got: " + der);
+            throw new IllegalArgumentException("ASN1Sequence or DERBitString expected, got: " + der);
         }
     }
 
     /**
      * IPAddressRange ::= SEQUENCE { min IPAddress, max IPAddress }
      */
-    IpResource derToIpRange(IpResourceType type, DEREncodable der) {
-        expect(der, DERSequence.class);
-        DERSequence sequence = (DERSequence) der;
+    IpResource derToIpRange(IpResourceType type, ASN1Encodable der) {
+        ASN1Sequence sequence = expect(der, ASN1Sequence.class);
         Validate.isTrue(sequence.size() == 2, "IPRange MUST consist of two entries (start and end)");
 
         IpAddress start = parseIpAddress(type, sequence.getObjectAt(0), false);
@@ -201,32 +196,31 @@ public class ResourceExtensionParser {
     /**
      * ASRange ::= SEQUENCE { min ASId, max ASId }
      */
-    IpResourceRange derToAsRange(DEREncodable der) {
-        expect(der, DERSequence.class);
-        DERSequence seq = (DERSequence) der;
-        Validate.isTrue(seq.size() == 2, "DERSequence with two elements expected");
+    IpResourceRange derToAsRange(ASN1Encodable der) {
+        ASN1Sequence seq = expect(der, ASN1Sequence.class);
+        Validate.isTrue(seq.size() == 2, "ASN1Sequence with two elements expected");
         return parseAsId(seq.getObjectAt(0)).upTo(parseAsId(seq.getObjectAt(1)));
     }
 
     /**
      * ASIdOrRange ::= CHOICE { id ASId, range ASRange }
      */
-    IpResource derToAsIdOrRange(DEREncodable der) {
-        if (der instanceof DERInteger) {
+    IpResource derToAsIdOrRange(ASN1Encodable der) {
+        if (der instanceof ASN1Integer) {
             return parseAsId(der);
-        } else if (der instanceof DERSequence) {
+        } else if (der instanceof ASN1Sequence) {
             return derToAsRange(der);
         } else {
-            throw new IllegalArgumentException("DERInteger or DERSequence expected, got: " + der);
+            throw new IllegalArgumentException("ASN1Integer or ASN1Sequence expected, got: " + der);
         }
     }
 
     /**
      * asIdsOrRanges ::= SEQUENCE OF ASIdOrRange
      */
-    IpResourceSet derToAsIdsOrRanges(DEREncodable der) {
-        expect(der, DERSequence.class);
-        DERSequence seq = (DERSequence) der;
+    IpResourceSet derToAsIdsOrRanges(ASN1Encodable der) {
+        expect(der, ASN1Sequence.class);
+        ASN1Sequence seq = (ASN1Sequence) der;
         IpResourceSet result = new IpResourceSet();
         for (int i = 0; i < seq.size(); ++i) {
             result.add(derToAsIdOrRange(seq.getObjectAt(i)));
@@ -238,13 +232,13 @@ public class ResourceExtensionParser {
      * ASIdentifierChoice ::= CHOICE { inherit NULL, -- inherit from issuer --
      * asIdsOrRanges SEQUENCE OF ASIdOrRange }
      */
-    IpResourceSet derToAsIdentifierChoice(DEREncodable der) {
-        if (der instanceof DERNull) {
+    IpResourceSet derToAsIdentifierChoice(ASN1Encodable der) {
+        if (der instanceof ASN1Null) {
             return null;
-        } else if (der instanceof DERSequence) {
+        } else if (der instanceof ASN1Sequence) {
             return derToAsIdsOrRanges(der);
         } else {
-            throw new IllegalArgumentException("DERNull or DERSequence expected, got: " + der);
+            throw new IllegalArgumentException("ASN1Null or ASN1Sequence expected, got: " + der);
         }
     }
 
@@ -258,15 +252,15 @@ public class ResourceExtensionParser {
      *         certificate. An empty resource set indicates no resources were
      *         specified in the certificate.
      */
-    IpResourceSet[] derToAsIdentifiers(DEREncodable der) {
-        expect(der, DERSequence.class);
-        DERSequence seq = (DERSequence) der;
-        Validate.isTrue(seq.size() <= 2, "DERSequence with 2 or fewer elements expected");
+    IpResourceSet[] derToAsIdentifiers(ASN1Encodable der) {
+        expect(der, ASN1Sequence.class);
+        ASN1Sequence seq = (ASN1Sequence) der;
+        Validate.isTrue(seq.size() <= 2, "ASN1Sequence with 2 or fewer elements expected");
 
         IpResourceSet[] result = { new IpResourceSet(), new IpResourceSet() };
         for (int i = 0; i < seq.size(); ++i) {
-            expect(seq.getObjectAt(i), DERTaggedObject.class);
-            DERTaggedObject tagged = (DERTaggedObject) seq.getObjectAt(i);
+            expect(seq.getObjectAt(i), ASN1TaggedObject.class);
+            ASN1TaggedObject tagged = (ASN1TaggedObject) seq.getObjectAt(i);
             Validate.isTrue(tagged.getTagNo() == 0 || tagged.getTagNo() == 1, "unknown tag no: " + tagged.getTagNo());
             result[tagged.getTagNo()] = derToAsIdentifierChoice(tagged.getObject());
         }

@@ -29,14 +29,14 @@
  */
 package net.ripe.commons.provisioning.x509.pkcs10;
 
+import java.io.IOException;
 import java.net.URI;
 import java.security.PublicKey;
 import java.util.Enumeration;
-
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
-
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.pkcs.Attribute;
@@ -109,14 +109,14 @@ public class RpkiCaCertificateRequestParser {
             X509Extensions extensions = getPkcs9Extensions();
             X509Extension extension = extensions.getExtension(X509Extension.subjectInfoAccess);
 
-            DERSequence accessDescriptorSequence = (DERSequence) DERSequence.fromByteArray(extension.getValue().getOctets());
+            ASN1Sequence accessDescriptorSequence = (ASN1Sequence) ASN1Sequence.fromByteArray(extension.getValue().getOctets());
 
             @SuppressWarnings("unchecked")
             Enumeration<DERSequence> objects = accessDescriptorSequence.getObjects();
             while (objects.hasMoreElements()) {
-                AccessDescription accessDescription = new AccessDescription(objects.nextElement());
+                AccessDescription accessDescription = AccessDescription.getInstance(objects.nextElement());
                 X509CertificateInformationAccessDescriptor accessDescriptor = new X509CertificateInformationAccessDescriptor(accessDescription);
-                DERObjectIdentifier oid = accessDescriptor.getMethod();
+                ASN1ObjectIdentifier oid = accessDescriptor.getMethod();
                 if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY)) {
                     caRepositoryUri = accessDescriptor.getLocation();
                 } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST)) {
@@ -125,7 +125,7 @@ public class RpkiCaCertificateRequestParser {
                     throw new RpkiCaCertificateRequestParserException("Don't understand access descriptor using method: " + oid);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RpkiCaCertificateRequestParserException(e);
         }
 
@@ -167,7 +167,7 @@ public class RpkiCaCertificateRequestParser {
                         + nextElement.getClass().getSimpleName());
             }
 
-            DERObjectIdentifier oid = attr.getAttrType();
+            ASN1ObjectIdentifier oid = attr.getAttrType();
             if (oid.equals(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest)) {
                 return (DERSet) attr.getAttrValues();
             }

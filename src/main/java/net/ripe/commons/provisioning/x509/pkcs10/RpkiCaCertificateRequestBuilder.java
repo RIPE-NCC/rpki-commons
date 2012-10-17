@@ -29,20 +29,24 @@
  */
 package net.ripe.commons.provisioning.x509.pkcs10;
 
+import java.io.IOException;
+import java.net.URI;
+import java.security.KeyPair;
+import java.util.Vector;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-
-import javax.security.auth.x500.X500Principal;
-import java.net.URI;
-import java.security.KeyPair;
-import java.util.Vector;
 
 
 /**
@@ -77,7 +81,7 @@ public class RpkiCaCertificateRequestBuilder {
 
     /**
      * Default: SunRsaSign
-     * @return 
+     * @return
      */
     public RpkiCaCertificateRequestBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
@@ -86,7 +90,7 @@ public class RpkiCaCertificateRequestBuilder {
 
     /**
      * Default: SHA256withRSA
-     * @return 
+     * @return
      */
     public RpkiCaCertificateRequestBuilder withSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
@@ -111,10 +115,10 @@ public class RpkiCaCertificateRequestBuilder {
         }
     }
 
-    private X509Extensions createExtensions() {
+    private X509Extensions createExtensions() throws IOException {
         // Make extension for SIA in request. See here:
         // http://www.bouncycastle.org/wiki/display/JA1/X.509+Public+Key+Certificate+and+Certification+Request+Generation
-        Vector<DERObjectIdentifier> oids = new Vector<DERObjectIdentifier>();
+        Vector<ASN1ObjectIdentifier> oids = new Vector<ASN1ObjectIdentifier>();
         Vector<X509Extension> values = new Vector<X509Extension>();
 
         X509CertificateInformationAccessDescriptor[] descriptors = new X509CertificateInformationAccessDescriptor[] {
@@ -124,18 +128,18 @@ public class RpkiCaCertificateRequestBuilder {
         DERSequence derSequence = new DERSequence(subjectInformationAccess);
 
         oids.add(X509Extension.subjectInfoAccess);
-        X509Extension siaExtension = new X509Extension(false, new DEROctetString(derSequence.getDEREncoded()));
+        X509Extension siaExtension = new X509Extension(false, new DEROctetString(derSequence.getEncoded()));
         values.add(siaExtension);
 
         KeyUsage keyUsage = new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         X509Extension keyUsageExtension = new X509Extension(true, new DEROctetString(keyUsage));
         oids.add(X509Extension.keyUsage);
         values.add(keyUsageExtension);
-        
+
         X509Extension basicConstraintsExtension = new X509Extension(true, new DEROctetString(new BasicConstraints(true)));
         oids.add(X509Extension.basicConstraints);
         values.add(basicConstraintsExtension);
-        
+
         return new X509Extensions(oids, values);
     }
 }

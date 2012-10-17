@@ -59,6 +59,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.operator.ContentSigner;
@@ -230,42 +231,48 @@ public final class X509CertificateBuilderHelper {
         }
     }
 
-	/**
-	 * Override this to add your extensions to the certificate generator
-	 */
-	protected X509v3CertificateBuilder createCertificateGenerator() {
-		X509v3CertificateBuilder generator = createX509V3CertificateGenerator();
+    /**
+     * Override this to add your extensions to the certificate generator
+     */
+    protected X509v3CertificateBuilder createCertificateGenerator() {
+        try {
+            X509v3CertificateBuilder generator = createX509V3CertificateGenerator();
 
-		if (addSubjectKeyIdentifier) {
-			addSubjectKeyIdentifier(generator);
-		}
-		if (addAuthorityKeyIdentifier) {
-			addAuthorityKeyIdentifier(generator);
-		}
-		if (ca) {
-			addCaBit(generator);
-		}
-		if (keyUsage != 0) {
-			addKeyUsage(generator);
-		}
-		if (authorityInformationAccess != null) {
-			addAIA(generator);
-		}
-		if (subjectInformationAccess != null) {
-			addSIA(generator);
-		}
-		if (crlDistributionPoints != null) {
-			Validate.noNullElements(crlDistributionPoints);
-			addCrlDistributionPoints(generator);
-		}
-		if (policies != null && policies.length > 0) {
-			addPolicies(generator);
-		}
-		if (resources != null) {
-			addResourceExtensions(generator);
-		}
-		return generator;
-	}
+            if (addSubjectKeyIdentifier) {
+                addSubjectKeyIdentifier(generator);
+            }
+            if (addAuthorityKeyIdentifier) {
+                addAuthorityKeyIdentifier(generator);
+            }
+            if (ca) {
+                addCaBit(generator);
+            }
+            if (keyUsage != 0) {
+                addKeyUsage(generator);
+            }
+            if (authorityInformationAccess != null) {
+                addAIA(generator);
+            }
+            if (subjectInformationAccess != null) {
+                addSIA(generator);
+            }
+            if (crlDistributionPoints != null) {
+                Validate.noNullElements(crlDistributionPoints);
+                addCrlDistributionPoints(generator);
+            }
+            if (policies != null && policies.length > 0) {
+                addPolicies(generator);
+            }
+            if (resources != null) {
+                addResourceExtensions(generator);
+            }
+            return generator;
+        } catch (CertIOException e) {
+            throw new X509ResourceCertificateBuilderException(e);
+        } catch (InvalidKeyException e) {
+            throw new X509ResourceCertificateBuilderException(e);
+        }
+    }
 
 	private X509v3CertificateBuilder createX509V3CertificateGenerator() {
 		validateCertificateFields();
@@ -289,53 +296,45 @@ public final class X509CertificateBuilderHelper {
 		}
 	}
 
-	private void addSubjectKeyIdentifier(X509v3CertificateBuilder generator) {
-		try {
-			generator.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(publicKey));
-		} catch (InvalidKeyException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		}
-	}
+    private void addSubjectKeyIdentifier(X509v3CertificateBuilder generator) throws InvalidKeyException, CertIOException {
+            generator.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(publicKey));
+    }
 
-	private void addAuthorityKeyIdentifier(X509v3CertificateBuilder generator) {
-		try {
-			generator.addExtension(
-					X509Extension.authorityKeyIdentifier,
-					false,
-					new AuthorityKeyIdentifierStructure(signingKeyPair.getPublic()));
-		} catch (InvalidKeyException e) {
-			throw new X509ResourceCertificateBuilderException(e);
-		}
-	}
+    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder generator) throws InvalidKeyException, CertIOException {
+            generator.addExtension(
+                    X509Extension.authorityKeyIdentifier,
+                    false,
+                    new AuthorityKeyIdentifierStructure(signingKeyPair.getPublic()));
+    }
 
-	private void addCaBit(X509v3CertificateBuilder generator) {
-		generator.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(ca));
-	}
+    private void addCaBit(X509v3CertificateBuilder generator) throws CertIOException {
+        generator.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(ca));
+    }
 
-	private void addKeyUsage(X509v3CertificateBuilder generator) {
-		generator.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
-	}
+    private void addKeyUsage(X509v3CertificateBuilder generator) throws CertIOException {
+            generator.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
+    }
 
-	private void addAIA(X509v3CertificateBuilder generator) {
-		generator.addExtension(X509Extension.authorityInfoAccess, false,
-				new AuthorityInformationAccess(new DERSequence(authorityInformationAccess)));
-	}
+    private void addAIA(X509v3CertificateBuilder generator) throws CertIOException {
+        generator.addExtension(X509Extension.authorityInfoAccess, false,
+                AuthorityInformationAccess.getInstance(new DERSequence(authorityInformationAccess)));
+    }
 
-	private void addSIA(X509v3CertificateBuilder generator) {
-		generator.addExtension(X509Extension.subjectInfoAccess, false,
-				new AuthorityInformationAccess(new DERSequence(subjectInformationAccess)));
-	}
+    private void addSIA(X509v3CertificateBuilder generator) throws CertIOException {
+        generator.addExtension(X509Extension.subjectInfoAccess, false,
+                AuthorityInformationAccess.getInstance(new DERSequence(subjectInformationAccess)));
+    }
 
-	private void addCrlDistributionPoints(X509v3CertificateBuilder generator) {
-		CRLDistPoint crldp = convertToCrlDistributionPoint(crlDistributionPoints);
-		generator.addExtension(X509Extension.cRLDistributionPoints, false, crldp);
-	}
+    private void addCrlDistributionPoints(X509v3CertificateBuilder generator) throws CertIOException {
+        CRLDistPoint crldp = convertToCrlDistributionPoint(crlDistributionPoints);
+        generator.addExtension(X509Extension.cRLDistributionPoints, false, crldp);
+    }
 
-	private void addPolicies(X509v3CertificateBuilder generator) {
-		generator.addExtension(X509Extension.certificatePolicies, true, new DERSequence(policies));
-	}
+    private void addPolicies(X509v3CertificateBuilder generator) throws CertIOException {
+        generator.addExtension(X509Extension.certificatePolicies, true, new DERSequence(policies));
+    }
 
-	private void addResourceExtensions(X509v3CertificateBuilder generator) {
+	private void addResourceExtensions(X509v3CertificateBuilder generator) throws CertIOException {
 		ResourceExtensionEncoder encoder = new ResourceExtensionEncoder();
 
 		boolean inherit = resources instanceof InheritedIpResourceSet;
@@ -358,11 +357,11 @@ public final class X509CertificateBuilderHelper {
 	 * Generate a single distribution point where the names contains each URI.
 	 */
 	private CRLDistPoint convertToCrlDistributionPoint(URI[] uris) {
-		ASN1Encodable[] seq = new ASN1Encodable[uris.length];
+		GeneralName[] seq = new GeneralName[uris.length];
 		for (int i = 0; i < uris.length; ++i) {
 			seq[i] = new GeneralName(GeneralName.uniformResourceIdentifier, uris[i].toString());
 		}
-		GeneralNames names = new GeneralNames(new DERSequence(seq));
+		GeneralNames names = new GeneralNames(seq);
 		DistributionPointName distributionPoint = new DistributionPointName(
 				names);
 		DistributionPoint[] dps = { new DistributionPoint(distributionPoint, null, null) };

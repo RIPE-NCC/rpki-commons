@@ -43,9 +43,10 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -92,7 +93,7 @@ public class ResourceExtensionEncoder {
      *            the set of IPv4 and IPv6 resources.
      * @return the DER encoding of the IP Address Block Extension.
      */
-    public ASN1Encodable encodeIpAddressBlocks(boolean inheritIpv4, boolean inheritIpv6, IpResourceSet resources) {
+    public ASN1Object encodeIpAddressBlocks(boolean inheritIpv4, boolean inheritIpv6, IpResourceSet resources) {
         SortedMap<AddressFamily, IpResourceSet> addressBlocks = new TreeMap<AddressFamily, IpResourceSet>();
 
         if (inheritIpv4) {
@@ -121,7 +122,7 @@ public class ResourceExtensionEncoder {
      *            the set of ASNs.
      * @return the DER encoding of the AS Identifier extension.
      */
-    public ASN1Encodable encodeAsIdentifiers(boolean inherit, IpResourceSet resources) {
+    public ASN1Object encodeAsIdentifiers(boolean inherit, IpResourceSet resources) {
         if (inherit || resources.containsType(IpResourceType.ASN)) {
             return asIdentifiersToDer(inherit, resources, false, new IpResourceSet());
         }
@@ -136,7 +137,7 @@ public class ResourceExtensionEncoder {
      * ASIdentifiers ::= SEQUENCE { asnum [0] EXPLICIT ASIdentifierChoice
      * OPTIONAL, rdi [1] EXPLICIT ASIdentifierChoice OPTIONAL}
      */
-    ASN1Encodable asIdentifiersToDer(boolean inheritAsn, IpResourceSet asnResources, boolean inheritRdi, IpResourceSet rdiResources) {
+    ASN1Object asIdentifiersToDer(boolean inheritAsn, IpResourceSet asnResources, boolean inheritRdi, IpResourceSet rdiResources) {
         List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>(2);
         if (inheritAsn || asnResources.containsType(IpResourceType.ASN)) {
             seq.add(new DERTaggedObject(0, asIdentifierChoiceToDer(inheritAsn, asnResources)));
@@ -186,14 +187,14 @@ public class ResourceExtensionEncoder {
     /**
      * ASId ::= INTEGER
      */
-    DERInteger asIdToDer(Asn asn) {
-        return new DERInteger(asn.getValue());
+    ASN1Integer asIdToDer(Asn asn) {
+        return new ASN1Integer(asn.getValue());
     }
 
     /**
      * IPAddrBlocks ::= SEQUENCE OF IPAddressFamily
      */
-    ASN1Encodable ipAddressBlocksToDer(SortedMap<AddressFamily, IpResourceSet> resources) {
+    ASN1Object ipAddressBlocksToDer(SortedMap<AddressFamily, IpResourceSet> resources) {
         List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>(2);
         for (AddressFamily addressFamily : resources.keySet()) {
             seq.add(ipAddressFamilyToDer(addressFamily, resources.get(addressFamily)));
@@ -205,7 +206,7 @@ public class ResourceExtensionEncoder {
      * IPAddressFamily ::= SEQUENCE { -- AFI & opt SAFI -- addressFamily OCTET
      * STRING (SIZE (2..3)), ipAddressChoice IPAddressChoice }
      */
-    ASN1Encodable ipAddressFamilyToDer(AddressFamily addressFamily, IpResourceSet resources) {
+    ASN1Object ipAddressFamilyToDer(AddressFamily addressFamily, IpResourceSet resources) {
         IpResourceType type = addressFamily.toIpResourceType();
         ASN1Encodable[] seq = new ASN1Encodable[2];
         seq[0] = addressFamily.toDer();
