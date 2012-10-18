@@ -29,24 +29,6 @@
  */
 package net.ripe.commons.provisioning.cms;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.cert.CertStore;
-import java.security.cert.CertStoreException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
@@ -61,11 +43,22 @@ import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
+import org.bouncycastle.cert.jcajce.JcaCRLStore;
+import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTimeUtils;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.cert.*;
+import java.util.*;
 
 
 public class ProvisioningCmsObjectBuilder {
@@ -143,11 +136,13 @@ public class ProvisioningCmsObjectBuilder {
             throw new ProvisioningCmsObjectBuilderException(e);
         } catch (CertificateEncodingException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
+        } catch (CRLException e) {
+            throw new ProvisioningCmsObjectBuilderException(e);
         }
     }
 
     private byte[] doGenerate(PrivateKey privateKey) throws InvalidAlgorithmParameterException,
-            NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
+            NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException, CRLException {
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         addCertificateAndCrl(generator);
         generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
@@ -158,17 +153,14 @@ public class ProvisioningCmsObjectBuilder {
     }
 
     private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException,
-            CertStoreException, CMSException {
-        List<X509Extension> signedObjects = new ArrayList<X509Extension>();
-        signedObjects.add(cmsCertificate);
+            CertStoreException, CMSException, CRLException, CertificateEncodingException {
+        List<X509Extension> certificates = new ArrayList<X509Extension>();
+        certificates.add(cmsCertificate);
         if (caCertificates != null) {
-            signedObjects.addAll(Arrays.asList(caCertificates));
+            certificates.addAll(Arrays.asList(caCertificates));
         }
-        signedObjects.add(crl);
-
-        CollectionCertStoreParameters certStoreParameters = new CollectionCertStoreParameters(signedObjects);
-        CertStore certStore = CertStore.getInstance("Collection", certStoreParameters);
-        generator.addCertificatesAndCRLs(certStore);
+        generator.addCertificates(new JcaCertStore(certificates));
+        generator.addCRLs(new JcaCRLStore(Collections.singleton(crl)));
     }
 
     private AttributeTable createSignedAttributes() {

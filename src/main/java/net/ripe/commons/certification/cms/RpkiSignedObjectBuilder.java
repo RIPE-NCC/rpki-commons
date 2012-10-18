@@ -29,36 +29,32 @@
  */
 package net.ripe.commons.certification.cms;
 
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.cert.CertStore;
-import java.security.cert.CertStoreException;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.X509Certificate;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
-
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
+import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTimeUtils;
+
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.cert.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
 
 public abstract class RpkiSignedObjectBuilder {
 
@@ -78,20 +74,20 @@ public abstract class RpkiSignedObjectBuilder {
             throw new RpkiSignedObjectBuilderException(e);
         } catch (CertStoreException e) {
             throw new RpkiSignedObjectBuilderException(e);
+        } catch (CertificateEncodingException e) {
+            throw new RpkiSignedObjectBuilderException(e);
         }
         return result;
     }
 
-    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException {
+    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
         byte[] subjectKeyIdentifier = X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate);
         Validate.notNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
 
-        CollectionCertStoreParameters certStoreParameters = new CollectionCertStoreParameters(Collections.singleton(signingCertificate));
-        CertStore certStore = CertStore.getInstance("Collection", certStoreParameters);
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         AttributeTable signedAttributeTable = createSignedAttributes();
         generator.addSigner(privateKey, subjectKeyIdentifier, RpkiSignedObject.DIGEST_ALGORITHM_OID, signedAttributeTable, null);
-        generator.addCertificatesAndCRLs(certStore);
+        generator.addCertificates(new JcaCertStore(Collections.singleton(signingCertificate)));
 
         byte[] content = Asn1Util.encode(encodableContent);
         CMSSignedData data = generator.generate(contentTypeOid.getId(), new CMSProcessableByteArray(content), true, signatureProvider);
