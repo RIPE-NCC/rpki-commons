@@ -30,20 +30,15 @@
 package net.ripe.commons.provisioning.cms;
 
 import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -78,6 +73,8 @@ import org.bouncycastle.cms.CMSTypedStream;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.StoreException;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
@@ -425,16 +422,10 @@ public class ProvisioningCmsObjectParser {
     private void verifySignature(SignerInformation signer) {
         boolean errorOccured = false;
         try {
-            validationResult.rejectIfFalse(signer.verify(cmsCertificate, DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
-        } catch (CertificateExpiredException e) {
-            errorOccured = true;
-        } catch (CertificateNotYetValidException e) {
-            errorOccured = true;
-        } catch (NoSuchAlgorithmException e) {
-            errorOccured = true;
-        } catch (NoSuchProviderException e) {
-            errorOccured = true;
+            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(cmsCertificate)), SIGNATURE_VERIFICATION);
         } catch (CMSException e) {
+            errorOccured = true;
+        } catch (OperatorCreationException e) {
             errorOccured = true;
         }
 

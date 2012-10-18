@@ -38,19 +38,14 @@ import java.net.URI;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -145,16 +140,8 @@ public class RoaCmsTest {
     }
 
     @Test
-    public void shouldUseMockedTimeForSigningTime() {
-        // Not using mocked time will give verification errors, which will break
-        // our FitNesse test cases in the future.
-        try {
-            DateTime date = new DateTime(2003, 01, 01, 0, 0, 0, 0, DateTimeZone.UTC);
-            DateTimeUtils.setCurrentMillisFixed(date.getMillis());
-            RoaCms roaCms = createRoaCms(allPrefixes);
-            assertEquals(date, roaCms.getSigningTime());
-        } finally {
-            DateTimeUtils.setCurrentMillisSystem();
-        }
+    public void shouldUseNotValidBeforeTimeForSigningTime() {
+        RoaCms roaCms = createRoaCms(allPrefixes);
+        assertEquals(roaCms.getCertificate().getValidityPeriod().getNotValidBefore(), roaCms.getSigningTime());
     }
 }

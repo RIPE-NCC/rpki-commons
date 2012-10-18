@@ -35,7 +35,6 @@ import static org.junit.Assert.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
-
 import net.ripe.commons.certification.FixedDateRule;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.cms.manifest.ManifestCms;
@@ -45,10 +44,9 @@ import net.ripe.commons.certification.cms.roa.RoaCmsTest;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.crl.X509CrlTest;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Rule;
@@ -66,7 +64,7 @@ public class CertificateRepositoryObjectPrinterTest {
         StringWriter output = new StringWriter();
         CertificateRepositoryObjectPrinter.print(new PrintWriter(output), manifest);
 
-        assertEquals("Object Type: RPKI Manifest\n" + "Signing time: 2008-01-01T00:00:00.000Z\n" + "Version: 0\n" + "Number: 68\n"
+        assertEquals("Object Type: RPKI Manifest\n" + "Signing time: 2008-09-01T22:43:29.000Z\n" + "Version: 0\n" + "Number: 68\n"
                 + "This update time: 2008-09-01T22:43:29.000Z\n" + "Next update time: 2008-09-02T06:43:29.000Z\n" + "Filenames and hashes:\n"
                 + "    BaR cb8379ac2098aa165029e3938a51da0bcecfc008fd6795f401178647f96c5b34\n"
                 + "    foo1 ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\n", output.getBuffer().toString());
@@ -96,13 +94,12 @@ public class CertificateRepositoryObjectPrinterTest {
 
         CertificateRepositoryObjectPrinter.print(new PrintWriter(output), roaCms);
 
-        assertEquals("Object Type: Route Origin Authorisation object\n" + "Signing time: 2008-01-01T00:00:00.000Z\n" + "ASN: AS42\n" + "Prefixes:\n"
+        assertEquals("Object Type: Route Origin Authorisation object\n" + "Signing time: 2007-12-31T23:59:00.000Z\n" + "ASN: AS42\n" + "Prefixes:\n"
                 + "    10.64.0.0/12 [24]\n" + "    10.32.0.0/12\n" + "    2001:0:200::/39\n", output.getBuffer().toString());
     }
 
     @Test
     public void shouldPrintCRL() {
-
         X509CrlBuilder builder = X509CrlTest.getCrlBuilder();
         builder.addEntry(BigInteger.TEN, new DateTime().minusDays(1));
         builder.addEntry(BigInteger.valueOf(42), new DateTime().minusDays(3));

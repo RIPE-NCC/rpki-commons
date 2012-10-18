@@ -41,6 +41,7 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -49,6 +50,8 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.operator.DigestCalculatorProvider;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.Selector;
 import org.bouncycastle.util.StoreException;
 
@@ -61,6 +64,8 @@ public class BouncyCastleUtil {
             throw new RuntimeException(e);
         }
     }
+
+    public static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
 
     private BouncyCastleUtil() {
     }
@@ -89,8 +94,12 @@ public class BouncyCastleUtil {
         }
     }
 
-    public static AuthorityKeyIdentifier createAuthorityKeyIdentifier(PublicKey key) {
-        return JCA_X509_EXTENSION_UTILS.createAuthorityKeyIdentifier(key);
+    public static AuthorityKeyIdentifier createAuthorityKeyIdentifier(PublicKey publicKey) {
+        return JCA_X509_EXTENSION_UTILS.createAuthorityKeyIdentifier(publicKey);
+    }
+
+    public static SubjectKeyIdentifier createSubjectKeyIdentifier(PublicKey publicKey) {
+        return JCA_X509_EXTENSION_UTILS.createSubjectKeyIdentifier(publicKey);
     }
 
     public static X500Name principalToName(X500Principal dn) {

@@ -37,11 +37,11 @@ import java.security.PrivateKey;
 import java.security.cert.CertStoreException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import net.ripe.commons.certification.Asn1Util;
+import net.ripe.commons.certification.BouncyCastleUtil;
 import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import org.apache.commons.lang.Validate;
@@ -64,7 +64,6 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.joda.time.DateTimeUtils;
 
 public abstract class RpkiSignedObjectBuilder {
 
@@ -105,16 +104,16 @@ public abstract class RpkiSignedObjectBuilder {
         return data.getEncoded();
     }
 
-    private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey, String signatureProvider, X509Extension signingCertificate) throws OperatorCreationException {
+    private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey, String signatureProvider, X509Certificate signingCertificate) throws OperatorCreationException {
         ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
-        DigestCalculatorProvider digestProvider = RpkiSignedObjectParser.DIGEST_CALCULATOR_PROVIDER;
-        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate));
+        DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
+        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes(signingCertificate.getNotBefore()))).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate));
         generator.addSignerInfoGenerator(gen);
     }
 
-    private AttributeTable createSignedAttributes() {
+    private AttributeTable createSignedAttributes(Date signingTime) {
         Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>(); //NOPMD - ReplaceHashtableWithMap
-        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));
+        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(signingTime)));
         attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
         return new AttributeTable(attributes);
     }

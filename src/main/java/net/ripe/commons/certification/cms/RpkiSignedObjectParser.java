@@ -34,8 +34,6 @@ import static net.ripe.commons.certification.validation.ValidationString.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -59,15 +57,13 @@ import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
-import org.bouncycastle.operator.DigestCalculatorProvider;
-import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 public abstract class RpkiSignedObjectParser {
-
-    public static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
 
     private byte[] encoded;
 
@@ -87,7 +83,6 @@ public abstract class RpkiSignedObjectParser {
         this.validationResult = result;
     }
 
-    @Deprecated
     public final void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
         parse(new ValidationLocation(location), encoded);
     }
@@ -127,7 +122,7 @@ public abstract class RpkiSignedObjectParser {
     private void parseCms() {
         CMSSignedDataParser sp;
         try {
-            sp = new CMSSignedDataParser(DIGEST_CALCULATOR_PROVIDER, encoded);
+            sp = new CMSSignedDataParser(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER, encoded);
         } catch (CMSException e) {
             validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
             return;
@@ -287,12 +282,10 @@ public abstract class RpkiSignedObjectParser {
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
         boolean errorOccured = false;
         try {
-            validationResult.rejectIfFalse(signer.verify(certificate.getPublicKey(), (String) null), SIGNATURE_VERIFICATION);
-        } catch (NoSuchAlgorithmException e) {
-            errorOccured = true;
-        } catch (NoSuchProviderException e) {
-            errorOccured = true;
+            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate)), SIGNATURE_VERIFICATION);
         } catch (CMSException e) {
+            errorOccured = true;
+        } catch (OperatorCreationException e) {
             errorOccured = true;
         }
 

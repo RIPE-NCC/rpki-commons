@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
+import net.ripe.commons.certification.BouncyCastleUtil;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
@@ -76,8 +76,6 @@ import org.joda.time.DateTimeUtils;
 
 
 public class ProvisioningCmsObjectBuilder {
-
-    private static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
 
     private static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28");
 
@@ -161,7 +159,7 @@ public class ProvisioningCmsObjectBuilder {
 
     private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey) throws OperatorCreationException {
         ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
-        DigestCalculatorProvider digestProvider = RpkiSignedObjectParser.DIGEST_CALCULATOR_PROVIDER;
+        DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
         SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate));
         generator.addSignerInfoGenerator(gen);
     }

@@ -29,16 +29,23 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
-import net.ripe.commons.certification.cms.RpkiSignedObjectBuilder;
-import net.ripe.commons.certification.validation.ValidationLocation;
-import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import org.bouncycastle.asn1.*;
-import org.joda.time.DateTime;
-
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.util.Map;
 import java.util.TreeMap;
+import net.ripe.commons.certification.cms.RpkiSignedObjectBuilder;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
+import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERSequence;
+import org.joda.time.DateTime;
 
 public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
 
@@ -46,7 +53,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     private BigInteger number;
     private DateTime thisUpdateTime;
     private DateTime nextUpdateTime;
-    private String signatureProvider;
+    private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
     private Map<String, byte[]> files = new TreeMap<String, byte[]>();
 
 

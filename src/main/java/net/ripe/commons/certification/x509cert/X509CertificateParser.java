@@ -61,7 +61,6 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         this.result = result;
     }
 
-    @Deprecated
     public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
         parse(new ValidationLocation(location), encoded);
     }

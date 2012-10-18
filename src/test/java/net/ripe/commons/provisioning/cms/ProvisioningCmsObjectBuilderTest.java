@@ -63,6 +63,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -334,7 +335,7 @@ public class ProvisioningCmsObjectBuilderTest {
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
         assertNotNull(signer.getSignature());
-        signer.verify(TEST_CMS_CERT.getCertificate(), DEFAULT_SIGNATURE_PROVIDER);
+        assertTrue("signature verify", signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(TEST_CMS_CERT.getCertificate())));
     }
 
     /**
