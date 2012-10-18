@@ -36,16 +36,16 @@ import static org.bouncycastle.cms.CMSSignedGenerator.*;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.security.cert.CertStore;
-import java.security.cert.Certificate;
-import java.util.ArrayList;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertStoreException;
+import java.security.cert.X509CRL;
 import java.util.Collection;
+import net.ripe.commons.certification.BouncyCastleUtil;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -57,6 +57,9 @@ import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CRLHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerInformation;
@@ -156,34 +159,20 @@ public class ProvisioningCmsObjectBuilderTest {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
      */
     @Test
-    public void shouldCmsObjectHaveEmbeddedEECertificate() throws Exception {
-        CertStore certificatesAndCRLs = signedDataParser.getCertificatesAndCRLs("Collection", (String) null);
-        Collection<? extends Certificate> certificates = certificatesAndCRLs.getCertificates(null);
+    public void shouldCmsObjectHaveEmbeddedSigningCertificate() throws Exception {
+        Collection<? extends X509CertificateHolder> certificates = getCertificates();
 
         assertNotNull(certificates);
-        assertFalse(certificates.isEmpty());
+        assertEquals("size", 1, certificates.size());
 
-        certificates = new ArrayList<Certificate>(certificates);
-        assertTrue(certificates.contains(TEST_CMS_CERT.getCertificate()));
+        X509CertificateHolder holder = certificates.iterator().next();
+        assertEquals(new JcaX509CertificateHolder(TEST_CMS_CERT.getCertificate()), holder);
     }
 
-    /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
-     */
-    @Test
-    public void shouldCmsObjectHaveEmbeddedIdentityCertificate() throws Exception {
-        CertStore certificatesAndCRLs = signedDataParser.getCertificatesAndCRLs("Collection", (String) null);
-        Collection<? extends Certificate> certificates = certificatesAndCRLs.getCertificates(null);
-
-        assertNotNull(certificates);
-        assertFalse(certificates.isEmpty());
-        assertEquals(1, certificates.size());
-
-        Certificate cert1 = certificates.iterator().next();
-        ProvisioningIdentityCertificateParser provisioningIdentityCertificateParser = new ProvisioningIdentityCertificateParser();
-        provisioningIdentityCertificateParser.parse("cms", cert1.getEncoded());
-        ProvisioningIdentityCertificate certificate = provisioningIdentityCertificateParser.getCertificate();
-        assertTrue(certificate.isEe());
+    @SuppressWarnings("unchecked")
+    private Collection<? extends X509CertificateHolder> getCertificates() throws NoSuchAlgorithmException, NoSuchProviderException, CMSException,
+            CertStoreException {
+        return signedDataParser.getCertificates().getMatches(new BouncyCastleUtil.X509CertificateHolderStoreSelector());
     }
 
     /**
@@ -191,12 +180,12 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedCrl() throws Exception {
-        CertStore certificatesAndCRLs = signedDataParser.getCertificatesAndCRLs("Collection", (String) null);
-        Collection<? extends java.security.cert.CRL> crls = certificatesAndCRLs.getCRLs(null);
+        @SuppressWarnings("unchecked")
+        Collection<X509CRL> crls = signedDataParser.getCRLs().getMatches(new BouncyCastleUtil.X509CRLHolderStoreSelector());
 
         assertNotNull(crls);
         assertFalse(crls.isEmpty());
-        assertEquals(CRL, crls.iterator().next());
+        assertEquals(new JcaX509CRLHolder(CRL), crls.iterator().next());
     }
 
     /**

@@ -29,6 +29,28 @@
  */
 package net.ripe.commons.provisioning.cms;
 
+import static net.ripe.commons.certification.validation.ValidationString.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CRL;
+import java.security.cert.CRLException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import net.ripe.commons.certification.BouncyCastleUtil;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
@@ -41,26 +63,24 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.cms.*;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.CMSSignedGenerator;
+import org.bouncycastle.cms.CMSTypedStream;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.util.StoreException;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-
-import static net.ripe.commons.certification.validation.ValidationString.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public class ProvisioningCmsObjectParser {
 
@@ -240,58 +260,46 @@ public class ProvisioningCmsObjectParser {
     }
 
     private Collection<? extends Certificate> extractCertificates(CMSSignedDataParser sp) {
-        Collection<? extends Certificate> certificates;
         try {
-            CertStore certs;
-            certs = sp.getCertificatesAndCRLs("Collection", (String) null);
-            certificates = certs.getCertificates(null);
-        } catch (NoSuchAlgorithmException e) {
-            certificates = null;
-        } catch (NoSuchProviderException e) {
-            certificates = null;
+            return BouncyCastleUtil.extractCertificates(sp);
         } catch (CMSException e) {
-            certificates = null;
-        } catch (CertStoreException e) {
-            certificates = null;
+            return null;
+        } catch (StoreException e) {
+            return null;
+        } catch (CertificateException e) {
+            return null;
         }
-        return certificates;
     }
 
     /**
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.5
      */
     private void parseCmsCrl() {
-        Collection<? extends CRL> certificates = extractCrl(sp);
-        if (!validationResult.rejectIfNull(certificates, GET_CERTS_AND_CRLS)) {
+        List<? extends X509CRL> crls = extractCrl(sp);
+        if (!validationResult.rejectIfNull(crls, GET_CERTS_AND_CRLS)) {
             return;
         }
 
-        if (!validationResult.rejectIfFalse(certificates.size() == 1, ONLY_ONE_CRL_ALLOWED)) {
+        if (!validationResult.rejectIfFalse(crls.size() == 1, ONLY_ONE_CRL_ALLOWED)) {
             return;
         }
 
-        CRL x509Crl = certificates.iterator().next();
+        CRL x509Crl = crls.get(0);
         if (validationResult.rejectIfFalse(x509Crl instanceof X509CRL, CRL_IS_X509CRL)) {
             crl = (X509CRL) x509Crl;
         }
     }
 
-    private Collection<? extends CRL> extractCrl(CMSSignedDataParser sp) {
-        Collection<? extends CRL> certificates;
+    private List<? extends X509CRL> extractCrl(CMSSignedDataParser sp) {
         try {
-            CertStore certs;
-            certs = sp.getCertificatesAndCRLs("Collection", (String) null);
-            certificates = certs.getCRLs(null);
-        } catch (NoSuchAlgorithmException e) {
-            certificates = null;
-        } catch (NoSuchProviderException e) {
-            certificates = null;
+            return BouncyCastleUtil.extractCrls(sp);
         } catch (CMSException e) {
-            certificates = null;
-        } catch (CertStoreException e) {
-            certificates = null;
+            return null;
+        } catch (StoreException e) {
+            return null;
+        } catch (CRLException e) {
+            return null;
         }
-        return certificates;
     }
 
     /**

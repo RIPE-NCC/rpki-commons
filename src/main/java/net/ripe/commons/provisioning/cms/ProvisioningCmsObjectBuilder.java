@@ -29,9 +29,25 @@
  */
 package net.ripe.commons.provisioning.cms;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.security.PrivateKey;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509Extension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import net.ripe.commons.certification.cms.RpkiSignedObjectParser;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.PayloadParser;
@@ -49,16 +65,14 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
+import org.bouncycastle.cms.SignerInfoGenerator;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DigestCalculatorProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.joda.time.DateTimeUtils;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.cert.*;
-import java.util.*;
 
 
 public class ProvisioningCmsObjectBuilder {
@@ -73,7 +87,7 @@ public class ProvisioningCmsObjectBuilder {
 
     private X509CRL crl;
 
-    private String signatureProvider;
+    private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
     private String payloadContent;
 
@@ -122,38 +136,37 @@ public class ProvisioningCmsObjectBuilder {
     private byte[] generateCms(PrivateKey privateKey) {
         try {
             return doGenerate(privateKey);
-        } catch (NoSuchAlgorithmException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (NoSuchProviderException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
         } catch (CMSException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
         } catch (IOException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (CertStoreException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (CertificateEncodingException e) {
+        } catch (OperatorCreationException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
         } catch (CRLException e) {
+            throw new ProvisioningCmsObjectBuilderException(e);
+        } catch (CertificateEncodingException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
         }
     }
 
-    private byte[] doGenerate(PrivateKey privateKey) throws InvalidAlgorithmParameterException,
-            NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException, CRLException {
+    private byte[] doGenerate(PrivateKey privateKey) throws CMSException, IOException, CertificateEncodingException, CRLException, OperatorCreationException {
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         addCertificateAndCrl(generator);
-        generator.addSigner(privateKey, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate), DIGEST_ALGORITHM_OID, createSignedAttributes(), null);
+        addSignerInfo(generator, privateKey);
 
-        CMSSignedData data = generator.generate(CONTENT_TYPE.getId(), new CMSProcessableByteArray(payloadContent.getBytes(Charset.forName("UTF-8"))), true, signatureProvider);
+        CMSSignedData data = generator.generate(new CMSProcessableByteArray(CONTENT_TYPE, payloadContent.getBytes(Charset.forName("UTF-8"))), true);
 
         return data.getEncoded();
     }
 
-    private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException,
-            CertStoreException, CMSException, CRLException, CertificateEncodingException {
+    private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey) throws OperatorCreationException {
+        ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
+        DigestCalculatorProvider digestProvider = RpkiSignedObjectParser.DIGEST_CALCULATOR_PROVIDER;
+        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate));
+        generator.addSignerInfoGenerator(gen);
+    }
+
+    private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws CertificateEncodingException, CMSException, CRLException {
         List<X509Extension> certificates = new ArrayList<X509Extension>();
         certificates.add(cmsCertificate);
         if (caCertificates != null) {

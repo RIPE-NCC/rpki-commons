@@ -29,23 +29,6 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
-import net.ripe.ipresource.InheritedIpResourceSet;
-import net.ripe.ipresource.IpResourceSet;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-
-import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.InvalidKeyException;
@@ -56,9 +39,33 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-
-import static net.ripe.commons.certification.x509cert.X509CertificateUtil.createSubjectPublicKeyInfo;
-import static net.ripe.commons.certification.x509cert.X509CertificateUtil.principalToName;
+import javax.security.auth.x500.X500Principal;
+import net.ripe.commons.certification.BouncyCastleUtil;
+import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
+import net.ripe.ipresource.InheritedIpResourceSet;
+import net.ripe.ipresource.IpResourceSet;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
@@ -273,12 +280,12 @@ public final class X509CertificateBuilderHelper {
 
         PublicKey key = publicKey;
         X509v3CertificateBuilder generator = new X509v3CertificateBuilder(
-                principalToName(issuerDN),
+                BouncyCastleUtil.principalToName(issuerDN),
                 serial,
                 new Date(validityPeriod.getNotValidBefore().getMillis()),
                 new Date(validityPeriod.getNotValidAfter().getMillis()),
-                principalToName(subjectDN),
-                createSubjectPublicKeyInfo(key));
+                BouncyCastleUtil.principalToName(subjectDN),
+                BouncyCastleUtil.createSubjectPublicKeyInfo(key));
         return generator;
     }
 
@@ -303,7 +310,7 @@ public final class X509CertificateBuilderHelper {
             generator.addExtension(
                     X509Extension.authorityKeyIdentifier,
                     false,
-                    X509CertificateUtil.createAuthorityKeyIdentifier(signingKeyPair.getPublic()));
+                    BouncyCastleUtil.createAuthorityKeyIdentifier(signingKeyPair.getPublic()));
     }
 
     private void addCaBit(X509v3CertificateBuilder generator) throws CertIOException {

@@ -29,7 +29,20 @@
  */
 package net.ripe.commons.certification.cms;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.cert.CertStoreException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509Extension;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
 import net.ripe.commons.certification.Asn1Util;
+import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
 import net.ripe.commons.certification.x509cert.X509CertificateUtil;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -44,17 +57,14 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
+import org.bouncycastle.cms.SignerInfoGenerator;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DigestCalculatorProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.joda.time.DateTimeUtils;
-
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.cert.*;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
 
 public abstract class RpkiSignedObjectBuilder {
 
@@ -76,22 +86,30 @@ public abstract class RpkiSignedObjectBuilder {
             throw new RpkiSignedObjectBuilderException(e);
         } catch (CertificateEncodingException e) {
             throw new RpkiSignedObjectBuilderException(e);
+        } catch (OperatorCreationException e) {
+            throw new RpkiSignedObjectBuilderException(e);
         }
         return result;
     }
 
-    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException {
+    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException, OperatorCreationException {
         byte[] subjectKeyIdentifier = X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate);
         Validate.notNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
 
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
-        AttributeTable signedAttributeTable = createSignedAttributes();
-        generator.addSigner(privateKey, subjectKeyIdentifier, RpkiSignedObject.DIGEST_ALGORITHM_OID, signedAttributeTable, null);
+        addSignerInfo(generator, privateKey, signatureProvider, signingCertificate);
         generator.addCertificates(new JcaCertStore(Collections.singleton(signingCertificate)));
 
         byte[] content = Asn1Util.encode(encodableContent);
-        CMSSignedData data = generator.generate(contentTypeOid.getId(), new CMSProcessableByteArray(content), true, signatureProvider);
+        CMSSignedData data = generator.generate(new CMSProcessableByteArray(contentTypeOid, content), true);
         return data.getEncoded();
+    }
+
+    private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey, String signatureProvider, X509Extension signingCertificate) throws OperatorCreationException {
+        ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
+        DigestCalculatorProvider digestProvider = RpkiSignedObjectParser.DIGEST_CALCULATOR_PROVIDER;
+        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate));
+        generator.addSignerInfoGenerator(gen);
     }
 
     private AttributeTable createSignedAttributes() {

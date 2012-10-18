@@ -29,6 +29,19 @@
  */
 package net.ripe.commons.certification.cms;
 
+import static net.ripe.commons.certification.cms.RpkiSignedObject.*;
+import static net.ripe.commons.certification.validation.ValidationString.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
+import net.ripe.commons.certification.BouncyCastleUtil;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
@@ -41,27 +54,20 @@ import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.util.StoreException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.*;
-import java.util.Collection;
-
-import static net.ripe.commons.certification.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
-import static net.ripe.commons.certification.cms.RpkiSignedObject.ENCRYPTION_ALGORITHM_OID;
-import static net.ripe.commons.certification.validation.ValidationString.*;
-
-
 public abstract class RpkiSignedObjectParser {
 
-    private static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
+    public static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
 
     private byte[] encoded;
 
@@ -196,21 +202,15 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private Collection<? extends Certificate> extractCertificate(CMSSignedDataParser sp) {
-        Collection<? extends Certificate> certificates;
         try {
-            CertStore certs;
-            certs = sp.getCertificatesAndCRLs("Collection", (String) null);
-            certificates = certs.getCertificates(null);
-        } catch (NoSuchAlgorithmException e) {
-            certificates = null;
-        } catch (NoSuchProviderException e) {
-            certificates = null;
+            return BouncyCastleUtil.extractCertificates(sp);
         } catch (CMSException e) {
-            certificates = null;
-        } catch (CertStoreException e) {
-            certificates = null;
+            return null;
+        } catch (StoreException e) {
+            return null;
+        } catch (CertificateException e) {
+            return null;
         }
-        return certificates;
     }
 
     private void verifyCmsSigning(CMSSignedDataParser sp, X509Certificate certificate) {
