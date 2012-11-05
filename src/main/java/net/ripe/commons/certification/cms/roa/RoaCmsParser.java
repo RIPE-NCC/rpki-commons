@@ -77,7 +77,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 
     public RoaCms getRoaCms() {
         if (!isSuccess()) {
-            throw new IllegalArgumentException("ROA validation failed");
+            throw new IllegalArgumentException("ROA validation failed: " + getValidationResult().getFailuresForCurrentLocation());
         }
 
         RpkiSignedObjectInfo cmsObjectInfo = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
