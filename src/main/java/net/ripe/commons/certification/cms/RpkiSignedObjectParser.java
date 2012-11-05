@@ -280,17 +280,17 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
-        boolean errorOccured = false;
+        String errorMessage = null;
         try {
             validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate)), SIGNATURE_VERIFICATION);
         } catch (CMSException e) {
-            errorOccured = true;
+            errorMessage = String.valueOf(e.getMessage());
         } catch (OperatorCreationException e) {
-            errorOccured = true;
+            errorMessage = String.valueOf(e.getMessage());
         }
 
-        if (errorOccured) {
-            validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION);
+        if (errorMessage != null) {
+            validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION, errorMessage);
         }
     }
 

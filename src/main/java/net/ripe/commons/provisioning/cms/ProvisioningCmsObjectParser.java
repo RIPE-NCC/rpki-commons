@@ -420,17 +420,17 @@ public class ProvisioningCmsObjectParser {
      * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.6
      */
     private void verifySignature(SignerInformation signer) {
-        boolean errorOccured = false;
+        String errorMessage = null;
         try {
             validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(cmsCertificate)), SIGNATURE_VERIFICATION);
         } catch (CMSException e) {
-            errorOccured = true;
+            errorMessage = String.valueOf(e.getMessage());
         } catch (OperatorCreationException e) {
-            errorOccured = true;
+            errorMessage = String.valueOf(e.getMessage());
         }
 
-        if (errorOccured) {
-            validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION);
+        if (errorMessage != null) {
+            validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION, errorMessage);
         }
     }
 
