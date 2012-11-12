@@ -226,14 +226,14 @@ public class ValidationResult implements Serializable {
 	}
 
     public void addAll(ValidationResult that) {
-        for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> result: that.results.entrySet()) {
-            Map<ValidationStatus, List<ValidationCheck>> map = results.get(result.getKey());
+        for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> resultsByLocation: that.results.entrySet()) {
+            Map<ValidationStatus, List<ValidationCheck>> map = results.get(resultsByLocation.getKey());
             if (map == null) {
                 map = new HashMap<ValidationStatus, List<ValidationCheck>>();
-                this.results.put(result.getKey(), map);
+                this.results.put(resultsByLocation.getKey(), map);
             }
-            for (Entry<ValidationStatus, List<ValidationCheck>> checks: result.getValue().entrySet()) {
-                List<ValidationCheck> list = map.get(checks.getValue());
+            for (Entry<ValidationStatus, List<ValidationCheck>> checks: resultsByLocation.getValue().entrySet()) {
+                List<ValidationCheck> list = map.get(checks.getKey());
                 if (list == null) {
                     list = new ArrayList<ValidationCheck>();
                     map.put(checks.getKey(), list);

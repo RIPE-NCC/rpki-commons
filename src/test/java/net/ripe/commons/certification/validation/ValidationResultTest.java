@@ -118,4 +118,16 @@ public class ValidationResultTest {
         assertEquals(Arrays.asList(new ValidationMetric("name", "value", NOW.getMillis())), result.getMetrics(FIRST_LOCATION));
         assertEquals(Collections.emptyList(), result.getMetrics(SECOND_LOCATION));
     }
+
+    @Test
+    public void should_add_all_results() {
+        ValidationResult source = new ValidationResult();
+        source.rejectForLocation(SECOND_LOCATION, "added", "param");
+        result.rejectForLocation(SECOND_LOCATION, "existing", "param");
+
+        result.addAll(source);
+
+        assertEquals(2, result.getFailures(SECOND_LOCATION).size());
+        assertEquals("existing", result.getFailures(SECOND_LOCATION).get(0).getKey());
+    }
 }
