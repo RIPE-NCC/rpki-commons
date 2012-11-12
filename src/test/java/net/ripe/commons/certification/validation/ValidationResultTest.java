@@ -120,14 +120,37 @@ public class ValidationResultTest {
     }
 
     @Test
-    public void should_add_all_results() {
+    public void should_keep_checks_from_target_result() {
         ValidationResult source = new ValidationResult();
-        source.rejectForLocation(SECOND_LOCATION, "added", "param");
-        result.rejectForLocation(SECOND_LOCATION, "existing", "param");
+        result.rejectForLocation(FIRST_LOCATION, "existing", "param");
 
         result.addAll(source);
 
-        assertEquals(2, result.getFailures(SECOND_LOCATION).size());
-        assertEquals("existing", result.getFailures(SECOND_LOCATION).get(0).getKey());
+        assertEquals(1, result.getFailures(FIRST_LOCATION).size());
+        assertEquals("existing", result.getFailures(FIRST_LOCATION).get(0).getKey());
+    }
+
+    @Test
+    public void should_copy_checks_from_source_result() {
+        ValidationResult source = new ValidationResult();
+        source.rejectForLocation(FIRST_LOCATION, "added", "param");
+
+        result.addAll(source);
+
+        assertEquals(1, result.getFailures(FIRST_LOCATION).size());
+        assertEquals("added", result.getFailures(FIRST_LOCATION).get(0).getKey());
+    }
+
+    @Test
+    public void should_add_all_checks_from_both_results() {
+        ValidationResult source = new ValidationResult();
+        source.rejectForLocation(FIRST_LOCATION, "added", "param");
+        result.rejectForLocation(FIRST_LOCATION, "existing", "param");
+
+        result.addAll(source);
+
+        assertEquals(2, result.getFailures(FIRST_LOCATION).size());
+        assertEquals("existing", result.getFailures(FIRST_LOCATION).get(0).getKey());
+        assertEquals("added", result.getFailures(FIRST_LOCATION).get(1).getKey());
     }
 }
