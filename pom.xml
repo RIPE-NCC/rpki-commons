@@ -8,7 +8,7 @@
     <inceptionYear>2008</inceptionYear>
 
     <scm>
-        <connection>scm:svn:https://svn.ripe.net/svn/ba/certification/rpki-commons/trunk</connection>
+        <connection>scm:git:ssh://git.db.ripe.net/certification/rpki-commons</connection>
     </scm>
 
     <distributionManagement>
