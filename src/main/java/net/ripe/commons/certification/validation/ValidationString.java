@@ -45,6 +45,9 @@ public final class ValidationString {
     public static final String KNOWN_OBJECT_TYPE = "known.object.type";
     public static final String VALIDATOR_INTERNAL_ERROR = "validator.internal.error";
 
+    // Trust anchor
+    public static final String TRUST_ANCHOR_PUBLIC_KEY_MATCH = "trust.anchor.public.key.match";
+
     //certificate (validator)
     public static final String CERT_CHAIN_LENGTH = "cert.chain.length";
     public static final String CERT_CHAIN_COMPLETE = "cert.chain.complete";
