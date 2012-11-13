@@ -34,15 +34,20 @@ import static net.ripe.commons.certification.validation.ValidationString.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import net.ripe.commons.certification.BouncyCastleUtil;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.AbstractX509CertificateWrapperException;
+import net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -57,8 +62,6 @@ import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
-import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -279,13 +282,24 @@ public abstract class RpkiSignedObjectParser {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
         String errorMessage = null;
         try {
-            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate)), SIGNATURE_VERIFICATION);
+            // New bouncy castle API is too strict when validating signing time. Use old API for now.
+//            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate)), SIGNATURE_VERIFICATION);
+//        } catch (OperatorCreationException e) {
+//            errorMessage = String.valueOf(e.getMessage());
+            validationResult.rejectIfFalse(signer.verify(certificate, X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
         } catch (CMSException e) {
             errorMessage = String.valueOf(e.getMessage());
-        } catch (OperatorCreationException e) {
+        } catch (CertificateExpiredException e) {
+            errorMessage = String.valueOf(e.getMessage());
+        } catch (CertificateNotYetValidException e) {
+            errorMessage = String.valueOf(e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            errorMessage = String.valueOf(e.getMessage());
+        } catch (NoSuchProviderException e) {
             errorMessage = String.valueOf(e.getMessage());
         }
 
