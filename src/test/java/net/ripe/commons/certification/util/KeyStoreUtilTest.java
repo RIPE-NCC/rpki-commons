@@ -29,30 +29,21 @@
  */
 package net.ripe.commons.certification.util;
 
-import static net.ripe.commons.certification.util.KeyPairFactoryTest.DEFAULT_KEYPAIR_GENERATOR_PROVIDER;
-import static net.ripe.commons.certification.util.KeyStoreUtil.KEYSTORE_KEY_ALIAS;
-import static net.ripe.commons.certification.util.KeyStoreUtil.clearKeyStore;
-import static net.ripe.commons.certification.util.KeyStoreUtil.createKeyStoreForKeyPair;
-import static net.ripe.commons.certification.util.KeyStoreUtil.getKeyPairFromKeyStore;
-import static net.ripe.commons.certification.util.KeyStoreUtil.storeKeyStore;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static net.ripe.commons.certification.util.KeyStoreUtil.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
-
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateParser;
-
 import org.junit.Test;
 
 public class KeyStoreUtilTest {
 
-	private static KeyPair TEST_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+	private static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
 
 	private KeyStore keyStore;
 

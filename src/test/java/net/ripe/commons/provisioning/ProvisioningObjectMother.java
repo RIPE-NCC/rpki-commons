@@ -35,12 +35,10 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.cert.X509CRL;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
-import net.ripe.commons.certification.util.KeyPairFactory;
+import net.ripe.commons.certification.util.PregeneratedKeyPairFactory;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
@@ -55,7 +53,6 @@ import net.ripe.commons.provisioning.payload.list.request.ResourceClassListQuery
 import net.ripe.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilder;
 import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBuilderParserTest;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
 
@@ -64,7 +61,7 @@ public class ProvisioningObjectMother {
     public static final KeyPair TEST_KEY_PAIR = ProvisioningKeyPairGenerator.generate();
     public static final KeyPair TEST_KEY_PAIR_2 = ProvisioningKeyPairGenerator.generate();
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
-    public static KeyPair SECOND_TEST_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
 
     public static final X509CRL CRL = generateCrl();
 
@@ -77,7 +74,7 @@ public class ProvisioningObjectMother {
     public static URI RPKI_CA_CERT_REQUEST_CA_MFT_URI = URI.create("rsync://host/module/subdir/subject.mft");
 
     public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
-    public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = KeyPairFactory.getInstance().generate(2048, "SunRsaSign");
+    public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate(2048);
     public static PKCS10CertificationRequest RPKI_CA_CERT_REQUEST = RpkiCaCertificateRequestBuilderParserTest.createRpkiCaCertificateRequest();
     private static final CertificateIssuanceRequestPayload RPKI_CA_CERT_REQUEST_PAYLOAD = CertificateIssuanceRequestPayloadBuilderTest.createCertificateIssuanceRequestPayloadForPkcs10Request(RPKI_CA_CERT_REQUEST);
 
@@ -115,7 +112,7 @@ public class ProvisioningObjectMother {
     public static ProvisioningCmsObject createResourceCertificateSignRequestProvisioningCmsObject() {
         return createCmsForPayload(RPKI_CA_CERT_REQUEST_PAYLOAD);
     }
-    
+
     public static ProvisioningCmsObject createRequestNotPerformedResponseObject() {
         return createCmsForPayload(RequestNotPerformedResponsePayloadBuilderTest.NOT_PERFORMED_PAYLOAD);
     }

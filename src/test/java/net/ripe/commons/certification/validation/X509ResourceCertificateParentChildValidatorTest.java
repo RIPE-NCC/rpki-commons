@@ -29,25 +29,21 @@
  */
 package net.ripe.commons.certification.validation;
 
-import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
-import net.ripe.commons.certification.util.KeyPairFactory;
+import net.ripe.commons.certification.util.PregeneratedKeyPairFactory;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -67,9 +63,9 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
     private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMonths(2), new DateTime().minusMonths(1));
 
-	private static final KeyPair ROOT_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
-	private static final KeyPair FIRST_CHILD_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
-	private static final KeyPair SECOND_CHILD_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+	private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+	private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+	private static final KeyPair SECOND_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
 
 	private static final ValidationLocation CHILD_VALIDATION_LOCATION = new ValidationLocation("child");
 
@@ -79,7 +75,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 	private X509Crl rootCrl;
 
 	private ValidationResult result;
-	
+
 	private ValidationOptions options;
 
 	@Before

@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 import java.net.URI;
 import java.security.KeyPair;
 import javax.security.auth.x500.X500Principal;
-import net.ripe.commons.certification.util.KeyPairFactory;
+import net.ripe.commons.certification.util.PregeneratedKeyPairFactory;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public class RpkiCaCertificateRequestBuilderParserTest {
         URI caRepositoryUri = URI.create("rsync://host/module/subdir/");
         URI manifestUri = URI.create("rsync://host/module/subdir/subject.mft");
         X500Principal subject = new X500Principal("CN=subject");
-        KeyPair keyPair = KeyPairFactory.getInstance().generate(2048, "SunRsaSign");
+        KeyPair keyPair = PregeneratedKeyPairFactory.getInstance().generate(2048);
 
         requestBuilder.withCaRepositoryUri(caRepositoryUri);
         requestBuilder.withManifestUri(manifestUri);

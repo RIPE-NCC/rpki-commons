@@ -12,3 +12,5 @@ target/
 *.classpath
 *.project
 
+# Caches, etc.
+.pregenerated-test-key-pairs.keystore

@@ -43,8 +43,8 @@ public class KeyPairFactoryTest {
 
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
 
-    public static KeyPair TEST_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
-    public static KeyPair SECOND_TEST_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
 
     private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<String, KeyPair>();
 
@@ -53,7 +53,7 @@ public class KeyPairFactoryTest {
         synchronized (cachedKeyPairs) {
             KeyPair result = cachedKeyPairs.get(name);
             if (result == null) {
-                result = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+                result = PregeneratedKeyPairFactory.getInstance().generate(512);
                 cachedKeyPairs.put(name, result);
             }
             return result;
@@ -63,12 +63,12 @@ public class KeyPairFactoryTest {
 
     @Test
     public void shouldGenerateRsaKeyPairs() {
-        KeyPair keyPair = TEST_KEY_PAIR;
+        KeyPair keyPair = new KeyPairFactory(DEFAULT_KEYPAIR_GENERATOR_PROVIDER).generate(512);
         assertTrue(keyPair.getPublic() instanceof RSAPublicKey);
         assertTrue(keyPair.getPrivate() instanceof RSAPrivateKey);
 
-        assertEquals(keyPair.getPublic(), KeyPairFactory.getInstance().decodePublicKey(keyPair.getPublic().getEncoded()));
-        assertEquals(keyPair.getPrivate(), KeyPairFactory.getInstance().decodePrivateKey(keyPair.getPrivate().getEncoded()));
+        assertEquals(keyPair.getPublic(), KeyPairFactory.decodePublicKey(keyPair.getPublic().getEncoded()));
+        assertEquals(keyPair.getPrivate(), KeyPairFactory.decodePrivateKey(keyPair.getPrivate().getEncoded()));
 
         RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
         assertEquals("RSA", rsaPublicKey.getAlgorithm());
@@ -77,16 +77,16 @@ public class KeyPairFactoryTest {
 
     @Test(expected=RuntimeException.class)
     public void shouldKeypairGenerationFailOnInvalidProvider() {
-        KeyPairFactory.getInstance().generate(512, "foo provider");
+        new KeyPairFactory("invalid_provider").generate(512);
     }
 
     @Test(expected=RuntimeException.class)
     public void shouldDecodePublicKeyFailOnInvalidInput() {
-        KeyPairFactory.getInstance().decodePublicKey(new byte[] {0});
+        KeyPairFactory.decodePublicKey(new byte[] {0});
     }
 
     @Test(expected=RuntimeException.class)
     public void shouldDecodePrivateKeyFailOnInvalidInput() {
-        KeyPairFactory.getInstance().decodePrivateKey(new byte[] {0});
+        KeyPairFactory.decodePrivateKey(new byte[] {0});
     }
 }

@@ -29,24 +29,23 @@
  */
 package net.ripe.commons.certification.crl;
 
-import static net.ripe.commons.certification.util.KeyPairFactoryTest.*;
 import static net.ripe.commons.certification.validation.ValidationString.*;
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
-
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.util.KeyPairFactory;
-import net.ripe.commons.certification.validation.*;
+import net.ripe.commons.certification.util.PregeneratedKeyPairFactory;
+import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationStatus;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -62,8 +61,8 @@ public class X509CrlValidatorTest {
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
     private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1));
 
-    private static final KeyPair ROOT_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
-    private static final KeyPair FIRST_CHILD_KEY_PAIR = KeyPairFactory.getInstance().generate(512, DEFAULT_KEYPAIR_GENERATOR_PROVIDER);
+    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
 
     private X509CrlValidator subject;
     private X509ResourceCertificate parent;
