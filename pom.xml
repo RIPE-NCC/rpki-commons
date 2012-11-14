@@ -198,10 +198,12 @@
                         <exclude>src/test/resources/**</exclude>
 			<exclude>.idea/**</exclude>
 			<exclude>.gitignore</exclude>
+			<exclude>.pregenerated-test-key-pairs.keystore</exclude>
                     </excludes>
                 </configuration>
                 <executions>
                     <execution>
+                        <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
