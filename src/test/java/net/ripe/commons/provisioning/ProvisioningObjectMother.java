@@ -43,7 +43,6 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
-import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
 import net.ripe.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadBuilderTest;
 import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
@@ -58,10 +57,10 @@ import org.joda.time.DateTime;
 
 public class ProvisioningObjectMother {
 
-    public static final KeyPair TEST_KEY_PAIR = ProvisioningKeyPairGenerator.generate();
-    public static final KeyPair TEST_KEY_PAIR_2 = ProvisioningKeyPairGenerator.generate();
+    public static final KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(2048);
+    public static final KeyPair TEST_KEY_PAIR_2 = PregeneratedKeyPairFactory.getInstance().generate(2048);
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
-    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+    public static final KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
 
     public static final X509CRL CRL = generateCrl();
 

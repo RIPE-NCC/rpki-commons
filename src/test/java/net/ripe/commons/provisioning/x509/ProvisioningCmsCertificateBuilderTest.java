@@ -32,25 +32,21 @@ package net.ripe.commons.provisioning.x509;
 import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
 import static net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest.*;
-
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
-
 import javax.security.auth.x500.X500Principal;
-
+import net.ripe.commons.certification.util.PregeneratedKeyPairFactory;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
-import net.ripe.commons.provisioning.keypair.ProvisioningKeyPairGenerator;
-
 import org.junit.Before;
 import org.junit.Test;
 
 public class ProvisioningCmsCertificateBuilderTest {
 
-    public static final KeyPair EE_KEYPAIR = ProvisioningKeyPairGenerator.generate();
+    public static final KeyPair EE_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate(2048);
 
     public static final ProvisioningCmsCertificate TEST_CMS_CERT = getTestProvisioningCmsCertificate();
 
@@ -126,7 +122,7 @@ public class ProvisioningCmsCertificateBuilderTest {
     @Test
     public void shouldUse2048BitRsaKey() {
         assertTrue(TEST_CMS_CERT.getPublicKey() instanceof RSAPublicKey);
-        assertEquals(((RSAPublicKey) TEST_CMS_CERT.getPublicKey()).getModulus().bitLength(), 2048);
+        assertEquals(2048, ((RSAPublicKey) TEST_CMS_CERT.getPublicKey()).getModulus().bitLength());
     }
 
     @Test

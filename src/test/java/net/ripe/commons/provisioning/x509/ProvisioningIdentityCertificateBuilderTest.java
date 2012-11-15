@@ -35,9 +35,7 @@ import static org.junit.Assert.*;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,9 +51,9 @@ public class ProvisioningIdentityCertificateBuilderTest {
 
     private static ProvisioningIdentityCertificate getTestProvisioningIdentityCertificate() {
         return getTestBuilder(TEST_IDENTITY_KEYPAIR).build();
-    
+
     }
-    
+
     private static ProvisioningIdentityCertificate getProvisioningIdentityCertificateForKey2() {
         return getTestBuilder(TEST_IDENTITY_KEYPAIR_2).build();
     }
@@ -93,7 +91,7 @@ public class ProvisioningIdentityCertificateBuilderTest {
         subject.withSelfSigningSubject(null);
         subject.build();
     }
-    
+
     @Test(expected=IllegalArgumentException.class)
     public void shouldRequireSignatureProvider() {
         subject.withSignatureProvider(null);
@@ -118,7 +116,7 @@ public class ProvisioningIdentityCertificateBuilderTest {
     @Test
     public void shouldUse2048BitRsaKey() {
         assertTrue(TEST_IDENTITY_CERT.getPublicKey() instanceof RSAPublicKey);
-        assertEquals(((RSAPublicKey) TEST_IDENTITY_CERT.getPublicKey()).getModulus().bitLength(), 2048);
+        assertEquals(2048, ((RSAPublicKey) TEST_IDENTITY_CERT.getPublicKey()).getModulus().bitLength());
     }
 
     /**

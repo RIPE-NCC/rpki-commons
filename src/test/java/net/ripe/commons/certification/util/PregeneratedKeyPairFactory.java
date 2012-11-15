@@ -91,7 +91,6 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
     }
 
     public synchronized KeyPair generate(int size) {
-        size = 512; // Speed up tests by using smaller key size.
         try {
             int count = keyCounters.containsKey(size) ? keyCounters.get(size) : 0;
             keyCounters.put(size, count + 1);
