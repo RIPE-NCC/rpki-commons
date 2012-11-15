@@ -62,6 +62,8 @@ import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -282,24 +284,19 @@ public abstract class RpkiSignedObjectParser {
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
         String errorMessage = null;
         try {
-            // New bouncy castle API is too strict when validating signing time. Use old API for now.
-//            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate)), SIGNATURE_VERIFICATION);
-//        } catch (OperatorCreationException e) {
-//            errorMessage = String.valueOf(e.getMessage());
-            validationResult.rejectIfFalse(signer.verify(certificate, X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER), SIGNATURE_VERIFICATION);
+            /*
+             * Use the public key for the "verifier" not the certificate, because otherwise
+             * BC will reject the CMS if the signingTime is outside of the EE certificate validity
+             * time. This happens occasionally and is no ground to reject according to standards:
+             * http://tools.ietf.org/html/rfc6488#section-2.1.6.4.3
+             */
+            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey())), SIGNATURE_VERIFICATION);
+        } catch (OperatorCreationException e) {
+            errorMessage = String.valueOf(e.getMessage());
         } catch (CMSException e) {
-            errorMessage = String.valueOf(e.getMessage());
-        } catch (CertificateExpiredException e) {
-            errorMessage = String.valueOf(e.getMessage());
-        } catch (CertificateNotYetValidException e) {
-            errorMessage = String.valueOf(e.getMessage());
-        } catch (NoSuchAlgorithmException e) {
-            errorMessage = String.valueOf(e.getMessage());
-        } catch (NoSuchProviderException e) {
             errorMessage = String.valueOf(e.getMessage());
         }
 
