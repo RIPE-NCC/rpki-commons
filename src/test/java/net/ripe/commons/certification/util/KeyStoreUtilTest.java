@@ -43,7 +43,7 @@ import org.junit.Test;
 
 public class KeyStoreUtilTest {
 
-	private static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+	private static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
 	private KeyStore keyStore;
 

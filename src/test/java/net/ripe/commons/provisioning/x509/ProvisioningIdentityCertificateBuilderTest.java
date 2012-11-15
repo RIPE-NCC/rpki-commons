@@ -33,7 +33,6 @@ import static net.ripe.commons.provisioning.ProvisioningObjectMother.*;
 import static org.junit.Assert.*;
 
 import java.security.KeyPair;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import javax.security.auth.x500.X500Principal;
 import org.junit.Before;
@@ -110,13 +109,9 @@ public class ProvisioningIdentityCertificateBuilderTest {
         assertEquals("SHA256withRSA", identityCert.getCertificate().getSigAlgName());
     }
 
-    /**
-     * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
-     */
     @Test
-    public void shouldUse2048BitRsaKey() {
-        assertTrue(TEST_IDENTITY_CERT.getPublicKey() instanceof RSAPublicKey);
-        assertEquals(2048, ((RSAPublicKey) TEST_IDENTITY_CERT.getPublicKey()).getModulus().bitLength());
+    public void shouldUseProvidedSigningKey() {
+        assertEquals(TEST_IDENTITY_KEYPAIR.getPublic(), TEST_IDENTITY_CERT.getPublicKey());
     }
 
     /**

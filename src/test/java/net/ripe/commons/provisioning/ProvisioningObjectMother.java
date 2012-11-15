@@ -57,10 +57,10 @@ import org.joda.time.DateTime;
 
 public class ProvisioningObjectMother {
 
-    public static final KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(2048);
-    public static final KeyPair TEST_KEY_PAIR_2 = PregeneratedKeyPairFactory.getInstance().generate(2048);
+    public static final KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static final KeyPair TEST_KEY_PAIR_2 = PregeneratedKeyPairFactory.getInstance().generate();
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
-    public static final KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+    public static final KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
     public static final X509CRL CRL = generateCrl();
 
@@ -73,7 +73,7 @@ public class ProvisioningObjectMother {
     public static URI RPKI_CA_CERT_REQUEST_CA_MFT_URI = URI.create("rsync://host/module/subdir/subject.mft");
 
     public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
-    public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate(2048);
+    public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate();
     public static PKCS10CertificationRequest RPKI_CA_CERT_REQUEST = RpkiCaCertificateRequestBuilderParserTest.createRpkiCaCertificateRequest();
     private static final CertificateIssuanceRequestPayload RPKI_CA_CERT_REQUEST_PAYLOAD = CertificateIssuanceRequestPayloadBuilderTest.createCertificateIssuanceRequestPayloadForPkcs10Request(RPKI_CA_CERT_REQUEST);
 

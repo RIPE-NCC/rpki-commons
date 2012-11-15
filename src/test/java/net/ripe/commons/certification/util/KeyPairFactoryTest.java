@@ -43,8 +43,8 @@ public class KeyPairFactoryTest {
 
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
 
-    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
-    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
     private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<String, KeyPair>();
 
@@ -53,7 +53,7 @@ public class KeyPairFactoryTest {
         synchronized (cachedKeyPairs) {
             KeyPair result = cachedKeyPairs.get(name);
             if (result == null) {
-                result = PregeneratedKeyPairFactory.getInstance().generate(512);
+                result = PregeneratedKeyPairFactory.getInstance().generate();
                 cachedKeyPairs.put(name, result);
             }
             return result;
@@ -63,7 +63,7 @@ public class KeyPairFactoryTest {
 
     @Test
     public void shouldGenerateRsaKeyPairs() {
-        KeyPair keyPair = new KeyPairFactory(DEFAULT_KEYPAIR_GENERATOR_PROVIDER).generate(512);
+        KeyPair keyPair = new KeyPairFactory(DEFAULT_KEYPAIR_GENERATOR_PROVIDER).generate();
         assertTrue(keyPair.getPublic() instanceof RSAPublicKey);
         assertTrue(keyPair.getPrivate() instanceof RSAPrivateKey);
 
@@ -72,12 +72,12 @@ public class KeyPairFactoryTest {
 
         RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
         assertEquals("RSA", rsaPublicKey.getAlgorithm());
-        assertEquals(512, rsaPublicKey.getModulus().bitLength());
+        assertEquals(KeyPairFactory.RPKI_KEY_PAIR_SIZE, rsaPublicKey.getModulus().bitLength());
     }
 
     @Test(expected=RuntimeException.class)
     public void shouldKeypairGenerationFailOnInvalidProvider() {
-        new KeyPairFactory("invalid_provider").generate(512);
+        new KeyPairFactory("invalid_provider").generate();
     }
 
     @Test(expected=RuntimeException.class)

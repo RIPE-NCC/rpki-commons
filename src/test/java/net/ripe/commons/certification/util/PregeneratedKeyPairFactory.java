@@ -40,8 +40,6 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.util.HashMap;
-import java.util.Map;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
@@ -62,7 +60,7 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
     private File keyStoreFile = new File(".pregenerated-test-key-pairs.keystore");
     private KeyStore pregeneratedKeys;
 
-    private Map<Integer, Integer> keyCounters = new HashMap<Integer, Integer>();
+    private int count = 0;
 
     private PregeneratedKeyPairFactory() {
         super("SunRsaSign");
@@ -90,15 +88,16 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
         return INSTANCE;
     }
 
-    public synchronized KeyPair generate(int size) {
+    @Override
+    public synchronized KeyPair generate() {
         try {
-            int count = keyCounters.containsKey(size) ? keyCounters.get(size) : 0;
-            keyCounters.put(size, count + 1);
-            String alias = "key_" + size + "_" + count;
+            String alias = "key_" + count;
+            ++count;
+
             PrivateKey key = (PrivateKey) pregeneratedKeys.getKey(alias, PASSPHRASE);
             KeyPair result;
             if (key == null) {
-                result = super.generate(size);
+                result = super.generate();
                 pregeneratedKeys.setKeyEntry(alias, result.getPrivate(), PASSPHRASE, new Certificate[] { createCertificate(result).getCertificate() });
                 OutputStream output = new FileOutputStream(keyStoreFile);
                 try {

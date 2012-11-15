@@ -47,6 +47,8 @@ public class KeyPairFactory {
 
     public static final String ALGORITHM = "RSA";
 
+    public static final int RPKI_KEY_PAIR_SIZE = 2048;
+
     /** F4 Public Exponent */
     public static final BigInteger PUBLIC_EXPONENT = RSAKeyGenParameterSpec.F4;
 
@@ -56,10 +58,10 @@ public class KeyPairFactory {
         this.provider = provider;
     }
 
-    public KeyPair generate(int size) {
+    public KeyPair generate() {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM, provider);
-            generator.initialize(new RSAKeyGenParameterSpec(size, PUBLIC_EXPONENT));
+            generator.initialize(new RSAKeyGenParameterSpec(RPKI_KEY_PAIR_SIZE, PUBLIC_EXPONENT));
             return generator.generateKeyPair();
         } catch (NoSuchProviderException e) {
             throw new KeyPairFactoryException(e);

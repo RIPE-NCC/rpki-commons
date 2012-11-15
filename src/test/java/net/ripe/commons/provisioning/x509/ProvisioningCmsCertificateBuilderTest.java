@@ -36,7 +36,6 @@ import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.util.PregeneratedKeyPairFactory;
@@ -46,7 +45,7 @@ import org.junit.Test;
 
 public class ProvisioningCmsCertificateBuilderTest {
 
-    public static final KeyPair EE_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate(2048);
+    public static final KeyPair EE_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
     public static final ProvisioningCmsCertificate TEST_CMS_CERT = getTestProvisioningCmsCertificate();
 
@@ -116,13 +115,9 @@ public class ProvisioningCmsCertificateBuilderTest {
         assertEquals("SHA256withRSA", TEST_CMS_CERT.getCertificate().getSigAlgName());
     }
 
-    /**
-     * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
-     */
     @Test
-    public void shouldUse2048BitRsaKey() {
-        assertTrue(TEST_CMS_CERT.getPublicKey() instanceof RSAPublicKey);
-        assertEquals(2048, ((RSAPublicKey) TEST_CMS_CERT.getPublicKey()).getModulus().bitLength());
+    public void shouldUseProvidedSubjectKey() {
+        assertEquals(EE_KEYPAIR.getPublic(), TEST_CMS_CERT.getCertificate().getPublicKey());
     }
 
     @Test

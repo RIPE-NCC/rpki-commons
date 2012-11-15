@@ -61,8 +61,8 @@ public class X509CrlValidatorTest {
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
     private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1));
 
-    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
-    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate(512);
+    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
     private X509CrlValidator subject;
     private X509ResourceCertificate parent;
