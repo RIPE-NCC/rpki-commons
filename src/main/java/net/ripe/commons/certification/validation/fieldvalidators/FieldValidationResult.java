@@ -29,18 +29,17 @@
  */
 package net.ripe.commons.certification.validation.fieldvalidators;
 
+import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationStatus;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import net.ripe.commons.certification.validation.ValidationCheck;
-import net.ripe.commons.certification.validation.ValidationStatus;
-
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 
 public class FieldValidationResult implements Serializable {
 
@@ -52,9 +51,9 @@ public class FieldValidationResult implements Serializable {
     public boolean isTrue(boolean condition, String key, String... param) {
         Validate.notNull(key, "key is required");
         if (condition) {
-        	checkList.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
+            checkList.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
         } else {
-        	checkList.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
+            checkList.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
         }
         return condition;
     }

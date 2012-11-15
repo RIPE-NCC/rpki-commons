@@ -29,18 +29,6 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
-
-import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
-import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
@@ -59,14 +47,27 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
 
 public class X509ResourceCertificateTest {
 
-	private static final URI CERT_URI = URI.create("rsync://host.foo/bar/ta.cer");
-	private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(CERT_URI);
+    private static final URI CERT_URI = URI.create("rsync://host.foo/bar/ta.cer");
+    private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(CERT_URI);
 
-	private static final URI CRL_DP = URI.create("rsync://host/foo/crl");
-	private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(CRL_DP);
+    private static final URI CRL_DP = URI.create("rsync://host/foo/crl");
+    private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(CRL_DP);
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
     private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private CrlLocator crlLocator;
@@ -218,8 +219,8 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldHaveValidSignature() throws InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
-    	X509ResourceCertificate certificate = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
-    	certificate.getCertificate().verify(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
+        X509ResourceCertificate certificate = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
+        certificate.getCertificate().verify(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
     }
 
     @Test(expected=SignatureException.class)
@@ -255,7 +256,7 @@ public class X509ResourceCertificateTest {
            @Override
         public X509Crl answer() throws Throwable {
 
-			assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
+            assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
                result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
                return null;
             }

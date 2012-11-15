@@ -35,7 +35,7 @@ import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
 public class IpResourceConverter extends AbstractSingleValueConverter {
 
-	@SuppressWarnings("rawtypes")
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return IpResource.class.isAssignableFrom(type);

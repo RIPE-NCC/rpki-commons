@@ -43,22 +43,22 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class ManifestCmsConverter implements Converter {
 
-	@SuppressWarnings("rawtypes")
+    @SuppressWarnings("rawtypes")
     @Override
-	public boolean canConvert(Class type) {
+    public boolean canConvert(Class type) {
         return ManifestCms.class.equals(type);
-	}
+    }
 
-	@Override
-	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-		ManifestCms manifest = (ManifestCms) source;
+    @Override
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        ManifestCms manifest = (ManifestCms) source;
         writer.startNode("encoded");
         context.convertAnother(manifest.getEncoded());
         writer.endNode();
-	}
+    }
 
-	@Override
-	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         reader.moveDown();
         Validate.isTrue("encoded".equals(reader.getNodeName()));
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
@@ -66,5 +66,5 @@ public class ManifestCmsConverter implements Converter {
         ManifestCmsParser parser = new ManifestCmsParser();
         parser.parse(new ValidationLocation("encoded"), encoded);
         return parser.getManifestCms();
-	}
+    }
 }

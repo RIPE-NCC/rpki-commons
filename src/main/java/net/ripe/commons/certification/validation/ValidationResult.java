@@ -29,49 +29,44 @@
  */
 package net.ripe.commons.certification.validation;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.joda.time.DateTimeUtils;
 
+import java.io.Serializable;
+import java.util.*;
+import java.util.Map.Entry;
+
 public class ValidationResult implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new HashMap<ValidationLocation, Map<ValidationStatus,List<ValidationCheck>>>();
+    private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new HashMap<ValidationLocation, Map<ValidationStatus,List<ValidationCheck>>>();
 
-	private ValidationLocation currentLocation = new ValidationLocation("<unknown>");
+    private ValidationLocation currentLocation = new ValidationLocation("<unknown>");
 
-	private Map<ValidationLocation, List<ValidationMetric>> metrics = new HashMap<ValidationLocation, List<ValidationMetric>>();
+    private Map<ValidationLocation, List<ValidationMetric>> metrics = new HashMap<ValidationLocation, List<ValidationMetric>>();
 
-	// Mutators
+    // Mutators
 
-	public void setLocation(ValidationLocation location) {
-		currentLocation = location;
+    public void setLocation(ValidationLocation location) {
+        currentLocation = location;
 
-		if (!results.containsKey(currentLocation)) {
-			Map<ValidationStatus, List<ValidationCheck>> locationResults = new HashMap<ValidationStatus, List<ValidationCheck>>();
-			locationResults.put(ValidationStatus.ERROR, new ArrayList<ValidationCheck>());
-			locationResults.put(ValidationStatus.WARNING, new ArrayList<ValidationCheck>());
-			locationResults.put(ValidationStatus.PASSED, new ArrayList<ValidationCheck>());
-			results.put(currentLocation, locationResults);
-		}
-	}
+        if (!results.containsKey(currentLocation)) {
+            Map<ValidationStatus, List<ValidationCheck>> locationResults = new HashMap<ValidationStatus, List<ValidationCheck>>();
+            locationResults.put(ValidationStatus.ERROR, new ArrayList<ValidationCheck>());
+            locationResults.put(ValidationStatus.WARNING, new ArrayList<ValidationCheck>());
+            locationResults.put(ValidationStatus.PASSED, new ArrayList<ValidationCheck>());
+            results.put(currentLocation, locationResults);
+        }
+    }
 
-	private void setValidationCheckForCurrentLocation(ValidationStatus status, String key, String... param) {
-		Map<ValidationStatus, List<ValidationCheck>> currentResults = results.get(currentLocation);
-		List<ValidationCheck> checksForStatus = currentResults.get(status);
-		checksForStatus.add(new ValidationCheck(status, key, param));
-	}
+    private void setValidationCheckForCurrentLocation(ValidationStatus status, String key, String... param) {
+        Map<ValidationStatus, List<ValidationCheck>> currentResults = results.get(currentLocation);
+        List<ValidationCheck> checksForStatus = currentResults.get(status);
+        checksForStatus.add(new ValidationCheck(status, key, param));
+    }
 
     public void pass(String key, String... param) {
         setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
@@ -85,23 +80,23 @@ public class ValidationResult implements Serializable {
         setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
     }
 
-	public boolean warnIfFalse(boolean condition, String key, String... param) {
-		Validate.notNull(key, "key is required");
-		if (condition) {
-			setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
-		} else {
+    public boolean warnIfFalse(boolean condition, String key, String... param) {
+        Validate.notNull(key, "key is required");
+        if (condition) {
+            setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+        } else {
             warn(key, param);
-		}
-		return condition;
-	}
+        }
+        return condition;
+    }
 
-	public boolean warnIfTrue(boolean condition, String key, String... param) {
-		return warnIfFalse(!condition, key, param);
-	}
+    public boolean warnIfTrue(boolean condition, String key, String... param) {
+        return warnIfFalse(!condition, key, param);
+    }
 
-	public boolean warnIfNull(Object object, String key, String... param) {
-		return warnIfTrue(object == null, key, param);
-	}
+    public boolean warnIfNull(Object object, String key, String... param) {
+        return warnIfTrue(object == null, key, param);
+    }
 
     public void rejectForLocation(ValidationLocation location, String key, String... param) {
         ValidationLocation locationBefore = currentLocation;
@@ -110,44 +105,44 @@ public class ValidationResult implements Serializable {
         setLocation(locationBefore);
     }
 
-	public boolean rejectIfFalse(boolean condition, String key, String... param) {
-	    Validate.notNull(key, "key is required");
-	    if (condition) {
-	    	setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
-	    } else {
-	    	setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
-	    }
-		return condition;
-	}
+    public boolean rejectIfFalse(boolean condition, String key, String... param) {
+        Validate.notNull(key, "key is required");
+        if (condition) {
+            setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+        } else {
+            setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
+        }
+        return condition;
+    }
 
-	public boolean rejectIfTrue(boolean condition, String key, String... param) {
-	    return rejectIfFalse(!condition, key, param);
-	}
+    public boolean rejectIfTrue(boolean condition, String key, String... param) {
+        return rejectIfFalse(!condition, key, param);
+    }
 
-	public boolean rejectIfNull(Object object, String key, String... param) {
-	    return rejectIfTrue(object == null, key, param);
-	}
+    public boolean rejectIfNull(Object object, String key, String... param) {
+        return rejectIfTrue(object == null, key, param);
+    }
 
-	public void addMetric(String name, String value) {
-	    if (!metrics.containsKey(currentLocation)) {
-	        metrics.put(currentLocation, new ArrayList<ValidationMetric>());
-	    }
-	    metrics.get(currentLocation).add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
-	}
+    public void addMetric(String name, String value) {
+        if (!metrics.containsKey(currentLocation)) {
+            metrics.put(currentLocation, new ArrayList<ValidationMetric>());
+        }
+        metrics.get(currentLocation).add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+    }
 
-	// Accessors
+    // Accessors
 
-	public Set<ValidationLocation> getValidatedLocations() {
-		return results.keySet();
-	}
+    public Set<ValidationLocation> getValidatedLocations() {
+        return results.keySet();
+    }
 
     public ValidationLocation getCurrentLocation() {
         return currentLocation;
     }
 
-	public boolean hasFailures() {
+    public boolean hasFailures() {
         return getFailuresForAllLocations().size() > 0;
-	}
+    }
 
     public Set<ValidationCheck> getFailuresForCurrentLocation() {
         return new HashSet<ValidationCheck>(getFailures(currentLocation));
@@ -165,13 +160,13 @@ public class ValidationResult implements Serializable {
         return getChecks(location, ValidationStatus.ERROR);
     }
 
-	public boolean hasFailureForCurrentLocation() {
-		return hasFailureForLocation(currentLocation);
-	}
+    public boolean hasFailureForCurrentLocation() {
+        return hasFailureForLocation(currentLocation);
+    }
 
-	public boolean hasFailureForLocation(ValidationLocation location) {
+    public boolean hasFailureForLocation(ValidationLocation location) {
         return !getFailures(location).isEmpty();
-	}
+    }
 
     public List<ValidationCheck> getWarnings() {
         List<ValidationCheck> warnings = new ArrayList<ValidationCheck>();
@@ -190,27 +185,27 @@ public class ValidationResult implements Serializable {
     }
 
 
-	public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
-		ArrayList<ValidationCheck> allChecks = new ArrayList<ValidationCheck>();
-		if (results.containsKey(location)) {
-			Map<ValidationStatus, List<ValidationCheck>> locationChecksMap = results.get(location);
-			allChecks.addAll(locationChecksMap.get(ValidationStatus.ERROR));
-			allChecks.addAll(locationChecksMap.get(ValidationStatus.WARNING));
-			allChecks.addAll(locationChecksMap.get(ValidationStatus.PASSED));
-		}
+    public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
+        ArrayList<ValidationCheck> allChecks = new ArrayList<ValidationCheck>();
+        if (results.containsKey(location)) {
+            Map<ValidationStatus, List<ValidationCheck>> locationChecksMap = results.get(location);
+            allChecks.addAll(locationChecksMap.get(ValidationStatus.ERROR));
+            allChecks.addAll(locationChecksMap.get(ValidationStatus.WARNING));
+            allChecks.addAll(locationChecksMap.get(ValidationStatus.PASSED));
+        }
 
-		return allChecks;
-	}
+        return allChecks;
+    }
 
-	public ValidationCheck getResult(ValidationLocation location, String checkKey) {
-		List<ValidationCheck> allChecks = getAllValidationChecksForLocation(location);
-		for (ValidationCheck check: allChecks) {
-			if (check.getKey().equals(checkKey)) {
-				return check;
-			}
-		}
-		return null;
-	}
+    public ValidationCheck getResult(ValidationLocation location, String checkKey) {
+        List<ValidationCheck> allChecks = getAllValidationChecksForLocation(location);
+        for (ValidationCheck check: allChecks) {
+            if (check.getKey().equals(checkKey)) {
+                return check;
+            }
+        }
+        return null;
+    }
 
     public List<ValidationMetric> getMetrics(ValidationLocation location) {
         if (metrics.containsKey(location)) {
@@ -220,10 +215,10 @@ public class ValidationResult implements Serializable {
         }
     }
 
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-	}
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
 
     public void addAll(ValidationResult that) {
         for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> resultsByLocation: that.results.entrySet()) {

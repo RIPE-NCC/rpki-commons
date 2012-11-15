@@ -54,8 +54,8 @@ public final class KeyStoreUtil {
     static final String KEYSTORE_KEY_ALIAS = "mykey1";
 
 
-	private KeyStoreUtil() {
-	    //Utility classes should not have a public or default constructor.
+    private KeyStoreUtil() {
+        //Utility classes should not have a public or default constructor.
     }
 
     public static KeyStore createKeyStoreForKeyPair(KeyPair keyPair, String keyStoreProvider, String signatureProvider, String keyStoreType) {
@@ -73,71 +73,71 @@ public final class KeyStoreUtil {
         }
     }
 
-	public static KeyPair getKeyPairFromKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
-		KeyStore keyStore = loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType);
-		return getKeyPairFromKeyStore(keyStore);
-	}
+    public static KeyPair getKeyPairFromKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
+        KeyStore keyStore = loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType);
+        return getKeyPairFromKeyStore(keyStore);
+    }
 
-	public static byte[] storeKeyStore(KeyStore keyStore) {
-		ByteArrayOutputStream keyStoreOS = new ByteArrayOutputStream();
-		try {
-			keyStore.store(keyStoreOS, KEYSTORE_PASSPHRASE);
-			keyStoreOS.flush();
-			return keyStoreOS.toByteArray();
-		} catch (GeneralSecurityException e) {
-			throw new KeyStoreException(e);
-		} catch (IOException e) {
-			throw new KeyStoreException(e);
-		}
-	}
+    public static byte[] storeKeyStore(KeyStore keyStore) {
+        ByteArrayOutputStream keyStoreOS = new ByteArrayOutputStream();
+        try {
+            keyStore.store(keyStoreOS, KEYSTORE_PASSPHRASE);
+            keyStoreOS.flush();
+            return keyStoreOS.toByteArray();
+        } catch (GeneralSecurityException e) {
+            throw new KeyStoreException(e);
+        } catch (IOException e) {
+            throw new KeyStoreException(e);
+        }
+    }
 
-	public static KeyStore clearKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
-		KeyStore keyStore = loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType);
-		clearKeyStore(keyStore);
-		return keyStore;
-	}
+    public static KeyStore clearKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
+        KeyStore keyStore = loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType);
+        clearKeyStore(keyStore);
+        return keyStore;
+    }
 
-	private static KeyStore clearKeyStore(KeyStore keyStore) {
-		try {
-			if (keyStore.containsAlias(KEYSTORE_KEY_ALIAS)) {
-				keyStore.deleteEntry(KEYSTORE_KEY_ALIAS);
-				keyStore.store(new NullOutputStream(), KEYSTORE_PASSPHRASE);
-			}
-			return keyStore;
-		} catch (GeneralSecurityException e) {
-			throw new KeyStoreException(e);
-		} catch (IOException e) {
-			throw new KeyStoreException(e);
-		}
-	}
+    private static KeyStore clearKeyStore(KeyStore keyStore) {
+        try {
+            if (keyStore.containsAlias(KEYSTORE_KEY_ALIAS)) {
+                keyStore.deleteEntry(KEYSTORE_KEY_ALIAS);
+                keyStore.store(new NullOutputStream(), KEYSTORE_PASSPHRASE);
+            }
+            return keyStore;
+        } catch (GeneralSecurityException e) {
+            throw new KeyStoreException(e);
+        } catch (IOException e) {
+            throw new KeyStoreException(e);
+        }
+    }
 
-	private static KeyPair getKeyPairFromKeyStore(KeyStore keyStore) {
-		try {
-			Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
+    private static KeyPair getKeyPairFromKeyStore(KeyStore keyStore) {
+        try {
+            Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
             X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
             parser.parse(new ValidationLocation("mykeystore"), c.getEncoded());
             X509ResourceCertificate certificate = parser.getCertificate();
             PublicKey publicKey = certificate.getPublicKey();
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);
             return new KeyPair(publicKey, privateKey);
-		} catch (GeneralSecurityException e) {
-			throw new KeyStoreException(e);
-		}
-	}
-
-	private static KeyStore loadKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
-    	try {
-    		KeyStore keyStore = KeyStore.getInstance(keyStoreType, keyStoreProvider);
-    		keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
-    		return keyStore;
-    	} catch (GeneralSecurityException e) {
-    		throw new KeyStoreException(e);
-    	} catch (IOException e) {
-    		throw new KeyStoreException(e);
-		}
+        } catch (GeneralSecurityException e) {
+            throw new KeyStoreException(e);
+        }
     }
 
-	private static X509ResourceCertificate createCertificate(KeyPair keyPair, String signatureProvider) {
+    private static KeyStore loadKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
+        try {
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType, keyStoreProvider);
+            keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
+            return keyStore;
+        } catch (GeneralSecurityException e) {
+            throw new KeyStoreException(e);
+        } catch (IOException e) {
+            throw new KeyStoreException(e);
+        }
+    }
+
+    private static X509ResourceCertificate createCertificate(KeyPair keyPair, String signatureProvider) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withSignatureProvider(signatureProvider);
         builder.withSerial(BigInteger.ONE);

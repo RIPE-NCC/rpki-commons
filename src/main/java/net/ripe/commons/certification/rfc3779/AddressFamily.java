@@ -52,7 +52,7 @@ public class AddressFamily extends EqualsSupport implements Comparable<AddressFa
     private static final int SAFI_MIN = 0;
     private static final int SAFI_MAX = 255;
 
-	private static final int AFI_IPV4 = 1;
+    private static final int AFI_IPV4 = 1;
     private static final int AFI_IPV6 = 2;
 
     public static final AddressFamily IPV4 = new AddressFamily(AFI_IPV4);
@@ -130,29 +130,29 @@ public class AddressFamily extends EqualsSupport implements Comparable<AddressFa
     }
 
     public static AddressFamily fromDer(ASN1Encodable der) {
-    	Validate.isTrue(der instanceof DEROctetString, "DEROctetString expected");
-    	DEROctetString derOctetString = (DEROctetString) der;
+        Validate.isTrue(der instanceof DEROctetString, "DEROctetString expected");
+        DEROctetString derOctetString = (DEROctetString) der;
 
-    	byte[] bytes = derOctetString.getOctets();
+        byte[] bytes = derOctetString.getOctets();
 
-    	Validate.isTrue(bytes.length == AFI_OCTET_COUNT_WITHOUT_SAFI || bytes.length == AFI_OCTET_COUNT_WITH_SAFI, "Byte array must consist of "
-    	        + AFI_OCTET_COUNT_WITHOUT_SAFI + " or " + AFI_OCTET_COUNT_WITH_SAFI + " elements");
+        Validate.isTrue(bytes.length == AFI_OCTET_COUNT_WITHOUT_SAFI || bytes.length == AFI_OCTET_COUNT_WITH_SAFI, "Byte array must consist of "
+                + AFI_OCTET_COUNT_WITHOUT_SAFI + " or " + AFI_OCTET_COUNT_WITH_SAFI + " elements");
 
-    	int thisAddressFamilyIdentifier = (unsignedByteToInt(bytes[0]) << Byte.SIZE) | unsignedByteToInt(bytes[1]) ;
+        int thisAddressFamilyIdentifier = (unsignedByteToInt(bytes[0]) << Byte.SIZE) | unsignedByteToInt(bytes[1]) ;
 
         AddressFamily addressFamily;
-    	if (bytes.length == 2) {
-    		addressFamily = new AddressFamily(thisAddressFamilyIdentifier);
-    	} else {
-    		// subsequentAddressIdentifier given
-    		int thisSafi = unsignedByteToInt(bytes[2]);
-    		addressFamily = new AddressFamily(thisAddressFamilyIdentifier, thisSafi);
-    	}
-    	return addressFamily;
+        if (bytes.length == 2) {
+            addressFamily = new AddressFamily(thisAddressFamilyIdentifier);
+        } else {
+            // subsequentAddressIdentifier given
+            int thisSafi = unsignedByteToInt(bytes[2]);
+            addressFamily = new AddressFamily(thisAddressFamilyIdentifier, thisSafi);
+        }
+        return addressFamily;
     }
 
     private static int unsignedByteToInt(byte b) {
-    	return b & BYTE_MASK;
+        return b & BYTE_MASK;
     }
 
     public static AddressFamily fromIpResourceType(IpResourceType type) {

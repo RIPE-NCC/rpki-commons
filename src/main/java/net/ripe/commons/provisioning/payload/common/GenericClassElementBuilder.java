@@ -29,18 +29,17 @@
  */
 package net.ripe.commons.provisioning.payload.common;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.provisioning.payload.issue.response.CertificateIssuanceResponseClassElement;
 import net.ripe.commons.provisioning.payload.list.response.ResourceClassListResponseClassElement;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GenericClassElementBuilder {
 
@@ -124,6 +123,5 @@ public class GenericClassElementBuilder {
         classElement.setValidityNotAfter(validityNotAfter);
         classElement.setSiaHeadUri(siaHeadUri);
     }
-
 
 }

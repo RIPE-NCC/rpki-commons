@@ -29,17 +29,13 @@
  */
 package net.ripe.commons.certification;
 
-import static org.junit.Assert.*;
+import org.joda.time.*;
+import org.junit.Rule;
+import org.junit.Test;
 
 import java.util.Date;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.Period;
-import org.joda.time.ReadableInstant;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class ValidityPeriodTest {
@@ -48,34 +44,34 @@ public class ValidityPeriodTest {
     public FixedDateRule fixedDateRule = new FixedDateRule(new DateTime(2008, 04, 05, 0, 0, 0, 0, DateTimeZone.UTC));
 
 
-	@Test
-	public void testWrongValidityPeriod() {
-	    try {
-	        new ValidityPeriod(new DateTime(), new DateTime().minus(Period.millis(1)));
-	        fail("IllegalArgumentException expected");
-	    } catch (IllegalArgumentException expected) {
-	    }
-	}
+    @Test
+    public void testWrongValidityPeriod() {
+        try {
+            new ValidityPeriod(new DateTime(), new DateTime().minus(Period.millis(1)));
+            fail("IllegalArgumentException expected");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
 
-	@Test
-	public void singleInstantShouldBeOK() {
-		DateTime now = new DateTime();
-		new ValidityPeriod(now, now);
-	}
+    @Test
+    public void singleInstantShouldBeOK() {
+        DateTime now = new DateTime();
+        new ValidityPeriod(now, now);
+    }
 
-	@Test
-	public void shouldAllowUnspecifiedNotValidAfterDate() {
-	    ValidityPeriod closed = new ValidityPeriod(date(2008, 1, 1), date(2008, 12, 1));
-	    ValidityPeriod open = new ValidityPeriod(date(2008, 1, 1), null);
+    @Test
+    public void shouldAllowUnspecifiedNotValidAfterDate() {
+        ValidityPeriod closed = new ValidityPeriod(date(2008, 1, 1), date(2008, 12, 1));
+        ValidityPeriod open = new ValidityPeriod(date(2008, 1, 1), null);
 
         assertTrue(closed.isClosed());
         assertFalse(open.isClosed());
-	    assertTrue("open should contain closed", open.contains(closed));
-	    assertFalse("closed should not contain open", closed.contains(open));
-	    assertTrue(open.isValidAt(date(2008, 1, 1)));
-	    assertTrue(open.isValidAt(date(2023, 1, 1)));
-	    assertFalse(open.isValidAt(date(2003, 1, 1)));
-	}
+        assertTrue("open should contain closed", open.contains(closed));
+        assertFalse("closed should not contain open", closed.contains(open));
+        assertTrue(open.isValidAt(date(2008, 1, 1)));
+        assertTrue(open.isValidAt(date(2023, 1, 1)));
+        assertFalse(open.isValidAt(date(2003, 1, 1)));
+    }
 
     @Test
     public void shouldAllowUnspecifiedNotBeforeAfterDate() {
@@ -132,14 +128,14 @@ public class ValidityPeriodTest {
 
     @Test
     public void sameStartingInstantShouldBeValid() {
-    	ValidityPeriod validityPeriod = new ValidityPeriod(date(2008,1,1), date(2009,1,1));
-    	assertTrue(validityPeriod.isValidAt(date(2008,1,1)));
+        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008,1,1), date(2009,1,1));
+        assertTrue(validityPeriod.isValidAt(date(2008,1,1)));
     }
 
     @Test
     public void sameEndingInstantShouldBeValid() {
-    	ValidityPeriod validityPeriod = new ValidityPeriod(date(2008,1,1), date(2009,1,1));
-    	assertTrue(validityPeriod.isValidAt(date(2009,1,1)));
+        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008,1,1), date(2009,1,1));
+        assertTrue(validityPeriod.isValidAt(date(2009,1,1)));
     }
 
     @Test

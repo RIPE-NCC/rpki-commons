@@ -39,7 +39,7 @@ import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 
 public class ProvisioningCmsObjectValidator {
 
-	private ValidationOptions options;
+    private ValidationOptions options;
     private ProvisioningCmsObject cmsObject;
     private ProvisioningIdentityCertificate identityCertificate;
 
@@ -47,16 +47,16 @@ public class ProvisioningCmsObjectValidator {
     private ProvisioningCmsCertificate cmsCertificate;
 
     private X509Crl crl;
-    
+
     public ProvisioningCmsObjectValidator(ValidationOptions options, ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate identityCertificate) {
-    	this.options = options;
+        this.options = options;
         this.cmsObject = cmsObject;
         this.identityCertificate = identityCertificate;
     }
 
     public void validate(ValidationResult validationResult) {
         this.validationResult = validationResult;
-        
+
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser(validationResult);
         parser.parseCms("<cms>", cmsObject.getEncoded());
         if (parser.getValidationResult().hasFailures()) {

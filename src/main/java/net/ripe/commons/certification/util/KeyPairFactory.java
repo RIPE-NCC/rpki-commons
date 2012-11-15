@@ -64,7 +64,7 @@ public class KeyPairFactory {
         } catch (NoSuchProviderException e) {
             throw new KeyPairFactoryException(e);
         } catch (NoSuchAlgorithmException e) {
-        	throw new KeyPairFactoryException(e);
+            throw new KeyPairFactoryException(e);
         } catch (InvalidAlgorithmParameterException e) {
             throw new KeyPairFactoryException(e);
         }

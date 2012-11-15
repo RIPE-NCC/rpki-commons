@@ -73,13 +73,13 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     public RoaCmsBuilder withSignatureProvider(String signatureProvider) {
-    	this.signatureProvider = signatureProvider;
-    	return this;
+        this.signatureProvider = signatureProvider;
+        return this;
     }
 
     public RoaCms build(PrivateKey privateKey) {
-    	RoaCmsParser parser = new RoaCmsParser();
-    	parser.parse(new ValidationLocation("generated.roa"), generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
+        RoaCmsParser parser = new RoaCmsParser();
+        parser.parse(new ValidationLocation("generated.roa"), generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
         return parser.getRoaCms();
     }
 

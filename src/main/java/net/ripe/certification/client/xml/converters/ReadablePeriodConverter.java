@@ -36,18 +36,18 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
 
 public class ReadablePeriodConverter implements SingleValueConverter {
 
-	@SuppressWarnings("rawtypes")
-	@Override
+    @SuppressWarnings("rawtypes")
+    @Override
     public boolean canConvert(Class type) {
         return ReadablePeriod.class.isAssignableFrom(type);
     }
 
-	@Override
+    @Override
     public Object fromString(String str) {
         return ISOPeriodFormat.standard().parsePeriod(str);
     }
 
-	@Override
+    @Override
     public String toString(Object obj) {
         return ISOPeriodFormat.standard().print((ReadablePeriod) obj);
     }

@@ -29,12 +29,6 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.cms.RpkiSignedObject;
 import net.ripe.commons.certification.cms.RpkiSignedObjectInfo;
@@ -55,6 +49,13 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.io.DigestOutputStream;
 import org.joda.time.DateTime;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A manifest of files published by a CA certificate.
@@ -148,9 +149,9 @@ public class ManifestCms extends RpkiSignedObject {
 
 
     private void checkManifestAndEeCertificateValidityTimes(ValidationOptions options, ValidationResult result) {
-		ValidityPeriod certificateValidity = getCertificate().getValidityPeriod();
-		result.warnIfFalse(certificateValidity.getNotValidBefore().equals(getThisUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
-		result.warnIfFalse(certificateValidity.getNotValidAfter().equals(getNextUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
+        ValidityPeriod certificateValidity = getCertificate().getValidityPeriod();
+        result.warnIfFalse(certificateValidity.getNotValidBefore().equals(getThisUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
+        result.warnIfFalse(certificateValidity.getNotValidAfter().equals(getNextUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
 
         DateTime now = new DateTime();
         DateTime nextUpdateTime = getNextUpdateTime();
@@ -164,9 +165,9 @@ public class ManifestCms extends RpkiSignedObject {
         }
 
 
-	}
+    }
 
-	/**
+    /**
      * @deprecated use {@link #verifyFileContents(String, byte[])} or {@link #getFileContentSpecification(String)}.
      */
     @Deprecated

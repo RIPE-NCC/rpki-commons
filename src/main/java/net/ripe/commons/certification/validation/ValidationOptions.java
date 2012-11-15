@@ -34,15 +34,15 @@ package net.ripe.commons.certification.validation;
  * User controlled options to use when validating objects.
  */
 public class ValidationOptions {
-	
-	private int maxStaleDays = 0;
-	
-	public void setMaxStaleDays(int maxStaleDays) {
-		this.maxStaleDays = maxStaleDays;
-	}
-	
-	public int getMaxStaleDays() {
-		return maxStaleDays;
-	}
-	
+
+    private int maxStaleDays = 0;
+
+    public void setMaxStaleDays(int maxStaleDays) {
+        this.maxStaleDays = maxStaleDays;
+    }
+
+    public int getMaxStaleDays() {
+        return maxStaleDays;
+    }
+
 }

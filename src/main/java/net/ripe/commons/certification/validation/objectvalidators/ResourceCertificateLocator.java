@@ -36,7 +36,7 @@ import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 
 public interface ResourceCertificateLocator {
 
-	CertificateRepositoryObjectFile<X509ResourceCertificate> findParent(X509ResourceCertificate certificate);
+    CertificateRepositoryObjectFile<X509ResourceCertificate> findParent(X509ResourceCertificate certificate);
 
-	CertificateRepositoryObjectFile<X509Crl> findCrl(X509ResourceCertificate certificate);
+    CertificateRepositoryObjectFile<X509Crl> findCrl(X509ResourceCertificate certificate);
 }

@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class XStreamXmlSerializerTest {
 
-	@Test
-	public void pass() {}
+    @Test
+    public void pass() {}
 
 }

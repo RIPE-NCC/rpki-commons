@@ -29,17 +29,16 @@
  */
 package net.ripe.certification.client.xml.converters;
 
-import static org.junit.Assert.*;
-
-import java.util.regex.Pattern;
-
+import com.thoughtworks.xstream.XStream;
 import net.ripe.commons.certification.cms.manifest.ManifestCms;
 import net.ripe.commons.certification.cms.manifest.ManifestCmsTest;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import com.thoughtworks.xstream.XStream;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class ManifestCmsConverterTest {
@@ -48,7 +47,7 @@ public class ManifestCmsConverterTest {
     private ManifestCmsConverter subject;
 
     private String expectedXmlRegEx =
-    	"<net\\.ripe\\..*\\.ManifestCms>\n" +
+        "<net\\.ripe\\..*\\.ManifestCms>\n" +
         "  <encoded>[^<]*</encoded>\n" +
         "</net\\.ripe\\..*\\.ManifestCms>";
 
@@ -66,18 +65,18 @@ public class ManifestCmsConverterTest {
 
     @Test
     public void shouldOnlyUseEncodedWhenSerializingManifest() {
-    	ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
-    	String xml = xStream.toXML(manifestCms);
-    	assertTrue(Pattern.matches(expectedXmlRegEx, xml));
+        ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
+        String xml = xStream.toXML(manifestCms);
+        assertTrue(Pattern.matches(expectedXmlRegEx, xml));
     }
 
     @Test
     public void shouldDoRoundTripSerializeAndDesirializeManifest() {
-    	ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
+        ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
 
-    	String xml = xStream.toXML(manifestCms);
-    	ManifestCms processedManifest = (ManifestCms) xStream.fromXML(xml);
+        String xml = xStream.toXML(manifestCms);
+        ManifestCms processedManifest = (ManifestCms) xStream.fromXML(xml);
 
-    	assertEquals(manifestCms, processedManifest);
+        assertEquals(manifestCms, processedManifest);
     }
 }

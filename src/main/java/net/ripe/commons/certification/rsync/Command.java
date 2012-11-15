@@ -38,57 +38,57 @@ import java.util.Map;
 
 public class Command extends Thread {
 
-	public static final int NOT_EXECUTED = -1;
-	public static final int COMMAND_FAILED = -2;
+    public static final int NOT_EXECUTED = -1;
+    public static final int COMMAND_FAILED = -2;
 
-	private List<String> args;
-	private Map<String, String> envp;
-	private String execDir;
+    private List<String> args;
+    private Map<String, String> envp;
+    private String execDir;
 
-	private int exitStatus = NOT_EXECUTED;
+    private int exitStatus = NOT_EXECUTED;
 
-	private boolean started;
+    private boolean started;
 
-	private Exception exception;
+    private Exception exception;
 
-	private List<String> outputLines;
-	private List<String> errorLines;
+    private List<String> outputLines;
+    private List<String> errorLines;
 
 
-	public Command(String command) {
-		this(command, null, null);
-	}
+    public Command(String command) {
+        this(command, null, null);
+    }
 
-	public Command(String command, Map<String, String> envp) {
-		this(command, envp, null);
-	}
+    public Command(String command, Map<String, String> envp) {
+        this(command, envp, null);
+    }
 
-	public Command(String command, Map<String, String> envp, String execdir) {
-		this(Arrays.asList(command), envp, execdir);
-	}
+    public Command(String command, Map<String, String> envp, String execdir) {
+        this(Arrays.asList(command), envp, execdir);
+    }
 
-	public Command(List<String> args) {
-		this(args, null, null);
-	}
+    public Command(List<String> args) {
+        this(args, null, null);
+    }
 
-	public Command(List<String> args, Map<String, String> envp) {
-		this(args, envp, null);
-	}
+    public Command(List<String> args, Map<String, String> envp) {
+        this(args, envp, null);
+    }
 
-	public Command(List<String> args, Map<String, String> envp, String execdir) {
-		this.args = args;
-		this.envp = envp;
-		this.execDir = execdir;
-	}
+    public Command(List<String> args, Map<String, String> envp, String execdir) {
+        this.args = args;
+        this.envp = envp;
+        this.execDir = execdir;
+    }
 
-	public void execute() {
-	    started = true;
-	    try {
-	        exitStatus = runExternalCommand();
+    public void execute() {
+        started = true;
+        try {
+            exitStatus = runExternalCommand();
         } catch (CommandExecutionException e) {
             exitStatus = COMMAND_FAILED;
         }
-	}
+    }
 
     private int runExternalCommand() {
         try {
@@ -125,37 +125,37 @@ public class Command extends Thread {
             exception = e;
             throw new CommandExecutionException(e);
         }
-	}
+    }
 
-	public boolean isCompleted() {
-		return exitStatus != NOT_EXECUTED;
-	}
+    public boolean isCompleted() {
+        return exitStatus != NOT_EXECUTED;
+    }
 
-	public boolean wasStarted() {
-		return started;
-	}
+    public boolean wasStarted() {
+        return started;
+    }
 
-	public int getExitStatus() {
-		return exitStatus;
-	}
+    public int getExitStatus() {
+        return exitStatus;
+    }
 
-	public String[] getOutputLines() {
-		return outputLines == null ? null : outputLines.toArray(new String[outputLines.size()]);
-	}
+    public String[] getOutputLines() {
+        return outputLines == null ? null : outputLines.toArray(new String[outputLines.size()]);
+    }
 
-	public List<String> getOutputs() {
-		return outputLines;
-	}
+    public List<String> getOutputs() {
+        return outputLines;
+    }
 
-	public String[] getErrorLines() {
-		return errorLines == null ? null : errorLines.toArray(new String[errorLines.size()]);
-	}
+    public String[] getErrorLines() {
+        return errorLines == null ? null : errorLines.toArray(new String[errorLines.size()]);
+    }
 
-	public List<String> getErrors() {
-		return errorLines;
-	}
+    public List<String> getErrors() {
+        return errorLines;
+    }
 
-	public Exception getException() {
-		return exception;
-	}
+    public Exception getException() {
+        return exception;
+    }
 }

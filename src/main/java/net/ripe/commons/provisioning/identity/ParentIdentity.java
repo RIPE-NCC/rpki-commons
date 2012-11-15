@@ -29,13 +29,12 @@
  */
 package net.ripe.commons.provisioning.identity;
 
-import java.net.URI;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.commons.certification.util.EqualsSupport;
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import java.net.URI;
 
 @XStreamAlias(ParentIdentity.PARENT_IDENTITY_NODE_NAME)
 public class ParentIdentity extends EqualsSupport {
@@ -44,59 +43,59 @@ public class ParentIdentity extends EqualsSupport {
 
     public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
     public static final String PARENT_IDENTITY_NODE_NAME = "parent";
-    
+
     public ParentIdentity(URI upDownUrl, String parentHandle,
-			String childHandle,
-			ProvisioningIdentityCertificate parentIdCertificate,
-			ProvisioningIdentityCertificate childIdCertificate) {
-		this.upDownUrl = upDownUrl;
-		this.parentHandle = parentHandle;
-		this.childHandle = childHandle;
-		this.parentIdCertificate = parentIdCertificate;
-		this.childIdCertificate = childIdCertificate;
-	}
+            String childHandle,
+            ProvisioningIdentityCertificate parentIdCertificate,
+            ProvisioningIdentityCertificate childIdCertificate) {
+        this.upDownUrl = upDownUrl;
+        this.parentHandle = parentHandle;
+        this.childHandle = childHandle;
+        this.parentIdCertificate = parentIdCertificate;
+        this.childIdCertificate = childIdCertificate;
+    }
 
 
     @SuppressWarnings("unused")
     @XStreamAsAttribute
     @XStreamAlias("version")
     private final int version = VERSION;
-    
-	@XStreamAsAttribute
+
+    @XStreamAsAttribute
     @XStreamAlias("child_handle")
     private String childHandle;
-    
+
     @XStreamAsAttribute
     @XStreamAlias("parent_handle")
     private String parentHandle;
-    
+
     @XStreamAsAttribute
     @XStreamAlias("service_uri")
     private URI upDownUrl;
-    
+
     @XStreamAlias("bpki_resource_ta")
     private ProvisioningIdentityCertificate parentIdCertificate;
-    
+
     @XStreamAlias("bpki_child_ta")
     private ProvisioningIdentityCertificate childIdCertificate;
-    
+
     public String getChildHandle() {
         return childHandle;
     }
-    
+
     public String getParentHandle() {
         return parentHandle;
     }
 
-    
+
     public ProvisioningIdentityCertificate getParentIdCertificate() {
         return parentIdCertificate;
     }
-    
+
     public ProvisioningIdentityCertificate getChildIdCertificate() {
         return childIdCertificate;
     }
-    
+
     public URI getUpDownUrl() {
         return upDownUrl;
     }

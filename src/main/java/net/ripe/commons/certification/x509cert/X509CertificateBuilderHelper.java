@@ -29,6 +29,24 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import net.ripe.commons.certification.BouncyCastleUtil;
+import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
+import net.ripe.ipresource.InheritedIpResourceSet;
+import net.ripe.ipresource.IpResourceSet;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
+import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.InvalidKeyException;
@@ -39,33 +57,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import javax.security.auth.x500.X500Principal;
-import net.ripe.commons.certification.BouncyCastleUtil;
-import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
-import net.ripe.ipresource.InheritedIpResourceSet;
-import net.ripe.ipresource.IpResourceSet;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
@@ -80,139 +71,139 @@ public final class X509CertificateBuilderHelper {
 
     public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
 
-	public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
+    public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
-	private String signatureProvider = DEFAULT_SIGNATURE_PROVIDER;
+    private String signatureProvider = DEFAULT_SIGNATURE_PROVIDER;
 
-	private String signatureAlgorithm = DEFAULT_SIGNATURE_ALGORITHM;
+    private String signatureAlgorithm = DEFAULT_SIGNATURE_ALGORITHM;
 
-	private BigInteger serial;
+    private BigInteger serial;
 
-	private X500Principal subjectDN;
+    private X500Principal subjectDN;
 
-	private X500Principal issuerDN;
+    private X500Principal issuerDN;
 
-	private ValidityPeriod validityPeriod;
+    private ValidityPeriod validityPeriod;
 
-	private IpResourceSet resources;
+    private IpResourceSet resources;
 
-	private PublicKey publicKey;
+    private PublicKey publicKey;
 
-	private KeyPair signingKeyPair;
+    private KeyPair signingKeyPair;
 
-	private int keyUsage;
+    private int keyUsage;
 
-	private boolean ca;
+    private boolean ca;
 
-	private boolean addSubjectKeyIdentifier = true;
+    private boolean addSubjectKeyIdentifier = true;
 
-	private boolean addAuthorityKeyIdentifier = true;
+    private boolean addAuthorityKeyIdentifier = true;
 
-	private URI[] crlDistributionPoints;
+    private URI[] crlDistributionPoints;
 
-	private AccessDescription[] authorityInformationAccess;
+    private AccessDescription[] authorityInformationAccess;
 
-	private AccessDescription[] subjectInformationAccess;
+    private AccessDescription[] subjectInformationAccess;
 
-	private PolicyInformation[] policies;
+    private PolicyInformation[] policies;
 
-	public X509CertificateBuilderHelper withSignatureProvider(
-			String signatureProvider) {
-		this.signatureProvider = signatureProvider;
-		return this;
-	}
+    public X509CertificateBuilderHelper withSignatureProvider(
+            String signatureProvider) {
+        this.signatureProvider = signatureProvider;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withSerial(BigInteger serial) {
-		this.serial = serial;
-		return this;
-	}
+    public X509CertificateBuilderHelper withSerial(BigInteger serial) {
+        this.serial = serial;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withSubjectDN(X500Principal subjectDN) {
-		this.subjectDN = subjectDN;
-		return this;
-	}
+    public X509CertificateBuilderHelper withSubjectDN(X500Principal subjectDN) {
+        this.subjectDN = subjectDN;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withIssuerDN(X500Principal issuerDN) {
-		this.issuerDN = issuerDN;
-		return this;
-	}
+    public X509CertificateBuilderHelper withIssuerDN(X500Principal issuerDN) {
+        this.issuerDN = issuerDN;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withValidityPeriod(
-			ValidityPeriod validityPeriod) {
-		this.validityPeriod = validityPeriod;
-		return this;
-	}
+    public X509CertificateBuilderHelper withValidityPeriod(
+            ValidityPeriod validityPeriod) {
+        this.validityPeriod = validityPeriod;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withResources(IpResourceSet resources) {
-		this.resources = resources;
-		return this;
-	}
+    public X509CertificateBuilderHelper withResources(IpResourceSet resources) {
+        this.resources = resources;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withPublicKey(PublicKey publicKey) {
-		this.publicKey = publicKey;
-		return this;
-	}
+    public X509CertificateBuilderHelper withPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withSigningKeyPair(KeyPair signingKey) {
-		this.signingKeyPair = signingKey;
-		return this;
-	}
+    public X509CertificateBuilderHelper withSigningKeyPair(KeyPair signingKey) {
+        this.signingKeyPair = signingKey;
+        return this;
+    }
 
-	/**
-	 * Careful! You probably want to stick to the default. This method is here
-	 * mainly to allow for testing the parser -> it should reject sig algos not
-	 * allowed by RFC
-	 */
-	public X509CertificateBuilderHelper withSignatureAlgorithm(
-			String signatureAlgorithm) {
-		this.signatureAlgorithm = signatureAlgorithm;
-		return this;
-	}
+    /**
+     * Careful! You probably want to stick to the default. This method is here
+     * mainly to allow for testing the parser -> it should reject sig algos not
+     * allowed by RFC
+     */
+    public X509CertificateBuilderHelper withSignatureAlgorithm(
+            String signatureAlgorithm) {
+        this.signatureAlgorithm = signatureAlgorithm;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withKeyUsage(int keyUsage) {
-		this.keyUsage = keyUsage;
-		return this;
-	}
+    public X509CertificateBuilderHelper withKeyUsage(int keyUsage) {
+        this.keyUsage = keyUsage;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withCa(boolean ca) {
-		this.ca = ca;
-		return this;
-	}
+    public X509CertificateBuilderHelper withCa(boolean ca) {
+        this.ca = ca;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withSubjectKeyIdentifier(boolean add) {
-		this.addSubjectKeyIdentifier = add;
-		return this;
-	}
+    public X509CertificateBuilderHelper withSubjectKeyIdentifier(boolean add) {
+        this.addSubjectKeyIdentifier = add;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withAuthorityKeyIdentifier(boolean add) {
-		this.addAuthorityKeyIdentifier = add;
-		return this;
-	}
+    public X509CertificateBuilderHelper withAuthorityKeyIdentifier(boolean add) {
+        this.addAuthorityKeyIdentifier = add;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withCrlDistributionPoints(URI... uris) {
-		this.crlDistributionPoints = uris;
-		return this;
-	}
+    public X509CertificateBuilderHelper withCrlDistributionPoints(URI... uris) {
+        this.crlDistributionPoints = uris;
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withAuthorityInformationAccess(
-			X509CertificateInformationAccessDescriptor... descriptors) {
-		authorityInformationAccess = X509CertificateInformationAccessDescriptor
-				.convertAccessDescriptors(descriptors);
-		return this;
-	}
+    public X509CertificateBuilderHelper withAuthorityInformationAccess(
+            X509CertificateInformationAccessDescriptor... descriptors) {
+        authorityInformationAccess = X509CertificateInformationAccessDescriptor
+                .convertAccessDescriptors(descriptors);
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withSubjectInformationAccess(
-			X509CertificateInformationAccessDescriptor... descriptors) {
-		subjectInformationAccess = X509CertificateInformationAccessDescriptor
-				.convertAccessDescriptors(descriptors);
-		return this;
-	}
+    public X509CertificateBuilderHelper withSubjectInformationAccess(
+            X509CertificateInformationAccessDescriptor... descriptors) {
+        subjectInformationAccess = X509CertificateInformationAccessDescriptor
+                .convertAccessDescriptors(descriptors);
+        return this;
+    }
 
-	public X509CertificateBuilderHelper withPolicies(
-			PolicyInformation... policies) {
-		this.policies = policies;
-		return this;
-	}
+    public X509CertificateBuilderHelper withPolicies(
+            PolicyInformation... policies) {
+        this.policies = policies;
+        return this;
+    }
 
     public X509Certificate generateCertificate() {
         X509v3CertificateBuilder certificateGenerator = createCertificateGenerator();
@@ -290,17 +281,17 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void validateCertificateFields() {
-		Validate.notNull(issuerDN, "no issuerDN");
-		Validate.notNull(subjectDN, "no subjectDN");
-		Validate.notNull(serial, "no serial");
-		Validate.notNull(publicKey, "no publicKey");
-		Validate.notNull(signingKeyPair, "no signingKeyPair");
-		Validate.notNull(validityPeriod, "no validityPeriod");
-		if (!ca) {
-			Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
-					"keyCertSign only allowed for ca");
-		}
-	}
+        Validate.notNull(issuerDN, "no issuerDN");
+        Validate.notNull(subjectDN, "no subjectDN");
+        Validate.notNull(serial, "no serial");
+        Validate.notNull(publicKey, "no publicKey");
+        Validate.notNull(signingKeyPair, "no signingKeyPair");
+        Validate.notNull(validityPeriod, "no validityPeriod");
+        if (!ca) {
+            Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
+                    "keyCertSign only allowed for ca");
+        }
+    }
 
     private void addSubjectKeyIdentifier(X509v3CertificateBuilder generator) throws InvalidKeyException, CertIOException, NoSuchAlgorithmException {
         generator.addExtension(X509Extension.subjectKeyIdentifier, false, new JcaX509ExtensionUtils().createSubjectKeyIdentifier(publicKey));
@@ -340,37 +331,37 @@ public final class X509CertificateBuilderHelper {
         generator.addExtension(X509Extension.certificatePolicies, true, new DERSequence(policies));
     }
 
-	private void addResourceExtensions(X509v3CertificateBuilder generator) throws CertIOException {
-		ResourceExtensionEncoder encoder = new ResourceExtensionEncoder();
+    private void addResourceExtensions(X509v3CertificateBuilder generator) throws CertIOException {
+        ResourceExtensionEncoder encoder = new ResourceExtensionEncoder();
 
-		boolean inherit = resources instanceof InheritedIpResourceSet;
+        boolean inherit = resources instanceof InheritedIpResourceSet;
 
-		ASN1Encodable encodedIPAddressBlocks = encoder.encodeIpAddressBlocks(inherit,
-				inherit, resources);
-		if (encodedIPAddressBlocks != null) {
-			generator.addExtension(
-					ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS, true,
-					encodedIPAddressBlocks);
-		}
+        ASN1Encodable encodedIPAddressBlocks = encoder.encodeIpAddressBlocks(inherit,
+                inherit, resources);
+        if (encodedIPAddressBlocks != null) {
+            generator.addExtension(
+                    ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS, true,
+                    encodedIPAddressBlocks);
+        }
 
-		ASN1Encodable encodedASNs = encoder.encodeAsIdentifiers(inherit, resources);
-		if (encodedASNs != null) {
-			generator.addExtension(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true,encodedASNs);
-		}
-	}
+        ASN1Encodable encodedASNs = encoder.encodeAsIdentifiers(inherit, resources);
+        if (encodedASNs != null) {
+            generator.addExtension(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true,encodedASNs);
+        }
+    }
 
-	/**
-	 * Generate a single distribution point where the names contains each URI.
-	 */
-	private CRLDistPoint convertToCrlDistributionPoint(URI[] uris) {
-		GeneralName[] seq = new GeneralName[uris.length];
-		for (int i = 0; i < uris.length; ++i) {
-			seq[i] = new GeneralName(GeneralName.uniformResourceIdentifier, uris[i].toString());
-		}
-		GeneralNames names = new GeneralNames(seq);
-		DistributionPointName distributionPoint = new DistributionPointName(
-				names);
-		DistributionPoint[] dps = { new DistributionPoint(distributionPoint, null, null) };
-		return new CRLDistPoint(dps);
-	}
+    /**
+     * Generate a single distribution point where the names contains each URI.
+     */
+    private CRLDistPoint convertToCrlDistributionPoint(URI[] uris) {
+        GeneralName[] seq = new GeneralName[uris.length];
+        for (int i = 0; i < uris.length; ++i) {
+            seq[i] = new GeneralName(GeneralName.uniformResourceIdentifier, uris[i].toString());
+        }
+        GeneralNames names = new GeneralNames(seq);
+        DistributionPointName distributionPoint = new DistributionPointName(
+                names);
+        DistributionPoint[] dps = { new DistributionPoint(distributionPoint, null, null) };
+        return new CRLDistPoint(dps);
+    }
 }

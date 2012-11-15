@@ -29,17 +29,18 @@
  */
 package net.ripe.commons.certification.cms.roa;
 
-import static net.ripe.commons.certification.Asn1Util.*;
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.BERTags;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.ripe.commons.certification.Asn1Util.decode;
+import static org.junit.Assert.assertEquals;
 
 public class RoaCmsParserTest {
 
@@ -116,9 +117,9 @@ public class RoaCmsParserTest {
                             BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
     };
 
-	private RoaCmsParser parser;
+    private RoaCmsParser parser;
 
-	private List<RoaPrefix> ipv4Prefixes;
+    private List<RoaPrefix> ipv4Prefixes;
     private List<RoaPrefix> allPrefixes;
 
     @Before
@@ -132,31 +133,31 @@ public class RoaCmsParserTest {
         parser.parse("test", RoaCmsTest.createRoaCms(allPrefixes).getEncoded());
     }
 
-	@Test
-	public void shouldParseRoaIpAddress() {
-		assertEquals(TEST_IPV4_PREFIX_1, parser.parseRoaIpAddressFamily(IpResourceType.IPv4, decode(ENCODED_ROA_IP_ADDRESS)));
-		assertEquals(TEST_IPV4_PREFIX_2, parser.parseRoaIpAddressFamily(IpResourceType.IPv4, decode(ENCODED_ROA_IP_ADDRESS_2)));
-	}
+    @Test
+    public void shouldParseRoaIpAddress() {
+        assertEquals(TEST_IPV4_PREFIX_1, parser.parseRoaIpAddressFamily(IpResourceType.IPv4, decode(ENCODED_ROA_IP_ADDRESS)));
+        assertEquals(TEST_IPV4_PREFIX_2, parser.parseRoaIpAddressFamily(IpResourceType.IPv4, decode(ENCODED_ROA_IP_ADDRESS_2)));
+    }
 
-	@Test
-	public void shouldParseRoaIpAddressFamily() {
-		List<RoaPrefix> result = new ArrayList<RoaPrefix>();
-		parser.parseRoaIpAddressFamily(result, decode(ENCODED_ROA_IP_ADDRESS_FAMILY));
-		assertEquals(ipv4Prefixes, result);
-	}
+    @Test
+    public void shouldParseRoaIpAddressFamily() {
+        List<RoaPrefix> result = new ArrayList<RoaPrefix>();
+        parser.parseRoaIpAddressFamily(result, decode(ENCODED_ROA_IP_ADDRESS_FAMILY));
+        assertEquals(ipv4Prefixes, result);
+    }
 
-	@Test
-	public void shouldParseRoaIpAddressFamilySequence() {
-		assertEquals(ipv4Prefixes, parser.parseRoaIpAddressFamilySequence(decode(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_IPV4)));
-		assertEquals(allPrefixes, parser.parseRoaIpAddressFamilySequence(decode(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_ALL)));
-	}
+    @Test
+    public void shouldParseRoaIpAddressFamilySequence() {
+        assertEquals(ipv4Prefixes, parser.parseRoaIpAddressFamilySequence(decode(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_IPV4)));
+        assertEquals(allPrefixes, parser.parseRoaIpAddressFamilySequence(decode(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_ALL)));
+    }
 
-	@Test
-	public void shouldParseRouteOriginAttestation() {
-		parser.parseRouteOriginAttestation(decode(ENCODED_ROUTE_ORIGIN_ATTESTATION));
-		RoaCms roa = parser.getRoaCms();
-		assertEquals(TEST_ASN, roa.getAsn());
-		assertEquals(ipv4Prefixes, roa.getPrefixes());
-	}
+    @Test
+    public void shouldParseRouteOriginAttestation() {
+        parser.parseRouteOriginAttestation(decode(ENCODED_ROUTE_ORIGIN_ATTESTATION));
+        RoaCms roa = parser.getRoaCms();
+        assertEquals(TEST_ASN, roa.getAsn());
+        assertEquals(ipv4Prefixes, roa.getPrefixes());
+    }
 
 }

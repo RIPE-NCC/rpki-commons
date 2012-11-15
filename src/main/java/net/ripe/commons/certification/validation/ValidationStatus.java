@@ -30,5 +30,5 @@
 package net.ripe.commons.certification.validation;
 
 public enum ValidationStatus {
-	ERROR, WARNING, PASSED
+    ERROR, WARNING, PASSED
 }

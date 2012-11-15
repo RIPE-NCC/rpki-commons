@@ -47,6 +47,6 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
 
     @Override
     public String serialize(ParentIdentity parentIdentity) {
-    	return xStream.toXML(parentIdentity);
+        return xStream.toXML(parentIdentity);
     }
 }

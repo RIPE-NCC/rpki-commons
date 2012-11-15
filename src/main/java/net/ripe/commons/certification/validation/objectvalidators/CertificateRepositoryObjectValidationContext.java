@@ -29,16 +29,15 @@
  */
 package net.ripe.commons.certification.validation.objectvalidators;
 
-import java.net.URI;
-
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+
+import java.net.URI;
 
 /**
  * Represents the context used to validate an issued object. The context
@@ -48,49 +47,49 @@ import org.apache.commons.lang.builder.ToStringStyle;
  */
 public class CertificateRepositoryObjectValidationContext {
 
-	private final URI location;
+    private final URI location;
 
-	private final X509ResourceCertificate certificate;
+    private final X509ResourceCertificate certificate;
 
-	private final IpResourceSet resources;
+    private final IpResourceSet resources;
 
     public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
-    	this(location, certificate, certificate.getResources());
+        this(location, certificate, certificate.getResources());
     }
 
-	public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources) {
-		this.location = location;
-		this.certificate = certificate;
-		this.resources = resources;
-	}
+    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources) {
+        this.location = location;
+        this.certificate = certificate;
+        this.resources = resources;
+    }
 
     public URI getLocation() {
-		return location;
-	}
+        return location;
+    }
 
-	public X509ResourceCertificate getCertificate() {
-		return certificate;
-	}
+    public X509ResourceCertificate getCertificate() {
+        return certificate;
+    }
 
-	public IpResourceSet getResources() {
-		return resources;
-	}
+    public IpResourceSet getResources() {
+        return resources;
+    }
 
-	public URI getManifestURI() {
-		return certificate.getManifestUri();
-	}
+    public URI getManifestURI() {
+        return certificate.getManifestUri();
+    }
 
-	public URI getRepositoryURI() {
-		return certificate.getRepositoryUri();
-	}
+    public URI getRepositoryURI() {
+        return certificate.getRepositoryUri();
+    }
 
-	public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-		if (childCertificate.getResources() instanceof InheritedIpResourceSet) {
-			return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, resources);
-		} else {
-			return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.getResources());
-		}
-	}
+    public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
+        if (childCertificate.getResources() instanceof InheritedIpResourceSet) {
+            return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, resources);
+        } else {
+            return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.getResources());
+        }
+    }
 
     @Override
     public int hashCode() {

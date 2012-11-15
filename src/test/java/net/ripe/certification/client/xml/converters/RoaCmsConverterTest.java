@@ -29,17 +29,16 @@
  */
 package net.ripe.certification.client.xml.converters;
 
-import static org.junit.Assert.*;
-
-import java.util.regex.Pattern;
-
+import com.thoughtworks.xstream.XStream;
 import net.ripe.commons.certification.cms.roa.RoaCms;
 import net.ripe.commons.certification.cms.roa.RoaCmsTest;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import com.thoughtworks.xstream.XStream;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RoaCmsConverterTest {
 
@@ -47,7 +46,7 @@ public class RoaCmsConverterTest {
     private RoaCmsConverter subject;
 
     private String expectedXmlRegEx =
-    	"<net\\.ripe\\..*\\.RoaCms>\n" +
+        "<net\\.ripe\\..*\\.RoaCms>\n" +
         "  <encoded>[^<]*</encoded>\n" +
         "</net\\.ripe\\..*\\.RoaCms>";
 
@@ -65,19 +64,19 @@ public class RoaCmsConverterTest {
 
     @Test
     public void shouldOnlyUseEncodedWhenSerializingRoa() {
-    	RoaCms roa = RoaCmsTest.getRoaCms();
-    	String xml = xStream.toXML(roa);
-    	assertTrue(Pattern.matches(expectedXmlRegEx, xml));
+        RoaCms roa = RoaCmsTest.getRoaCms();
+        String xml = xStream.toXML(roa);
+        assertTrue(Pattern.matches(expectedXmlRegEx, xml));
     }
 
     @Test
     public void shouldDoRoundTripSerializeAndDesirializeRoa() {
-    	RoaCms roa = RoaCmsTest.getRoaCms();
-    	String xml = xStream.toXML(roa);
+        RoaCms roa = RoaCmsTest.getRoaCms();
+        String xml = xStream.toXML(roa);
 
-    	RoaCms processedRoa = (RoaCms) xStream.fromXML(xml);
+        RoaCms processedRoa = (RoaCms) xStream.fromXML(xml);
 
-    	assertEquals(roa, processedRoa);
+        assertEquals(roa, processedRoa);
     }
 
 }

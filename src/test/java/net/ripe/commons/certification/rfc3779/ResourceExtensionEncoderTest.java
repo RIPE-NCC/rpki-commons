@@ -29,11 +29,6 @@
  */
 package net.ripe.commons.certification.rfc3779;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import net.ripe.commons.certification.Asn1UtilTest;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
@@ -41,6 +36,13 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNull;
 
 //ESCA-JAVA0076:
 public class ResourceExtensionEncoderTest {
@@ -55,7 +57,7 @@ public class ResourceExtensionEncoderTest {
     // Expected byte arrays for the tests:
     public static final byte[] ENCODED_NULL = { 0x05, 0x00 };
 
-	// Addresses
+    // Addresses
     public static final byte[] ENCODED_IPV4_0_0_0_0_0 = { 0x03, 0x01, 0x00 };
     public static final byte[] ENCODED_IPV4_10_5_0_4_32 = { 0x03, 0x05, 0x00, 0x0a, 0x05, 0x00, 0x04 };
     public static final byte[] ENCODED_IPV4_10_5_0_0_23 = { 0x03, 0x04, 0x01, 0x0a, 0x05, 0x00 };

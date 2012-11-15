@@ -64,11 +64,11 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
     private static final int THIS_UPDATE_TIME_INDEX = 1;
     private static final int NEXT_UPDATE_TIME_INDEX = 2;
     private static final int FILE_HASH_ALGORHYTHM_INDEX = 3;
-	private static final int FILE_LIST_INDEX = 4;
+    private static final int FILE_LIST_INDEX = 4;
 
-	private BigInteger number;
+    private BigInteger number;
 
-	private DateTime thisUpdateTime;
+    private DateTime thisUpdateTime;
 
     private DateTime nextUpdateTime;
 
@@ -77,13 +77,13 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
     private Map<String, byte[]> files;
 
 
-	public ManifestCmsParser() {
-		super();
-	}
+    public ManifestCmsParser() {
+        super();
+    }
 
-	public ManifestCmsParser(ValidationResult result) {
-		super(result);
-	}
+    public ManifestCmsParser(ValidationResult result) {
+        super(result);
+    }
 
     @Override
     public void parse(ValidationLocation location, byte[] encoded) {
@@ -149,19 +149,19 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
         ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
         boolean errorOccured = false;
         for (int i = 0; i < seq.size(); ++i) {
-        	try {
-        		decodeFileAndHash(result, seq.getObjectAt(i));
-        	} catch(IllegalArgumentException e) {
-        		errorOccured = true;
-        		break;
-        	}
+            try {
+                decodeFileAndHash(result, seq.getObjectAt(i));
+            } catch(IllegalArgumentException e) {
+                errorOccured = true;
+                break;
+            }
         }
         getValidationResult().rejectIfTrue(errorOccured, MANIFEST_DECODE_FILELIST);
     }
 
-	@Override
-	public void decodeContent(ASN1Encodable encoded) {
-		decodeManifest(encoded);
-	}
+    @Override
+    public void decodeContent(ASN1Encodable encoded) {
+        decodeManifest(encoded);
+    }
 
 }

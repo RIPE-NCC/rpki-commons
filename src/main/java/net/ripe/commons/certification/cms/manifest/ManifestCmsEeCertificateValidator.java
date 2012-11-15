@@ -29,26 +29,25 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
-import static net.ripe.commons.certification.validation.ValidationString.NOT_VALID_AFTER;
-import static net.ripe.commons.certification.validation.ValidationString.NOT_VALID_BEFORE;
-
-import org.joda.time.DateTime;
-
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.IpResourceSet;
+import org.joda.time.DateTime;
+
+import static net.ripe.commons.certification.validation.ValidationString.NOT_VALID_AFTER;
+import static net.ripe.commons.certification.validation.ValidationString.NOT_VALID_BEFORE;
 
 public class ManifestCmsEeCertificateValidator extends X509ResourceCertificateParentChildValidator {
 
-	public ManifestCmsEeCertificateValidator(ValidationOptions options, ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
-		super(options, result, parent, crl, resources);
-	}
+    public ManifestCmsEeCertificateValidator(ValidationOptions options, ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
+        super(options, result, parent, crl, resources);
+    }
 
-	@Override
-	protected void verifyValidity() {
+    @Override
+    protected void verifyValidity() {
         DateTime now = new DateTime();
 
         // Reject certificates that are not yet valid
@@ -66,8 +65,8 @@ public class ManifestCmsEeCertificateValidator extends X509ResourceCertificatePa
         }
 
 
-	}
+    }
 
-	
+
 
 }

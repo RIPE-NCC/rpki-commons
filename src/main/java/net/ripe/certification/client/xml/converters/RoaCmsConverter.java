@@ -43,22 +43,22 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class RoaCmsConverter implements Converter {
 
-	@SuppressWarnings("rawtypes")
+    @SuppressWarnings("rawtypes")
     @Override
-	public boolean canConvert(Class type) {
-		return RoaCms.class.equals(type);
-	}
+    public boolean canConvert(Class type) {
+        return RoaCms.class.equals(type);
+    }
 
-	@Override
-	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-		RoaCms roa = (RoaCms) source;
+    @Override
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        RoaCms roa = (RoaCms) source;
         writer.startNode("encoded");
         context.convertAnother(roa.getEncoded());
         writer.endNode();
-	}
+    }
 
-	@Override
-	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         reader.moveDown();
         Validate.isTrue("encoded".equals(reader.getNodeName()));
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
@@ -66,5 +66,5 @@ public class RoaCmsConverter implements Converter {
         RoaCmsParser parser = new RoaCmsParser();
         parser.parse(new ValidationLocation("encoded"), encoded);
         return parser.getRoaCms();
-	}
+    }
 }

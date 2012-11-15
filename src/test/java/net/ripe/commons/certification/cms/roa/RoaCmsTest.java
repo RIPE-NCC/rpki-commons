@@ -29,16 +29,6 @@
  */
 package net.ripe.commons.certification.cms.roa;
 
-import static net.ripe.commons.certification.cms.roa.RoaCmsParserTest.*;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
-
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.KeyPair;
-import java.util.ArrayList;
-import java.util.List;
-import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
@@ -48,6 +38,18 @@ import net.ripe.ipresource.IpResourceSet;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.KeyPair;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.ripe.commons.certification.cms.roa.RoaCmsParserTest.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class RoaCmsTest {
@@ -87,9 +89,9 @@ public class RoaCmsTest {
 
     // TODO: Refactor to RoaCmsObjectMother
     public static RoaCms getRoaCms() {
-    	RoaCmsTest roaCmsTest = new RoaCmsTest();
-    	roaCmsTest.setUp();
-    	return roaCmsTest.subject;
+        RoaCmsTest roaCmsTest = new RoaCmsTest();
+        roaCmsTest.setUp();
+        return roaCmsTest.subject;
     }
 
     public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes) {

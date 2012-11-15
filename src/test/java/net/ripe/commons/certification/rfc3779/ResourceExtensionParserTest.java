@@ -29,11 +29,6 @@
  */
 package net.ripe.commons.certification.rfc3779;
 
-import static net.ripe.commons.certification.rfc3779.ResourceExtensionEncoderTest.*;
-import static org.junit.Assert.*;
-
-import java.util.SortedMap;
-import java.util.TreeMap;
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
@@ -41,6 +36,13 @@ import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import static net.ripe.commons.certification.rfc3779.ResourceExtensionEncoderTest.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 
 //ESCA-JAVA0076:
@@ -50,32 +52,32 @@ public class ResourceExtensionParserTest {
 
     @Before
     public void setUp() {
-    	parser = new ResourceExtensionParser();
+        parser = new ResourceExtensionParser();
     }
 
     @Test
     public void shouldParseIpv4Range() {
-    	assertEquals(IpResource.parse("10.5.0.0-10.5.1.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_10_5_0_0_TO_10_5_1_255)));
-    	assertEquals(IpResource.parse("0.0.0.0-255.255.255.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_0_0_0_0_TO_255_255_255_255)));
-    	assertEquals(IpResource.parse("10.5.4.0-10.5.15.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_10_5_4_0_TO_10_5_15_255)));
-    	assertEquals(IpResource.parse("128.5.4.0-128.5.15.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_128_5_4_0_TO_128_5_15_255)));
+        assertEquals(IpResource.parse("10.5.0.0-10.5.1.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_10_5_0_0_TO_10_5_1_255)));
+        assertEquals(IpResource.parse("0.0.0.0-255.255.255.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_0_0_0_0_TO_255_255_255_255)));
+        assertEquals(IpResource.parse("10.5.4.0-10.5.15.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_10_5_4_0_TO_10_5_15_255)));
+        assertEquals(IpResource.parse("128.5.4.0-128.5.15.255"), parser.derToIpRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_128_5_4_0_TO_128_5_15_255)));
     }
 
     @Test
     public void shouldParseIpv6Range() {
-    	assertEquals(IpResource.parse("2001:0:200::-2001:0:3ff:ffff:ffff:ffff:ffff:ffff"), parser.derToIpRange(IpResourceType.IPv6, Asn1Util.decode(ENCODED_IPV6_RANGE_2001_0_200__TO_2001_0_3FF_FFFF_FFFF_FFFF_FFFF_FFFF)));
+        assertEquals(IpResource.parse("2001:0:200::-2001:0:3ff:ffff:ffff:ffff:ffff:ffff"), parser.derToIpRange(IpResourceType.IPv6, Asn1Util.decode(ENCODED_IPV6_RANGE_2001_0_200__TO_2001_0_3FF_FFFF_FFFF_FFFF_FFFF_FFFF)));
     }
 
     @Test
     public void shouldParseIpv4AddressOrRange() {
-    	assertEquals(IpResource.parse("10.5.0.0-10.5.1.255"), parser.derToIpAddressOrRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_10_5_0_0_TO_10_5_1_255)));
-    	assertEquals(IpResource.parse("0.0.0.0/0"), parser.derToIpAddressOrRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_0_0_0_0_0)));
+        assertEquals(IpResource.parse("10.5.0.0-10.5.1.255"), parser.derToIpAddressOrRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RANGE_10_5_0_0_TO_10_5_1_255)));
+        assertEquals(IpResource.parse("0.0.0.0/0"), parser.derToIpAddressOrRange(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_0_0_0_0_0)));
     }
 
     @Test
     public void shouldParseIpv6AddressOrRange() {
-    	assertEquals(IpResource.parse("2001:0:200::-2001:0:3ff:ffff:ffff:ffff:ffff:ffff"), parser.derToIpAddressOrRange(IpResourceType.IPv6, Asn1Util.decode(ENCODED_IPV6_RANGE_2001_0_200__TO_2001_0_3FF_FFFF_FFFF_FFFF_FFFF_FFFF)));
-    	assertEquals(IpResource.parse("2001:0:200::/39"), parser.derToIpAddressOrRange(IpResourceType.IPv6, Asn1Util.decode(ENCODED_IPV6_2001_0_200_39)));
+        assertEquals(IpResource.parse("2001:0:200::-2001:0:3ff:ffff:ffff:ffff:ffff:ffff"), parser.derToIpAddressOrRange(IpResourceType.IPv6, Asn1Util.decode(ENCODED_IPV6_RANGE_2001_0_200__TO_2001_0_3FF_FFFF_FFFF_FFFF_FFFF_FFFF)));
+        assertEquals(IpResource.parse("2001:0:200::/39"), parser.derToIpAddressOrRange(IpResourceType.IPv6, Asn1Util.decode(ENCODED_IPV6_2001_0_200_39)));
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -85,31 +87,31 @@ public class ResourceExtensionParserTest {
 
     @Test
     public void shouldParseIpv4AddressChoice() {
-    	IpResourceSet ipResourceSet = new IpResourceSet();
-    	ipResourceSet.add(IpResource.parse("10.5.4.0-10.5.15.255"));
-    	ipResourceSet.add(IpResource.parse("128.5.0.4/32"));
-    	assertEquals(ipResourceSet, parser.derToIpAddressChoice(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RESOURCES)));
+        IpResourceSet ipResourceSet = new IpResourceSet();
+        ipResourceSet.add(IpResource.parse("10.5.4.0-10.5.15.255"));
+        ipResourceSet.add(IpResource.parse("128.5.0.4/32"));
+        assertEquals(ipResourceSet, parser.derToIpAddressChoice(IpResourceType.IPv4, Asn1Util.decode(ENCODED_IPV4_RESOURCES)));
     }
 
     @Test
     public void shouldParseNullAsIpv4AddressChoice() {
-    	assertNull(parser.derToIpAddressChoice(IpResourceType.IPv4, Asn1Util.decode(ENCODED_NULL)));
+        assertNull(parser.derToIpAddressChoice(IpResourceType.IPv4, Asn1Util.decode(ENCODED_NULL)));
     }
 
 
     @Test
     public void shouldParseIpAddressFamily() {
-    	IpResourceSet ipResourceSet = new IpResourceSet();
-    	ipResourceSet.add(IpResource.parse("10.5.4.0-10.5.15.255"));
-    	ipResourceSet.add(IpResource.parse("128.5.0.4/32"));
+        IpResourceSet ipResourceSet = new IpResourceSet();
+        ipResourceSet.add(IpResource.parse("10.5.4.0-10.5.15.255"));
+        ipResourceSet.add(IpResource.parse("128.5.0.4/32"));
 
-    	SortedMap<AddressFamily, IpResourceSet> map = new TreeMap<AddressFamily, IpResourceSet>();
-    	SortedMap<AddressFamily, IpResourceSet> map2 = new TreeMap<AddressFamily, IpResourceSet>();
+        SortedMap<AddressFamily, IpResourceSet> map = new TreeMap<AddressFamily, IpResourceSet>();
+        SortedMap<AddressFamily, IpResourceSet> map2 = new TreeMap<AddressFamily, IpResourceSet>();
 
-    	map.put(AddressFamily.IPV4, ipResourceSet);
-    	parser.derToIpAddressFamily(Asn1Util.decode(ENCODED_IPV4_ADDRESS_FAMILY_RESOURCES), map2);
+        map.put(AddressFamily.IPV4, ipResourceSet);
+        parser.derToIpAddressFamily(Asn1Util.decode(ENCODED_IPV4_ADDRESS_FAMILY_RESOURCES), map2);
 
-    	assertEquals(map, map2);
+        assertEquals(map, map2);
     }
 
     /**
@@ -141,8 +143,8 @@ public class ResourceExtensionParserTest {
 
     @Test
     public void shouldParseExtensionWithoutNullSetsToIpResourceSet() {
-    	IpResourceSet ipResourceSet = IpResourceSet.parse("10.5.4.0-10.5.15.255, 128.5.0.4/32,2001:0:200::/39");
-    	assertEquals(ipResourceSet, parser.parseIpAddressBlocks(ENCODED_IP_ADDRESS_BLOCKS_EXTENSION));
+        IpResourceSet ipResourceSet = IpResourceSet.parse("10.5.4.0-10.5.15.255, 128.5.0.4/32,2001:0:200::/39");
+        assertEquals(ipResourceSet, parser.parseIpAddressBlocks(ENCODED_IP_ADDRESS_BLOCKS_EXTENSION));
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -162,7 +164,7 @@ public class ResourceExtensionParserTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void shouldFailToParseExtensionWithNullSet() {
-    	parser.parseIpAddressBlocks(RFC3779_APPENDIX_B_EXAMPLE_1);
+        parser.parseIpAddressBlocks(RFC3779_APPENDIX_B_EXAMPLE_1);
     }
 
     @Test

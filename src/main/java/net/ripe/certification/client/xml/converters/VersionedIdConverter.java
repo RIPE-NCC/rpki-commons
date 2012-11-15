@@ -39,18 +39,18 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
  */
 public class VersionedIdConverter implements SingleValueConverter {
 
-	@SuppressWarnings("rawtypes")
-	@Override
+    @SuppressWarnings("rawtypes")
+    @Override
     public boolean canConvert(Class type) {
         return VersionedId.class.equals(type);
     }
 
-	@Override
+    @Override
     public Object fromString(String str) {
         return VersionedId.parse(str);
     }
 
-	@Override
+    @Override
     public String toString(Object obj) {
         return obj.toString();
     }

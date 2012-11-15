@@ -41,19 +41,19 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class X509ResourceCertificateBase64Converter implements Converter {
 
-	@SuppressWarnings("rawtypes")
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return type == X509ResourceCertificate.class;
     }
 
-	@Override
+    @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         X509ResourceCertificate certificate = (X509ResourceCertificate) source;
         context.convertAnother(certificate.getEncoded());
     }
 
-	@Override
+    @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         String base64Encoded = reader.getValue();
 

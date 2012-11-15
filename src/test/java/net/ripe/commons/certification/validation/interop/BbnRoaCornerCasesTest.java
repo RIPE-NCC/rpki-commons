@@ -29,18 +29,17 @@
  */
 package net.ripe.commons.certification.validation.interop;
 
-import static org.junit.Assert.assertFalse;
+import net.ripe.commons.certification.cms.roa.RoaCmsParser;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationResult;
+import org.apache.commons.io.FileUtils;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import net.ripe.commons.certification.cms.roa.RoaCmsParser;
-import net.ripe.commons.certification.validation.ValidationLocation;
-import net.ripe.commons.certification.validation.ValidationResult;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
 @Ignore
 public class BbnRoaCornerCasesTest {
@@ -52,36 +51,35 @@ public class BbnRoaCornerCasesTest {
     public void shouldRejectBadRoaVersionV2Roa() throws IOException {
         byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_BBN_ROAS + "/badROAVersionV2.roa"));
 
-
 //        System.err.println(ASN1Dump.dumpAsString(Asn1Util.decode(encoded)));
-        
+
         RoaCmsParser parser = new RoaCmsParser();
         parser.parse("roa", encoded);
         ValidationResult validationResult = parser.getValidationResult();
-        
+
         for (ValidationLocation location: validationResult.getValidatedLocations()) {
-        	System.err.println(location + "  ->  " + validationResult.getFailures(location));
+            System.err.println(location + "  ->  " + validationResult.getFailures(location));
         }
-        
+
         assertFalse(validationResult.hasFailures());
     }
-    
+
     @Test
     public void shouldAcceptGoodRoa() throws IOException {
-    	byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_BBN_ROAS + "/goodROANothingWrong.roa"));
-    	
-    	
+        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_BBN_ROAS + "/goodROANothingWrong.roa"));
+
+
 //        System.err.println(ASN1Dump.dumpAsString(Asn1Util.decode(encoded)));
-    	
-    	RoaCmsParser parser = new RoaCmsParser();
-    	parser.parse("roa", encoded);
-    	ValidationResult validationResult = parser.getValidationResult();
-    	
-    	for (ValidationLocation location: validationResult.getValidatedLocations()) {
-    		System.err.println(location + "  ->  " + validationResult.getFailures(location));
-    	}
-    	
-    	assertFalse(validationResult.hasFailures());
+
+        RoaCmsParser parser = new RoaCmsParser();
+        parser.parse("roa", encoded);
+        ValidationResult validationResult = parser.getValidationResult();
+
+        for (ValidationLocation location: validationResult.getValidatedLocations()) {
+            System.err.println(location + "  ->  " + validationResult.getFailures(location));
+        }
+
+        assertFalse(validationResult.hasFailures());
     }
 
 }
