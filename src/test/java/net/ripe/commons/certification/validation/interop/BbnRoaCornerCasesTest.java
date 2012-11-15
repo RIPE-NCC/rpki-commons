@@ -44,7 +44,7 @@ import static org.junit.Assert.assertFalse;
 @Ignore
 public class BbnRoaCornerCasesTest {
 
-    private static final String PATH_TO_BBN_ROAS = "src/test/resources/bbn-psycho-cases/root";
+    private static final String PATH_TO_BBN_ROAS = "src/test/resources/bbn-standard-compliance-cases/root";
 
 
     @Test
