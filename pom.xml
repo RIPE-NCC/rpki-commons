@@ -1,11 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <name>RPKI Commmons</name>
     <groupId>net.ripe.rpki-commons</groupId>
     <artifactId>rpki-commons</artifactId>
     <version>1.0.21-SNAPSHOT</version>
-    <packaging>jar</packaging>
     <inceptionYear>2008</inceptionYear>
+
+    <name>RPKI Commmons</name>
+    <description>Resource Public Key Infrastructure - RPKI objects, HSM integration</description>
+    <organization>
+        <name>RIPE NCC, the Netherlands</name>
+        <url>http://www.ripe.net/</url>
+    </organization>
 
     <scm>
         <connection>scm:git:ssh://git.db.ripe.net/ba/certification/rpki-commons</connection>
@@ -192,13 +197,13 @@
                 <version>1.9.0</version>
                 <configuration>
                     <strictCheck>true</strictCheck>
-                    <header>src/main/release/LICENSE.txt</header>
+                    <header>LICENSE.txt</header>
                     <excludes>
                         <exclude>**/*.txt</exclude>
                         <exclude>src/test/resources/**</exclude>
-			<exclude>.idea/**</exclude>
-			<exclude>.gitignore</exclude>
-			<exclude>.pregenerated-test-key-pairs.keystore</exclude>
+                        <exclude>.idea/**</exclude>
+                        <exclude>.gitignore</exclude>
+                        <exclude>.pregenerated-test-key-pairs.keystore</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -277,5 +282,5 @@
         </pluginManagement>
     </build>
 </project>
- 
- 
+
+

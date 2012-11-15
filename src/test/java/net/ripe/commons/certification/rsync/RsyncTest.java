@@ -1,7 +1,7 @@
 /**
  * The BSD License
  *
- * Copyright (c) 2010, 2011 RIPE NCC
+ * Copyright (c) 2010-2012 RIPE NCC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,11 +29,11 @@
  */
 package net.ripe.commons.certification.rsync;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class RsyncTest {
