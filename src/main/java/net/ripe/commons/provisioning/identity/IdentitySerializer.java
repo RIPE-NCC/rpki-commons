@@ -29,17 +29,15 @@
  */
 package net.ripe.commons.provisioning.identity;
 
-import javax.xml.namespace.QName;
-
-import net.ripe.certification.client.xml.converters.URIConverter;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.Sun14ReflectionProvider;
 import com.thoughtworks.xstream.io.xml.QNameMap;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import javax.xml.namespace.QName;
+import net.ripe.certification.client.xml.converters.URIConverter;
 
 
 public abstract class IdentitySerializer<T> {
@@ -56,7 +54,7 @@ public abstract class IdentitySerializer<T> {
         QName childIdQName = new QName(ChildIdentity.XMLNS, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
         qNameMap.registerMapping(childIdQName, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
 
-        XmlFriendlyReplacer replacer = new XmlFriendlyReplacer("_-", "_");
+        XmlFriendlyNameCoder replacer = new XmlFriendlyNameCoder("_-", "_");
 
         xStream = new XStream(new Sun14ReflectionProvider(), new StaxDriver(qNameMap, replacer)) {
             @Override

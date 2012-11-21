@@ -34,7 +34,6 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.commons.certification.validation.ValidationCheck;
 import net.ripe.commons.certification.validation.ValidationLocation;
@@ -53,10 +52,8 @@ import net.ripe.commons.provisioning.payload.issue.request.CertificateIssuanceRe
 import net.ripe.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestParser;
 import net.ripe.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestParserException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.HexDump;
 import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
@@ -124,11 +121,11 @@ public class ProcessIscUpdownPdusTest {
         ValidationResult result = new ValidationResult();
         validator.validate(result);
 
-        for (ValidationLocation location : result.getValidatedLocations()) {
-            for (ValidationCheck check : result.getFailures(location)) {
-                System.err.println(location + " : " + check);
-            }
-        }
+//        for (ValidationLocation location : result.getValidatedLocations()) {
+//            for (ValidationCheck check : result.getFailures(location)) {
+//                System.err.println(location + " : " + check);
+//            }
+//        }
 
         List<ValidationCheck> failures = result.getFailuresForAllLocations();
 
@@ -148,9 +145,9 @@ public class ProcessIscUpdownPdusTest {
             byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
             ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
             parser.parseCms("cms", encoded);
-            System.err.println("\nDumping: " + fileName + "\n");
-            HexDump.dump(encoded, 0, System.err, 0);
-            System.err.println("\n");
+//            System.err.println("\nDumping: " + fileName + "\n");
+//            HexDump.dump(encoded, 0, System.err, 0);
+//            System.err.println("\n");
             assertTrue("Error parsing file: " + fileName + " and giving up!", !parser.getValidationResult().hasFailures());
         }
     }

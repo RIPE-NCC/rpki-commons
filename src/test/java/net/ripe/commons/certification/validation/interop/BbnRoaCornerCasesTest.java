@@ -29,17 +29,16 @@
  */
 package net.ripe.commons.certification.validation.interop;
 
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.io.IOException;
 import net.ripe.commons.certification.cms.roa.RoaCmsParser;
 import net.ripe.commons.certification.validation.ValidationLocation;
 import net.ripe.commons.certification.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertFalse;
 
 @Ignore
 public class BbnRoaCornerCasesTest {

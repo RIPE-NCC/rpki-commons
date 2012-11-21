@@ -29,12 +29,11 @@
  */
 package net.ripe.commons.provisioning.payload;
 
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 import net.ripe.certification.client.xml.XStreamXmlSerializer;
 import net.ripe.certification.client.xml.XStreamXmlSerializerBuilder;
-
-import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
-import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
-import com.thoughtworks.xstream.io.xml.XppDriver;
 
 public class ProvisioningPayloadXmlSerializerBuilder<T extends AbstractProvisioningPayload> extends XStreamXmlSerializerBuilder<T> {
 
@@ -52,6 +51,6 @@ public class ProvisioningPayloadXmlSerializerBuilder<T extends AbstractProvision
     @Override
     protected HierarchicalStreamDriver getStreamDriver() {
         // replace $ with __ and don't replace _
-        return new XppDriver(new XmlFriendlyReplacer("__", "_"));
+        return new XppDriver(new XmlFriendlyNameCoder("__", "_"));
     }
 }
