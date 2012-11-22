@@ -29,6 +29,11 @@
  */
 package net.ripe.commons.certification.rfc3779;
 
+import static net.ripe.commons.certification.rfc3779.ResourceExtensionEncoderTest.*;
+import static org.junit.Assert.*;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
 import net.ripe.commons.certification.Asn1Util;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
@@ -36,13 +41,6 @@ import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import static net.ripe.commons.certification.rfc3779.ResourceExtensionEncoderTest.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 
 //ESCA-JAVA0076:
@@ -143,18 +141,27 @@ public class ResourceExtensionParserTest {
 
     @Test
     public void shouldParseExtensionWithoutNullSetsToIpResourceSet() {
-        IpResourceSet ipResourceSet = IpResourceSet.parse("10.5.4.0-10.5.15.255, 128.5.0.4/32,2001:0:200::/39");
-        assertEquals(ipResourceSet, parser.parseIpAddressBlocks(ENCODED_IP_ADDRESS_BLOCKS_EXTENSION));
+        IpResourceSet ipv4ResourceSet = IpResourceSet.parse("10.5.4.0-10.5.15.255, 128.5.0.4/32");
+        IpResourceSet ipv6ResourceSet = IpResourceSet.parse("2001:0:200::/39");
+        SortedMap<AddressFamily, IpResourceSet> parsed = parser.parseIpAddressBlocks(ENCODED_IP_ADDRESS_BLOCKS_EXTENSION);
+        assertEquals(ipv4ResourceSet, parsed.get(AddressFamily.IPV4));
+        assertEquals(ipv6ResourceSet, parsed.get(AddressFamily.IPV6));
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldFailOnIpv4OnlyInheritance() {
-        parser.parseIpAddressBlocks(ENCODED_IPV4_ONLY_INHERITED);
+    @Test
+    public void shouldSupportIpv4OnlyInheritance() {
+        SortedMap<AddressFamily, IpResourceSet> parsed = parser.parseIpAddressBlocks(ENCODED_IPV4_ONLY_INHERITED);
+
+        assertTrue(parsed.containsKey(AddressFamily.IPV4) && parsed.get(AddressFamily.IPV4) == null);
+        assertNotNull(parsed.get(AddressFamily.IPV6));
     }
 
     @Test
     public void shouldSupportIpv4AndIpv6Inheritance() {
-        assertNull(parser.parseIpAddressBlocks(ENCODED_IPV4_AND_IPV6_INHERITED));
+        SortedMap<AddressFamily, IpResourceSet> parsed = parser.parseIpAddressBlocks(ENCODED_IPV4_AND_IPV6_INHERITED);
+
+        assertTrue(parsed.containsKey(AddressFamily.IPV4) && parsed.get(AddressFamily.IPV4) == null);
+        assertTrue(parsed.containsKey(AddressFamily.IPV6) && parsed.get(AddressFamily.IPV6) == null);
     }
 
     @Test

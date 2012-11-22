@@ -35,10 +35,7 @@ import static net.ripe.commons.certification.x509cert.AbstractX509CertificateWra
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.util.regex.Pattern;
-import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
-import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationResult;
-import net.ripe.ipresource.IpResourceSet;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
@@ -145,29 +142,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
     private void validateResourceExtensionsForResourceCertificates() {
         if (result.rejectIfFalse(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
-            result.rejectIfFalse(true, AS_OR_IP_RESOURCE_PRESENT);
-            parseResourceExtensions();
+            result.rejectIfTrue(false, AS_OR_IP_RESOURCE_PRESENT);
         }
-    }
-
-    private void parseResourceExtensions() {
-        ResourceExtensionParser parser = new ResourceExtensionParser();
-        boolean ipInherited = false;
-        boolean asInherited = false;
-        byte[] ipAddressBlocksExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
-        if (ipAddressBlocksExtension != null) {
-            IpResourceSet ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
-            if (ipResources == null) {
-                ipInherited = true;
-            }
-        }
-        byte[] asnExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
-        if (asnExtension != null) {
-            IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
-            if (asResources == null) {
-                asInherited = true;
-            }
-        }
-        result.rejectIfFalse(ipInherited == asInherited, PARTIAL_INHERITANCE);
     }
 }

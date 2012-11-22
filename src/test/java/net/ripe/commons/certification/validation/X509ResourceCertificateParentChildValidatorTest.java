@@ -34,6 +34,7 @@ import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.X509Crl;
@@ -42,8 +43,8 @@ import net.ripe.commons.certification.util.PregeneratedKeyPairFactory;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -202,7 +203,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
     @Test
     public void shouldRejectInvalidResorceSet() {
-		child = createChildCertificateBuilder().withResources(INVALID_CHILD_RESOURCE_SET).build();
+        child = createChildCertificateBuilder().withInheritedResourceTypes(EnumSet.noneOf(IpResourceType.class)).withResources(INVALID_CHILD_RESOURCE_SET).build();
 
 		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 		validate(validator, child);
@@ -227,7 +228,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     }
 
     private X509ResourceCertificate getRootResourceCertificateWithInheritedResources() {
-    	return createRootCertificateBuilder().withResources(InheritedIpResourceSet.getInstance()).build();
+        return createRootCertificateBuilder().withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).withResources(new IpResourceSet()).build();
     }
 
     private X509ResourceCertificateBuilder createRootCertificateBuilder() {
@@ -262,7 +263,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
         builder.withSubjectKeyIdentifier(true);
-        builder.withResources(InheritedIpResourceSet.getInstance());
+        builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(VALIDITY_PERIOD);
 		return builder;
 	}

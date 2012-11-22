@@ -29,9 +29,15 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import java.net.URI;
+import java.security.cert.X509Certificate;
+import java.util.EnumSet;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import net.ripe.commons.certification.CertificateRepositoryObject;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
+import net.ripe.commons.certification.rfc3779.AddressFamily;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
 import net.ripe.commons.certification.rfc3779.ResourceExtensionParser;
 import net.ripe.commons.certification.validation.ValidationLocation;
@@ -41,12 +47,10 @@ import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateValidator;
-import net.ripe.ipresource.InheritedIpResourceSet;
+import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
-
-import java.net.URI;
-import java.security.cert.X509Certificate;
 
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.
@@ -55,6 +59,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
     private static final long serialVersionUID = 2L;
 
+    private EnumSet<IpResourceType> inheritedResourceTypes;
     private IpResourceSet resources;
 
 
@@ -65,38 +70,48 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
     private void parseResourceExtensions() {
         ResourceExtensionParser parser = new ResourceExtensionParser();
-        IpResourceSet result = new IpResourceSet();
-        boolean ipInherited = false;
-        boolean asInherited = false;
+
+        inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
+        resources = new IpResourceSet();
+
         byte[] ipAddressBlocksExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
         if (ipAddressBlocksExtension != null) {
-            IpResourceSet ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
-            if (ipResources == null) {
-                ipInherited = true;
-            } else {
-                result.addAll(ipResources);
+            SortedMap<AddressFamily, IpResourceSet> ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
+            for (Entry<AddressFamily, IpResourceSet> resourcesByType: ipResources.entrySet()) {
+                if (resourcesByType.getValue() == null) {
+                    inheritedResourceTypes.add(resourcesByType.getKey().toIpResourceType());
+                } else {
+                    resources.addAll(resourcesByType.getValue());
+                }
             }
         }
+
         byte[] asnExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
         if (asnExtension != null) {
             IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
             if (asResources == null) {
-                asInherited = true;
+                inheritedResourceTypes.add(IpResourceType.ASN);
             } else {
-                result.addAll(asResources);
+                resources.addAll(asResources);
             }
         }
-        Validate.isTrue(ipInherited == asInherited, "partial inheritance not supported");
-        resources = ipInherited && asInherited ? InheritedIpResourceSet.getInstance() : result;
-        Validate.isTrue(!resources.isEmpty(), "empty resource set");
+        Validate.isTrue(!inheritedResourceTypes.isEmpty() || !resources.isEmpty(), "empty resource set");
     }
 
     public IpResourceSet getResources() {
         return resources;
     }
 
+    public EnumSet<IpResourceType> getInheritedResourceTypes() {
+        return inheritedResourceTypes;
+    }
+
+    public boolean isResourceTypesInherited(EnumSet<IpResourceType> resourceTypes) {
+        return inheritedResourceTypes.containsAll(resourceTypes);
+    }
+
     public boolean isResourceSetInherited() {
-        return resources instanceof InheritedIpResourceSet;
+        return !inheritedResourceTypes.isEmpty();
     }
 
     @Override
@@ -134,6 +149,16 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         }
         X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, this);
+    }
+
+    public IpResourceSet deriveResources(IpResourceSet parentResources) {
+        IpResourceSet result = new IpResourceSet(getResources());
+        for (IpResource ipResource : parentResources) {
+            if (inheritedResourceTypes.contains(ipResource.getType())) {
+                result.add(ipResource);
+            }
+        }
+        return result;
     }
 
 }

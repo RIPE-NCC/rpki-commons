@@ -29,15 +29,13 @@
  */
 package net.ripe.commons.certification.validation.objectvalidators;
 
+import java.net.URI;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-
-import java.net.URI;
 
 /**
  * Represents the context used to validate an issued object. The context
@@ -84,11 +82,7 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-        if (childCertificate.getResources() instanceof InheritedIpResourceSet) {
-            return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, resources);
-        } else {
-            return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.getResources());
-        }
+        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.deriveResources(resources));
     }
 
     @Override

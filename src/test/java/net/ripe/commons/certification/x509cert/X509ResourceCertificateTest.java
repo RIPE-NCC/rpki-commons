@@ -29,6 +29,19 @@
  */
 package net.ripe.commons.certification.x509cert;
 
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.util.EnumSet;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
@@ -39,26 +52,13 @@ import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.easymock.IAnswer;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
 
 
 public class X509ResourceCertificateTest {
@@ -150,10 +150,36 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldSupportResourceInheritance() {
-        X509ResourceCertificate inherited = createSelfSignedCaResourceCertificateBuilder().withResources(InheritedIpResourceSet.getInstance()).build();
+        X509ResourceCertificate inherited = createSelfSignedCaResourceCertificateBuilder().withResources(new IpResourceSet()).withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).build();
         assertTrue(inherited.isResourceSetInherited());
-        assertTrue(inherited.getResources() instanceof InheritedIpResourceSet);
+        assertTrue(inherited.getResources().isEmpty());
         assertFalse(createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET).isResourceSetInherited());
+
+        assertEquals("AS21212, 10.0.0.0/8, 192.168.0.0/16, ffce::/16", inherited.deriveResources(TEST_RESOURCE_SET).toString());
+    }
+
+    @Test
+    public void shouldSupportInheritedAsnsOnly() {
+        X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.parse("10.0.0.0/8")).withInheritedResourceTypes(EnumSet.of(IpResourceType.ASN)).build();
+
+        assertTrue(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.ASN)));
+        assertFalse(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv4)));
+        assertFalse(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv6)));
+        assertTrue(subject.isResourceSetInherited());
+
+        assertEquals("AS21212, 10.0.0.0/8", subject.deriveResources(TEST_RESOURCE_SET).toString());
+    }
+
+    @Test
+    public void shouldSupportInheritedIpAddressesOnly() {
+        X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.parse("AS1234")).withInheritedResourceTypes(EnumSet.of(IpResourceType.IPv4, IpResourceType.IPv6)).build();
+
+        assertFalse(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.ASN)));
+        assertTrue(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv4)));
+        assertTrue(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv6)));
+        assertTrue(subject.isResourceSetInherited());
+
+        assertEquals("AS1234, 10.0.0.0/8, 192.168.0.0/16, ffce::/16", subject.deriveResources(TEST_RESOURCE_SET).toString());
     }
 
     @Test

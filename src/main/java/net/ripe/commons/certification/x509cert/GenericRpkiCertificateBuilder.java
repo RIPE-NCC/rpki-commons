@@ -33,12 +33,11 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.PublicKey;
-
+import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.ipresource.IpResourceSet;
-
+import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
 
 public abstract class GenericRpkiCertificateBuilder {
@@ -46,16 +45,17 @@ public abstract class GenericRpkiCertificateBuilder {
     private PublicKey publicKey;
     private KeyPair signingKeyPair;
     private BigInteger serial;
-    private IpResourceSet resources;
+    private IpResourceSet resources = new IpResourceSet();
+    private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
     private X500Principal subject;
     private X500Principal issuer;
     private ValidityPeriod validityPeriod;
-    
+
     private URI crlUri;
     private URI parentResourceCertificatePublicationUri;
-    
+
     private String signatureProvider = "SunRsaSign";
-    
+
     public void withPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
@@ -70,6 +70,10 @@ public abstract class GenericRpkiCertificateBuilder {
 
     public void withResources(IpResourceSet resources) {
         this.resources = resources;
+    }
+
+    public void withInheritedResourceTypes(EnumSet<IpResourceType> resourceTypes) {
+        this.inheritedResourceTypes = EnumSet.copyOf(resourceTypes);
     }
 
     public void withSubjectDN(X500Principal subject) {
@@ -109,37 +113,38 @@ public abstract class GenericRpkiCertificateBuilder {
     public void withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
     }
-    
+
     protected X509ResourceCertificateBuilder createGenericRpkiCertificateBuilder() {
-        
+
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        
+
         builder.withPublicKey(publicKey);
         builder.withSigningKeyPair(signingKeyPair);
-        
+
         builder.withSerial(serial);
-        
+
         builder.withResources(resources);
-        
+        builder.withInheritedResourceTypes(inheritedResourceTypes);
+
         builder.withSubjectDN(subject);
         builder.withIssuerDN(issuer);
-        
+
         builder.withValidityPeriod(validityPeriod);
-        
+
         if(!isSelfSigned()) {
             builder.withCrlDistributionPoints(crlUri);
-            
+
             X509CertificateInformationAccessDescriptor[] aiaDescriptors = {
                     new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, parentResourceCertificatePublicationUri)
             };
             builder.withAuthorityInformationAccess(aiaDescriptors);
             builder.withAuthorityKeyIdentifier(true);
         }
-        
+
         builder.withSignatureProvider(signatureProvider);
-        
+
         builder.withSubjectKeyIdentifier(true);
-        
+
         return builder;
     }
 
@@ -147,19 +152,19 @@ public abstract class GenericRpkiCertificateBuilder {
         Validate.notNull(publicKey, "Public Key is required");
         Validate.notNull(signingKeyPair, "Signing Key Pair is required");
         Validate.notNull(serial, "Serial is required");
-        Validate.notNull(resources, "Resources are required. Inherited resources are allowed but not advised (unless you are building an EE cert for manifests)");
+        Validate.isTrue(!inheritedResourceTypes.isEmpty() || !resources.isEmpty(), "Resources are required. Inherited resources are allowed but not advised (unless you are building an EE cert for manifests)");
         Validate.notNull(subject, "Subject is required");
         Validate.notNull(issuer, "Issuer is required");
         Validate.notNull(validityPeriod, "ValidityPeriod is required");
-        
-        
+
+
         if (!isSelfSigned()) {
             Validate.notNull(crlUri, "CRL URI is required (except for self-signed (root) certificates)");
             Validate.notNull(parentResourceCertificatePublicationUri, "Parent Certificate Publication URI is required");
         }
-        
+
         Validate.notNull(signatureProvider, "SignatureProvider is required");
     }
-    
+
 
 }

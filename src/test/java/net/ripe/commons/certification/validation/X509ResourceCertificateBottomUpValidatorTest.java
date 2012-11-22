@@ -35,6 +35,7 @@ import static org.junit.Assert.*;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.cert.CRLException;
+import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.CertificateRepositoryObjectFile;
 import net.ripe.commons.certification.ValidityPeriod;
@@ -45,8 +46,8 @@ import net.ripe.commons.certification.validation.objectvalidators.ResourceCertif
 import net.ripe.commons.certification.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
@@ -113,7 +114,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
     @Test
     public void testShouldFailOnInvalidResorceSet() {
-		child = createChildBuilder().withResources(INVALID_CHILD_RESOURCE_SET).build();
+        child = createChildBuilder().withInheritedResourceTypes(EnumSet.noneOf(IpResourceType.class)).withResources(INVALID_CHILD_RESOURCE_SET).build();
 
     	X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
     	validator.validate("child", child);
@@ -124,7 +125,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     }
 
     @Test
-    public void testShouldFailOnInvalidResorceSetAfterInheritance() {
+    public void testShouldFailOnInvalidResourceSetAfterInheritance() {
 		child = createChildBuilder().build();
 		grandchild = createSecondChildBuilder().withResources(INVALID_CHILD_RESOURCE_SET).build();
 
@@ -261,7 +262,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
         builder.withSubjectKeyIdentifier(true);
-        builder.withResources(InheritedIpResourceSet.getInstance());
+        builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(VALIDITY_PERIOD);
 		return builder;
 	}

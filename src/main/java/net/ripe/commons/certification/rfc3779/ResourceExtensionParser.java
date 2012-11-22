@@ -64,45 +64,27 @@ public class ResourceExtensionParser {
     /**
      * Parses the IP address blocks extension and merges all address families
      * into a single {@link IpResourceSet} containing both IPv4 and IPv6
-     * addresses. Returns <code>null</code> when all {@link AddressFamily}s
-     * use resource inheritance.
-     *
-     * Partial resource inheritance is not yet supported.
+     * addresses. Maps an {@link AddressFamily} to <code>null</code> when the
+     * resource of this type are inherited. If no resources are specified it is
+     * mapped to an empty resource set.
      */
-    public IpResourceSet parseIpAddressBlocks(byte[] extension) {
+    public SortedMap<AddressFamily, IpResourceSet> parseIpAddressBlocks(byte[] extension) {
         ASN1Primitive octetString = decode(extension);
         expect(octetString, ASN1OctetString.class);
         ASN1OctetString o = (ASN1OctetString) octetString;
         SortedMap<AddressFamily, IpResourceSet> map = derToIpAddressBlocks(decode(o.getOctets()));
-        IpResourceSet ipResourceSet = new IpResourceSet();
 
-        if (allSupportedAddressFamiliesInherited(map)) {
-            return null;
+        for (AddressFamily family: SUPPORTED_ADDRESS_FAMILIES) {
+            if (!map.containsKey(family)) {
+                map.put(family, new IpResourceSet());
+            }
         }
 
         for (AddressFamily addressFamily : map.keySet()) {
             Validate.isTrue(!addressFamily.hasSubsequentAddressFamilyIdentifier(), "SAFI not supported");
-            Validate.notNull(map.get(addressFamily), "partial inheritance not supported");
-            ipResourceSet.addAll(map.get(addressFamily));
         }
 
-        return ipResourceSet;
-    }
-
-    private boolean allSupportedAddressFamiliesInherited(SortedMap<AddressFamily, IpResourceSet> map) {
-        if (map.size() == SUPPORTED_ADDRESS_FAMILIES.length) {
-            for (AddressFamily addressFamily : SUPPORTED_ADDRESS_FAMILIES) {
-                if (!containsNullMappingForAddressFamily(map, addressFamily)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private boolean containsNullMappingForAddressFamily(SortedMap<AddressFamily, IpResourceSet> map, AddressFamily addressFamily) {
-        return map.containsKey(addressFamily) && map.get(addressFamily) == null;
+        return map;
     }
 
     /**

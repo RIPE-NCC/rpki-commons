@@ -29,24 +29,6 @@
  */
 package net.ripe.commons.certification.x509cert;
 
-import net.ripe.commons.certification.BouncyCastleUtil;
-import net.ripe.commons.certification.ValidityPeriod;
-import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
-import net.ripe.ipresource.InheritedIpResourceSet;
-import net.ripe.ipresource.IpResourceSet;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-
-import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.InvalidKeyException;
@@ -57,6 +39,34 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.EnumSet;
+import javax.security.auth.x500.X500Principal;
+import net.ripe.commons.certification.BouncyCastleUtil;
+import net.ripe.commons.certification.ValidityPeriod;
+import net.ripe.commons.certification.rfc3779.ResourceExtensionEncoder;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
@@ -106,6 +116,8 @@ public final class X509CertificateBuilderHelper {
     private AccessDescription[] subjectInformationAccess;
 
     private PolicyInformation[] policies;
+
+    private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
 
     public X509CertificateBuilderHelper withSignatureProvider(
             String signatureProvider) {
@@ -202,6 +214,11 @@ public final class X509CertificateBuilderHelper {
     public X509CertificateBuilderHelper withPolicies(
             PolicyInformation... policies) {
         this.policies = policies;
+        return this;
+    }
+
+    public X509CertificateBuilderHelper withInheritedResourceTypes(EnumSet<IpResourceType> resourceTypes) {
+        this.inheritedResourceTypes = EnumSet.copyOf(resourceTypes);
         return this;
     }
 
@@ -334,17 +351,23 @@ public final class X509CertificateBuilderHelper {
     private void addResourceExtensions(X509v3CertificateBuilder generator) throws CertIOException {
         ResourceExtensionEncoder encoder = new ResourceExtensionEncoder();
 
-        boolean inherit = resources instanceof InheritedIpResourceSet;
+        for (IpResourceType inherited: inheritedResourceTypes) {
+            if (resources.containsType(inherited)) {
+                throw new IllegalArgumentException("resource set '" + resources + "' contains resources of inherited type " + inherited);
+            }
+        }
 
-        ASN1Encodable encodedIPAddressBlocks = encoder.encodeIpAddressBlocks(inherit,
-                inherit, resources);
+        ASN1Encodable encodedIPAddressBlocks = encoder.encodeIpAddressBlocks(
+                inheritedResourceTypes.contains(IpResourceType.IPv4),
+                inheritedResourceTypes.contains(IpResourceType.IPv6),
+                resources);
         if (encodedIPAddressBlocks != null) {
             generator.addExtension(
                     ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS, true,
                     encodedIPAddressBlocks);
         }
 
-        ASN1Encodable encodedASNs = encoder.encodeAsIdentifiers(inherit, resources);
+        ASN1Encodable encodedASNs = encoder.encodeAsIdentifiers(inheritedResourceTypes.contains(IpResourceType.ASN), resources);
         if (encodedASNs != null) {
             generator.addExtension(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true,encodedASNs);
         }

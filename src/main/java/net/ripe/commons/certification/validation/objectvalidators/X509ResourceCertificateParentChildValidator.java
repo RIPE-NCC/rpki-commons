@@ -30,11 +30,11 @@
 package net.ripe.commons.certification.validation.objectvalidators;
 
 import static net.ripe.commons.certification.validation.ValidationString.*;
+
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.validation.ValidationOptions;
 import net.ripe.commons.certification.validation.ValidationResult;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 
 
@@ -57,14 +57,11 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
     private void verifyResources() {
         ValidationResult result = getValidationResult();
         X509ResourceCertificate child = getChild();
-        IpResourceSet childResourceSet = child.getResources();
+        IpResourceSet childResourceSet = child.deriveResources(resources);
 
         if (child.isRoot()) {
             // root certificate cannot have inherited resources
-            result.rejectIfTrue(childResourceSet instanceof InheritedIpResourceSet, RESOURCE_RANGE);
-        } else if (childResourceSet instanceof InheritedIpResourceSet) {
-            // for other certs inherited resources should always be okay
-            return;
+            result.rejectIfTrue(child.isResourceSetInherited(), RESOURCE_RANGE);
         } else {
             // otherwise the child resources cannot exceed the specified resources
             result.rejectIfFalse(resources.contains(childResourceSet), RESOURCE_RANGE);

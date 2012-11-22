@@ -38,7 +38,7 @@
     </scm>
 
     <properties>
-        <net.ripe.ipresource.version>1.44</net.ripe.ipresource.version>
+        <net.ripe.ipresource.version>1.45-SNAPSHOT</net.ripe.ipresource.version>
 
         <easymock.version>3.0</easymock.version>
 

@@ -29,12 +29,22 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
+import static net.ripe.commons.certification.Asn1Util.*;
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
+
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.BERTags;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -42,16 +52,6 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.util.Map;
-import java.util.TreeMap;
-
-import static net.ripe.commons.certification.Asn1Util.decode;
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static org.junit.Assert.*;
 
 
 public class ManifestCmsParserTest {
@@ -128,7 +128,8 @@ public class ManifestCmsParserTest {
         builder.withCa(false).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        builder.withResources(InheritedIpResourceSet.getInstance());
+        builder.withResources(new IpResourceSet());
+        builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         return builder.build();
     }

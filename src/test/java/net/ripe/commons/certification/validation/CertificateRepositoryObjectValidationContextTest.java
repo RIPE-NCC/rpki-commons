@@ -29,18 +29,18 @@
  */
 package net.ripe.commons.certification.validation;
 
+import static org.junit.Assert.*;
+
 import com.gargoylesoftware.base.testing.EqualsTester;
+import java.net.URI;
+import java.util.EnumSet;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
+import org.junit.Before;
 import org.junit.Test;
-
-import java.net.URI;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 
 public class CertificateRepositoryObjectValidationContextTest {
@@ -53,8 +53,19 @@ public class CertificateRepositoryObjectValidationContextTest {
 
     private CertificateRepositoryObjectValidationContext subject = create();
 
+    private X509ResourceCertificate certificateWithInheritedResources;
+
     public static CertificateRepositoryObjectValidationContext create() {
         return new CertificateRepositoryObjectValidationContext(location, certificate);
+    }
+
+    @Before
+    public void setUp() {
+        certificateWithInheritedResources = X509ResourceCertificateTest.
+                createSelfSignedCaResourceCertificateBuilder().
+                withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class))
+                .withResources(new IpResourceSet()).
+                build();
     }
 
     @Test
@@ -73,25 +84,23 @@ public class CertificateRepositoryObjectValidationContextTest {
 
     @Test
     public void shouldNotUpdateResourcesForChildCertificateWithInheritedResources() {
-        X509ResourceCertificate childCertificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate(InheritedIpResourceSet.getInstance());
-        CertificateRepositoryObjectValidationContext childContext = subject.createChildContext(childLocation, childCertificate);
+        CertificateRepositoryObjectValidationContext childContext = subject.createChildContext(childLocation, certificateWithInheritedResources);
         assertEquals(subject.getResources(), childContext.getResources());
     }
 
     @Test
     public void shouldUpdateLocationAndCertificateForChildCertificate() {
-        X509ResourceCertificate childCertificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate(InheritedIpResourceSet.getInstance());
-        CertificateRepositoryObjectValidationContext childContext = subject.createChildContext(childLocation, childCertificate);
+        CertificateRepositoryObjectValidationContext childContext = subject.createChildContext(childLocation, certificateWithInheritedResources);
 
         assertSame(childLocation, childContext.getLocation());
-        assertSame(childCertificate, childContext.getCertificate());
+        assertSame(certificateWithInheritedResources, childContext.getCertificate());
     }
 
     @Test
     public void testEquals() {
         CertificateRepositoryObjectValidationContext a = new CertificateRepositoryObjectValidationContext(location, certificate);
         CertificateRepositoryObjectValidationContext b = new CertificateRepositoryObjectValidationContext(location, certificate);
-        CertificateRepositoryObjectValidationContext c = new CertificateRepositoryObjectValidationContext(URI.create("rsync://another/uri"), X509ResourceCertificateTest.createSelfSignedCaResourceCertificate(InheritedIpResourceSet.getInstance()));
+        CertificateRepositoryObjectValidationContext c = new CertificateRepositoryObjectValidationContext(URI.create("rsync://another/uri"), certificateWithInheritedResources);
         CertificateRepositoryObjectValidationContext d = new CertificateRepositoryObjectValidationContext(location, certificate) {};
         new EqualsTester(a, b, c, d);
     }

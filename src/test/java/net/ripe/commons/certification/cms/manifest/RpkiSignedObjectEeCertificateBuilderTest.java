@@ -33,25 +33,24 @@ import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.net.URI;
-
+import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
 import net.ripe.commons.certification.x509cert.RpkiSignedObjectEeCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
-import net.ripe.ipresource.InheritedIpResourceSet;
-
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
 public class RpkiSignedObjectEeCertificateBuilderTest {
-    
+
     public static final int KEY_SIZE = 2048;
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
-    
+
     private RpkiSignedObjectEeCertificateBuilder subject;
 
     @Before
@@ -63,7 +62,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
     public void shouldCreateEeCertificate() {
         // given
         X509ResourceCertificate resourceCertificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
-        
+
         URI crlUri = URI.create("rsync://somewhere/certificate.crl");
         subject.withCrlUri(crlUri);
 
@@ -72,23 +71,24 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
 
         subject.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         subject.withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic());
-        
-        
+
+
         DateTime now = new DateTime();
         ValidityPeriod vp = new ValidityPeriod(now, now.plusSeconds(5));
-        
+
         subject.withValidityPeriod(vp);
 
         URI publicationUri = URI.create("rsync://somewhere/certificate.cer");
         subject.withParentResourceCertificatePublicationUri(publicationUri);
         subject.withSerial(BigInteger.TEN);
-        
+
         subject.withSubjectDN(new X500Principal("CN=subject"));
         subject.withIssuerDN(resourceCertificate.getSubject());
-        
+
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-        
-        subject.withResources(InheritedIpResourceSet.getInstance());
+
+        subject.withResources(new IpResourceSet());
+        subject.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
 
         // when
         X509ResourceCertificate certificate = subject.build();
@@ -184,7 +184,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
 
         subject.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         subject.withIssuerDN(resourceCertificate.getSubject());
-        
+
         DateTime now = new DateTime();
         subject.withValidityPeriod(new ValidityPeriod(now, now.plusSeconds(5)));
 

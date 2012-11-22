@@ -33,12 +33,11 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.PublicKey;
-
+import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
-
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.ipresource.IpResourceSet;
-
+import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 
@@ -51,10 +50,12 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 public class X509ResourceCertificateBuilder {
 
     private X509CertificateBuilderHelper builderHelper;
-    private IpResourceSet resources;
-    
+    private IpResourceSet resources = new IpResourceSet();
+    private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
+
     public X509ResourceCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
+        builderHelper.withResources(resources);
         builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
     }
 
@@ -140,10 +141,16 @@ public class X509ResourceCertificateBuilder {
     }
 
     public X509ResourceCertificate build() {
-        Validate.notNull(resources, "no resources");
-        Validate.isTrue(!resources.isEmpty(), "empty resources");
+        if (inheritedResourceTypes.isEmpty()) {
+            Validate.notNull(resources, "no resources");
+            Validate.isTrue(!resources.isEmpty(), "empty resources");
+        }
         return new X509ResourceCertificate(builderHelper.generateCertificate());
     }
 
-
+    public X509ResourceCertificateBuilder withInheritedResourceTypes(EnumSet<IpResourceType> resourceTypes) {
+        this.inheritedResourceTypes = resourceTypes;
+        builderHelper.withInheritedResourceTypes(resourceTypes);
+        return this;
+    }
 }

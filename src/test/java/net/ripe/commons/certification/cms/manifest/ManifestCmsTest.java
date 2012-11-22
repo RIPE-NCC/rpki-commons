@@ -29,20 +29,34 @@
  */
 package net.ripe.commons.certification.cms.manifest;
 
+import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.*;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.KeyPair;
+import java.util.EnumSet;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.commons.certification.ValidityPeriod;
 import net.ripe.commons.certification.cms.manifest.ManifestCms.FileContentSpecification;
 import net.ripe.commons.certification.crl.CrlLocator;
 import net.ripe.commons.certification.crl.X509Crl;
 import net.ripe.commons.certification.crl.X509CrlBuilder;
 import net.ripe.commons.certification.util.KeyPairFactoryTest;
-import net.ripe.commons.certification.validation.*;
+import net.ripe.commons.certification.validation.ValidationCheck;
+import net.ripe.commons.certification.validation.ValidationLocation;
+import net.ripe.commons.certification.validation.ValidationOptions;
+import net.ripe.commons.certification.validation.ValidationResult;
+import net.ripe.commons.certification.validation.ValidationStatus;
+import net.ripe.commons.certification.validation.ValidationString;
 import net.ripe.commons.certification.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.commons.certification.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificate;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.commons.certification.x509cert.X509ResourceCertificateTest;
-import net.ripe.ipresource.InheritedIpResourceSet;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.easymock.IAnswer;
 import org.joda.time.DateTime;
@@ -51,15 +65,6 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.KeyPair;
-
-import static net.ripe.commons.certification.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
 
 
 public class ManifestCmsTest{
@@ -327,7 +332,7 @@ public class ManifestCmsTest{
 
         builder.withPublicKey(MANIFEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
-        builder.withResources(InheritedIpResourceSet.getInstance());
+        builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(validityPeriod);
         builder.withCrlDistributionPoints(ROOT_MANIFEST_CRL_LOCATION);
         return builder;
