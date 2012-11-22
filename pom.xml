@@ -1,19 +1,40 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.ripe.rpki-commons</groupId>
+    <groupId>net.ripe.rpki</groupId>
     <artifactId>rpki-commons</artifactId>
     <version>1.0.21-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <name>RPKI Commmons</name>
     <description>Resource Public Key Infrastructure - RPKI objects, HSM integration</description>
+    <url>https://github.com/RIPE-NCC/rpki-commons</url>
     <organization>
         <name>RIPE NCC, the Netherlands</name>
         <url>http://www.ripe.net/</url>
     </organization>
+    <developers>
+        <developer>
+            <name>RIPE NCC - Business Applications Department</name>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>The BSD License</name>
+            <url>https://raw.github.com/RIPE-NCC/rpki-commons/master/LICENSE.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git.db.ripe.net/ba/certification/rpki-commons</connection>
+        <url>https://github.com/RIPE-NCC/rpki-commons.git</url>
+        <connection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</connection>
+        <developerConnection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</developerConnection>
     </scm>
 
     <properties>
