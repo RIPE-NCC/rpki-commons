@@ -16,26 +16,8 @@
         <connection>scm:git:ssh://git.db.ripe.net/ba/certification/rpki-commons</connection>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>ripe-releases</id>
-            <name>BA repository (nexus)</name>
-            <url>http://${dist.repo.url}/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>bad-public-snapshots</id>
-            <name>BA snapshots repository (nexus)</name>
-            <url>http://${dist.repo.snapshot.url}/nexus/content/repositories/snapshots</url>
-            <!-- prevents timed snapshot to be created. -->
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
-        <net.ripe.commons.internet-resources.version>1.43</net.ripe.commons.internet-resources.version>
-
-        <dist.repo.url>nexus.ripe.net</dist.repo.url>
-        <dist.repo.snapshot.url>nexus.ripe.net</dist.repo.snapshot.url>
+        <net.ripe.ipresource.version>1.44</net.ripe.ipresource.version>
 
         <easymock.version>3.0</easymock.version>
 
@@ -70,9 +52,9 @@
         </dependency>
 
         <dependency>
-            <groupId>net.ripe.commons</groupId>
-            <artifactId>commons-internet-resources</artifactId>
-            <version>${net.ripe.commons.internet-resources.version}</version>
+            <groupId>net.ripe.ipresource</groupId>
+            <artifactId>ipresource</artifactId>
+            <version>${net.ripe.ipresource.version}</version>
         </dependency>
 
         <dependency>
