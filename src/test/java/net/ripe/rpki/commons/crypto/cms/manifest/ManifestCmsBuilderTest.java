@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import static net.ripe.rpki.commons.Asn1UtilTest.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1UtilTest.*;
 import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;

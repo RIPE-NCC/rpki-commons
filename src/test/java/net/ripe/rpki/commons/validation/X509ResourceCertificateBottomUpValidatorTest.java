@@ -41,7 +41,7 @@ import net.ripe.rpki.commons.crypto.CertificateRepositoryObjectFile;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
-import net.ripe.rpki.commons.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceCertificateLocator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;

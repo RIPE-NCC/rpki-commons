@@ -43,7 +43,7 @@ import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms.FileContentSpecific
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
-import net.ripe.rpki.commons.util.KeyPairFactoryTest;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;

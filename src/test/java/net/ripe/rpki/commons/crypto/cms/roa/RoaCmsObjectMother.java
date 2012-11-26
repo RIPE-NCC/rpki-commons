@@ -39,7 +39,7 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.KeyPairFactoryTest;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.Asn;

@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509Extension;
-import net.ripe.rpki.commons.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;

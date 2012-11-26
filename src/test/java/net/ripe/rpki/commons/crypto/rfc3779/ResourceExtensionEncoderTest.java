@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import net.ripe.rpki.commons.Asn1UtilTest;
+import net.ripe.rpki.commons.crypto.util.Asn1UtilTest;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;

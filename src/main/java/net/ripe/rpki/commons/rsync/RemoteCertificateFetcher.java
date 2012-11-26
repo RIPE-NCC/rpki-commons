@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.UUID;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.util.CertificateRepositoryObjectFactory;
+import net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import org.apache.commons.io.FileUtils;

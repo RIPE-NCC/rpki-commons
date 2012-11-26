@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import static net.ripe.rpki.commons.util.Asn1Util.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.KeyPairFactoryTest;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.ipresource.IpResourceSet;

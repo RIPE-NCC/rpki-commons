@@ -37,7 +37,7 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;

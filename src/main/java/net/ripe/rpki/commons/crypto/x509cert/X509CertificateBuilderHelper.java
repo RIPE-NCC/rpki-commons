@@ -41,7 +41,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
-import net.ripe.rpki.commons.util.BouncyCastleUtil;
+import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.ipresource.IpResourceSet;

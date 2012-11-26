@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static net.ripe.rpki.commons.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.junit.Assert.*;
 
@@ -38,7 +38,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import javax.security.auth.x500.X500Principal;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.KeyPairFactoryTest;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationStatus;

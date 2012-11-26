@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static net.ripe.rpki.commons.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 
 import java.math.BigInteger;
 

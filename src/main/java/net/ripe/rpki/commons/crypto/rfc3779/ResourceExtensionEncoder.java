@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import net.ripe.rpki.commons.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpAddress;
 import net.ripe.ipresource.IpRange;

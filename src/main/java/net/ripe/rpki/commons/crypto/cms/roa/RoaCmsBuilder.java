@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import net.ripe.rpki.commons.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.validation.ValidationLocation;

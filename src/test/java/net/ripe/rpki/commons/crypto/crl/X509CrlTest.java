@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
-import net.ripe.rpki.commons.util.KeyPairUtil;
+import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -43,8 +43,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 
-import static net.ripe.rpki.commons.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
-import static net.ripe.rpki.commons.util.KeyPairFactoryTest.TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest.createSelfSignedCaResourceCertificate;
 import static org.easymock.EasyMock.*;

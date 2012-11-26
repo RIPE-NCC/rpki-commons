@@ -31,7 +31,7 @@ package net.ripe.rpki.commons.crypto.rfc3779;
 
 import static net.ripe.rpki.commons.crypto.rfc3779.AddressFamily.*;
 import static org.junit.Assert.*;
-import net.ripe.rpki.commons.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.ipresource.IpResourceType;
 
 import org.junit.Test;

@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
-import net.ripe.rpki.commons.util.BouncyCastleUtil;
+import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;

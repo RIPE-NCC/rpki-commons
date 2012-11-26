@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import net.ripe.rpki.commons.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
@@ -48,8 +48,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static net.ripe.rpki.commons.util.Asn1Util.expect;
-import static net.ripe.rpki.commons.util.Asn1Util.parseIpAddressAsPrefix;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.parseIpAddressAsPrefix;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class RoaCmsParser extends RpkiSignedObjectParser {

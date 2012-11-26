@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import static net.ripe.rpki.commons.util.Asn1Util.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 import java.math.BigInteger;

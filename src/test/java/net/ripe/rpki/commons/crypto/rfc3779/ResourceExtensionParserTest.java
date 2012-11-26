@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-import net.ripe.rpki.commons.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;

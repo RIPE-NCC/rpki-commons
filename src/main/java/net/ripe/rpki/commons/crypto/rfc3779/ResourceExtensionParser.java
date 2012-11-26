@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import static net.ripe.rpki.commons.util.Asn1Util.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
