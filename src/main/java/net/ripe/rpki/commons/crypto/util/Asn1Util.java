@@ -29,19 +29,30 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import net.ripe.ipresource.*;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
+
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpAddress;
+import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.IpResourceType;
+import net.ripe.ipresource.UniqueIpResource;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DEROutputStream;
 
 public final class Asn1Util {
 
     private Asn1Util() {
-        //Utility classes should not have a public or default constructor.
+        // Utility classes should not have a public or default constructor.
     }
 
     public static byte[] encode(ASN1Encodable value) {
@@ -57,15 +68,26 @@ public final class Asn1Util {
     }
 
     public static DERBitString resourceToBitString(UniqueIpResource resource, int bitCount) {
-        byte[] data = resource.getValue().toByteArray();
-        int startByte = 0;
-        if (data.length > resource.getType().getBitSize() / Byte.SIZE) {
-            // Ignore sign byte.
-            startByte = 1;
+        int resourceTypeByteSize = resource.getType().getBitSize() / Byte.SIZE;
+
+        byte[] value = resource.getValue().toByteArray();
+        byte[] padded;
+        if (value.length > resourceTypeByteSize) {
+            // Skip extra sign byte added by BigInteger.
+            padded = Arrays.copyOfRange(value, 1, value.length);
+        } else if (value.length < resourceTypeByteSize) {
+            // Pad with leading zero bytes (e.g. 0.12.0.0)
+            padded = new byte[resourceTypeByteSize];
+            System.arraycopy(value, 0, padded, resourceTypeByteSize - value.length, value.length);
+        } else {
+            padded = value;
         }
+
+        assert padded.length == resourceTypeByteSize: "incorrect padded length";
+
         int byteCount = (bitCount + Byte.SIZE - 1) / Byte.SIZE;
         int unusedBits = Byte.SIZE - 1 - ((bitCount + Byte.SIZE - 1) % Byte.SIZE);
-        return new DERBitString(ArrayUtils.subarray(data, startByte, startByte + byteCount), unusedBits);
+        return new DERBitString(ArrayUtils.subarray(padded, 0, byteCount), unusedBits);
     }
 
     /**
@@ -90,7 +112,8 @@ public final class Asn1Util {
      */
     public static <T extends ASN1Encodable> T expect(ASN1Encodable value, Class<? extends T> expectedClass) {
         Validate.notNull(value, expectedClass.getSimpleName() + " expected, got null");
-        Validate.isTrue(expectedClass.isInstance(value), expectedClass.getSimpleName() + " expected, got " + value.getClass().getSimpleName() + " with value: " + value);
+        Validate.isTrue(expectedClass.isInstance(value), expectedClass.getSimpleName() + " expected, got " + value.getClass().getSimpleName()
+                + " with value: " + value);
         return expectedClass.cast(value);
     }
 
