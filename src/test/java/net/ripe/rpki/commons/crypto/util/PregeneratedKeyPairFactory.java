@@ -41,10 +41,10 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import javax.security.auth.x500.X500Principal;
+import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 
@@ -86,6 +86,11 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     public static PregeneratedKeyPairFactory getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public KeyPairFactory withProvider(String provider) {
+        return this;
     }
 
     @Override

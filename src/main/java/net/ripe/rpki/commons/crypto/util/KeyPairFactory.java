@@ -104,4 +104,8 @@ public class KeyPairFactory {
             throw new KeyPairFactoryException(e);
         }
     }
+
+    public KeyPairFactory withProvider(String provider) {
+        return new KeyPairFactory(provider);
+    }
 }
