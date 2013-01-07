@@ -44,6 +44,7 @@ import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.VersionedId;
 import net.ripe.rpki.commons.validation.roa.AnnouncedRoute;
@@ -103,6 +104,7 @@ public class XStreamXmlSerializerBuilder<T> {
         withAliasType("RouteValidityState", RouteValidityState.class);
         withAliasType("RoaPrefix", RoaPrefix.class);
         withAliasType("AnnouncedRoute", AnnouncedRoute.class);
+        withAliasType("X509CertificateInformationAccessDescriptor", X509CertificateInformationAccessDescriptor.class);
 
         withAliasType("principal", X500Principal.class);
         withConverter(new X500PrincipalConverter());
