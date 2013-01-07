@@ -29,6 +29,11 @@
  */
 package net.ripe.rpki.commons.xml;
 
+import static org.junit.Assert.*;
+
+import java.sql.Timestamp;
+import java.util.regex.Pattern;
+import javax.security.auth.x500.X500Principal;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -39,19 +44,11 @@ import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
 import net.ripe.rpki.commons.util.VersionedId;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializerBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;
-
-import javax.security.auth.x500.X500Principal;
-import java.sql.Timestamp;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class XStreamXmlSerializerBuilderTest {
@@ -72,7 +69,7 @@ public class XStreamXmlSerializerBuilderTest {
         XStreamXmlSerializer<ValidityPeriod> serializer = builder.build();
 
         String serializedData = serializer.serialize(new ValidityPeriod());
-        Assert.assertEquals("<commons.ValidityPeriod/>", serializedData);
+        Assert.assertEquals("<ValidityPeriod/>", serializedData);
     }
 
     @Test
@@ -160,7 +157,7 @@ public class XStreamXmlSerializerBuilderTest {
         X509ResourceCertificate resourceCertificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
 
         String serializedData = serializer.serialize(resourceCertificate);
-        Assert.assertTrue(Pattern.matches("<commons\\.x509cert\\.X509ResourceCertificate>\\s*<encoded>[^<]+</encoded>\\s*</commons\\.x509cert\\.X509ResourceCertificate>", serializedData));
+        Assert.assertTrue(Pattern.matches("<X509ResourceCertificate>\\s*<encoded>[^<]+</encoded>\\s*</X509ResourceCertificate>", serializedData));
         assertEquals(resourceCertificate, serializer.deserialize(serializedData));
     }
 
@@ -171,7 +168,7 @@ public class XStreamXmlSerializerBuilderTest {
         ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
 
         String serializedData = serializer.serialize(manifestCms);
-        Assert.assertTrue(Pattern.matches("<commons\\.cms\\.manifest\\.ManifestCms>\\s*<encoded>[^<]+</encoded>\\s*</commons\\.cms\\.manifest\\.ManifestCms>", serializedData));
+        Assert.assertTrue(Pattern.matches("<ManifestCms>\\s*<encoded>[^<]+</encoded>\\s*</ManifestCms>", serializedData));
         assertEquals(manifestCms, serializer.deserialize(serializedData));
     }
 
@@ -182,7 +179,7 @@ public class XStreamXmlSerializerBuilderTest {
         RoaCms roaCms = RoaCmsTest.getRoaCms();
 
         String serializedData = serializer.serialize(roaCms);
-        Assert.assertTrue(Pattern.matches("<commons\\.cms\\.roa\\.RoaCms>\\s*<encoded>[^<]+</encoded>\\s*</commons\\.cms\\.roa\\.RoaCms>", serializedData));
+        Assert.assertTrue(Pattern.matches("<RoaCms>\\s*<encoded>[^<]+</encoded>\\s*</RoaCms>", serializedData));
         assertEquals(roaCms, serializer.deserialize(serializedData));
     }
 
