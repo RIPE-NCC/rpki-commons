@@ -36,12 +36,15 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
@@ -52,8 +55,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.easymock.IAnswer;
 import org.joda.time.DateTime;
@@ -112,6 +113,11 @@ public class X509ResourceCertificateTest {
     public static X509ResourceCertificate createSelfSignedCaResourceCertificate(IpResourceSet ipResourceSet) {
             X509ResourceCertificateBuilder builder = createSelfSignedCaResourceCertificateBuilder().withResources(ipResourceSet);
             return builder.build();
+    }
+
+    public static X509ResourceCertificate createSelfSignedCaResourceCertificate(KeyPair keyPair) {
+        X509ResourceCertificateBuilder builder = createSelfSignedCaResourceCertificateBuilder().withResources(TEST_RESOURCE_SET).withSigningKeyPair(keyPair).withPublicKey(keyPair.getPublic());
+        return builder.build();
     }
 
     public static X509ResourceCertificateBuilder createSelfSignedCaResourceCertificateBuilder() {
