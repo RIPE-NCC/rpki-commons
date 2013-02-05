@@ -53,7 +53,7 @@ import org.joda.time.DateTime;
  */
 public final class PregeneratedKeyPairFactory extends KeyPairFactory {
 
-    private static final PregeneratedKeyPairFactory INSTANCE = new PregeneratedKeyPairFactory();
+    private static final PregeneratedKeyPairFactory INSTANCE = new PregeneratedKeyPairFactory("SunRsaSign");
 
     private static final char[] PASSPHRASE = "passphrase".toCharArray();
 
@@ -62,8 +62,8 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     private int count = 0;
 
-    private PregeneratedKeyPairFactory() {
-        super("SunRsaSign");
+    private PregeneratedKeyPairFactory(String provider) {
+        super(provider);
         initKeyStore();
     }
 
