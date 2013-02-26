@@ -55,6 +55,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -112,6 +113,22 @@ public class ManifestCms extends RpkiSignedObject {
 
     public Map<String, byte[]> getFiles() {
         return files;
+    }
+
+    public boolean matchesFiles(Map<String, byte[]> filesToMatch) {
+
+        if (files.keySet().equals(filesToMatch.keySet())) {
+            for (Entry<String, byte[]> entry: files.entrySet()) {
+                String fileName = entry.getKey();
+                byte[] contentToMatch = filesToMatch.get(fileName);
+                if (! verifyFileContents(fileName, contentToMatch)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Set<String> getFileNames() {

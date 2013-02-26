@@ -152,6 +152,12 @@ public class X509CrlBuilder {
         return generator;
     }
 
+    /*
+     * This method is used to determine if all the certs that need to be revoked are indeed revoked.
+     * NOTE: The CRL may contain additional entries, in particular when a revoked certificate becomes expired.
+     * However we DO NOT want to trigger re-issuance of the CRL in this case as this will generate a lot of
+     * unnecessary churn.
+     */
     public boolean isSatisfiedByEntries(X509Crl crl) {
         SortedSet<Entry> crlEntries = crl.getRevokedCertificates();
         return crlEntries.containsAll(entries.values());

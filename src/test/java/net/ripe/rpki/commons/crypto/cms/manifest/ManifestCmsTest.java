@@ -36,7 +36,12 @@ import static org.junit.Assert.*;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.security.auth.x500.X500Principal;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms.FileContentSpecification;
@@ -82,11 +87,18 @@ public class ManifestCmsTest{
     private static final X500Principal MANIFEST_DN = new X500Principal("CN=manifest");
 
     // Manifest data
-    private static byte[] FOO_CONTENTS = { 'a', 'b', 'c' };
-    private static byte[] BAR_CONTENTS = { 'd', 'e', 'f' };
+    private static byte[] FILE1_CONTENTS = { 'a', 'b', 'c' };
+    private static byte[] FILE2_CONTENTS = { 'd', 'e', 'f' };
 
     private static final DateTime THIS_UPDATE_TIME = new DateTime(2008, 9, 1, 22, 43, 29, 0, DateTimeZone.UTC);
     private static final DateTime NEXT_UPDATE_TIME = new DateTime(2008, 9, 2, 6, 43, 29, 0, DateTimeZone.UTC);
+
+    // Test Manifest entries
+    private static Map<String, byte[]> files = new HashMap<String, byte[]>();
+    static {
+        files.put("filename1", FILE1_CONTENTS);
+        files.put("filename2", FILE2_CONTENTS);
+    }
 
     private CrlLocator crlLocator;
     private ManifestCms subject;
@@ -96,8 +108,9 @@ public class ManifestCmsTest{
 
     public static ManifestCms getRootManifestCms() {
         ManifestCmsBuilder builder = getRootManifestBuilder();
-        builder.addFile("foo1", FOO_CONTENTS);
-        builder.addFile("BaR", BAR_CONTENTS);
+        for (Entry<String, byte[]> entry: files.entrySet()) {
+            builder.addFile(entry.getKey(), entry.getValue());
+        }
         return builder.build(MANIFEST_KEY_PAIR.getPrivate());
     }
 
@@ -122,12 +135,12 @@ public class ManifestCmsTest{
 
     @Test
     public void shouldVerifyFileContents() {
-        assertTrue(subject.verifyFileContents("foo1", FOO_CONTENTS));
-        assertFalse(subject.verifyFileContents("BaR", FOO_CONTENTS));
+        assertTrue(subject.verifyFileContents("filename1", FILE1_CONTENTS));
+        assertFalse(subject.verifyFileContents("filename2", FILE1_CONTENTS));
 
-        FileContentSpecification spec = subject.getFileContentSpecification("BaR");
-        assertTrue(spec.isSatisfiedBy(BAR_CONTENTS));
-        assertFalse(spec.isSatisfiedBy(FOO_CONTENTS));
+        FileContentSpecification spec = subject.getFileContentSpecification("filename2");
+        assertTrue(spec.isSatisfiedBy(FILE2_CONTENTS));
+        assertFalse(spec.isSatisfiedBy(FILE1_CONTENTS));
     }
 
     @Test
@@ -271,6 +284,36 @@ public class ManifestCmsTest{
             );
 
     }
+
+    @Test
+    public void shouldMatchFiles() {
+        ManifestCms mft = getRootManifestCms();
+        assertTrue(mft.matchesFiles(files));
+    }
+
+    @Test
+    public void shouldNotMatchIfFilesMissing() {
+        ManifestCms mft = getRootManifestCms();
+        Map<String, byte[]> emptyFiles = Collections.emptyMap();
+        assertFalse(mft.matchesFiles(emptyFiles));
+    }
+
+    @Test
+    public void shouldNotMatchIfAdditionalFilesPresent() {
+        ManifestCms mft = getRootManifestCms();
+        Map<String, byte[]> wrongFiles = new HashMap<String, byte[]>(files);
+        wrongFiles.put("newfile", FILE1_CONTENTS);
+        assertFalse(mft.matchesFiles(wrongFiles));
+    }
+
+    @Test
+    public void shouldNotMatchIfFileContentChanged() {
+        ManifestCms mft = getRootManifestCms();
+        Map<String, byte[]> wrongFiles = new HashMap<String, byte[]>(files);
+        wrongFiles.put("filename2", FILE1_CONTENTS);
+        assertFalse(mft.matchesFiles(wrongFiles));
+    }
+
 
     private X509Crl getRootCrl() {
         return getRootCrlBuilder().build(ROOT_KEY_PAIR.getPrivate());
