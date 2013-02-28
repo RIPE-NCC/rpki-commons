@@ -57,14 +57,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class BouncyCastleUtil {
-    private static final JcaX509ExtensionUtils JCA_X509_EXTENSION_UTILS;
-    static {
-        try {
-            JCA_X509_EXTENSION_UTILS = new JcaX509ExtensionUtils();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
 
@@ -95,12 +87,26 @@ public class BouncyCastleUtil {
         }
     }
 
+    /**
+     * NOTE: JcaX509ExtensionUtils is not tread safe.
+     * We always need to get a new instance of it.
+     *
+     * @return a new instance of JcaX509ExtensionUtils
+     */
+    private static JcaX509ExtensionUtils newJcaX509ExtensionUtils() {
+        try {
+            return new JcaX509ExtensionUtils();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static AuthorityKeyIdentifier createAuthorityKeyIdentifier(PublicKey publicKey) {
-        return JCA_X509_EXTENSION_UTILS.createAuthorityKeyIdentifier(publicKey);
+        return newJcaX509ExtensionUtils().createAuthorityKeyIdentifier(publicKey);
     }
 
     public static SubjectKeyIdentifier createSubjectKeyIdentifier(PublicKey publicKey) {
-        return JCA_X509_EXTENSION_UTILS.createSubjectKeyIdentifier(publicKey);
+        return newJcaX509ExtensionUtils().createSubjectKeyIdentifier(publicKey);
     }
 
     public static X500Name principalToName(X500Principal dn) {
