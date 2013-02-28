@@ -29,24 +29,29 @@
  */
 package net.ripe.rpki.commons.validation;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.joda.time.DateTimeUtils;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.Map.Entry;
-
 public class ValidationResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new HashMap<ValidationLocation, Map<ValidationStatus,List<ValidationCheck>>>();
+    private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new LinkedHashMap<ValidationLocation, Map<ValidationStatus,List<ValidationCheck>>>();
 
     private ValidationLocation currentLocation = new ValidationLocation("<unknown>");
 
-    private Map<ValidationLocation, List<ValidationMetric>> metrics = new HashMap<ValidationLocation, List<ValidationMetric>>();
+    private Map<ValidationLocation, List<ValidationMetric>> metrics = new LinkedHashMap<ValidationLocation, List<ValidationMetric>>();
 
     // Mutators
 
@@ -54,7 +59,7 @@ public class ValidationResult implements Serializable {
         currentLocation = location;
 
         if (!results.containsKey(currentLocation)) {
-            Map<ValidationStatus, List<ValidationCheck>> locationResults = new HashMap<ValidationStatus, List<ValidationCheck>>();
+            Map<ValidationStatus, List<ValidationCheck>> locationResults = new LinkedHashMap<ValidationStatus, List<ValidationCheck>>();
             locationResults.put(ValidationStatus.ERROR, new ArrayList<ValidationCheck>());
             locationResults.put(ValidationStatus.WARNING, new ArrayList<ValidationCheck>());
             locationResults.put(ValidationStatus.PASSED, new ArrayList<ValidationCheck>());
@@ -224,7 +229,7 @@ public class ValidationResult implements Serializable {
         for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> resultsByLocation: that.results.entrySet()) {
             Map<ValidationStatus, List<ValidationCheck>> map = results.get(resultsByLocation.getKey());
             if (map == null) {
-                map = new HashMap<ValidationStatus, List<ValidationCheck>>();
+                map = new LinkedHashMap<ValidationStatus, List<ValidationCheck>>();
                 this.results.put(resultsByLocation.getKey(), map);
             }
             for (Entry<ValidationStatus, List<ValidationCheck>> checks: resultsByLocation.getValue().entrySet()) {
