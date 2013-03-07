@@ -137,6 +137,7 @@ public final class ValidationString {
 
     //roacms
     public static final String ROA_CONTENT_TYPE = "roa.content.type";
+    public static final String ROA_CONTENT_STRUCTURE = "roa.content.structure";
     public static final String ROA_RESOURCES = "roa.resources";
     public static final String ASN_AND_PREFIXES_IN_DER_SEQ = "roa.seq.has.asn.and.prefixes";
     public static final String ROA_ATTESTATION_VERSION = "roa.attestation.version";

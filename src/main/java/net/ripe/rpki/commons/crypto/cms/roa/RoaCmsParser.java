@@ -126,19 +126,23 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
     }
 
     void parseRouteOriginAttestation(ASN1Encodable der) {
+        ValidationResult validationResult = getValidationResult();
+        try {
+            ASN1Sequence seq = expect(der, ASN1Sequence.class);
 
-        ASN1Sequence seq = expect(der, ASN1Sequence.class);
+            if (!validationResult.rejectIfTrue(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0).toString())) {
+                // eContent seems to contain non-standard version (default 0 is omitted in structure)
+                return;
+            }
 
-        if (!getValidationResult().rejectIfTrue(seq.size() == 3, ROA_ATTESTATION_VERSION, seq.getObjectAt(0).toString())) {
-            // eContent seems to contain non-standard version (default 0 is omitted in structure)
-            return;
+            if (!validationResult.rejectIfFalse(seq.size() == 2, ASN_AND_PREFIXES_IN_DER_SEQ)) {
+                return;
+            }
+            asn = Asn1Util.parseAsId(seq.getObjectAt(0));
+            prefixes = parseRoaIpAddressFamilySequence(seq.getObjectAt(1));
+        } catch (IllegalArgumentException ex) {
+            validationResult.error(ROA_CONTENT_STRUCTURE);
         }
-
-        if (!getValidationResult().rejectIfFalse(seq.size() == 2, ASN_AND_PREFIXES_IN_DER_SEQ)) {
-            return;
-        }
-        asn = Asn1Util.parseAsId(seq.getObjectAt(0));
-        prefixes = parseRoaIpAddressFamilySequence(seq.getObjectAt(1));
     }
 
     void parseRoaIpAddressFamily(List<RoaPrefix> roaPrefixList, ASN1Encodable der) {
