@@ -47,71 +47,71 @@ import org.junit.Test;
 
 public class ProvisioningCmsObjectValidatorTest {
 
-    private ProvisioningCmsObjectValidator subject;
-    
-    private ValidationOptions options = new ValidationOptions();
+	private ProvisioningCmsObjectValidator subject;
+
+	private ValidationOptions options = new ValidationOptions();
 
 
-    @Before
-    public void setUp() throws Exception {
-        subject = new ProvisioningCmsObjectValidator(options, ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject(), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
-    }
+	@Before
+	public void setUp() throws Exception {
+		subject = new ProvisioningCmsObjectValidator(options, ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject(), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+	}
 
 
-    @Test
-    public void shouldValidateValidObject() {
-        ValidationResult validationResult = new ValidationResult();
-        subject.validate(validationResult);
+	@Test
+	public void shouldValidateValidObject() {
+		ValidationResult validationResult = ValidationResult.withLocation("n/a");
+		subject.validate(validationResult);
 
-        assertFalse(validationResult.hasFailures());
-    }
+		assertFalse(validationResult.hasFailures());
+	}
 
-    @Test
-    public void shouldHaveValidatedLocationsForAllObjects() {
-        ValidationResult validationResult = new ValidationResult();
-        subject.validate(validationResult);
+	@Test
+	public void shouldHaveValidatedLocationsForAllObjects() {
+		ValidationResult validationResult = ValidationResult.withLocation("n/a");
+		subject.validate(validationResult);
 
-        Set<ValidationLocation> validatedLocations = validationResult.getValidatedLocations();
+		Set<ValidationLocation> validatedLocations = validationResult.getValidatedLocations();
 
-        assertTrue(validatedLocations.contains(new ValidationLocation("<cms>")));
-        assertTrue(validatedLocations.contains(new ValidationLocation("<crl>")));
-        assertTrue(validatedLocations.contains(new ValidationLocation("<cms-cert>")));
-        assertTrue(validatedLocations.contains(new ValidationLocation("<identity-cert>")));
-    }
+		assertTrue(validatedLocations.contains(new ValidationLocation("<cms>")));
+		assertTrue(validatedLocations.contains(new ValidationLocation("<crl>")));
+		assertTrue(validatedLocations.contains(new ValidationLocation("<cms-cert>")));
+		assertTrue(validatedLocations.contains(new ValidationLocation("<identity-cert>")));
+	}
 
-    @Test
-    public void shouldStopIfCmsObjectIsBadlyFormatted() {
-        ValidationResult validationResult = new ValidationResult();
-        subject = new ProvisioningCmsObjectValidator(options, new ProvisioningCmsObject(new byte[] {0}, null, null, null, null), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
-        subject.validate(validationResult);
+	@Test
+	public void shouldStopIfCmsObjectIsBadlyFormatted() {
+		ValidationResult validationResult = ValidationResult.withLocation("n/a");
+		subject = new ProvisioningCmsObjectValidator(options, new ProvisioningCmsObject(new byte[]{0}, null, null, null, null), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+		subject.validate(validationResult);
 
-        assertTrue(validationResult.hasFailures());
-    }
+		assertTrue(validationResult.hasFailures());
+	}
 
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldFailIfCmsObjectDoesNotContainAnyCACertificate() {
-        ValidationResult validationResult = new ValidationResult();
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldFailIfCmsObjectDoesNotContainAnyCACertificate() {
+		ValidationResult validationResult = ValidationResult.withLocation("n/a");
 
-        ProvisioningCmsObjectBuilder builder =  new ProvisioningCmsObjectBuilder()
-                                                        .withCmsCertificate(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT.getCertificate())
-                                                        .withCrl(CRL);
+		ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder()
+				.withCmsCertificate(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT.getCertificate())
+				.withCrl(CRL);
 
-        subject = new ProvisioningCmsObjectValidator(options, builder.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate()), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
-        subject.validate(validationResult);
+		subject = new ProvisioningCmsObjectValidator(options, builder.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate()), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+		subject.validate(validationResult);
 
-        assertTrue(validationResult.hasFailures());
-    }
+		assertTrue(validationResult.hasFailures());
+	}
 
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldFaiIfCmsObjectContainsMultipleCACertificate() {
-        ValidationResult validationResult = new ValidationResult();
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldFaiIfCmsObjectContainsMultipleCACertificate() {
+		ValidationResult validationResult = ValidationResult.withLocation("n/a");
 
-        ProvisioningCmsObjectBuilder builder =  new ProvisioningCmsObjectBuilder()
-                                                        .withCmsCertificate(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT.getCertificate())
-                                                        .withCrl(CRL);
+		ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder()
+				.withCmsCertificate(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT.getCertificate())
+				.withCrl(CRL);
 
-        subject = new ProvisioningCmsObjectValidator(options, builder.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate()), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
-        subject.validate(validationResult);
-    }
+		subject = new ProvisioningCmsObjectValidator(options, builder.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate()), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+		subject.validate(validationResult);
+	}
 
 }

@@ -30,96 +30,98 @@
 package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
+import net.ripe.rpki.commons.util.RepositoryObjectType;
+import net.ripe.rpki.commons.validation.ValidationResult;
 
 public final class CertificateRepositoryObjectFactory {
 
-    private CertificateRepositoryObjectFactory() {
-        //Utility classes should not have a public or default constructor.
-    }
+	public static final String CERTIFICATE_REPOSITORY_UNKNOWN_OBJECT_TYPE_MESSAGE_KEY = "certificateRepository.unknownObjectType";
 
-    /**
-     * @param encoded the DER encoded object.
-     * @throws CertificateRepositoryObjectParserException when encoded object can't be parsed
-     */
-    public static CertificateRepositoryObject createCertificateRepositoryObject(byte[] encoded, ValidationResult validationResult) {
-        CertificateRepositoryObject result;
+	private CertificateRepositoryObjectFactory() {
+	}
 
-        // Try to parse as resource certificate
-        result = tryParseAsX509ResourceCertificate(encoded, validationResult);
-        if (result != null) {
-            return result;
-        }
+	/**
+	 * @param encoded the DER encoded object.
+	 * @throws CertificateRepositoryObjectParserException
+	 *          when encoded object has a valid location, but its contents can not be parsed
+	 */
+	public static CertificateRepositoryObject createCertificateRepositoryObject(byte[] encoded, ValidationResult validationResult) {
 
-        // Try to parse as manifest
-        result = tryParseAsManifest(encoded, validationResult);
-        if (result != null) {
-            return result;
-        }
+		// find the file-extension of the current location and see if it is known to us
+		String name = validationResult.getCurrentLocation().getName();
 
-        result = tryParseAsCrl(encoded);
-        if (result != null) {
-            return result;
-        }
+		RepositoryObjectType objectType = RepositoryObjectType.parse(name);
+		if (objectType == null) {
+			validationResult.warn(CERTIFICATE_REPOSITORY_UNKNOWN_OBJECT_TYPE_MESSAGE_KEY, name);
+			return new UnknownCertificateRepositoryObject(encoded);
+		}
 
-        // Try to parse as ROA
-        result = tryParseAsROA(encoded, validationResult);
-        if (result != null) {
-            return result;
-        }
+		CertificateRepositoryObject result = null;
+		switch (objectType) {
+			case Manifest:
+				result = tryParseAsManifest(encoded, validationResult);
+				break;
+			case Roa:
+				result = tryParseAsROA(encoded, validationResult);
+				break;
+			case Certificate:
+				result = tryParseAsX509ResourceCertificate(encoded, validationResult);
+				break;
+			case Crl:
+				result = tryParseAsCrl(encoded);
+				break;
+		}
 
-        throw new CertificateRepositoryObjectParserException("Could not parse encoded object");
-    }
+		if (result == null) {
+			throw new CertificateRepositoryObjectParserException("Could not parse encoded object");
+		}
+		return result;
+	}
 
 
-    private static CertificateRepositoryObject tryParseAsCrl(byte[] encoded) {
-        try {
-            return X509Crl.parseDerEncoded(encoded);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+	private static CertificateRepositoryObject tryParseAsCrl(byte[] encoded) {
+		try {
+			return X509Crl.parseDerEncoded(encoded);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
 
-    private static X509ResourceCertificate tryParseAsX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
-        ValidationResult temp = new ValidationResult();
-        X509ResourceCertificateParser parser = new X509ResourceCertificateParser(temp);
-        parser.parse(validationResult.getCurrentLocation(), encoded);
-        if (parser.isSuccess()) {
-            validationResult.addAll(temp);
-            return parser.getCertificate();
-        } else {
-            return null;
-        }
-    }
+	private static X509ResourceCertificate tryParseAsX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
+		X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+		parser.parse(validationResult, encoded);
+		if (parser.isSuccess()) {
+			return parser.getCertificate();
+		} else {
+			return null;
+		}
+	}
 
-    private static RoaCms tryParseAsROA(byte[] encoded, ValidationResult validationResult) {
-        ValidationResult temp = new ValidationResult();
-        RoaCmsParser parser = new RoaCmsParser(temp);
-        parser.parse(validationResult.getCurrentLocation(), encoded);
-        if (parser.isSuccess()) {
-            validationResult.addAll(temp);
-            return parser.getRoaCms();
-        } else {
-            return null;
-        }
-    }
+	private static RoaCms tryParseAsROA(byte[] encoded, ValidationResult validationResult) {
+		RoaCmsParser parser = new RoaCmsParser();
+		parser.parse(validationResult, encoded);
+		if (parser.isSuccess()) {
+			return parser.getRoaCms();
+		} else {
+			return null;
+		}
+	}
 
-    private static ManifestCms tryParseAsManifest(byte[] encoded, ValidationResult validationResult) {
-        ValidationResult temp = new ValidationResult();
-        ManifestCmsParser parser = new ManifestCmsParser(temp);
-        parser.parse(validationResult.getCurrentLocation(), encoded);
-        if (parser.isSuccess()) {
-            validationResult.addAll(temp);
-            return parser.getManifestCms();
-        } else {
-            return null;
-        }
-    }
+	private static ManifestCms tryParseAsManifest(byte[] encoded, ValidationResult validationResult) {
+		ManifestCmsParser parser = new ManifestCmsParser();
+		parser.parse(validationResult, encoded);
+		if (parser.isSuccess()) {
+			return parser.getManifestCms();
+		} else {
+			return null;
+		}
+	}
 }

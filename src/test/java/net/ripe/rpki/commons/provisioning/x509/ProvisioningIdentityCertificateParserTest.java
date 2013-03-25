@@ -41,29 +41,30 @@ import org.junit.Test;
 
 public class ProvisioningIdentityCertificateParserTest {
 
-    private ProvisioningIdentityCertificateParser subject;
+	public static final String UNKNOWN_CER = "unknown.cer";
+	private ProvisioningIdentityCertificateParser subject;
 
 
-    @Before
-    public void setUp() {
-        subject = new ProvisioningIdentityCertificateParser();
-    }
+	@Before
+	public void setUp() {
+		subject = new ProvisioningIdentityCertificateParser();
+	}
 
-    @Test
-    public void shouldParseValidObject() {
-        subject.parse("placeholder location", ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getEncoded());
-        Assert.assertEquals(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT, subject.getCertificate());
-    }
+	@Test
+	public void shouldParseValidObject() {
+		subject.parse(UNKNOWN_CER, ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getEncoded());
+		Assert.assertEquals(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT, subject.getCertificate());
+	}
 
-    @Test(expected=IllegalArgumentException.class)
-    public void shouldFailOnInvalidObject() {
-        subject.parse("placeholder location", new byte[] {0});
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldFailOnInvalidObject() {
+		subject.parse(UNKNOWN_CER, new byte[]{0});
 
-        ValidationResult validationResult = subject.getValidationResult();
-        assertTrue(validationResult.hasFailures());
-        assertEquals(1, validationResult.getFailuresForCurrentLocation().size());
-        assertEquals(CERTIFICATE_PARSED, validationResult.getFailuresForCurrentLocation().iterator().next().getKey());
+		ValidationResult validationResult = subject.getValidationResult();
+		assertTrue(validationResult.hasFailures());
+		assertEquals(1, validationResult.getFailuresForCurrentLocation().size());
+		assertEquals(CERTIFICATE_PARSED, validationResult.getFailuresForCurrentLocation().iterator().next().getKey());
 
-        subject.getCertificate(); // results in an exception
-    }
+		subject.getCertificate(); // results in an exception
+	}
 }

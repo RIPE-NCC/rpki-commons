@@ -29,47 +29,47 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationResult;
-
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
+import net.ripe.rpki.commons.validation.ValidationResult;
 
 /**
  * A converter to be used when (de)serializing a ProvisioningIdentityCertificate in ISC style identity exchange XML
+ *
  * @see net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate
  */
 public class ProvisioningIdentityCertificateConverterForIdExchange implements Converter {
-    
-    @SuppressWarnings("rawtypes")
-    @Override
-    public boolean canConvert(Class type) {
-        return ProvisioningIdentityCertificate.class.equals(type);
-    }
 
-    @Override
-    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        ProvisioningIdentityCertificate certificate = (ProvisioningIdentityCertificate) source;
-        context.convertAnother(certificate.getEncoded());
-    }
+	@SuppressWarnings("rawtypes")
+	@Override
+	public boolean canConvert(Class type) {
+		return ProvisioningIdentityCertificate.class.equals(type);
+	}
 
-    @Override
-    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
-        ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-        parser.parse(new ValidationLocation("encoded"), encoded);
-        
-        ValidationResult result = parser.getValidationResult();
-        if (result.hasFailureForCurrentLocation()) {
-            throw new IllegalArgumentException("Could not parse certificate: " + result.getFailuresForCurrentLocation());
-        }
-        
-        return parser.getCertificate();
-    }
+	@Override
+	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+		ProvisioningIdentityCertificate certificate = (ProvisioningIdentityCertificate) source;
+		context.convertAnother(certificate.getEncoded());
+	}
+
+	@Override
+	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+		byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
+
+		ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
+		ValidationResult result = ValidationResult.withLocation("unknown.cer");
+		parser.parse(result, encoded);
+
+		if (result.hasFailureForCurrentLocation()) {
+			throw new IllegalArgumentException("Could not parse certificate: " + result.getFailuresForCurrentLocation());
+		}
+
+		return parser.getCertificate();
+	}
 
 }

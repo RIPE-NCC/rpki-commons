@@ -29,31 +29,22 @@
  */
 package net.ripe.rpki.commons.provisioning.x509;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-
-import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateParser;
+
+import static net.ripe.rpki.commons.validation.ValidationString.RESOURCE_EXT_NOT_PRESENT;
 
 public class ProvisioningIdentityCertificateParser extends X509CertificateParser<ProvisioningIdentityCertificate> {
 
-    public ProvisioningIdentityCertificateParser() {
-        this(new ValidationResult());
-    }
+	@Override
+	public ProvisioningIdentityCertificate getCertificate() {
+		if (!isSuccess()) {
+			throw new IllegalArgumentException("Identity Certificate validation failed");
+		}
+		return new ProvisioningIdentityCertificate(getX509Certificate());
+	}
 
-    public ProvisioningIdentityCertificateParser(ValidationResult result) {
-        super(result);
-    }
-
-    @Override
-    public ProvisioningIdentityCertificate getCertificate() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("Identity Certificate validation failed");
-        }
-        return new ProvisioningIdentityCertificate(getX509Certificate());
-    }
-
-    @Override
-    protected void doTypeSpecificValidation() {
-        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
-    }
+	@Override
+	protected void doTypeSpecificValidation() {
+		result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
+	}
 }

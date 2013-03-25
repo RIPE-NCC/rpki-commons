@@ -29,7 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -38,101 +42,92 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
-import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class X509CertificateParser<T extends AbstractX509CertificateWrapper> {
 
-    private static final String[] ALLOWED_SIGNATURE_ALGORITHM_OIDS = {
-        PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
-    };
+	private static final String[] ALLOWED_SIGNATURE_ALGORITHM_OIDS = {
+			PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
+	};
 
-    private byte[] encoded;
+	private byte[] encoded;
 
-    protected X509Certificate certificate;
+	protected X509Certificate certificate;
 
-    protected ValidationResult result;
+	protected ValidationResult result;
 
-    protected X509CertificateParser(ValidationResult result) {
-        this.result = result;
-    }
+	public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
+		parse(ValidationResult.withLocation(location), encoded);
+	}
 
-    public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
-        parse(new ValidationLocation(location), encoded);
-    }
+	public void parse(ValidationResult validationResult, byte[] encoded) {
+		this.result = validationResult;
+		this.encoded = encoded;
+		parse();
+		if (!result.hasFailureForCurrentLocation()) {
+			validateSignatureAlgorithm();
+			validatePublicKey();
+			doTypeSpecificValidation();
+		}
+	}
 
-    public void parse(ValidationLocation location, byte[] encoded) {
-        this.encoded = encoded;
-        result.setLocation(location);
-        parse();
-        if (!result.hasFailureForCurrentLocation()) {
-            validateSignatureAlgorithm();
-            validatePublicKey();
-            doTypeSpecificValidation();
-        }
-    }
+	private void validatePublicKey() {
+		PublicKey publicKey = certificate.getPublicKey();
+		result.rejectIfFalse(
+				"RSA".equals(publicKey.getAlgorithm()) && publicKey instanceof RSAPublicKey,
+				PUBLIC_KEY_CERT_ALGORITHM,
+				publicKey.getAlgorithm());
+		if (publicKey instanceof RSAPublicKey) {
+			RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
+			result.warnIfFalse(2048 == rsaPublicKey.getModulus().bitLength(), PUBLIC_KEY_CERT_SIZE, String.valueOf(rsaPublicKey.getModulus().bitLength()));
+		}
+	}
 
-    private void validatePublicKey() {
-        PublicKey publicKey = certificate.getPublicKey();
-        result.rejectIfFalse(
-                "RSA".equals(publicKey.getAlgorithm()) && publicKey instanceof RSAPublicKey,
-                PUBLIC_KEY_CERT_ALGORITHM,
-                publicKey.getAlgorithm());
-        if (publicKey instanceof RSAPublicKey) {
-            RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
-            result.warnIfFalse(2048 == rsaPublicKey.getModulus().bitLength(), PUBLIC_KEY_CERT_SIZE, String.valueOf(rsaPublicKey.getModulus().bitLength()));
-        }
-    }
+	protected void doTypeSpecificValidation() {
+	}
 
-    protected void doTypeSpecificValidation() {
-    }
+	public ValidationResult getValidationResult() {
+		return result;
+	}
 
-    public ValidationResult getValidationResult() {
-        return result;
-    }
+	public boolean isSuccess() {
+		return !result.hasFailures();
+	}
 
-    public boolean isSuccess() {
-        return !result.hasFailures();
-    }
+	public abstract T getCertificate();
 
-    public abstract T getCertificate();
+	protected X509Certificate getX509Certificate() {
+		return certificate;
+	}
 
-    protected X509Certificate getX509Certificate() {
-        return certificate;
-    }
-
-    private void parse() {
-        InputStream input = null;
-        try {
-            input = new ByteArrayInputStream(encoded);
-            CertificateFactory factory = CertificateFactory.getInstance("X.509");
-            certificate = (X509Certificate) factory.generateCertificate(input);
-        } catch (CertificateException e) {
-            certificate = null;
-        } finally {
-            IOUtils.closeQuietly(input);
-        }
-        result.rejectIfNull(certificate, CERTIFICATE_PARSED);
-    }
+	private void parse() {
+		InputStream input = null;
+		try {
+			input = new ByteArrayInputStream(encoded);
+			CertificateFactory factory = CertificateFactory.getInstance("X.509");
+			certificate = (X509Certificate) factory.generateCertificate(input);
+		} catch (CertificateException e) {
+			certificate = null;
+		} finally {
+			IOUtils.closeQuietly(input);
+		}
+		result.rejectIfNull(certificate, CERTIFICATE_PARSED);
+	}
 
 
+	private void validateSignatureAlgorithm() {
+		result.rejectIfFalse(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM, certificate.getSigAlgOID());
+	}
 
-    private void validateSignatureAlgorithm() {
-        result.rejectIfFalse(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM, certificate.getSigAlgOID());
-    }
+	protected boolean isResourceExtensionPresent() {
+		if (certificate.getCriticalExtensionOIDs() == null) {
+			return false;
+		}
 
-    protected boolean isResourceExtensionPresent() {
-        if (certificate.getCriticalExtensionOIDs() == null) {
-            return false;
-        }
-
-        return certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId())
-            || certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
-    }
+		return certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId())
+				|| certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
+	}
 
 
 }

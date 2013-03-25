@@ -41,19 +41,20 @@ import static org.junit.Assert.assertFalse;
 
 public class FailingAfrinicRoaTest {
 
-    private static final String PATH_TO_OBJECTS = "src/test/resources/interop/misc-objects";
+	private static final String PATH_TO_OBJECTS = "src/test/resources/interop/misc-objects";
 
-    @Test
-    public void shouldParseAfrinicRoaWithSigningTimeOutsideOfCertificateValidityTime() throws IOException {
-        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_OBJECTS + "/6C76EDB2225D11E286C4BD8F7A2F2747.roa"));
+	@Test
+	public void shouldParseAfrinicRoaWithSigningTimeOutsideOfCertificateValidityTime() throws IOException {
+		byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_OBJECTS + "/6C76EDB2225D11E286C4BD8F7A2F2747.roa"));
 
-        ValidationResult result = new ValidationResult();
-        RoaCmsParser roaParser = new RoaCmsParser(result);
+		String location = "afrinic.roa";
+		ValidationResult result = ValidationResult.withLocation(location);
+		RoaCmsParser roaParser = new RoaCmsParser();
 
-        roaParser.parse("afrinic.roa", encoded);
+		roaParser.parse(result, encoded);
 
-        assertFalse(result.hasFailures());
-    }
+		assertFalse(result.hasFailures());
+	}
 
 
 }

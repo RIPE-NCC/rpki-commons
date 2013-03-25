@@ -50,28 +50,29 @@ public class KeyStoreUtilTest {
 
 	private byte[] keyStoreData;
 
-    public static final String DEFAULT_KEYSTORE_TYPE = "JKS";
+	public static final String DEFAULT_KEYSTORE_TYPE = "JKS";
 
-    public static final String DEFAULT_KEYSTORE_PROVIDER = "SUN";
+	public static final String DEFAULT_KEYSTORE_PROVIDER = "SUN";
 
 
 	@Test
 	public void shouldKeyStoreContainExpiredCertificate() throws Exception {
-	    keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
-	    keyStoreData = storeKeyStore(keyStore);
+		keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
+		keyStoreData = storeKeyStore(keyStore);
 
 		Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
-        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse("mykeystore", c.getEncoded());
-        X509ResourceCertificate certificate = parser.getCertificate();
+		String location = "unknown.cer";
+		X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+		parser.parse(location, c.getEncoded());
+		X509ResourceCertificate certificate = parser.getCertificate();
 
-        assertTrue(certificate.getValidityPeriod().isExpiredNow());
+		assertTrue(certificate.getValidityPeriod().isExpiredNow());
 	}
 
 	@Test
 	public void shouldGetKeyPairFromKeyStore() {
-	    keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
-	    keyStoreData = storeKeyStore(keyStore);
+		keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
+		keyStoreData = storeKeyStore(keyStore);
 
 		KeyPair keyPair = getKeyPairFromKeyStore(keyStoreData, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
 
@@ -81,29 +82,29 @@ public class KeyStoreUtilTest {
 
 	@Test
 	public void shouldClearKeyStore() throws GeneralSecurityException {
-	    keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
-	    keyStoreData = storeKeyStore(keyStore);
+		keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
+		keyStoreData = storeKeyStore(keyStore);
 
 		KeyStore emptyKeyStore = clearKeyStore(keyStoreData, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
 
 		assertFalse(emptyKeyStore.containsAlias(KEYSTORE_KEY_ALIAS));
 	}
 
-	@Test(expected=KeyStoreException.class)
+	@Test(expected = KeyStoreException.class)
 	public void shouldCreateKeyStoreHandleError() throws GeneralSecurityException {
-	    // non existing provider
-	    createKeyStoreForKeyPair(TEST_KEY_PAIR, "foo keystore provider", DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
+		// non existing provider
+		createKeyStoreForKeyPair(TEST_KEY_PAIR, "foo keystore provider", DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
 	}
 
-	@Test(expected=KeyStoreException.class)
+	@Test(expected = KeyStoreException.class)
 	public void shouldClearKeyStoreHandleError() throws GeneralSecurityException {
-	    // empty keystore data
-	    clearKeyStore(new byte[] {}, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
+		// empty keystore data
+		clearKeyStore(new byte[]{}, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
 	}
 
-	@Test(expected=KeyStoreException.class)
+	@Test(expected = KeyStoreException.class)
 	public void shouldStoreKeyStoreHandleError() throws GeneralSecurityException {
-	    // not initialized keystore
-	    storeKeyStore(KeyStore.getInstance(KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER));
+		// not initialized keystore
+		storeKeyStore(KeyStore.getInstance(KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER));
 	}
 }

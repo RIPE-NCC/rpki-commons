@@ -29,13 +29,8 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
-import net.ripe.rpki.commons.validation.ValidationLocation;
+import net.ripe.rpki.commons.validation.ValidationResult;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
@@ -44,68 +39,76 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509Extension;
+
 public final class X509CertificateUtil {
 
-    private X509CertificateUtil() {
-        //Utility classes should not have a public or default constructor.
-    }
+	private X509CertificateUtil() {
+		//Utility classes should not have a public or default constructor.
+	}
 
-    public static byte[] getSubjectKeyIdentifier(X509Extension certificate) {
-        try {
-            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.subjectKeyIdentifier.getId());
-            if (extensionValue == null) {
-                return null;
-            }
-            return SubjectKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
-        } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException("Cannot get SubjectKeyIdentifier for certificate", e);
-        }
-    }
+	public static byte[] getSubjectKeyIdentifier(X509Extension certificate) {
+		try {
+			byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.subjectKeyIdentifier.getId());
+			if (extensionValue == null) {
+				return null;
+			}
+			return SubjectKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
+		} catch (IOException e) {
+			throw new AbstractX509CertificateWrapperException("Cannot get SubjectKeyIdentifier for certificate", e);
+		}
+	}
 
-    public static byte[] getAuthorityKeyIdentifier(X509Extension certificate) {
-        try {
-            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.authorityKeyIdentifier.getId());
-            if (extensionValue == null) {
-                return null;
-            }
-            return AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
-        } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException("Can not get AuthorityKeyIdentifier for certificate", e);
-        }
-    }
+	public static byte[] getAuthorityKeyIdentifier(X509Extension certificate) {
+		try {
+			byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.authorityKeyIdentifier.getId());
+			if (extensionValue == null) {
+				return null;
+			}
+			return AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
+		} catch (IOException e) {
+			throw new AbstractX509CertificateWrapperException("Can not get AuthorityKeyIdentifier for certificate", e);
+		}
+	}
 
-    public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
-        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(new ValidationLocation("certificate"), encoded);
-        return parser.getCertificate();
-    }
+	public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
+		X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+		parser.parse(ValidationResult.withLocation("unknown.cer"), encoded);
+		return parser.getCertificate();
+	}
 
-    /**
-     * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
-     * @throws AbstractX509CertificateWrapperException
-     * @throws IOException
-     */
-    public static String getEncodedSubjectPublicKeyInfo(X509Certificate certificate) {
+	/**
+	 * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
+	 *
+	 * @throws AbstractX509CertificateWrapperException
+	 *
+	 * @throws IOException
+	 */
+	public static String getEncodedSubjectPublicKeyInfo(X509Certificate certificate) {
 
-        byte[] tbsCertificate;
-        try {
-            tbsCertificate = certificate.getTBSCertificate();
-        } catch (CertificateEncodingException e) {
-            throw new AbstractX509CertificateWrapperException("Can't extract TBSCertificate from certificate", e);
-        }
-        ASN1Sequence tbsCertificateSequence = (ASN1Sequence) Asn1Util.decode(tbsCertificate);
-        TBSCertificateStructure tbsCertificateStructure = new TBSCertificateStructure(tbsCertificateSequence);
-        SubjectPublicKeyInfo subjectPublicKeyInfo = tbsCertificateStructure.getSubjectPublicKeyInfo();
+		byte[] tbsCertificate;
+		try {
+			tbsCertificate = certificate.getTBSCertificate();
+		} catch (CertificateEncodingException e) {
+			throw new AbstractX509CertificateWrapperException("Can't extract TBSCertificate from certificate", e);
+		}
+		ASN1Sequence tbsCertificateSequence = (ASN1Sequence) Asn1Util.decode(tbsCertificate);
+		TBSCertificateStructure tbsCertificateStructure = new TBSCertificateStructure(tbsCertificateSequence);
+		SubjectPublicKeyInfo subjectPublicKeyInfo = tbsCertificateStructure.getSubjectPublicKeyInfo();
 
-        try {
-            byte[] data = subjectPublicKeyInfo.getEncoded();
-            Base64Encoder encoder = new Base64Encoder();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            encoder.encode(data, 0, data.length, out);
-            out.flush();
-            return out.toString();
-        } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException("Can't encode SubjectPublicKeyInfo for certificate", e);
-        }
-    }
+		try {
+			byte[] data = subjectPublicKeyInfo.getEncoded();
+			Base64Encoder encoder = new Base64Encoder();
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			encoder.encode(data, 0, data.length, out);
+			out.flush();
+			return out.toString();
+		} catch (IOException e) {
+			throw new AbstractX509CertificateWrapperException("Can't encode SubjectPublicKeyInfo for certificate", e);
+		}
+	}
 }

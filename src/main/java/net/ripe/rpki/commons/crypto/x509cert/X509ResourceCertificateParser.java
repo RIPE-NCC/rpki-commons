@@ -29,13 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.*;
-
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.util.regex.Pattern;
-import net.ripe.rpki.commons.validation.ValidationResult;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
@@ -47,102 +40,101 @@ import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.util.regex.Pattern;
+
+import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
+
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
 
-    // ASN.1 PrintableString type
-    private final static Pattern PRINTABLE_STRING = Pattern.compile("[-A-Za-z0-9 '()+,./:=?]+");
+	// ASN.1 PrintableString type
+	private final static Pattern PRINTABLE_STRING = Pattern.compile("[-A-Za-z0-9 '()+,./:=?]+");
 
-    public X509ResourceCertificateParser() {
-        this(new ValidationResult());
-    }
+	@Override
+	public X509ResourceCertificate getCertificate() {
+		if (!isSuccess()) {
+			throw new IllegalArgumentException("Resource Certificate validation failed");
+		}
+		return new X509ResourceCertificate(getX509Certificate());
+	}
 
-    public X509ResourceCertificateParser(ValidationResult result) {
-        super(result);
-    }
+	@Override
+	protected void doTypeSpecificValidation() {
+		validateIssuerAndSubjectDN();
+		validateCertificatePolicy();
+		validateResourceExtensionsForResourceCertificates();
+	}
 
-    @Override
-    public X509ResourceCertificate getCertificate() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("Resource Certificate validation failed");
-        }
-        return new X509ResourceCertificate(getX509Certificate());
-    }
+	private void validateIssuerAndSubjectDN() {
+		try {
+			JcaX509CertificateHolder cert = new JcaX509CertificateHolder(certificate);
+			getValidationResult().warnIfFalse(isValidName(cert.getIssuer()), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
+			getValidationResult().warnIfFalse(isValidName(cert.getSubject()), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
+		} catch (CertificateEncodingException e) {
+			throw new AbstractX509CertificateWrapperException(e);
+		}
+	}
 
-    @Override
-    protected void doTypeSpecificValidation() {
-        validateIssuerAndSubjectDN();
-        validateCertificatePolicy();
-        validateResourceExtensionsForResourceCertificates();
-    }
+	private boolean isValidName(X500Name principal) {
+		// RCF6487 section 4.4 and 4.5.
+		return hasOneValidCn(principal) && mayHaveOneValidSerialNumber(principal);
+	}
 
-    private void validateIssuerAndSubjectDN() {
-        try {
-            JcaX509CertificateHolder cert = new JcaX509CertificateHolder(certificate);
-            getValidationResult().warnIfFalse(isValidName(cert.getIssuer()), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
-            getValidationResult().warnIfFalse(isValidName(cert.getSubject()), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
-        } catch (CertificateEncodingException e) {
-            throw new AbstractX509CertificateWrapperException(e);
-        }
-    }
+	public boolean mayHaveOneValidSerialNumber(X500Name principal) {
+		RDN[] serialNumbers = principal.getRDNs(BCStyle.SERIALNUMBER);
+		return serialNumbers.length <= 1;
+	}
 
-    private boolean isValidName(X500Name principal) {
-        // RCF6487 section 4.4 and 4.5.
-        return hasOneValidCn(principal) && mayHaveOneValidSerialNumber(principal);
-    }
+	private boolean hasOneValidCn(X500Name principal) {
+		RDN[] cns = principal.getRDNs(BCStyle.CN);
+		if (cns.length != 1) {
+			return false;
+		}
+		AttributeTypeAndValue firstCn = cns[0].getFirst();
+		if (firstCn == null) {
+			return false;
+		}
+		ASN1Encodable firstCnValue = firstCn.getValue();
+		return firstCnValue != null && isPrintableString(firstCnValue.toString());
+	}
 
-    public boolean mayHaveOneValidSerialNumber(X500Name principal) {
-        RDN[] serialNumbers = principal.getRDNs(BCStyle.SERIALNUMBER);
-        return serialNumbers.length <= 1;
-    }
+	private boolean isPrintableString(String s) {
+		return PRINTABLE_STRING.matcher(s).matches();
+	}
 
-    private boolean hasOneValidCn(X500Name principal) {
-        RDN[] cns = principal.getRDNs(BCStyle.CN);
-        if (cns.length != 1) {
-            return false;
-        }
-        AttributeTypeAndValue firstCn = cns[0].getFirst();
-        if (firstCn == null) {
-            return false;
-        }
-        ASN1Encodable firstCnValue = firstCn.getValue();
-        return firstCnValue != null && isPrintableString(firstCnValue.toString());
-    }
+	private void validateCertificatePolicy() {
+		if (!result.rejectIfNull(certificate.getCriticalExtensionOIDs(), CRITICAL_EXT_PRESENT)) {
+			return;
+		}
 
-    private boolean isPrintableString(String s) {
-        return PRINTABLE_STRING.matcher(s).matches();
-    }
+		result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(X509Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
 
-    private void validateCertificatePolicy() {
-        if (!result.rejectIfNull(certificate.getCriticalExtensionOIDs(), CRITICAL_EXT_PRESENT)) {
-            return;
-        }
+		try {
+			byte[] extensionValue = certificate.getExtensionValue(X509Extension.certificatePolicies.getId());
+			if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
+				return;
+			}
+			ASN1Sequence policies = ASN1Sequence.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+			if (!result.rejectIfFalse(policies.size() == 1, SINGLE_CERT_POLICY)) {
+				return;
+			}
+			PolicyInformation policy = PolicyInformation.getInstance(policies.getObjectAt(0));
 
-        result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(X509Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
+			if (!result.rejectIfNull(policy.getPolicyIdentifier(), POLICY_ID_PRESENT)) {
+				return;
+			}
+			result.rejectIfFalse(POLICY_OID.equals(policy.getPolicyIdentifier()), POLICY_ID_VERSION);
+		} catch (IOException e) {
+			result.rejectIfFalse(false, POLICY_VALIDATION);
+		}
+	}
 
-        try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extension.certificatePolicies.getId());
-            if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
-                return;
-            }
-            ASN1Sequence policies = ASN1Sequence.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
-            if (!result.rejectIfFalse(policies.size() == 1, SINGLE_CERT_POLICY)) {
-                return;
-            }
-            PolicyInformation policy = PolicyInformation.getInstance(policies.getObjectAt(0));
-
-            if (!result.rejectIfNull(policy.getPolicyIdentifier(), POLICY_ID_PRESENT)) {
-                return;
-            }
-            result.rejectIfFalse(POLICY_OID.equals(policy.getPolicyIdentifier()), POLICY_ID_VERSION);
-        } catch (IOException e) {
-            result.rejectIfFalse(false, POLICY_VALIDATION);
-        }
-    }
-
-    private void validateResourceExtensionsForResourceCertificates() {
-        if (result.rejectIfFalse(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
-            result.rejectIfTrue(false, AS_OR_IP_RESOURCE_PRESENT);
-        }
-    }
+	private void validateResourceExtensionsForResourceCertificates() {
+		if (result.rejectIfFalse(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
+			result.rejectIfTrue(false, AS_OR_IP_RESOURCE_PRESENT);
+		}
+	}
 }
