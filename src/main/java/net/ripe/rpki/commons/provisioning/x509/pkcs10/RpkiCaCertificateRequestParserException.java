@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.provisioning.x509.pkcs10;
 public class RpkiCaCertificateRequestParserException extends Exception {
 
     private static final long serialVersionUID = 1L;
-    
+
     public RpkiCaCertificateRequestParserException(Exception e) {
         super(e);
     }

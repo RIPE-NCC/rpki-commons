@@ -70,17 +70,17 @@ public class RouteOriginValidationPolicyTest {
 
     @Test
     public void routes_with_non_intersecting_prefix_and_non_matching_ASN_should_be_UNKNOWN() {
-        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"),  "192.169.0.0/20", RouteValidityState.UNKNOWN);
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.169.0.0/20", RouteValidityState.UNKNOWN);
     }
 
     @Test
     public void routes_with_covering_aggregate_prefix_and_matching_ASN_should_be_UNKNOWN() {
-        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN,  "192.168.0.0/15", RouteValidityState.UNKNOWN);
+        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.168.0.0/15", RouteValidityState.UNKNOWN);
     }
 
     @Test
     public void routes_with_covering_aggregate_prefix_and_non_matching_ASN_should_be_UNKNOWN() {
-        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"),  "192.168.0.0/15", RouteValidityState.UNKNOWN);
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/15", RouteValidityState.UNKNOWN);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class RouteOriginValidationPolicyTest {
     private void testValidatityDetermination(String roaIpPrefix, int roaMaxLength, Asn routeAsn, String routePrefix, RouteValidityState expectedResult) {
         NestedIntervalMap<IpResource, List<AllowedRoute>> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
         AnnouncedRoute route = new AnnouncedRoute(routeAsn, IpRange.parse(routePrefix));
-        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(rtrPrefixes,route);
+        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(rtrPrefixes, route);
         assertEquals(expectedResult, validityStateFound);
     }
 }

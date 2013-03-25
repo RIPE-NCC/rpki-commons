@@ -45,8 +45,8 @@ public class RouteOriginValidationPolicy {
 
     public static NestedIntervalMap<IpResource, List<AllowedRoute>> allowedRoutesToNestedIntervalMap(Iterable<? extends AllowedRoute> allowedRoutes) {
         NestedIntervalMap<IpResource, List<AllowedRoute>> result = new NestedIntervalMap<IpResource, List<AllowedRoute>>(IpResourceIntervalStrategy.getInstance());
-        for (AllowedRoute allowedRoute: allowedRoutes) {
-            List<AllowedRoute> allowed  = result.findExact(allowedRoute.getPrefix());
+        for (AllowedRoute allowedRoute : allowedRoutes) {
+            List<AllowedRoute> allowed = result.findExact(allowedRoute.getPrefix());
             if (allowed == null) {
                 List<AllowedRoute> list = new LinkedList<AllowedRoute>();
                 list.add(allowedRoute);
@@ -63,13 +63,13 @@ public class RouteOriginValidationPolicy {
         for (Iterable<? extends AllowedRoute> routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.getPrefix())) {
             for (AllowedRoute allowedRoute : routes) {
                 switch (validate(allowedRoute, announcedRoute)) {
-                case VALID:
-                    return RouteValidityState.VALID;
-                case INVALID:
-                    result = RouteValidityState.INVALID;
-                    break;
-                case UNKNOWN:
-                    break;
+                    case VALID:
+                        return RouteValidityState.VALID;
+                    case INVALID:
+                        result = RouteValidityState.INVALID;
+                        break;
+                    case UNKNOWN:
+                        break;
                 }
             }
         }

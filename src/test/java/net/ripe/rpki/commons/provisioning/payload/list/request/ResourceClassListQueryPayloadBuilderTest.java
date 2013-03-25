@@ -48,7 +48,7 @@ public class ResourceClassListQueryPayloadBuilderTest {
         ResourceClassListQueryPayloadBuilder builder = new ResourceClassListQueryPayloadBuilder();
         return builder.build();
     }
-    
+
     @Test
     public void shouldCreateParsableProvisioningObject() throws IOException {
         assertEquals("sender", TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD.getSender());

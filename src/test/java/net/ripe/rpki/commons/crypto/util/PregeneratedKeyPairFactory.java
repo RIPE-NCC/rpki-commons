@@ -41,6 +41,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -103,7 +104,7 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
             KeyPair result;
             if (key == null) {
                 result = super.generate();
-                pregeneratedKeys.setKeyEntry(alias, result.getPrivate(), PASSPHRASE, new Certificate[] { createCertificate(result).getCertificate() });
+                pregeneratedKeys.setKeyEntry(alias, result.getPrivate(), PASSPHRASE, new Certificate[]{createCertificate(result).getCertificate()});
                 OutputStream output = new FileOutputStream(keyStoreFile);
                 try {
                     pregeneratedKeys.store(output, PASSPHRASE);

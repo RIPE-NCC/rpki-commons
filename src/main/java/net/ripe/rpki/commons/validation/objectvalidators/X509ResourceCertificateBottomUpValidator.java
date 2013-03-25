@@ -48,131 +48,131 @@ import net.ripe.ipresource.IpResourceSet;
 
 public class X509ResourceCertificateBottomUpValidator implements X509ResourceCertificateValidator {
 
-	private static final int MAX_CHAIN_LENGTH = 30;
-	private X509ResourceCertificate certificate;
-	private Collection<X509ResourceCertificate> trustAnchors;
-	private ResourceCertificateLocator locator;
-	private List<CertificateWithLocation> certificates = new LinkedList<CertificateWithLocation>();
-	private ValidationOptions options;
-	private ValidationResult result;
-	private ValidationLocation location;
+    private static final int MAX_CHAIN_LENGTH = 30;
+    private X509ResourceCertificate certificate;
+    private Collection<X509ResourceCertificate> trustAnchors;
+    private ResourceCertificateLocator locator;
+    private List<CertificateWithLocation> certificates = new LinkedList<CertificateWithLocation>();
+    private ValidationOptions options;
+    private ValidationResult result;
+    private ValidationLocation location;
 
 
-	public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, X509ResourceCertificate... trustAnchors) {
-		this(locator, Arrays.asList(trustAnchors));
-	}
+    public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, X509ResourceCertificate... trustAnchors) {
+        this(locator, Arrays.asList(trustAnchors));
+    }
 
-	public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
-		this(new ValidationOptions(), ValidationResult.withLocation("unknown.cer"), locator, trustAnchors);
-	}
+    public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
+        this(new ValidationOptions(), ValidationResult.withLocation("unknown.cer"), locator, trustAnchors);
+    }
 
-	public X509ResourceCertificateBottomUpValidator(ValidationOptions options, ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
-		this.options = options;
-		this.result = result;
-		this.location = new ValidationLocation("unknown.cer");
-		this.locator = locator;
-		this.trustAnchors = trustAnchors;
-	}
+    public X509ResourceCertificateBottomUpValidator(ValidationOptions options, ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
+        this.options = options;
+        this.result = result;
+        this.location = new ValidationLocation("unknown.cer");
+        this.locator = locator;
+        this.trustAnchors = trustAnchors;
+    }
 
-	@Override
-	public ValidationResult getValidationResult() {
-		return result;
-	}
+    @Override
+    public ValidationResult getValidationResult() {
+        return result;
+    }
 
-	@Override
-	public void validate(String location, X509ResourceCertificate certificate) {
-		this.location = new ValidationLocation(location);
-		this.certificate = certificate;
+    @Override
+    public void validate(String location, X509ResourceCertificate certificate) {
+        this.location = new ValidationLocation(location);
+        this.certificate = certificate;
 
-		buildCertificationList();
-		if (result.hasFailures()) {
-			// stop validation: certificate chain too long
-			return;
-		}
+        buildCertificationList();
+        if (result.hasFailures()) {
+            // stop validation: certificate chain too long
+            return;
+        }
 
-		checkTrustAnchor();
+        checkTrustAnchor();
 
-		X509ResourceCertificate parent = certificates.get(0).getCertificate();
-		certificates.remove(0); // No need to validate the root (1st parent) certificate against itself
+        X509ResourceCertificate parent = certificates.get(0).getCertificate();
+        certificates.remove(0); // No need to validate the root (1st parent) certificate against itself
 
-		IpResourceSet resources = parent.getResources();
+        IpResourceSet resources = parent.getResources();
 
-		for (CertificateWithLocation certificateWithLocation : certificates) {
-			String childLocation = certificateWithLocation.getLocation().getName();
-			X509ResourceCertificate child = certificateWithLocation.getCertificate();
+        for (CertificateWithLocation certificateWithLocation : certificates) {
+            String childLocation = certificateWithLocation.getLocation().getName();
+            X509ResourceCertificate child = certificateWithLocation.getCertificate();
 
-			X509Crl crl = getCRL(child);
+            X509Crl crl = getCRL(child);
 
-			X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, parent, crl, resources);
-			validator.validate(childLocation, child);
+            X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, parent, crl, resources);
+            validator.validate(childLocation, child);
 
-			resources = child.deriveResources(resources);
-			parent = child;
-		}
-	}
+            resources = child.deriveResources(resources);
+            parent = child;
+        }
+    }
 
-	private void buildCertificationList() {
-		certificates.add(0, new CertificateWithLocation(this.certificate, this.location));
-		result.setLocation(this.location);
-		if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.valueOf(MAX_CHAIN_LENGTH).toString())) {
-			return;
-		}
+    private void buildCertificationList() {
+        certificates.add(0, new CertificateWithLocation(this.certificate, this.location));
+        result.setLocation(this.location);
+        if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.valueOf(MAX_CHAIN_LENGTH).toString())) {
+            return;
+        }
 
-		X509ResourceCertificate cert = this.certificate;
-		while (!cert.isRoot()) {
-			CertificateRepositoryObjectFile<X509ResourceCertificate> parent = locator.findParent(cert);
+        X509ResourceCertificate cert = this.certificate;
+        while (!cert.isRoot()) {
+            CertificateRepositoryObjectFile<X509ResourceCertificate> parent = locator.findParent(cert);
 
-			if (!result.rejectIfNull(parent, CERT_CHAIN_COMPLETE)) {
-				return;
-			}
+            if (!result.rejectIfNull(parent, CERT_CHAIN_COMPLETE)) {
+                return;
+            }
 
-			X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-			parser.parse(ValidationResult.withLocation(parent.getName()), parent.getContent());
-			if (result.hasFailures()) {
-				return;
-			}
+            X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+            parser.parse(ValidationResult.withLocation(parent.getName()), parent.getContent());
+            if (result.hasFailures()) {
+                return;
+            }
 
-			cert = parser.getCertificate();
-			ValidationLocation parentLocation = new ValidationLocation(parent.getName());
-			certificates.add(0, new CertificateWithLocation(cert, parentLocation));
-			result.setLocation(parentLocation);
-			if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.valueOf(MAX_CHAIN_LENGTH).toString())) {
-				return;
-			}
-		}
+            cert = parser.getCertificate();
+            ValidationLocation parentLocation = new ValidationLocation(parent.getName());
+            certificates.add(0, new CertificateWithLocation(cert, parentLocation));
+            result.setLocation(parentLocation);
+            if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.valueOf(MAX_CHAIN_LENGTH).toString())) {
+                return;
+            }
+        }
 
-	}
+    }
 
-	private X509Crl getCRL(X509ResourceCertificate certificate) {
-		CertificateRepositoryObjectFile<X509Crl> crlFile = locator.findCrl(certificate);
-		if (crlFile == null) {
-			return null;
-		}
-		return X509Crl.parseDerEncoded(crlFile.getContent());
-	}
+    private X509Crl getCRL(X509ResourceCertificate certificate) {
+        CertificateRepositoryObjectFile<X509Crl> crlFile = locator.findCrl(certificate);
+        if (crlFile == null) {
+            return null;
+        }
+        return X509Crl.parseDerEncoded(crlFile.getContent());
+    }
 
-	private void checkTrustAnchor() {
-		if ((trustAnchors != null) && (trustAnchors.size() > 0)) {
-			result.rejectIfFalse(trustAnchors.contains(certificates.get(0).getCertificate()), ROOT_IS_TA);
-		}
-	}
+    private void checkTrustAnchor() {
+        if ((trustAnchors != null) && (trustAnchors.size() > 0)) {
+            result.rejectIfFalse(trustAnchors.contains(certificates.get(0).getCertificate()), ROOT_IS_TA);
+        }
+    }
 
-	private class CertificateWithLocation {
+    private class CertificateWithLocation {
 
-		private final X509ResourceCertificate certificate;
-		private final ValidationLocation location;
+        private final X509ResourceCertificate certificate;
+        private final ValidationLocation location;
 
-		public CertificateWithLocation(X509ResourceCertificate certificate, ValidationLocation location) {
-			this.location = location;
-			this.certificate = certificate;
-		}
+        public CertificateWithLocation(X509ResourceCertificate certificate, ValidationLocation location) {
+            this.location = location;
+            this.certificate = certificate;
+        }
 
-		public X509ResourceCertificate getCertificate() {
-			return certificate;
-		}
+        public X509ResourceCertificate getCertificate() {
+            return certificate;
+        }
 
-		public ValidationLocation getLocation() {
-			return location;
-		}
-	}
+        public ValidationLocation getLocation() {
+            return location;
+        }
+    }
 }

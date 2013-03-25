@@ -65,7 +65,7 @@ public class RpkiSignedObjectEeCertificateBuilder extends GenericRpkiCertificate
     @Override
     protected void validateFields() {
         super.validateFields();
-        Validate.isTrue(!isSelfSigned(),"EE Certificate can not be self-signed (use EE keypair for public and signing the object, sign this cert with parent key pair)");
+        Validate.isTrue(!isSelfSigned(), "EE Certificate can not be self-signed (use EE keypair for public and signing the object, sign this cert with parent key pair)");
         Validate.notNull(cmsPublicationUri, "CMS Object Publication URI is required");
     }
 }

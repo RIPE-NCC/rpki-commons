@@ -82,25 +82,25 @@ public class ProvisioningCmsCertificateBuilderTest {
         assertNotNull(cmsCertificate);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequirePublicKey() {
         subject.withPublicKey(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireIssuerDN() {
         subject.withIssuerDN(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSubjectDN() {
         subject.withSubjectDN(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSerial() {
         subject.withSerial(null);
         subject.build();
@@ -146,7 +146,7 @@ public class ProvisioningCmsCertificateBuilderTest {
     public void shouldHaveKeyUsageExtensionDigitalSignature() {
         boolean[] keyUsage = TEST_CMS_CERT.getCertificate().getKeyUsage();
         // For KeyUsage flags order see bouncy castle KeyUsage class
-        assertTrue(Arrays.equals(new boolean[] { true, false, false, false, false, false, false, false, false }, keyUsage));
+        assertTrue(Arrays.equals(new boolean[]{true, false, false, false, false, false, false, false, false}, keyUsage));
     }
 }
 

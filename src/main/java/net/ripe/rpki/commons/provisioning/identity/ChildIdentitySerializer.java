@@ -33,7 +33,7 @@ package net.ripe.rpki.commons.provisioning.identity;
 /**
  * Convert ChildIdentity to/from ISC style XML
  */
-public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity>{
+public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
 
     public ChildIdentitySerializer() {
         super();

@@ -43,7 +43,7 @@ import java.util.Arrays;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
-public abstract class X509CertificateParentChildValidator <T extends AbstractX509CertificateWrapper> {
+public abstract class X509CertificateParentChildValidator<T extends AbstractX509CertificateWrapper> {
 
     // http://www.ietf.org/rfc/rfc2459.txt
     private static final int DIG_SIGN_INDEX = 0;

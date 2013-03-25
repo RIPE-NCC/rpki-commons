@@ -36,6 +36,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.PublicKey;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.ipresource.IpResourceSet;
@@ -58,7 +59,7 @@ public class X509ResourceCertificateBuilderTest {
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = new DateTime(DateTimeZone.UTC);
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear()+1,1,1,0,0,0,0, DateTimeZone.UTC)));
+        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
 
@@ -93,55 +94,55 @@ public class X509ResourceCertificateBuilderTest {
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourcesForResourceCertificates() {
         subject.withResources(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireNonEmptyResourceSetForResourceCertificates() {
         subject.withResources(IpResourceSet.parse(""));
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireIssuer() {
         subject.withIssuerDN(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSubject() {
         subject.withSubjectDN(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSerial() {
         subject.withSerial(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequirePublicKey() {
         subject.withPublicKey(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSigningKeyPair() {
         subject.withSigningKeyPair(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireValidityPeriod() {
         subject.withValidityPeriod(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldNotAllowKeyCertSignForNonCAs() {
         subject.withCa(false);
         subject.withKeyUsage(KeyUsage.keyCertSign);
@@ -210,7 +211,7 @@ public class X509ResourceCertificateBuilderTest {
         assertEquals(crlURI, certificate.getCrlDistributionPoints()[0]);
     }
 
-    @Test(expected=X509ResourceCertificateBuilderException.class)
+    @Test(expected = X509ResourceCertificateBuilderException.class)
     public void shouldFailOnIncorrectProvider() {
         subject.withSignatureProvider("foo");
         subject.build();

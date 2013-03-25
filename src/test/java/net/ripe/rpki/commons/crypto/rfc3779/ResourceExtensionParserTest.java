@@ -34,6 +34,7 @@ import static org.junit.Assert.*;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
@@ -78,7 +79,7 @@ public class ResourceExtensionParserTest {
         assertEquals(IpResource.parse("2001:0:200::/39"), parser.derToIpAddressOrRange(IpResourceType.IPv6, Asn1Util.decode(ENCODED_IPV6_2001_0_200_39)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnIllegalIpAddressOrRange() {
         parser.derToIpAddressOrRange(IpResourceType.IPv4, new ASN1Integer(123));
     }
@@ -169,7 +170,7 @@ public class ResourceExtensionParserTest {
         assertNull(parser.parseAsIdentifiers(ENCODED_AS_IDENTIFIERS_INHERITED));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailToParseExtensionWithNullSet() {
         parser.parseIpAddressBlocks(RFC3779_APPENDIX_B_EXAMPLE_1);
     }
@@ -201,6 +202,7 @@ public class ResourceExtensionParserTest {
 
     /**
      * The example in Appendix C of RFC3779.
+     *
      * @
      */
     @Test

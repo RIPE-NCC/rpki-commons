@@ -34,6 +34,7 @@ import static org.junit.Assert.*;
 import java.net.URI;
 import java.security.KeyPair;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;

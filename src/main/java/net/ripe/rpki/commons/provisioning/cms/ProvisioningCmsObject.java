@@ -58,8 +58,8 @@ public class ProvisioningCmsObject {
     private AbstractProvisioningPayload payload;
 
     public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload) { // NOPMD
-                                                                                                                                                   // -
-                                                                                                                                                   // ArrayIsStoredDirectly
+        // -
+        // ArrayIsStoredDirectly
         this.encodedContent = encodedContent;
         this.cmsCertificate = cmsCertificate;
         this.caCertificates = caCertificates;

@@ -49,7 +49,9 @@ public class KeyPairFactory {
 
     public static final int RPKI_KEY_PAIR_SIZE = 2048;
 
-    /** F4 Public Exponent */
+    /**
+     * F4 Public Exponent
+     */
     public static final BigInteger PUBLIC_EXPONENT = RSAKeyGenParameterSpec.F4;
 
     private final String provider;

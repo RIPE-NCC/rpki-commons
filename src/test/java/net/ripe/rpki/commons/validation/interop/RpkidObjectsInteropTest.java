@@ -43,22 +43,22 @@ import static org.junit.Assert.assertNotNull;
 
 public class RpkidObjectsInteropTest {
 
-	private static final String PATH_TO_RPKID_OBJECTS = "src/test/resources/interop/rpkid-objects/";
+    private static final String PATH_TO_RPKID_OBJECTS = "src/test/resources/interop/rpkid-objects/";
 
-	@Test
-	public void shouldValidateRoa() throws IOException {
-		byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_RPKID_OBJECTS + "nI2bsx18I5mlex8lBpY0WSJUYio.roa"));
+    @Test
+    public void shouldValidateRoa() throws IOException {
+        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_RPKID_OBJECTS + "nI2bsx18I5mlex8lBpY0WSJUYio.roa"));
 
-		String location = "unknown.roa";
-		RoaCmsParser parser = new RoaCmsParser();
-		parser.parse(location, encoded);
-		ValidationResult validationResult = parser.getValidationResult();
+        String location = "unknown.roa";
+        RoaCmsParser parser = new RoaCmsParser();
+        parser.parse(location, encoded);
+        ValidationResult validationResult = parser.getValidationResult();
 
-		assertFalse(validationResult.hasFailures());
+        assertFalse(validationResult.hasFailures());
 
-		RoaCms roa = parser.getRoaCms();
-		assertNotNull(roa.getContentType());
-	}
+        RoaCms roa = parser.getRoaCms();
+        assertNotNull(roa.getContentType());
+    }
 
 
 }

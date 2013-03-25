@@ -53,44 +53,44 @@ import static org.junit.Assert.assertTrue;
 
 public class CreateObjectsForInteropTesting {
 
-	private static final String outputDirPath = "/tmp/provisioning-interop";
+    private static final String outputDirPath = "/tmp/provisioning-interop";
 
-	@Before
-	public void createOutputDir() {
-		File outputDir = new File(outputDirPath);
-		outputDir.mkdirs();
-	}
+    @Before
+    public void createOutputDir() {
+        File outputDir = new File(outputDirPath);
+        outputDir.mkdirs();
+    }
 
-	@Test
-	public void createObjects() throws IOException {
-		writeToDisk("identity-cert.cer", ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getEncoded());
+    @Test
+    public void createObjects() throws IOException {
+        writeToDisk("identity-cert.cer", ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getEncoded());
 
-		createValidCmsObjectAndWriteItToDisk(TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD, "resource-class-list-query.cms");
-		createValidCmsObjectAndWriteItToDisk(ResourceClassListResponsePayloadBuilderTest.TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD, "resource-class-list-response.cms");
+        createValidCmsObjectAndWriteItToDisk(TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD, "resource-class-list-query.cms");
+        createValidCmsObjectAndWriteItToDisk(ResourceClassListResponsePayloadBuilderTest.TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD, "resource-class-list-response.cms");
 
-		createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD, "certificate-issuance-request.cms");
-		createValidCmsObjectAndWriteItToDisk(CertificateIssuanceResponsePayloadBuilderTest.TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD, "certificate-issuance-response.cms");
+        createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD, "certificate-issuance-request.cms");
+        createValidCmsObjectAndWriteItToDisk(CertificateIssuanceResponsePayloadBuilderTest.TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD, "certificate-issuance-response.cms");
 
-		createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD, "certificate-revocation-request.cms");
-		createValidCmsObjectAndWriteItToDisk(CertificateRevocationResponsePayloadBuilderTest.TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD, "certificate-revocation-response.cms");
-	}
+        createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD, "certificate-revocation-request.cms");
+        createValidCmsObjectAndWriteItToDisk(CertificateRevocationResponsePayloadBuilderTest.TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD, "certificate-revocation-response.cms");
+    }
 
-	public void createValidCmsObjectAndWriteItToDisk(AbstractProvisioningPayload payload, String fileName) throws IOException {
-		ProvisioningCmsObject resourceClassListQueryCms = createProvisioningCmsObjectForPayload(payload);
-		validateCmsObject(resourceClassListQueryCms);
-		writeToDisk(fileName, resourceClassListQueryCms.getEncoded());
-	}
+    public void createValidCmsObjectAndWriteItToDisk(AbstractProvisioningPayload payload, String fileName) throws IOException {
+        ProvisioningCmsObject resourceClassListQueryCms = createProvisioningCmsObjectForPayload(payload);
+        validateCmsObject(resourceClassListQueryCms);
+        writeToDisk(fileName, resourceClassListQueryCms.getEncoded());
+    }
 
-	public void validateCmsObject(ProvisioningCmsObject resourceClassListQueryCms) {
-		ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), resourceClassListQueryCms, ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
-		ValidationResult result = ValidationResult.withLocation("n/a");
-		validator.validate(result);
-		assertTrue(!result.hasFailures());
-	}
+    public void validateCmsObject(ProvisioningCmsObject resourceClassListQueryCms) {
+        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), resourceClassListQueryCms, ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+        ValidationResult result = ValidationResult.withLocation("n/a");
+        validator.validate(result);
+        assertTrue(!result.hasFailures());
+    }
 
-	private void writeToDisk(String fileName, byte[] encoded) throws IOException {
-		File file = new File(outputDirPath + "/" + fileName);
-		FileUtils.writeByteArrayToFile(file, encoded);
-	}
+    private void writeToDisk(String fileName, byte[] encoded) throws IOException {
+        File file = new File(outputDirPath + "/" + fileName);
+        FileUtils.writeByteArrayToFile(file, encoded);
+    }
 
 }

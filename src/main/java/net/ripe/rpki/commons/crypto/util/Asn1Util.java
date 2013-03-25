@@ -83,7 +83,7 @@ public final class Asn1Util {
             padded = value;
         }
 
-        assert padded.length == resourceTypeByteSize: "incorrect padded length";
+        assert padded.length == resourceTypeByteSize : "incorrect padded length";
 
         int byteCount = (bitCount + Byte.SIZE - 1) / Byte.SIZE;
         int unusedBits = Byte.SIZE - 1 - ((bitCount + Byte.SIZE - 1) % Byte.SIZE);
@@ -106,9 +106,8 @@ public final class Asn1Util {
      * Checks if <code>value</code> is an instance of the
      * <code>expectedClass</code>.
      *
-     * @throws IllegalArgumentException
-     *             the instance is null or not an instance of the expected
-     *             class.
+     * @throws IllegalArgumentException the instance is null or not an instance of the expected
+     *                                  class.
      */
     public static <T extends ASN1Encodable> T expect(ASN1Encodable value, Class<? extends T> expectedClass) {
         Validate.notNull(value, expectedClass.getSimpleName() + " expected, got null");

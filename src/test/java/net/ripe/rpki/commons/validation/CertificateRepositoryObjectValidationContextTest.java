@@ -32,8 +32,10 @@ package net.ripe.rpki.commons.validation;
 import static org.junit.Assert.*;
 
 import com.gargoylesoftware.base.testing.EqualsTester;
+
 import java.net.URI;
 import java.util.EnumSet;
+
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
@@ -65,7 +67,7 @@ public class CertificateRepositoryObjectValidationContextTest {
                 createSelfSignedCaResourceCertificateBuilder().
                 withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class))
                 .withResources(new IpResourceSet()).
-                build();
+                        build();
     }
 
     @Test
@@ -101,7 +103,8 @@ public class CertificateRepositoryObjectValidationContextTest {
         CertificateRepositoryObjectValidationContext a = new CertificateRepositoryObjectValidationContext(location, certificate);
         CertificateRepositoryObjectValidationContext b = new CertificateRepositoryObjectValidationContext(location, certificate);
         CertificateRepositoryObjectValidationContext c = new CertificateRepositoryObjectValidationContext(URI.create("rsync://another/uri"), certificateWithInheritedResources);
-        CertificateRepositoryObjectValidationContext d = new CertificateRepositoryObjectValidationContext(location, certificate) {};
+        CertificateRepositoryObjectValidationContext d = new CertificateRepositoryObjectValidationContext(location, certificate) {
+        };
         new EqualsTester(a, b, c, d);
     }
 }

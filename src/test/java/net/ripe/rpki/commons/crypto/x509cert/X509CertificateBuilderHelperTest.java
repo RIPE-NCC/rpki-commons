@@ -57,14 +57,14 @@ public class X509CertificateBuilderHelperTest {
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = new DateTime(DateTimeZone.UTC);
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear()+1,1,1,0,0,0,0, DateTimeZone.UTC)));
+        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
-    
-    @Test(expected=IllegalArgumentException.class)
+
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnIncorrectAlgorithm() {
         subject.withSignatureAlgorithm("foo");
         subject.generateCertificate();
     }
-    
+
 }

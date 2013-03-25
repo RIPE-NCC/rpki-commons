@@ -35,6 +35,7 @@ import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
@@ -82,6 +83,7 @@ public class RpkiCaCertificateRequestBuilder {
 
     /**
      * Default: SunRsaSign
+     *
      * @return
      */
     public RpkiCaCertificateRequestBuilder withSignatureProvider(String signatureProvider) {
@@ -91,6 +93,7 @@ public class RpkiCaCertificateRequestBuilder {
 
     /**
      * Default: SHA256withRSA
+     *
      * @return
      */
     public RpkiCaCertificateRequestBuilder withSignatureAlgorithm(String signatureAlgorithm) {
@@ -117,7 +120,7 @@ public class RpkiCaCertificateRequestBuilder {
         // http://www.bouncycastle.org/wiki/display/JA1/X.509+Public+Key+Certificate+and+Certification+Request+Generation
         List<Extension> extensions = new ArrayList<Extension>();
 
-        X509CertificateInformationAccessDescriptor[] descriptors = new X509CertificateInformationAccessDescriptor[] {
+        X509CertificateInformationAccessDescriptor[] descriptors = new X509CertificateInformationAccessDescriptor[]{
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri),
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri),};
         AccessDescription[] subjectInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(descriptors);

@@ -65,7 +65,7 @@ public class ManifestCmsBuilderTest {
 
     @Test
     public void shouldTrackFilenameAndHash() {
-        byte[] content = { 1, 2, 3, 4 };
+        byte[] content = {1, 2, 3, 4};
         subject.addFile("foo1", content);
         subject.addFile("foo3", content);
 

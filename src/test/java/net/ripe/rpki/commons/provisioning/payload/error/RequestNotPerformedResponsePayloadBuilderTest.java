@@ -40,13 +40,13 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class RequestNotPerformedResponsePayloadBuilderTest {
-    
+
     private static final String TEST_ERROR_DESCRIPTION = "Something went wrong";
 
     private static final NotPerformedError TEST_ERROR = NotPerformedError.INTERNAL_SERVER_ERROR;
-    
+
     private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
-    
+
     public static RequestNotPerformedResponsePayload NOT_PERFORMED_PAYLOAD = createRequestNotPerformedResponsePayload();
 
     public static RequestNotPerformedResponsePayload createRequestNotPerformedResponsePayload() {
@@ -55,7 +55,7 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
         builder.withDescription(TEST_ERROR_DESCRIPTION);
         return builder.build();
     }
-    
+
     @Test
     public void shouldBuildValidListResponsePayload() throws Exception {
         assertEquals("sender", NOT_PERFORMED_PAYLOAD.getSender());
@@ -64,18 +64,18 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
         assertEquals(TEST_ERROR, NOT_PERFORMED_PAYLOAD.getStatus());
         assertEquals(TEST_ERROR_DESCRIPTION, NOT_PERFORMED_PAYLOAD.getDescription());
     }
-    
+
     @Test
     public void shouldProduceXmlConformDraft() {
         String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
-        
+
         String expectedXml =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
-            "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"error_response\">" + "\n" +
-            "  <status>" + TEST_ERROR.getErrorCode() + "</status>" + "\n" +
-            "  <description xml:lang=\"en-US\">" + TEST_ERROR_DESCRIPTION + "</description>" + "\n" +
-            "</message>";
-        
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
+                        "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"error_response\">" + "\n" +
+                        "  <status>" + TEST_ERROR.getErrorCode() + "</status>" + "\n" +
+                        "  <description xml:lang=\"en-US\">" + TEST_ERROR_DESCRIPTION + "</description>" + "\n" +
+                        "</message>";
+
         assertEquals(expectedXml, actualXml);
     }
 

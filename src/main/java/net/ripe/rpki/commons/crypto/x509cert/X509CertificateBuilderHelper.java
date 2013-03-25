@@ -41,6 +41,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
@@ -71,11 +72,10 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
  * (delegated to, not extended) specific certificate builders.
- *
+ * <p/>
  * Because we want to maintain the pattern where a specific Certificate builder
  * can be chained like: builder.withValidity(val).withSubjectDn(subject) etc...
  * dynamic typing would be required.. hence delegation.
- *
  */
 public final class X509CertificateBuilderHelper {
 
@@ -315,10 +315,10 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void addAuthorityKeyIdentifier(X509v3CertificateBuilder generator) throws InvalidKeyException, CertIOException {
-            generator.addExtension(
-                    X509Extension.authorityKeyIdentifier,
-                    false,
-                    BouncyCastleUtil.createAuthorityKeyIdentifier(signingKeyPair.getPublic()));
+        generator.addExtension(
+                X509Extension.authorityKeyIdentifier,
+                false,
+                BouncyCastleUtil.createAuthorityKeyIdentifier(signingKeyPair.getPublic()));
     }
 
     private void addCaBit(X509v3CertificateBuilder generator) throws CertIOException {
@@ -326,7 +326,7 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void addKeyUsage(X509v3CertificateBuilder generator) throws CertIOException {
-            generator.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
+        generator.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
     }
 
     private void addAIA(X509v3CertificateBuilder generator) throws CertIOException {
@@ -351,7 +351,7 @@ public final class X509CertificateBuilderHelper {
     private void addResourceExtensions(X509v3CertificateBuilder generator) throws CertIOException {
         ResourceExtensionEncoder encoder = new ResourceExtensionEncoder();
 
-        for (IpResourceType inherited: inheritedResourceTypes) {
+        for (IpResourceType inherited : inheritedResourceTypes) {
             if (resources.containsType(inherited)) {
                 throw new IllegalArgumentException("resource set '" + resources + "' contains resources of inherited type " + inherited);
             }
@@ -369,7 +369,7 @@ public final class X509CertificateBuilderHelper {
 
         ASN1Encodable encodedASNs = encoder.encodeAsIdentifiers(inheritedResourceTypes.contains(IpResourceType.ASN), resources);
         if (encodedASNs != null) {
-            generator.addExtension(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true,encodedASNs);
+            generator.addExtension(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS, true, encodedASNs);
         }
     }
 
@@ -384,7 +384,7 @@ public final class X509CertificateBuilderHelper {
         GeneralNames names = new GeneralNames(seq);
         DistributionPointName distributionPoint = new DistributionPointName(
                 names);
-        DistributionPoint[] dps = { new DistributionPoint(distributionPoint, null, null) };
+        DistributionPoint[] dps = {new DistributionPoint(distributionPoint, null, null)};
         return new CRLDistPoint(dps);
     }
 }

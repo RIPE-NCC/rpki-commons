@@ -40,7 +40,7 @@ import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
 
 import org.joda.time.DateTime;
 
-public class X509CrlValidator implements CertificateRepositoryObjectValidator<X509Crl>{
+public class X509CrlValidator implements CertificateRepositoryObjectValidator<X509Crl> {
 
     private AbstractX509CertificateWrapper parent;
 
@@ -77,7 +77,6 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
                 result.rejectIfTrue(true, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
             }
         }
-
 
 
     }

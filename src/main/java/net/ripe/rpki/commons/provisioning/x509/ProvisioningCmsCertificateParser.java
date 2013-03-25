@@ -35,16 +35,16 @@ import static net.ripe.rpki.commons.validation.ValidationString.RESOURCE_EXT_NOT
 
 public class ProvisioningCmsCertificateParser extends X509CertificateParser<ProvisioningCmsCertificate> {
 
-	@Override
-	public ProvisioningCmsCertificate getCertificate() {
-		if (!isSuccess()) {
-			throw new IllegalArgumentException("Provisioning CMS Certificate validation failed");
-		}
-		return new ProvisioningCmsCertificate(getX509Certificate());
-	}
+    @Override
+    public ProvisioningCmsCertificate getCertificate() {
+        if (!isSuccess()) {
+            throw new IllegalArgumentException("Provisioning CMS Certificate validation failed");
+        }
+        return new ProvisioningCmsCertificate(getX509Certificate());
+    }
 
-	@Override
-	protected void doTypeSpecificValidation() {
-		result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
-	}
+    @Override
+    protected void doTypeSpecificValidation() {
+        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
+    }
 }

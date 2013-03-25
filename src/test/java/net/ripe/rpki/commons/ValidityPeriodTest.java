@@ -129,34 +129,34 @@ public class ValidityPeriodTest {
 
     @Test
     public void sameStartingInstantShouldBeValid() {
-        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008,1,1), date(2009,1,1));
-        assertTrue(validityPeriod.isValidAt(date(2008,1,1)));
+        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008, 1, 1), date(2009, 1, 1));
+        assertTrue(validityPeriod.isValidAt(date(2008, 1, 1)));
     }
 
     @Test
     public void sameEndingInstantShouldBeValid() {
-        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008,1,1), date(2009,1,1));
-        assertTrue(validityPeriod.isValidAt(date(2009,1,1)));
+        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008, 1, 1), date(2009, 1, 1));
+        assertTrue(validityPeriod.isValidAt(date(2009, 1, 1)));
     }
 
     @Test
     public void shouldBeValidWithinTheValidityPeriod() {
-        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008,1,1), date(2009,1,1));
+        ValidityPeriod validityPeriod = new ValidityPeriod(date(2008, 1, 1), date(2009, 1, 1));
         assertTrue(validityPeriod.isValidNow());
     }
 
     @Test
     public void shouldBeInvalidOutsideTheValidityPeriod() {
-        ValidityPeriod validityPeriod = new ValidityPeriod(date(2007,1,1), date(2008,1,1));
+        ValidityPeriod validityPeriod = new ValidityPeriod(date(2007, 1, 1), date(2008, 1, 1));
         assertTrue(validityPeriod.isExpiredNow());
-        assertTrue(validityPeriod.isExpiredAt(date(2020,1,1)));
+        assertTrue(validityPeriod.isExpiredAt(date(2020, 1, 1)));
     }
 
     @Test
     public void shouldNeverBeExpiredIfNotValidAfterIsNotDefined() {
-        ValidityPeriod validityPeriod = new ValidityPeriod(date(2007,1,1), null);
-        assertFalse(validityPeriod.isExpiredAt(date(1920,1,1)));
-        assertFalse(validityPeriod.isExpiredAt(date(2020,1,1)));
+        ValidityPeriod validityPeriod = new ValidityPeriod(date(2007, 1, 1), null);
+        assertFalse(validityPeriod.isExpiredAt(date(1920, 1, 1)));
+        assertFalse(validityPeriod.isExpiredAt(date(2020, 1, 1)));
     }
 
     private ReadableInstant date(int year, int month, int day) {

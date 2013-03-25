@@ -70,6 +70,7 @@ public final class PayloadParser {
     private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> ERROR_RESPONSE_SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
 
     private static final Map<PayloadMessageType, XStreamXmlSerializer<? extends AbstractProvisioningPayload>> TYPE_MAP = new HashMap<PayloadMessageType, XStreamXmlSerializer<? extends AbstractProvisioningPayload>>();
+
     static {
         TYPE_MAP.put(PayloadMessageType.list, LIST_SERIALIZER);
         TYPE_MAP.put(PayloadMessageType.list_response, LIST_RESPONSE_SERIALIZER);
@@ -89,13 +90,13 @@ public final class PayloadParser {
         if (validationResult.hasFailures()) {
             return null;
         }
-        
+
         String type = matcher.group(1);
         validationResult.rejectIfFalse(PayloadMessageType.containsAsEnum(type), VALID_PAYLOAD_TYPE);
         if (validationResult.hasFailures()) {
             return null;
         }
-        
+
         PayloadMessageType messageType = PayloadMessageType.valueOf(type);
         XStreamXmlSerializer<? extends AbstractProvisioningPayload> serializer = TYPE_MAP.get(messageType);
         AbstractProvisioningPayload payload = serializer.deserialize(payloadXml);
@@ -103,29 +104,29 @@ public final class PayloadParser {
         if (validationResult.hasFailures()) {
             return null;
         }
-        
+
         return payload;
     }
 
     public static String serialize(AbstractProvisioningPayload payload) {
         PayloadMessageType type = payload.getType();
         switch (type) {
-        case list:
-            return LIST_SERIALIZER.serialize((ResourceClassListQueryPayload) payload);
-        case list_response:
-            return LIST_RESPONSE_SERIALIZER.serialize((ResourceClassListResponsePayload) payload);
-        case issue:
-            return ISSUE_SERIALIZER.serialize((CertificateIssuanceRequestPayload) payload);
-        case issue_response:
-            return ISSUE_RESPONSE_SERIALIZER.serialize((CertificateIssuanceResponsePayload) payload);
-        case revoke:
-            return REVOKE_SERIALIZER.serialize((CertificateRevocationRequestPayload) payload);
-        case revoke_response:
-            return REVOKE_RESPONSE_SERIALIZER.serialize((CertificateRevocationResponsePayload) payload);
-        case error_response:
-            return ERROR_RESPONSE_SERIALIZER.serialize((RequestNotPerformedResponsePayload) payload);
-        default:
-            throw new NotImplementedException("Don't have serializer for PayloadMessageType: " + type);
+            case list:
+                return LIST_SERIALIZER.serialize((ResourceClassListQueryPayload) payload);
+            case list_response:
+                return LIST_RESPONSE_SERIALIZER.serialize((ResourceClassListResponsePayload) payload);
+            case issue:
+                return ISSUE_SERIALIZER.serialize((CertificateIssuanceRequestPayload) payload);
+            case issue_response:
+                return ISSUE_RESPONSE_SERIALIZER.serialize((CertificateIssuanceResponsePayload) payload);
+            case revoke:
+                return REVOKE_SERIALIZER.serialize((CertificateRevocationRequestPayload) payload);
+            case revoke_response:
+                return REVOKE_RESPONSE_SERIALIZER.serialize((CertificateRevocationResponsePayload) payload);
+            case error_response:
+                return ERROR_RESPONSE_SERIALIZER.serialize((RequestNotPerformedResponsePayload) payload);
+            default:
+                throw new NotImplementedException("Don't have serializer for PayloadMessageType: " + type);
         }
     }
 }

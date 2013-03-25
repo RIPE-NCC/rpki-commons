@@ -72,10 +72,10 @@ public class CertificateRevocationRequestPayloadBuilderTest {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD);
 
         String expectedXmlRegex =
-            "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
-            "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"revoke\">" + "\n" +
-            "  <key class_name=\"a classname\" ski=\"[^\"]*\"/>" + "\n" +
-            "</message>";
+                "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
+                        "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"revoke\">" + "\n" +
+                        "  <key class_name=\"a classname\" ski=\"[^\"]*\"/>" + "\n" +
+                        "</message>";
 
         assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
     }

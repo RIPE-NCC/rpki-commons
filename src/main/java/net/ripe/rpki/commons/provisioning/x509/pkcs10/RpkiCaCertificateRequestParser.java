@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.PublicKey;
 import java.util.Enumeration;
+
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -154,7 +155,7 @@ public class RpkiCaCertificateRequestParser {
     private ASN1Set getPkcs9ExtensionRequest() throws RpkiCaCertificateRequestParserException {
         Attribute[] attributes = pkcs10CertificationRequest.getAttributes();
 
-        for (Attribute attr: attributes) {
+        for (Attribute attr : attributes) {
             ASN1ObjectIdentifier oid = attr.getAttrType();
             if (oid.equals(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest)) {
                 return attr.getAttrValues();

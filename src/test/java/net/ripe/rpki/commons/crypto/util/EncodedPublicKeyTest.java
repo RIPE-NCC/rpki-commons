@@ -38,7 +38,7 @@ import org.junit.Test;
 
 public class EncodedPublicKeyTest {
 
-    private static final byte[] ENCODED_PUBLIC_KEY = new byte[] {0};
+    private static final byte[] ENCODED_PUBLIC_KEY = new byte[]{0};
 
     public EncodedPublicKey subject;
 
@@ -53,12 +53,12 @@ public class EncodedPublicKeyTest {
         assertEquals(ENCODED_PUBLIC_KEY, subject.getEncoded());
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void shouldNotSpportFormat() {
         subject.getFormat();
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void shouldNotSpportAlgorithm() {
         subject.getAlgorithm();
     }

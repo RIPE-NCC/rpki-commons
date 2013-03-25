@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.validation;
 
 import java.io.Serializable;
 import java.net.URI;
+
 import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang.Validate;
 

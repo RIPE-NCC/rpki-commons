@@ -118,10 +118,10 @@ public class ManifestCms extends RpkiSignedObject {
     public boolean matchesFiles(Map<String, byte[]> filesToMatch) {
 
         if (files.keySet().equals(filesToMatch.keySet())) {
-            for (Entry<String, byte[]> entry: files.entrySet()) {
+            for (Entry<String, byte[]> entry : files.entrySet()) {
                 String fileName = entry.getKey();
                 byte[] contentToMatch = filesToMatch.get(fileName);
-                if (! verifyFileContents(fileName, contentToMatch)) {
+                if (!verifyFileContents(fileName, contentToMatch)) {
                     return false;
                 }
             }
@@ -175,7 +175,7 @@ public class ManifestCms extends RpkiSignedObject {
 
         if (now.isAfter(nextUpdateTime)) {
             if (nextUpdateTime.plusDays(options.getMaxStaleDays()).isAfter(now)) {
-                 result.warnIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
+                result.warnIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
             } else {
                 result.rejectIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
             }

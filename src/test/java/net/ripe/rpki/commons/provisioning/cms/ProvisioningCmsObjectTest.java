@@ -47,7 +47,7 @@ public class ProvisioningCmsObjectTest {
     public void shouldImplementEquals() {
         X509Certificate certificate1 = createMock(X509Certificate.class);
         X509CRL crl = createMock(X509CRL.class);
-        byte[] encodedContent = new byte[] {'f', 'o', 'o'};
+        byte[] encodedContent = new byte[]{'f', 'o', 'o'};
         ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl, null);
 
         assertFalse(cms1.equals(null));
@@ -61,7 +61,7 @@ public class ProvisioningCmsObjectTest {
         X509Certificate certificate2 = createMock(X509Certificate.class);
         X509CRL crl = createMock(X509CRL.class);
 
-        byte[] encodedContent = new byte[] {'f', 'o', 'o'};
+        byte[] encodedContent = new byte[]{'f', 'o', 'o'};
 
         ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl, null);
         ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet(), crl, null);
@@ -75,7 +75,7 @@ public class ProvisioningCmsObjectTest {
         X509Certificate certificate2 = createMock(X509Certificate.class);
         X509CRL crl = createMock(X509CRL.class);
 
-        byte[] encodedContent = new byte[] {'f', 'o', 'o'};
+        byte[] encodedContent = new byte[]{'f', 'o', 'o'};
 
         ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl, null);
         ProvisioningCmsObject cms2 = new ProvisioningCmsObject(encodedContent, certificate2, Collections.<X509Certificate>emptySet(), crl, null);

@@ -33,7 +33,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 public class CertificateRevocationKeyElement {
-    
+
     @XStreamAlias("class_name")
     @XStreamAsAttribute
     private String className;

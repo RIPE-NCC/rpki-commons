@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum NotPerformedError {
-    
+
     ALREADY_PROCESSING_REQUEST(1101),
     VERSION_NUMBER_ERROR(1102),
     UNRECOGNIZED_REQUEST_TYPE(1103),

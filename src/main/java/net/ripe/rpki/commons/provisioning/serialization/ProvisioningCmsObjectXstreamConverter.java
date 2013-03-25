@@ -42,6 +42,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
  * A converter to be used when (de)serializing a ProvisioningCmsObject to/from xml using XStream.
+ *
  * @see net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject
  */
 public class ProvisioningCmsObjectXstreamConverter implements Converter {

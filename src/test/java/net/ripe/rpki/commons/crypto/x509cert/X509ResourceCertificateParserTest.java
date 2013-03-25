@@ -52,62 +52,62 @@ import static org.junit.Assert.*;
 
 public class X509ResourceCertificateParserTest {
 
-	private X509ResourceCertificateParser subject = new X509ResourceCertificateParser();
+    private X509ResourceCertificateParser subject = new X509ResourceCertificateParser();
 
-	@Test(expected = IllegalArgumentException.class)
-	public void shouldRequireResourceCertificatePolicy() {
-		X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withPolicies();
-		X509ResourceCertificate certificate = builder.build();
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldRequireResourceCertificatePolicy() {
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withPolicies();
+        X509ResourceCertificate certificate = builder.build();
 
-		subject.parse("certificate", certificate.getEncoded());
-		subject.getCertificate();
-	}
+        subject.parse("certificate", certificate.getEncoded());
+        subject.getCertificate();
+    }
 
-	@Test
-	public void shouldParseResourceCertificateWhenResourceExtensionsArePresent() {
-		X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-		X509ResourceCertificate certificate = builder.build();
+    @Test
+    public void shouldParseResourceCertificateWhenResourceExtensionsArePresent() {
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        X509ResourceCertificate certificate = builder.build();
 
-		subject.parse("certificate", certificate.getEncoded());
-		X509ResourceCertificate parsed = subject.getCertificate();
+        subject.parse("certificate", certificate.getEncoded());
+        X509ResourceCertificate parsed = subject.getCertificate();
 
-		assertEquals(certificate, parsed);
-	}
+        assertEquals(certificate, parsed);
+    }
 
-	@Test
-	public void shouldFailOnInvalidInput() {
-		byte[] badlyEncoded = {0x01, 0x03, 0x23};
-		subject.parse("badly", badlyEncoded);
-		assertTrue(subject.getValidationResult().getFailures(new ValidationLocation("badly")).contains(new ValidationCheck(ValidationStatus.ERROR, CERTIFICATE_PARSED)));
-	}
+    @Test
+    public void shouldFailOnInvalidInput() {
+        byte[] badlyEncoded = {0x01, 0x03, 0x23};
+        subject.parse("badly", badlyEncoded);
+        assertTrue(subject.getValidationResult().getFailures(new ValidationLocation("badly")).contains(new ValidationCheck(ValidationStatus.ERROR, CERTIFICATE_PARSED)));
+    }
 
-	@Test
-	public void shouldFailOnInvalidSignatureAlgorithm() throws CertificateEncodingException {
-		X509CertificateBuilderHelper builder = new X509CertificateBuilderHelper();
-		builder.withSubjectDN(new X500Principal("CN=zz.subject")).withIssuerDN(new X500Principal("CN=zz.issuer"));
-		builder.withSerial(BigInteger.ONE);
-		builder.withPublicKey(TEST_KEY_PAIR.getPublic());
-		builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-		DateTime now = new DateTime(DateTimeZone.UTC);
-		builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
-		builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
-		builder.withSignatureAlgorithm("MD5withRSA");
-		X509Certificate certificate = builder.generateCertificate();
+    @Test
+    public void shouldFailOnInvalidSignatureAlgorithm() throws CertificateEncodingException {
+        X509CertificateBuilderHelper builder = new X509CertificateBuilderHelper();
+        builder.withSubjectDN(new X500Principal("CN=zz.subject")).withIssuerDN(new X500Principal("CN=zz.issuer"));
+        builder.withSerial(BigInteger.ONE);
+        builder.withPublicKey(TEST_KEY_PAIR.getPublic());
+        builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
+        DateTime now = new DateTime(DateTimeZone.UTC);
+        builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        builder.withSignatureAlgorithm("MD5withRSA");
+        X509Certificate certificate = builder.generateCertificate();
 
-		subject.parse("certificate", certificate.getEncoded());
+        subject.parse("certificate", certificate.getEncoded());
 
-		assertTrue(subject.getValidationResult().hasFailures());
-		assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
-	}
+        assertTrue(subject.getValidationResult().hasFailures());
+        assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
+    }
 
-	@Test
-	public void should_validate_key_algorithm_and_size() {
-		X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-		X509ResourceCertificate certificate = builder.build();
+    @Test
+    public void should_validate_key_algorithm_and_size() {
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        X509ResourceCertificate certificate = builder.build();
 
-		subject.parse("certificate", certificate.getEncoded());
+        subject.parse("certificate", certificate.getEncoded());
 
-		assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
-		assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
-	}
+        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
+        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
+    }
 }

@@ -44,7 +44,7 @@ public class ManifestCmsGeneralInfo implements Serializable {
     private DateTime nextUpdateTime;
     private String fileHashAlgorithm;
 
-    public ManifestCmsGeneralInfo(int version, BigInteger number, DateTime thisUpdateTime, DateTime nextUpdateTime,	String fileHashAlgorithm) {
+    public ManifestCmsGeneralInfo(int version, BigInteger number, DateTime thisUpdateTime, DateTime nextUpdateTime, String fileHashAlgorithm) {
         this.version = version;
         this.number = number;
         this.thisUpdateTime = thisUpdateTime;

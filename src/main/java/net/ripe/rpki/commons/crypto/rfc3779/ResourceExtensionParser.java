@@ -33,6 +33,7 @@ import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import net.ripe.ipresource.IpAddress;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
@@ -52,13 +53,13 @@ import org.bouncycastle.asn1.DERBitString;
 /**
  * Parses the certificate resource extensions as specified in RFC3779. Resource
  * inheritance is not yet supported.
- *
+ * <p/>
  * The methods in this class are named after the grammar rules in RFC3779,
  * prefixed with "derTo".
  */
 public class ResourceExtensionParser {
 
-    private static final AddressFamily[] SUPPORTED_ADDRESS_FAMILIES = new AddressFamily[] {AddressFamily.IPV4, AddressFamily.IPV6};
+    private static final AddressFamily[] SUPPORTED_ADDRESS_FAMILIES = new AddressFamily[]{AddressFamily.IPV4, AddressFamily.IPV6};
 
 
     /**
@@ -74,7 +75,7 @@ public class ResourceExtensionParser {
         ASN1OctetString o = (ASN1OctetString) octetString;
         SortedMap<AddressFamily, IpResourceSet> map = derToIpAddressBlocks(decode(o.getOctets()));
 
-        for (AddressFamily family: SUPPORTED_ADDRESS_FAMILIES) {
+        for (AddressFamily family : SUPPORTED_ADDRESS_FAMILIES) {
             if (!map.containsKey(family)) {
                 map.put(family, new IpResourceSet());
             }
@@ -239,7 +240,7 @@ public class ResourceExtensionParser {
         ASN1Sequence seq = (ASN1Sequence) der;
         Validate.isTrue(seq.size() <= 2, "ASN1Sequence with 2 or fewer elements expected");
 
-        IpResourceSet[] result = { new IpResourceSet(), new IpResourceSet() };
+        IpResourceSet[] result = {new IpResourceSet(), new IpResourceSet()};
         for (int i = 0; i < seq.size(); ++i) {
             expect(seq.getObjectAt(i), ASN1TaggedObject.class);
             ASN1TaggedObject tagged = (ASN1TaggedObject) seq.getObjectAt(i);

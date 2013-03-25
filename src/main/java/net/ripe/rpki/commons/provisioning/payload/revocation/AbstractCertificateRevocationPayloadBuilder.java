@@ -50,7 +50,7 @@ public abstract class AbstractCertificateRevocationPayloadBuilder<T extends Abst
     public void withPublicKeyHash(String publicKeyHash) {
         this.publicKeyHash = publicKeyHash;
     }
-    
+
     public void withPublicKey(PublicKey publicKey) {
         this.publicKeyHash = KeyPairUtil.getEncodedKeyIdentifier(publicKey);
     }

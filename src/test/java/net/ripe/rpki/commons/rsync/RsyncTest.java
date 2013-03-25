@@ -89,7 +89,7 @@ public class RsyncTest {
     @Test
     public void shouldResetProperly() {
         Rsync rsync = new Rsync();
-        rsync.addOptions(Arrays.asList(new String[] {"--version"}));
+        rsync.addOptions(Arrays.asList(new String[]{"--version"}));
 
         assertFalse(rsync.isCompleted());
         assertNull(rsync.getException());

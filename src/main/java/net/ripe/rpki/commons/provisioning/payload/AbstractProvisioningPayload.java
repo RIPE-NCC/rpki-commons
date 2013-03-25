@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.provisioning.payload;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 public abstract class AbstractProvisioningPayload {
-    
+
     public static final String DEFAULT_SENDER = "sender";
     public static final String DEFAULT_RECIPIENT = "recipient";
 
@@ -58,7 +58,7 @@ public abstract class AbstractProvisioningPayload {
         this.version = version;
         this.type = type;
     }
-    
+
     /**
      * Note: This field is used by some implementations to work out who the players
      * are in an exchange of ProvisioningCmsObjects. (eg APNIC). This setter is
@@ -69,7 +69,7 @@ public abstract class AbstractProvisioningPayload {
     public void setRecipient(String recipient) {
         this.recipient = recipient;
     }
-    
+
     /**
      * Note: This field is used by some implementations to work out who the players
      * are in an exchange of ProvisioningCmsObjects. (eg APNIC). This setter is
@@ -80,7 +80,7 @@ public abstract class AbstractProvisioningPayload {
     public void setSender(String sender) {
         this.sender = sender;
     }
-    
+
     public Integer getVersion() {
         return version;
     }
@@ -96,5 +96,5 @@ public abstract class AbstractProvisioningPayload {
     public PayloadMessageType getType() {
         return type;
     }
-    
+
 }

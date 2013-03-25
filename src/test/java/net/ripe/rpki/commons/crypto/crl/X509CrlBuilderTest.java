@@ -42,6 +42,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import org.joda.time.DateTime;
@@ -117,7 +118,7 @@ public class X509CrlBuilderTest {
         assertEquals(2, crl.getRevokedCertificates().size());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRejectDuplicateCrlEntriesForSameSerial() {
         subject.addEntry(BigInteger.TEN, REVOCATION_TIME);
     }
@@ -140,7 +141,7 @@ public class X509CrlBuilderTest {
         nonEmptyCrl.verify(PUBLIC_KEY);
     }
 
-    @Test(expected=SignatureException.class)
+    @Test(expected = SignatureException.class)
     public void shouldFailVerifyWithOtherKey() throws InvalidKeyException, CRLException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
         emptyCrl.verify(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic());
     }

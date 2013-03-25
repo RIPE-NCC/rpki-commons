@@ -45,9 +45,9 @@ public class RoaCmsConverterTest {
     private RoaCmsConverter subject;
 
     private String expectedXmlRegEx =
-        "<net\\.ripe\\..*\\.RoaCms>\n" +
-        "  <encoded>[^<]*</encoded>\n" +
-        "</net\\.ripe\\..*\\.RoaCms>";
+            "<net\\.ripe\\..*\\.RoaCms>\n" +
+                    "  <encoded>[^<]*</encoded>\n" +
+                    "</net\\.ripe\\..*\\.RoaCms>";
 
     @Before
     public void setUp() {

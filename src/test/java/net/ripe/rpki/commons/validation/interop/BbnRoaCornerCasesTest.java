@@ -44,29 +44,29 @@ import static org.junit.Assert.assertFalse;
 //TODO Tim fix this test, or remove it.
 public class BbnRoaCornerCasesTest {
 
-	private static final String PATH_TO_BBN_ROAS = "src/test/resources/bbn-standard-compliance-cases/root";
+    private static final String PATH_TO_BBN_ROAS = "src/test/resources/bbn-standard-compliance-cases/root";
 
-	@Test
-	public void shouldRejectBadRoaVersionV2Roa() throws IOException {
-		File file = new File(PATH_TO_BBN_ROAS + "/badROAVersionV2.roa");
-		byte[] encoded = FileUtils.readFileToByteArray(file);
+    @Test
+    public void shouldRejectBadRoaVersionV2Roa() throws IOException {
+        File file = new File(PATH_TO_BBN_ROAS + "/badROAVersionV2.roa");
+        byte[] encoded = FileUtils.readFileToByteArray(file);
 
-		RoaCmsParser parser = new RoaCmsParser();
-		ValidationResult result = ValidationResult.withLocation(file.getName());
-		parser.parse(result, encoded);
+        RoaCmsParser parser = new RoaCmsParser();
+        ValidationResult result = ValidationResult.withLocation(file.getName());
+        parser.parse(result, encoded);
 
-		assertFalse(result.hasFailures());
-	}
+        assertFalse(result.hasFailures());
+    }
 
-	@Test
-	public void shouldAcceptGoodRoa() throws IOException {
-		File file = new File(PATH_TO_BBN_ROAS + "/goodROANothingWrong.roa");
-		byte[] encoded = FileUtils.readFileToByteArray(file);
+    @Test
+    public void shouldAcceptGoodRoa() throws IOException {
+        File file = new File(PATH_TO_BBN_ROAS + "/goodROANothingWrong.roa");
+        byte[] encoded = FileUtils.readFileToByteArray(file);
 
-		RoaCmsParser parser = new RoaCmsParser();
-		ValidationResult result = ValidationResult.withLocation(file.getName());
-		parser.parse(result, encoded);
+        RoaCmsParser parser = new RoaCmsParser();
+        ValidationResult result = ValidationResult.withLocation(file.getName());
+        parser.parse(result, encoded);
 
-		assertFalse(result.hasFailures());
-	}
+        assertFalse(result.hasFailures());
+    }
 }

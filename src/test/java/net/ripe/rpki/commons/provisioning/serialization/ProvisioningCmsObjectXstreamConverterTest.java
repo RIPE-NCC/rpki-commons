@@ -54,7 +54,7 @@ public class ProvisioningCmsObjectXstreamConverterTest {
         xStreamXmlSerializerBuilder.withAliasType("ProvisioningCmsObject", ProvisioningCmsObject.class);
         serializer = xStreamXmlSerializerBuilder.build();
     }
-    
+
     @Test
     public void shouldRoundTrip() {
         ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject();
@@ -62,17 +62,17 @@ public class ProvisioningCmsObjectXstreamConverterTest {
         ProvisioningCmsObject deserializedCmsObject = serializer.deserialize(xml);
         assertEquals(cmsObject, deserializedCmsObject);
     }
-    
+
     @Test
     public void shouldUseSimpleXml() {
         ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject();
         String xml = serializer.serialize(cmsObject);
-        
+
         String expectedRegex = "<ProvisioningCmsObject>\n" +
-                               "  <encoded>[^<]*</encoded>\n" +
-                               "</ProvisioningCmsObject>";
+                "  <encoded>[^<]*</encoded>\n" +
+                "</ProvisioningCmsObject>";
 
         assertTrue(Pattern.matches(expectedRegex, xml));
     }
-    
+
 }

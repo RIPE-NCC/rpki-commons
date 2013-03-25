@@ -62,231 +62,231 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class RpkiSignedObjectParser {
 
-	private byte[] encoded;
+    private byte[] encoded;
 
-	private X509ResourceCertificate certificate;
+    private X509ResourceCertificate certificate;
 
-	private ASN1ObjectIdentifier contentType;
+    private ASN1ObjectIdentifier contentType;
 
-	private DateTime signingTime;
+    private DateTime signingTime;
 
-	private ValidationResult validationResult;
+    private ValidationResult validationResult;
 
-	public final void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
-		parse(ValidationResult.withLocation(location), encoded);
-	}
+    public final void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
+        parse(ValidationResult.withLocation(location), encoded);
+    }
 
-	public void parse(ValidationResult result, byte[] encoded) {
-		this.validationResult = result;
-		this.encoded = encoded;
-		parseCms();
-	}
+    public void parse(ValidationResult result, byte[] encoded) {
+        this.validationResult = result;
+        this.encoded = encoded;
+        parseCms();
+    }
 
-	protected byte[] getEncoded() {
-		return encoded;
-	}
+    protected byte[] getEncoded() {
+        return encoded;
+    }
 
-	public ValidationResult getValidationResult() {
-		return validationResult;
-	}
+    public ValidationResult getValidationResult() {
+        return validationResult;
+    }
 
-	protected X509ResourceCertificate getCertificate() {
-		return certificate;
-	}
+    protected X509ResourceCertificate getCertificate() {
+        return certificate;
+    }
 
-	protected X509ResourceCertificate getResourceCertificate() {
-		return certificate;
-	}
+    protected X509ResourceCertificate getResourceCertificate() {
+        return certificate;
+    }
 
-	protected ASN1ObjectIdentifier getContentType() {
-		return contentType;
-	}
+    protected ASN1ObjectIdentifier getContentType() {
+        return contentType;
+    }
 
-	protected DateTime getSigningTime() {
-		return signingTime;
-	}
+    protected DateTime getSigningTime() {
+        return signingTime;
+    }
 
-	public abstract void decodeContent(ASN1Encodable encoded);
+    public abstract void decodeContent(ASN1Encodable encoded);
 
-	private void parseCms() {
-		CMSSignedDataParser sp;
-		try {
-			sp = new CMSSignedDataParser(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER, encoded);
-		} catch (CMSException e) {
-			validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
-			return;
-		}
-		validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
+    private void parseCms() {
+        CMSSignedDataParser sp;
+        try {
+            sp = new CMSSignedDataParser(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER, encoded);
+        } catch (CMSException e) {
+            validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
+            return;
+        }
+        validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
 
-		if (!validationResult.hasFailures()) {
-			parseContent(sp);
-		}
-		if (!validationResult.hasFailures()) {
-			parseCmsCertificate(sp);
-		}
-		if (!validationResult.hasFailures()) {
-			verifyCmsSigning(sp, certificate.getCertificate());
-		}
-	}
+        if (!validationResult.hasFailures()) {
+            parseContent(sp);
+        }
+        if (!validationResult.hasFailures()) {
+            parseCmsCertificate(sp);
+        }
+        if (!validationResult.hasFailures()) {
+            verifyCmsSigning(sp, certificate.getCertificate());
+        }
+    }
 
-	private void parseContent(CMSSignedDataParser sp) {
-		contentType = sp.getSignedContent().getContentType();
+    private void parseContent(CMSSignedDataParser sp) {
+        contentType = sp.getSignedContent().getContentType();
 
-		InputStream signedContentStream = sp.getSignedContent().getContentStream();
-		ASN1InputStream asn1InputStream = new ASN1InputStream(signedContentStream);
+        InputStream signedContentStream = sp.getSignedContent().getContentStream();
+        ASN1InputStream asn1InputStream = new ASN1InputStream(signedContentStream);
 
-		try {
-			decodeContent(asn1InputStream.readObject());
-		} catch (IOException e) {
-			validationResult.rejectIfFalse(false, DECODE_CONTENT);
-			return;
-		}
-		validationResult.rejectIfFalse(true, DECODE_CONTENT);
+        try {
+            decodeContent(asn1InputStream.readObject());
+        } catch (IOException e) {
+            validationResult.rejectIfFalse(false, DECODE_CONTENT);
+            return;
+        }
+        validationResult.rejectIfFalse(true, DECODE_CONTENT);
 
-		try {
-			validationResult.rejectIfFalse(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
-			asn1InputStream.close();
-		} catch (IOException e) {
-			validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
-		}
-		validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
-	}
+        try {
+            validationResult.rejectIfFalse(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
+            asn1InputStream.close();
+        } catch (IOException e) {
+            validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
+        }
+        validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
+    }
 
-	private void parseCmsCertificate(CMSSignedDataParser sp) {
-		Collection<? extends Certificate> certificates = extractCertificate(sp);
+    private void parseCmsCertificate(CMSSignedDataParser sp) {
+        Collection<? extends Certificate> certificates = extractCertificate(sp);
 
-		if (!validationResult.rejectIfNull(certificates, GET_CERTS_AND_CRLS)) {
-			return;
-		}
-		if (!validationResult.rejectIfFalse(certificates.size() == 1, ONLY_ONE_EE_CERT_ALLOWED)) {
-			return;
-		}
-		if (!validationResult.rejectIfFalse(certificates.iterator().next() instanceof X509Certificate, CERT_IS_X509CERT)) {
-			return;
-		}
+        if (!validationResult.rejectIfNull(certificates, GET_CERTS_AND_CRLS)) {
+            return;
+        }
+        if (!validationResult.rejectIfFalse(certificates.size() == 1, ONLY_ONE_EE_CERT_ALLOWED)) {
+            return;
+        }
+        if (!validationResult.rejectIfFalse(certificates.iterator().next() instanceof X509Certificate, CERT_IS_X509CERT)) {
+            return;
+        }
 
-		certificate = parseCertificate(certificates.iterator().next());
-		if (validationResult.hasFailureForCurrentLocation()) {
-			return;
-		}
+        certificate = parseCertificate(certificates.iterator().next());
+        if (validationResult.hasFailureForCurrentLocation()) {
+            return;
+        }
 
-		validationResult.rejectIfFalse(certificate.isEe(), CERT_IS_EE_CERT);
-		validationResult.rejectIfNull(certificate.getSubjectKeyIdentifier(), CERT_HAS_SKI);
-	}
+        validationResult.rejectIfFalse(certificate.isEe(), CERT_IS_EE_CERT);
+        validationResult.rejectIfNull(certificate.getSubjectKeyIdentifier(), CERT_HAS_SKI);
+    }
 
-	private X509ResourceCertificate parseCertificate(Certificate certificate) {
-		try {
-			X509Certificate x509certificate = (X509Certificate) certificate;
-			X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-			parser.parse(validationResult, x509certificate.getEncoded());
-			return parser.isSuccess() ? parser.getCertificate() : null;
-		} catch (CertificateEncodingException e) {
-			throw new AbstractX509CertificateWrapperException("cannot parse already decoded X509 certificate: " + e, e);
-		}
-	}
+    private X509ResourceCertificate parseCertificate(Certificate certificate) {
+        try {
+            X509Certificate x509certificate = (X509Certificate) certificate;
+            X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+            parser.parse(validationResult, x509certificate.getEncoded());
+            return parser.isSuccess() ? parser.getCertificate() : null;
+        } catch (CertificateEncodingException e) {
+            throw new AbstractX509CertificateWrapperException("cannot parse already decoded X509 certificate: " + e, e);
+        }
+    }
 
-	private Collection<? extends Certificate> extractCertificate(CMSSignedDataParser sp) {
-		try {
-			return BouncyCastleUtil.extractCertificates(sp);
-		} catch (CMSException e) {
-			return null;
-		} catch (StoreException e) {
-			return null;
-		} catch (CertificateException e) {
-			return null;
-		}
-	}
+    private Collection<? extends Certificate> extractCertificate(CMSSignedDataParser sp) {
+        try {
+            return BouncyCastleUtil.extractCertificates(sp);
+        } catch (CMSException e) {
+            return null;
+        } catch (StoreException e) {
+            return null;
+        } catch (CertificateException e) {
+            return null;
+        }
+    }
 
-	private void verifyCmsSigning(CMSSignedDataParser sp, X509Certificate certificate) {
-		// Note: validationResult field is updated by methods used here.
+    private void verifyCmsSigning(CMSSignedDataParser sp, X509Certificate certificate) {
+        // Note: validationResult field is updated by methods used here.
 
-		SignerInformation signer = extractSingleCmsSigner(sp);
-		if (signer == null) {
-			return;
-		}
+        SignerInformation signer = extractSingleCmsSigner(sp);
+        if (signer == null) {
+            return;
+        }
 
-		if (!verifySigner(signer, certificate)) {
-			return;
-		}
+        if (!verifySigner(signer, certificate)) {
+            return;
+        }
 
-		if (!verifyAndStoreSigningTime(signer)) {
-			return;
-		}
+        if (!verifyAndStoreSigningTime(signer)) {
+            return;
+        }
 
-		verifySignature(certificate, signer);
-	}
+        verifySignature(certificate, signer);
+    }
 
-	private SignerInformation extractSingleCmsSigner(CMSSignedDataParser sp) {
-		SignerInformationStore signerStore = getSignerStore(sp);
-		if (!validationResult.rejectIfNull(signerStore, GET_SIGNER_INFO)) {
-			return null;
-		}
+    private SignerInformation extractSingleCmsSigner(CMSSignedDataParser sp) {
+        SignerInformationStore signerStore = getSignerStore(sp);
+        if (!validationResult.rejectIfNull(signerStore, GET_SIGNER_INFO)) {
+            return null;
+        }
 
-		Collection<?> signers = signerStore.getSigners();
-		validationResult.rejectIfFalse(signers.size() == 1, ONLY_ONE_SIGNER);
+        Collection<?> signers = signerStore.getSigners();
+        validationResult.rejectIfFalse(signers.size() == 1, ONLY_ONE_SIGNER);
 
-		return (SignerInformation) signers.iterator().next();
-	}
+        return (SignerInformation) signers.iterator().next();
+    }
 
-	private SignerInformationStore getSignerStore(CMSSignedDataParser sp) {
-		try {
-			return sp.getSignerInfos();
-		} catch (CMSException e) {
-			return null; // Caller will validate that the SignerInformationStore is not null
-		}
-	}
+    private SignerInformationStore getSignerStore(CMSSignedDataParser sp) {
+        try {
+            return sp.getSignerInfos();
+        } catch (CMSException e) {
+            return null; // Caller will validate that the SignerInformationStore is not null
+        }
+    }
 
-	private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
-		validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
-		validationResult.rejectIfFalse(ENCRYPTION_ALGORITHM_OID.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
-		if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
-			return false;
-		}
-		validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
-		validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
-		SignerId signerId = signer.getSID();
-		try {
-			validationResult.rejectIfFalse(signerId.match(new JcaX509CertificateHolder(certificate)), SIGNER_ID_MATCH);
-		} catch (CertificateEncodingException e) {
-			throw new AbstractX509CertificateWrapperException(e);
-		}
+    private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
+        validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
+        validationResult.rejectIfFalse(ENCRYPTION_ALGORITHM_OID.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
+        if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
+            return false;
+        }
+        validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
+        validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
+        SignerId signerId = signer.getSID();
+        try {
+            validationResult.rejectIfFalse(signerId.match(new JcaX509CertificateHolder(certificate)), SIGNER_ID_MATCH);
+        } catch (CertificateEncodingException e) {
+            throw new AbstractX509CertificateWrapperException(e);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private boolean verifyAndStoreSigningTime(SignerInformation signer) {
-		Attribute signingTimeAttibute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
-		if (!validationResult.rejectIfNull(signingTimeAttibute, SIGNING_TIME_ATTR_PRESENT)) {
-			return false;
-		}
-		if (!validationResult.rejectIfFalse(signingTimeAttibute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
-			return false;
-		}
+    private boolean verifyAndStoreSigningTime(SignerInformation signer) {
+        Attribute signingTimeAttibute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
+        if (!validationResult.rejectIfNull(signingTimeAttibute, SIGNING_TIME_ATTR_PRESENT)) {
+            return false;
+        }
+        if (!validationResult.rejectIfFalse(signingTimeAttibute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
+            return false;
+        }
 
-		Time signingTimeDate = Time.getInstance(signingTimeAttibute.getAttrValues().getObjectAt(0));
-		signingTime = new DateTime(signingTimeDate.getDate().getTime(), DateTimeZone.UTC);
-		return true;
-	}
+        Time signingTimeDate = Time.getInstance(signingTimeAttibute.getAttrValues().getObjectAt(0));
+        signingTime = new DateTime(signingTimeDate.getDate().getTime(), DateTimeZone.UTC);
+        return true;
+    }
 
-	private void verifySignature(X509Certificate certificate, SignerInformation signer) {
-		String errorMessage = null;
-		try {
-			/*
+    private void verifySignature(X509Certificate certificate, SignerInformation signer) {
+        String errorMessage = null;
+        try {
+            /*
 			 * Use the public key for the "verifier" not the certificate, because otherwise
              * BC will reject the CMS if the signingTime is outside of the EE certificate validity
              * time. This happens occasionally and is no ground to reject according to standards:
              * http://tools.ietf.org/html/rfc6488#section-2.1.6.4.3
              */
-			validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey())), SIGNATURE_VERIFICATION);
-		} catch (OperatorCreationException e) {
-			errorMessage = String.valueOf(e.getMessage());
-		} catch (CMSException e) {
-			errorMessage = String.valueOf(e.getMessage());
-		}
+            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey())), SIGNATURE_VERIFICATION);
+        } catch (OperatorCreationException e) {
+            errorMessage = String.valueOf(e.getMessage());
+        } catch (CMSException e) {
+            errorMessage = String.valueOf(e.getMessage());
+        }
 
-		if (errorMessage != null) {
-			validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION, errorMessage);
-		}
-	}
+        if (errorMessage != null) {
+            validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION, errorMessage);
+        }
+    }
 
 }

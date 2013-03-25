@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
-
 /**
  * Convert ParentIdentity to/from ISC style XML
  */

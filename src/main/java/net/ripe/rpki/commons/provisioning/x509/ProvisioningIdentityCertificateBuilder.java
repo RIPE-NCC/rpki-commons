@@ -66,9 +66,10 @@ public class ProvisioningIdentityCertificateBuilder {
         this.selfSigningSubject = selfSigningSubject;
         return this;
     }
-    
+
     /**
      * Only call this if you need to use a special signature provider, eg for HSM. Leave to use default otherwise
+     *
      * @see X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER
      */
     public ProvisioningIdentityCertificateBuilder withSignatureProvider(String signatureProvider) {

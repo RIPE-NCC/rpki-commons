@@ -56,5 +56,5 @@ public class DescriptionElementConverter implements Converter {
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         return reader.getValue();
     }
-    
+
 }

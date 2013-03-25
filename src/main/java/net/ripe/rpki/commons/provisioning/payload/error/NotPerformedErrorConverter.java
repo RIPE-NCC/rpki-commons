@@ -40,7 +40,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 public class NotPerformedErrorConverter implements Converter {
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        NotPerformedError error = (NotPerformedError)source;
+        NotPerformedError error = (NotPerformedError) source;
 
         context.convertAnother(error.getErrorCode());
     }

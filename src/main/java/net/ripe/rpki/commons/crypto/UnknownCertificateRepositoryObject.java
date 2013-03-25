@@ -38,24 +38,24 @@ import java.net.URI;
 
 public class UnknownCertificateRepositoryObject implements CertificateRepositoryObject {
 
-	private final byte[] encoded;
+    private final byte[] encoded;
 
-	public UnknownCertificateRepositoryObject(byte[] encoded) {
-		this.encoded = encoded;
-	}
+    public UnknownCertificateRepositoryObject(byte[] encoded) {
+        this.encoded = encoded;
+    }
 
-	public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
-	}
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    }
 
-	public URI getCrlUri() {
-		return null;
-	}
+    public URI getCrlUri() {
+        return null;
+    }
 
-	public URI getParentCertificateUri() {
-		return null;
-	}
+    public URI getParentCertificateUri() {
+        return null;
+    }
 
-	public byte[] getEncoded() {
-		return encoded;
-	}
+    public byte[] getEncoded() {
+        return encoded;
+    }
 }

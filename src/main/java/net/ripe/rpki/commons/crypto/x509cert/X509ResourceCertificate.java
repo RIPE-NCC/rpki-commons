@@ -58,108 +58,108 @@ import org.apache.commons.lang.Validate;
  */
 public class X509ResourceCertificate extends AbstractX509CertificateWrapper implements CertificateRepositoryObject {
 
-	private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 2L;
 
-	private EnumSet<IpResourceType> inheritedResourceTypes;
-	private IpResourceSet resources;
+    private EnumSet<IpResourceType> inheritedResourceTypes;
+    private IpResourceSet resources;
 
 
-	protected X509ResourceCertificate(X509Certificate certificate) {
-		super(certificate);
-		parseResourceExtensions();
-	}
+    protected X509ResourceCertificate(X509Certificate certificate) {
+        super(certificate);
+        parseResourceExtensions();
+    }
 
-	private void parseResourceExtensions() {
-		ResourceExtensionParser parser = new ResourceExtensionParser();
+    private void parseResourceExtensions() {
+        ResourceExtensionParser parser = new ResourceExtensionParser();
 
-		inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
-		resources = new IpResourceSet();
+        inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
+        resources = new IpResourceSet();
 
-		byte[] ipAddressBlocksExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
-		if (ipAddressBlocksExtension != null) {
-			SortedMap<AddressFamily, IpResourceSet> ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
-			for (Entry<AddressFamily, IpResourceSet> resourcesByType : ipResources.entrySet()) {
-				if (resourcesByType.getValue() == null) {
-					inheritedResourceTypes.add(resourcesByType.getKey().toIpResourceType());
-				} else {
-					resources.addAll(resourcesByType.getValue());
-				}
-			}
-		}
+        byte[] ipAddressBlocksExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
+        if (ipAddressBlocksExtension != null) {
+            SortedMap<AddressFamily, IpResourceSet> ipResources = parser.parseIpAddressBlocks(ipAddressBlocksExtension);
+            for (Entry<AddressFamily, IpResourceSet> resourcesByType : ipResources.entrySet()) {
+                if (resourcesByType.getValue() == null) {
+                    inheritedResourceTypes.add(resourcesByType.getKey().toIpResourceType());
+                } else {
+                    resources.addAll(resourcesByType.getValue());
+                }
+            }
+        }
 
-		byte[] asnExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
-		if (asnExtension != null) {
-			IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
-			if (asResources == null) {
-				inheritedResourceTypes.add(IpResourceType.ASN);
-			} else {
-				resources.addAll(asResources);
-			}
-		}
-		Validate.isTrue(!inheritedResourceTypes.isEmpty() || !resources.isEmpty(), "empty resource set");
-	}
+        byte[] asnExtension = getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
+        if (asnExtension != null) {
+            IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
+            if (asResources == null) {
+                inheritedResourceTypes.add(IpResourceType.ASN);
+            } else {
+                resources.addAll(asResources);
+            }
+        }
+        Validate.isTrue(!inheritedResourceTypes.isEmpty() || !resources.isEmpty(), "empty resource set");
+    }
 
-	public IpResourceSet getResources() {
-		return resources;
-	}
+    public IpResourceSet getResources() {
+        return resources;
+    }
 
-	public EnumSet<IpResourceType> getInheritedResourceTypes() {
-		return inheritedResourceTypes;
-	}
+    public EnumSet<IpResourceType> getInheritedResourceTypes() {
+        return inheritedResourceTypes;
+    }
 
-	public boolean isResourceTypesInherited(EnumSet<IpResourceType> resourceTypes) {
-		return inheritedResourceTypes.containsAll(resourceTypes);
-	}
+    public boolean isResourceTypesInherited(EnumSet<IpResourceType> resourceTypes) {
+        return inheritedResourceTypes.containsAll(resourceTypes);
+    }
 
-	public boolean isResourceSetInherited() {
-		return !inheritedResourceTypes.isEmpty();
-	}
+    public boolean isResourceSetInherited() {
+        return !inheritedResourceTypes.isEmpty();
+    }
 
-	@Override
-	public URI getCrlUri() {
-		return findFirstRsyncCrlDistributionPoint();
-	}
+    @Override
+    public URI getCrlUri() {
+        return findFirstRsyncCrlDistributionPoint();
+    }
 
-	@Override
-	public URI getParentCertificateUri() {
-		return findFirstAuthorityInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS);
-	}
+    @Override
+    public URI getParentCertificateUri() {
+        return findFirstAuthorityInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS);
+    }
 
-	public void validate(String location, X509ResourceCertificateValidator validator) {
-		X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-		parser.parse(ValidationResult.withLocation(location), getEncoded());
-		if (parser.getValidationResult().hasFailures()) {
-			return;
-		}
+    public void validate(String location, X509ResourceCertificateValidator validator) {
+        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+        parser.parse(ValidationResult.withLocation(location), getEncoded());
+        if (parser.getValidationResult().hasFailures()) {
+            return;
+        }
 
-		validator.validate(location, this);
-	}
+        validator.validate(location, this);
+    }
 
-	@Override
-	public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
-		X509Crl crl = null;
-		if (!isRoot()) {
-			ValidationLocation savedCurrentLocation = result.getCurrentLocation();
-			result.setLocation(new ValidationLocation(getCrlUri()));
-			crl = crlLocator.getCrl(getCrlUri(), context, result);
-			result.setLocation(savedCurrentLocation);
-			result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
-			if (crl == null) {
-				return;
-			}
-		}
-		X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
-		validator.validate(location, this);
-	}
+    @Override
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+        X509Crl crl = null;
+        if (!isRoot()) {
+            ValidationLocation savedCurrentLocation = result.getCurrentLocation();
+            result.setLocation(new ValidationLocation(getCrlUri()));
+            crl = crlLocator.getCrl(getCrlUri(), context, result);
+            result.setLocation(savedCurrentLocation);
+            result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
+            if (crl == null) {
+                return;
+            }
+        }
+        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
+        validator.validate(location, this);
+    }
 
-	public IpResourceSet deriveResources(IpResourceSet parentResources) {
-		IpResourceSet result = new IpResourceSet(getResources());
-		for (IpResource ipResource : parentResources) {
-			if (inheritedResourceTypes.contains(ipResource.getType())) {
-				result.add(ipResource);
-			}
-		}
-		return result;
-	}
+    public IpResourceSet deriveResources(IpResourceSet parentResources) {
+        IpResourceSet result = new IpResourceSet(getResources());
+        for (IpResource ipResource : parentResources) {
+            if (inheritedResourceTypes.contains(ipResource.getType())) {
+                result.add(ipResource);
+            }
+        }
+        return result;
+    }
 
 }

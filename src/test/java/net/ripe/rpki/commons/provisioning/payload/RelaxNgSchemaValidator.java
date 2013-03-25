@@ -47,9 +47,10 @@ public abstract class RelaxNgSchemaValidator {
 
     /**
      * Validate against a relax ng schema
+     *
      * @param xml to validate
      * @return true when all is valid
-     * @throws IOException upon failures
+     * @throws IOException  upon failures
      * @throws SAXException upon failures
      */
     public static boolean validateAgainstRelaxNg(String xml) throws IOException, SAXException {

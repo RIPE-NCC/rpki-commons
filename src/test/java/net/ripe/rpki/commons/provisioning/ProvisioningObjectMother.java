@@ -118,10 +118,10 @@ public class ProvisioningObjectMother {
 
     public static ProvisioningCmsObject createRevocationRequestCmsObject() throws Exception {
 
-    	CertificateRevocationRequestPayloadBuilder revokePayloadBuilder = new CertificateRevocationRequestPayloadBuilder();
-    	revokePayloadBuilder.withClassName(RPKI_CA_CERT_REQUEST_PAYLOAD.getRequestElement().getClassName());
-    	revokePayloadBuilder.withPublicKey(RPKI_CA_CERT_REQUEST_KEYPAIR.getPublic());
-		return createCmsForPayload(revokePayloadBuilder.build());
+        CertificateRevocationRequestPayloadBuilder revokePayloadBuilder = new CertificateRevocationRequestPayloadBuilder();
+        revokePayloadBuilder.withClassName(RPKI_CA_CERT_REQUEST_PAYLOAD.getRequestElement().getClassName());
+        revokePayloadBuilder.withPublicKey(RPKI_CA_CERT_REQUEST_KEYPAIR.getPublic());
+        return createCmsForPayload(revokePayloadBuilder.build());
     }
 
     private static ProvisioningCmsObject createCmsForPayload(AbstractProvisioningPayload payloadXml) {

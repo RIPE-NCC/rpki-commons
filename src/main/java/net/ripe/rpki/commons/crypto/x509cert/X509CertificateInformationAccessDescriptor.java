@@ -126,7 +126,7 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
 
     public static ASN1ObjectIdentifier stringToMethod(String method) {
         Validate.notNull(method);
-        for (Map.Entry<ASN1ObjectIdentifier, String> entry: METHOD_STRING_TABLE.entrySet()) {
+        for (Map.Entry<ASN1ObjectIdentifier, String> entry : METHOD_STRING_TABLE.entrySet()) {
             if (entry.getValue().equals(method)) {
                 return entry.getKey();
             }

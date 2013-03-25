@@ -38,7 +38,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.IpResourceSet;
 
 
-public class X509ResourceCertificateParentChildValidator extends X509CertificateParentChildValidator <X509ResourceCertificate> implements X509ResourceCertificateValidator {
+public class X509ResourceCertificateParentChildValidator extends X509CertificateParentChildValidator<X509ResourceCertificate> implements X509ResourceCertificateValidator {
 
     private IpResourceSet resources;
 

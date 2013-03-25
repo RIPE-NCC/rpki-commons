@@ -40,6 +40,7 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertStoreException;
 import java.security.cert.X509CRL;
 import java.util.Collection;
+
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
@@ -99,7 +100,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     public static ProvisioningCmsObject createProvisioningCmsObjectForPayload(AbstractProvisioningPayload payload) {
-        ProvisioningCmsObjectBuilder  builder = new ProvisioningCmsObjectBuilder();
+        ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder();
         builder.withCmsCertificate(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT.getCertificate());
         builder.withCrl(CRL);
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

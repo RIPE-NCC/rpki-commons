@@ -55,9 +55,9 @@ public class ProvisioningCmsCertificateParserTest {
         Assert.assertEquals(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT, subject.getCertificate());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnInvalidObject() {
-        subject.parse("placeholder location", new byte[] {0});
+        subject.parse("placeholder location", new byte[]{0});
 
         ValidationResult validationResult = subject.getValidationResult();
         assertTrue(validationResult.hasFailures());

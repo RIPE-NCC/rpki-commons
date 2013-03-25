@@ -51,9 +51,9 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
     private final DateTime notValidAfter;
 
     public ValidityPeriod() {
-        this((Date)null,(Date)null);
+        this((Date) null, (Date) null);
     }
-    
+
     public ValidityPeriod(ReadableInstant notValidBefore, ReadableInstant notValidAfter) {
         this.notValidBefore = (notValidBefore == null) ? null : new DateTime(truncatedMillis(notValidBefore.getMillis()), DateTimeZone.UTC);
         this.notValidAfter = (notValidAfter == null) ? null : new DateTime(truncatedMillis(notValidAfter.getMillis()), DateTimeZone.UTC);
@@ -132,8 +132,7 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
      * Calculates the intersection of two validity periods, taking into account
      * open-ended validity periods.
      *
-     * @param other
-     *            the validity period to intersect with.
+     * @param other the validity period to intersect with.
      * @return the intersection of this and the other validity period, or null
      *         if there is no overlap.
      */
@@ -147,7 +146,7 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
             return null;
         }
     }
-    
+
     private DateTime earliestDateTimeOf(DateTime date1, DateTime date2) {
         if (date1 == null) {
             return date2;

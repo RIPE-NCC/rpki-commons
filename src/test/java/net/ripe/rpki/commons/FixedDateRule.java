@@ -52,7 +52,7 @@ public class FixedDateRule implements MethodRule {
     }
 
     /**
-     * Set the date based on a readable string. Use format: yyyymmdd 
+     * Set the date based on a readable string. Use format: yyyymmdd
      */
     public FixedDateRule(String yyyymmdd) {
         this.millis = convertDateTimeStringToMillis(yyyymmdd);
@@ -73,18 +73,18 @@ public class FixedDateRule implements MethodRule {
             }
         };
     }
-    
+
     public static void setDateTime(DateTime dateTime) {
         DateTimeUtils.setCurrentMillisFixed(dateTime.getMillis());
     }
-    
+
     /**
-     * Set the date based on a readable string. Use format: yyyymmdd 
+     * Set the date based on a readable string. Use format: yyyymmdd
      */
     public static void setDateTime(String yyyymmdd) {
         DateTimeUtils.setCurrentMillisFixed(convertDateTimeStringToMillis(yyyymmdd));
     }
-    
+
     private static long convertDateTimeStringToMillis(String yyyymmdd) {
         DateTimeFormatter dateTimeParser = new DateTimeFormatterBuilder().appendYear(4, 4).appendMonthOfYear(2).appendDayOfMonth(2).toFormatter().withZone(DateTimeZone.UTC);
         return dateTimeParser.parseDateTime(yyyymmdd).getMillis();

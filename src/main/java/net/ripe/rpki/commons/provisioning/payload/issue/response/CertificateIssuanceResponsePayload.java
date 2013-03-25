@@ -39,12 +39,12 @@ public class CertificateIssuanceResponsePayload extends AbstractProvisioningResp
 
     @XStreamAlias("class")
     private CertificateIssuanceResponseClassElement classElement;
-    
+
     protected CertificateIssuanceResponsePayload(CertificateIssuanceResponseClassElement classElement) {
         super(PayloadMessageType.issue_response);
         this.classElement = classElement;
     }
-    
+
     public CertificateIssuanceResponseClassElement getClassElement() {
         return classElement;
     }

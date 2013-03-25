@@ -35,7 +35,7 @@ import org.junit.Test;
 
 public class ProvisioningCmsCertificateTest {
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldCheckForNullArgument() {
         new ProvisioningCmsCertificate(null);
     }

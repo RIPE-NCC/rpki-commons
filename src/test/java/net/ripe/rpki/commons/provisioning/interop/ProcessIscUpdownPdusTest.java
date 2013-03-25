@@ -55,114 +55,114 @@ import static org.junit.Assert.*;
 
 public class ProcessIscUpdownPdusTest {
 
-	private static final String PATH_TO_TEST_PDUS = "src/test/resources/isc-interop-updown";
+    private static final String PATH_TO_TEST_PDUS = "src/test/resources/isc-interop-updown";
 
-	@Test
-	public void shouldParseCertificateIssuanceRequest() throws IOException, RpkiCaCertificateRequestParserException {
-		byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
-		ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-		parser.parseCms("cms", encoded);
-		ValidationResult validationResult = parser.getValidationResult();
-		for (ValidationCheck check : validationResult.getFailures(new ValidationLocation("cms"))) {
-			System.err.println("Failure: " + check);
-		}
-		ProvisioningCmsObject provisioningCmsObject = parser.getProvisioningCmsObject();
+    @Test
+    public void shouldParseCertificateIssuanceRequest() throws IOException, RpkiCaCertificateRequestParserException {
+        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("cms", encoded);
+        ValidationResult validationResult = parser.getValidationResult();
+        for (ValidationCheck check : validationResult.getFailures(new ValidationLocation("cms"))) {
+            System.err.println("Failure: " + check);
+        }
+        ProvisioningCmsObject provisioningCmsObject = parser.getProvisioningCmsObject();
 
-		CertificateIssuanceRequestPayload payload = (CertificateIssuanceRequestPayload) provisioningCmsObject.getPayload();
+        CertificateIssuanceRequestPayload payload = (CertificateIssuanceRequestPayload) provisioningCmsObject.getPayload();
 
-		PKCS10CertificationRequest certificateRequest = payload.getRequestElement().getCertificateRequest();
+        PKCS10CertificationRequest certificateRequest = payload.getRequestElement().getCertificateRequest();
 
-		RpkiCaCertificateRequestParser rpkiCaCertificateRequestParser = new RpkiCaCertificateRequestParser(certificateRequest);
-		assertNotNull(rpkiCaCertificateRequestParser.getCaRepositoryUri());
-		assertNotNull(rpkiCaCertificateRequestParser.getManifestUri());
-		assertNotNull(rpkiCaCertificateRequestParser.getPublicKey());
-	}
+        RpkiCaCertificateRequestParser rpkiCaCertificateRequestParser = new RpkiCaCertificateRequestParser(certificateRequest);
+        assertNotNull(rpkiCaCertificateRequestParser.getCaRepositoryUri());
+        assertNotNull(rpkiCaCertificateRequestParser.getManifestUri());
+        assertNotNull(rpkiCaCertificateRequestParser.getPublicKey());
+    }
 
-	@Test
-	public void shouldReadIscChildIdentityXml() throws IOException {
-		ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
-		assertNotNull(childCert);
-	}
+    @Test
+    public void shouldReadIscChildIdentityXml() throws IOException {
+        ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
+        assertNotNull(childCert);
+    }
 
-	@Test
-	public void shouldReadIscIssuerXml() throws IOException {
-		String parentXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), "UTF-8");
-		ParentIdentitySerializer serializer = new ParentIdentitySerializer();
-		ParentIdentity parentId = serializer.deserialize(parentXml);
-		assertNotNull(parentId);
-	}
+    @Test
+    public void shouldReadIscIssuerXml() throws IOException {
+        String parentXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), "UTF-8");
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+        ParentIdentity parentId = serializer.deserialize(parentXml);
+        assertNotNull(parentId);
+    }
 
-	public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException {
-		String childIdXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), "UTF-8");
-		ChildIdentitySerializer serializer = new ChildIdentitySerializer();
-		ChildIdentity childId = serializer.deserialize(childIdXml);
-		ProvisioningIdentityCertificate childCert = childId.getIdentityCertificate();
-		return childCert;
-	}
+    public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException {
+        String childIdXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), "UTF-8");
+        ChildIdentitySerializer serializer = new ChildIdentitySerializer();
+        ChildIdentity childId = serializer.deserialize(childIdXml);
+        ProvisioningIdentityCertificate childCert = childId.getIdentityCertificate();
+        return childCert;
+    }
 
-	@Test
-	public void shouldValidateRequest() throws IOException {
+    @Test
+    public void shouldValidateRequest() throws IOException {
 
-		// Note this object expired 30 June 2012. Maybe get a new one sometime?
-		byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
-		ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-		parser.parseCms("cms", encoded);
-		ProvisioningCmsObject provisioningCmsObject = parser.getProvisioningCmsObject();
+        // Note this object expired 30 June 2012. Maybe get a new one sometime?
+        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("cms", encoded);
+        ProvisioningCmsObject provisioningCmsObject = parser.getProvisioningCmsObject();
 
-		ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
+        ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
 
-		ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), provisioningCmsObject, childCert);
-		ValidationResult result = ValidationResult.withLocation("unknown.der");
-		validator.validate(result);
+        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), provisioningCmsObject, childCert);
+        ValidationResult result = ValidationResult.withLocation("unknown.der");
+        validator.validate(result);
 
-		List<ValidationCheck> failures = result.getFailuresForAllLocations();
+        List<ValidationCheck> failures = result.getFailuresForAllLocations();
 
-		assertEquals(3, failures.size());
+        assertEquals(3, failures.size());
 
-		failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:08:03.000Z"));
-		failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, "2012-06-30T04:07:24.000Z"));
-		failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:07:24.000Z"));
+        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:08:03.000Z"));
+        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, "2012-06-30T04:07:24.000Z"));
+        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:07:24.000Z"));
 
-	}
+    }
 
-	@Test
-	public void shouldParseAllIscUpDownMessages() throws IOException {
-		String[] Files = new String[]{"pdu.170.der", "pdu.171.der", "pdu.172.der", "pdu.173.der", "pdu.180.der", "pdu.183.der", "pdu.184.der",
-				"pdu.189.der", "pdu.196.der", "pdu.199.der", "pdu.200.der", "pdu.205.der"};
-		for (String fileName : Files) {
-			byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
-			ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-			parser.parseCms("cms", encoded);
-			assertTrue("Error parsing file: " + fileName + " and giving up!", !parser.getValidationResult().hasFailures());
-		}
-	}
+    @Test
+    public void shouldParseAllIscUpDownMessages() throws IOException {
+        String[] Files = new String[]{"pdu.170.der", "pdu.171.der", "pdu.172.der", "pdu.173.der", "pdu.180.der", "pdu.183.der", "pdu.184.der",
+                "pdu.189.der", "pdu.196.der", "pdu.199.der", "pdu.200.der", "pdu.205.der"};
+        for (String fileName : Files) {
+            byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
+            ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+            parser.parseCms("cms", encoded);
+            assertTrue("Error parsing file: " + fileName + " and giving up!", !parser.getValidationResult().hasFailures());
+        }
+    }
 
-	@Test
-	public void shouldParseRpkidParentResponseXml() throws IOException {
-		String xml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), "UTF-8");
-		ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+    @Test
+    public void shouldParseRpkidParentResponseXml() throws IOException {
+        String xml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), "UTF-8");
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-		ParentIdentity parentId = serializer.deserialize(xml);
-		assertNotNull(parentId);
-	}
+        ParentIdentity parentId = serializer.deserialize(xml);
+        assertNotNull(parentId);
+    }
 
-	@Test
-	public void shouldParseRpkidMessageFromDeutscheTelekom() throws IOException {
-		// dtag-outbound-1.der
+    @Test
+    public void shouldParseRpkidMessageFromDeutscheTelekom() throws IOException {
+        // dtag-outbound-1.der
 
-		String[] Files = new String[]{"dtag-outbound-1.der", "dtag-outbound-9.der"};
+        String[] Files = new String[]{"dtag-outbound-1.der", "dtag-outbound-9.der"};
 
-		for (String fileName : Files) {
+        for (String fileName : Files) {
 
-			String base64Encoded = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/" + fileName));
+            String base64Encoded = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/" + fileName));
 
-			byte[] encoded = Base64.decodeBase64(base64Encoded);
+            byte[] encoded = Base64.decodeBase64(base64Encoded);
 
-			ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-			parser.parseCms("cms", encoded);
-			ValidationResult validationResult = parser.getValidationResult();
+            ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+            parser.parseCms("cms", encoded);
+            ValidationResult validationResult = parser.getValidationResult();
 
-			assertTrue("Error parsing file: " + fileName + " and giving up!", !validationResult.hasFailures());
-		}
-	}
+            assertTrue("Error parsing file: " + fileName + " and giving up!", !validationResult.hasFailures());
+        }
+    }
 }

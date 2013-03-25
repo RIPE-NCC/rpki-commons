@@ -41,28 +41,28 @@ import org.apache.commons.lang.Validate;
 
 public class X509ResourceCertificateConverter implements Converter {
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public boolean canConvert(Class type) {
-		return X509ResourceCertificate.class.equals(type);
-	}
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean canConvert(Class type) {
+        return X509ResourceCertificate.class.equals(type);
+    }
 
-	@Override
-	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-		X509ResourceCertificate certificate = (X509ResourceCertificate) source;
-		writer.startNode("encoded");
-		context.convertAnother(certificate.getEncoded());
-		writer.endNode();
-	}
+    @Override
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        X509ResourceCertificate certificate = (X509ResourceCertificate) source;
+        writer.startNode("encoded");
+        context.convertAnother(certificate.getEncoded());
+        writer.endNode();
+    }
 
-	@Override
-	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-		reader.moveDown();
-		Validate.isTrue("encoded".equals(reader.getNodeName()));
-		byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
-		reader.moveUp();
-		X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-		parser.parse(ValidationResult.withLocation("unknown.cer"), encoded);
-		return parser.getCertificate();
-	}
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        reader.moveDown();
+        Validate.isTrue("encoded".equals(reader.getNodeName()));
+        byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
+        reader.moveUp();
+        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+        parser.parse(ValidationResult.withLocation("unknown.cer"), encoded);
+        return parser.getCertificate();
+    }
 }

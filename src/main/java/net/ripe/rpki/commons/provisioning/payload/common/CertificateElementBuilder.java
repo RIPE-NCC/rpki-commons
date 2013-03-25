@@ -38,7 +38,7 @@ import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.Validate;
 
 public class CertificateElementBuilder {
-    
+
     private List<URI> certificatePublishedLocations;
     private IpResourceSet ipResourceSet;
     private X509ResourceCertificate certificate;

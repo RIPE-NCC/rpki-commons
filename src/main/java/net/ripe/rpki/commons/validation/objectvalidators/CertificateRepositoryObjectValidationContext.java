@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
 import java.net.URI;
+
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.builder.EqualsBuilder;

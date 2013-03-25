@@ -60,7 +60,7 @@ public class ResourceClassListResponseClassElement extends GenericClassElement {
         if (getCertificateElements() == null) {
             return false;
         }
-        for (CertificateElement element: getCertificateElements()) {
+        for (CertificateElement element : getCertificateElements()) {
             if (resourceCertificate.equals(element.getCertificate())) {
                 return true;
             }

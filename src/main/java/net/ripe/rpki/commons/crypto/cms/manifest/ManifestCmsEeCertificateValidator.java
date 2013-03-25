@@ -68,5 +68,4 @@ public class ManifestCmsEeCertificateValidator extends X509ResourceCertificatePa
     }
 
 
-
 }

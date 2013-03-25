@@ -42,43 +42,43 @@ import java.util.List;
 
 public class RoaCms extends RpkiSignedObject implements Roa {
 
-	public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.24");
+    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.24");
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Asn asn;
+    private Asn asn;
 
-	private List<RoaPrefix> prefixes;
+    private List<RoaPrefix> prefixes;
 
-	protected RoaCms(RpkiSignedObjectInfo cmsObjectInfo, Asn asn, List<RoaPrefix> prefixes) {
-		super(cmsObjectInfo);
-		this.asn = asn;
-		this.prefixes = prefixes;
-	}
+    protected RoaCms(RpkiSignedObjectInfo cmsObjectInfo, Asn asn, List<RoaPrefix> prefixes) {
+        super(cmsObjectInfo);
+        this.asn = asn;
+        this.prefixes = prefixes;
+    }
 
-	@Override
-	public Asn getAsn() {
-		return asn;
-	}
+    @Override
+    public Asn getAsn() {
+        return asn;
+    }
 
-	public IpResourceSet getResources() {
-		return getCertificate().getResources();
-	}
+    public IpResourceSet getResources() {
+        return getCertificate().getResources();
+    }
 
-	@Override
-	public List<RoaPrefix> getPrefixes() {
-		return Collections.unmodifiableList(prefixes);
-	}
+    @Override
+    public List<RoaPrefix> getPrefixes() {
+        return Collections.unmodifiableList(prefixes);
+    }
 
-	@Override
-	public URI getParentCertificateUri() {
-		return getCertificate().getParentCertificateUri();
-	}
+    @Override
+    public URI getParentCertificateUri() {
+        return getCertificate().getParentCertificateUri();
+    }
 
-	public static RoaCms parseDerEncoded(byte[] encoded) {
-		RoaCmsParser parser = new RoaCmsParser();
-		parser.parse(ValidationResult.withLocation("unknown.roa"), encoded);
-		return parser.getRoaCms();
-	}
+    public static RoaCms parseDerEncoded(byte[] encoded) {
+        RoaCmsParser parser = new RoaCmsParser();
+        parser.parse(ValidationResult.withLocation("unknown.roa"), encoded);
+        return parser.getRoaCms();
+    }
 
 }

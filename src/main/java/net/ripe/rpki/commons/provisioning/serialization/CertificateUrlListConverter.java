@@ -40,7 +40,7 @@ import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 public class CertificateUrlListConverter extends AbstractSingleValueConverter {
 
     public static final CertificateUrlListConverter INSTANCE = new CertificateUrlListConverter();
-    
+
     @Override
     public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
         return type == List.class;
@@ -49,7 +49,7 @@ public class CertificateUrlListConverter extends AbstractSingleValueConverter {
     @Override
     public List<URI> fromString(String str) {
         List<URI> result = new ArrayList<URI>();
-        for (String uri: str.split(",")) {
+        for (String uri : str.split(",")) {
             result.add(URI.create(uri));
         }
         return result;
@@ -62,7 +62,7 @@ public class CertificateUrlListConverter extends AbstractSingleValueConverter {
             return null;
         }
         List<String> encodedUrls = new ArrayList<String>();
-        for (URI uri: (List<URI>) obj) {
+        for (URI uri : (List<URI>) obj) {
             encodedUrls.add(uri.toString().replace(",", "%2C"));
         }
         return StringUtils.join(encodedUrls, ",");

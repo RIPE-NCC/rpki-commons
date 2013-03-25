@@ -73,7 +73,6 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
     }
 
 
-
     @Override
     protected void validateFields() {
         super.validateFields();

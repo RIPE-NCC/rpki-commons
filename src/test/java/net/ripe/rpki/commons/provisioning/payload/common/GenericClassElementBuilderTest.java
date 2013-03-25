@@ -37,7 +37,7 @@ import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElementBuil
 import org.junit.Test;
 
 public class GenericClassElementBuilderTest {
-    
+
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3
     @Test(expected = IllegalArgumentException.class)
     public void shouldNotBuildWithoutRsyncURI() throws URISyntaxException {

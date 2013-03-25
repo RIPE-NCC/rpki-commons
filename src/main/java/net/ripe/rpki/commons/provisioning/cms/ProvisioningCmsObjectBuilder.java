@@ -78,106 +78,106 @@ import org.joda.time.DateTimeUtils;
 
 public class ProvisioningCmsObjectBuilder {
 
-	private static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28");
+    private static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28");
 
-	private X509Certificate cmsCertificate;
+    private X509Certificate cmsCertificate;
 
-	private X509CRL crl;
+    private X509CRL crl;
 
-	private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+    private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
-	private String payloadContent;
+    private String payloadContent;
 
-	public ProvisioningCmsObjectBuilder withCmsCertificate(X509Certificate cmsCertificate) {
-		this.cmsCertificate = cmsCertificate;
-		return this;
-	}
+    public ProvisioningCmsObjectBuilder withCmsCertificate(X509Certificate cmsCertificate) {
+        this.cmsCertificate = cmsCertificate;
+        return this;
+    }
 
-	public ProvisioningCmsObjectBuilder withCrl(X509CRL crl) {
-		this.crl = crl;
-		return this;
-	}
+    public ProvisioningCmsObjectBuilder withCrl(X509CRL crl) {
+        this.crl = crl;
+        return this;
+    }
 
-	public ProvisioningCmsObjectBuilder withSignatureProvider(String signatureProvider) {
-		this.signatureProvider = signatureProvider;
-		return this;
-	}
+    public ProvisioningCmsObjectBuilder withSignatureProvider(String signatureProvider) {
+        this.signatureProvider = signatureProvider;
+        return this;
+    }
 
-	public ProvisioningCmsObjectBuilder withPayloadContent(AbstractProvisioningPayload payload) {
-		this.payloadContent = PayloadParser.serialize(payload);
-		return this;
-	}
+    public ProvisioningCmsObjectBuilder withPayloadContent(AbstractProvisioningPayload payload) {
+        this.payloadContent = PayloadParser.serialize(payload);
+        return this;
+    }
 
-	public ProvisioningCmsObject build(PrivateKey privateKey) {
-		Validate.notEmpty(payloadContent, "Payload content is required");
+    public ProvisioningCmsObject build(PrivateKey privateKey) {
+        Validate.notEmpty(payloadContent, "Payload content is required");
 
-		Validate.notNull(cmsCertificate, "cms certificate is required");
-		Validate.notNull(crl, "crl is required");
+        Validate.notNull(cmsCertificate, "cms certificate is required");
+        Validate.notNull(crl, "crl is required");
 
-		ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-		parser.parseCms("n/a", generateCms(privateKey));
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("n/a", generateCms(privateKey));
 
-		ValidationResult validationResult = parser.getValidationResult();
-		if (validationResult.hasFailures()) {
-			List<String> failureMessages = new ArrayList<String>();
-			List<ValidationCheck> failures = validationResult.getFailures(new ValidationLocation("generated.cms"));
-			for (ValidationCheck check : failures) {
-				failureMessages.add(check.getKey());
-			}
-			Validate.isTrue(false, "Validation of generated CMS object failed with following errors: " + StringUtils.join(failureMessages, ","));
-		}
+        ValidationResult validationResult = parser.getValidationResult();
+        if (validationResult.hasFailures()) {
+            List<String> failureMessages = new ArrayList<String>();
+            List<ValidationCheck> failures = validationResult.getFailures(new ValidationLocation("generated.cms"));
+            for (ValidationCheck check : failures) {
+                failureMessages.add(check.getKey());
+            }
+            Validate.isTrue(false, "Validation of generated CMS object failed with following errors: " + StringUtils.join(failureMessages, ","));
+        }
 
-		return parser.getProvisioningCmsObject();
-	}
+        return parser.getProvisioningCmsObject();
+    }
 
-	private byte[] generateCms(PrivateKey privateKey) {
-		try {
-			return doGenerate(privateKey);
-		} catch (CMSException e) {
-			throw new ProvisioningCmsObjectBuilderException(e);
-		} catch (IOException e) {
-			throw new ProvisioningCmsObjectBuilderException(e);
-		} catch (OperatorCreationException e) {
-			throw new ProvisioningCmsObjectBuilderException(e);
-		} catch (CRLException e) {
-			throw new ProvisioningCmsObjectBuilderException(e);
-		} catch (CertificateEncodingException e) {
-			throw new ProvisioningCmsObjectBuilderException(e);
-		}
-	}
+    private byte[] generateCms(PrivateKey privateKey) {
+        try {
+            return doGenerate(privateKey);
+        } catch (CMSException e) {
+            throw new ProvisioningCmsObjectBuilderException(e);
+        } catch (IOException e) {
+            throw new ProvisioningCmsObjectBuilderException(e);
+        } catch (OperatorCreationException e) {
+            throw new ProvisioningCmsObjectBuilderException(e);
+        } catch (CRLException e) {
+            throw new ProvisioningCmsObjectBuilderException(e);
+        } catch (CertificateEncodingException e) {
+            throw new ProvisioningCmsObjectBuilderException(e);
+        }
+    }
 
-	private byte[] doGenerate(PrivateKey privateKey) throws CMSException, IOException, CertificateEncodingException, CRLException, OperatorCreationException {
-		CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
-		addCertificateAndCrl(generator);
-		addSignerInfo(generator, privateKey);
+    private byte[] doGenerate(PrivateKey privateKey) throws CMSException, IOException, CertificateEncodingException, CRLException, OperatorCreationException {
+        CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+        addCertificateAndCrl(generator);
+        addSignerInfo(generator, privateKey);
 
-		CMSSignedData data = generator.generate(new CMSProcessableByteArray(CONTENT_TYPE, payloadContent.getBytes(Charset.forName("UTF-8"))), true);
+        CMSSignedData data = generator.generate(new CMSProcessableByteArray(CONTENT_TYPE, payloadContent.getBytes(Charset.forName("UTF-8"))), true);
 
-		return data.getEncoded();
-	}
+        return data.getEncoded();
+    }
 
-	private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey) throws OperatorCreationException {
-		ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
-		DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
-		SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate));
-		generator.addSignerInfoGenerator(gen);
-	}
+    private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey) throws OperatorCreationException {
+        ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
+        DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
+        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate));
+        generator.addSignerInfoGenerator(gen);
+    }
 
-	private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws CertificateEncodingException, CMSException, CRLException {
-		List<X509Extension> certificates = new ArrayList<X509Extension>();
-		certificates.add(cmsCertificate);
+    private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws CertificateEncodingException, CMSException, CRLException {
+        List<X509Extension> certificates = new ArrayList<X509Extension>();
+        certificates.add(cmsCertificate);
 
-		generator.addCertificates(new JcaCertStore(certificates));
-		generator.addCRLs(new JcaCRLStore(Collections.singleton(crl)));
-	}
+        generator.addCertificates(new JcaCertStore(certificates));
+        generator.addCRLs(new JcaCRLStore(Collections.singleton(crl)));
+    }
 
-	private AttributeTable createSignedAttributes() {
-		Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>(); // NOPMD
-		// -
-		// ReplaceHashtableWithMap
-		Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));
-		attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
-		return new AttributeTable(attributes);
-	}
+    private AttributeTable createSignedAttributes() {
+        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>(); // NOPMD
+        // -
+        // ReplaceHashtableWithMap
+        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));
+        attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
+        return new AttributeTable(attributes);
+    }
 
 }

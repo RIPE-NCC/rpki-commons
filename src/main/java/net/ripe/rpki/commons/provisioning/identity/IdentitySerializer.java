@@ -36,7 +36,9 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+
 import javax.xml.namespace.QName;
+
 import net.ripe.rpki.commons.xml.converters.URIConverter;
 
 

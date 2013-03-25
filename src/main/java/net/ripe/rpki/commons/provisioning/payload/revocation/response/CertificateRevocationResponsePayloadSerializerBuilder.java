@@ -38,7 +38,7 @@ public class CertificateRevocationResponsePayloadSerializerBuilder extends Provi
     public CertificateRevocationResponsePayloadSerializerBuilder() {
         super(CertificateRevocationResponsePayload.class);
     }
-    
+
     @Override
     public XStreamXmlSerializer<CertificateRevocationResponsePayload> build() {
         getXStream().processAnnotations(CertificateRevocationKeyElement.class);

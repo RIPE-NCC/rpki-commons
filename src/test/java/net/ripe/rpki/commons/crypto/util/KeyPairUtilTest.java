@@ -37,7 +37,7 @@ import org.junit.Test;
 
 public class KeyPairUtilTest {
 
-    
+
     @Test
     public void testBase64UrlEncoding() {
         byte[] data = {

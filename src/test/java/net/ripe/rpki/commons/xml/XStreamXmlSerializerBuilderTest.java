@@ -34,6 +34,7 @@ import static org.junit.Assert.*;
 import java.sql.Timestamp;
 import java.util.regex.Pattern;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;

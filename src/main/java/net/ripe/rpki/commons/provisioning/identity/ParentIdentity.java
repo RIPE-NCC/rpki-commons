@@ -45,9 +45,9 @@ public class ParentIdentity extends EqualsSupport {
     public static final String PARENT_IDENTITY_NODE_NAME = "parent";
 
     public ParentIdentity(URI upDownUrl, String parentHandle,
-            String childHandle,
-            ProvisioningIdentityCertificate parentIdCertificate,
-            ProvisioningIdentityCertificate childIdCertificate) {
+                          String childHandle,
+                          ProvisioningIdentityCertificate parentIdCertificate,
+                          ProvisioningIdentityCertificate childIdCertificate) {
         this.upDownUrl = upDownUrl;
         this.parentHandle = parentHandle;
         this.childHandle = childHandle;

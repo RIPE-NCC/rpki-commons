@@ -41,28 +41,28 @@ import org.apache.commons.lang.Validate;
 
 public class ManifestCmsConverter implements Converter {
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public boolean canConvert(Class type) {
-		return ManifestCms.class.equals(type);
-	}
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean canConvert(Class type) {
+        return ManifestCms.class.equals(type);
+    }
 
-	@Override
-	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-		ManifestCms manifest = (ManifestCms) source;
-		writer.startNode("encoded");
-		context.convertAnother(manifest.getEncoded());
-		writer.endNode();
-	}
+    @Override
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        ManifestCms manifest = (ManifestCms) source;
+        writer.startNode("encoded");
+        context.convertAnother(manifest.getEncoded());
+        writer.endNode();
+    }
 
-	@Override
-	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-		reader.moveDown();
-		Validate.isTrue("encoded".equals(reader.getNodeName()));
-		byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
-		reader.moveUp();
-		ManifestCmsParser parser = new ManifestCmsParser();
-		parser.parse(ValidationResult.withLocation("unknown.mft"), encoded);
-		return parser.getManifestCms();
-	}
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        reader.moveDown();
+        Validate.isTrue("encoded".equals(reader.getNodeName()));
+        byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
+        reader.moveUp();
+        ManifestCmsParser parser = new ManifestCmsParser();
+        parser.parse(ValidationResult.withLocation("unknown.mft"), encoded);
+        return parser.getManifestCms();
+    }
 }

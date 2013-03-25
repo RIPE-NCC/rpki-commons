@@ -42,14 +42,14 @@ public class VersionedIdTest {
         assertEquals(9, subject.getId());
         assertEquals(VersionedId.INITIAL_VERSION, subject.getVersion());
     }
-    
+
     @Test
     public void shouldHaveIdAndVersion() {
         VersionedId subject = new VersionedId(12, 32);
         assertEquals(12, subject.getId());
         assertEquals(32, subject.getVersion());
     }
-    
+
     @Test
     public void testEquals() {
         assertEquals(new VersionedId(12, 32), new VersionedId(12, 32));
@@ -63,24 +63,24 @@ public class VersionedIdTest {
         assertEquals("12:32", new VersionedId(12, 32).toString());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailToParseEmptyString() {
         VersionedId.parse("");
     }
-    
-    @Test(expected=IllegalArgumentException.class)
+
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailToParseNullString() {
         VersionedId.parse(null);
     }
-    
+
     @Test
     public void shouldParseIdWithVersion() {
         assertEquals(new VersionedId(3, 24), VersionedId.parse("3:24"));
     }
-    
+
     @Test
     public void shouldParseWithoutVersion() {
         assertEquals(new VersionedId(3, 0), VersionedId.parse("3"));
     }
-    
+
 }

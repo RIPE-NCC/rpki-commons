@@ -42,7 +42,7 @@ import org.junit.Test;
 
 public class X509CertificateUtilTest {
 
-    
+
     @Test
     public void shouldGetEncodedSubjectPublicKeyInfo() throws CertificateEncodingException, IOException {
         X509ResourceCertificate cert1 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES).build();

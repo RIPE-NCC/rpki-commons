@@ -40,7 +40,6 @@ import java.security.PublicKey;
  * (which send it further to X509CertificateBuilder) it is wrapped into
  * this class. As long as only the encoded representation of the key is used
  * this is sufficient.
- *
  */
 public class EncodedPublicKey implements PublicKey {
 

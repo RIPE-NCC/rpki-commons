@@ -35,16 +35,16 @@ import static net.ripe.rpki.commons.validation.ValidationString.RESOURCE_EXT_NOT
 
 public class ProvisioningIdentityCertificateParser extends X509CertificateParser<ProvisioningIdentityCertificate> {
 
-	@Override
-	public ProvisioningIdentityCertificate getCertificate() {
-		if (!isSuccess()) {
-			throw new IllegalArgumentException("Identity Certificate validation failed");
-		}
-		return new ProvisioningIdentityCertificate(getX509Certificate());
-	}
+    @Override
+    public ProvisioningIdentityCertificate getCertificate() {
+        if (!isSuccess()) {
+            throw new IllegalArgumentException("Identity Certificate validation failed");
+        }
+        return new ProvisioningIdentityCertificate(getX509Certificate());
+    }
 
-	@Override
-	protected void doTypeSpecificValidation() {
-		result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
-	}
+    @Override
+    protected void doTypeSpecificValidation() {
+        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
+    }
 }

@@ -44,10 +44,11 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import org.bouncycastle.util.encoders.Hex;
 
 public final class CertificateRepositoryObjectPrinter {
-    
+
     // Utility class
-    private CertificateRepositoryObjectPrinter() {}
-    
+    private CertificateRepositoryObjectPrinter() {
+    }
+
     public static void print(PrintWriter printWriter, CertificateRepositoryObject cro) {
         if (cro instanceof X509ResourceCertificate) {
             printX509ResourceCertificate(printWriter, (X509ResourceCertificate) cro);
@@ -84,7 +85,7 @@ public final class CertificateRepositoryObjectPrinter {
             printWriter.print(" ");
             printWriter.println(new String(Hex.encode(fileEntry.getValue())));
         }
-        
+
     }
 
     private static void printRoaCms(PrintWriter printWriter, RoaCms roa) {
@@ -92,7 +93,7 @@ public final class CertificateRepositoryObjectPrinter {
         printWriter.println("Signing time: " + roa.getSigningTime());
         printWriter.println("ASN: " + roa.getAsn());
         printWriter.println("Prefixes:");
-        for (RoaPrefix prefix: roa.getPrefixes()) {
+        for (RoaPrefix prefix : roa.getPrefixes()) {
             printWriter.print("    " + prefix.getPrefix());
             if (prefix.getMaximumLength() != null) {
                 printWriter.println(" [" + prefix.getMaximumLength() + "]");
@@ -101,7 +102,7 @@ public final class CertificateRepositoryObjectPrinter {
             }
         }
     }
-    
+
     private static void printCrl(PrintWriter printWriter, X509Crl crl) {
         printWriter.println("Object Type: Certificate Revocation List");
         printWriter.println("CRL version: " + crl.getVersion());

@@ -46,9 +46,9 @@ public class ManifestCmsConverterTest {
     private ManifestCmsConverter subject;
 
     private String expectedXmlRegEx =
-        "<net\\.ripe\\..*\\.ManifestCms>\n" +
-        "  <encoded>[^<]*</encoded>\n" +
-        "</net\\.ripe\\..*\\.ManifestCms>";
+            "<net\\.ripe\\..*\\.ManifestCms>\n" +
+                    "  <encoded>[^<]*</encoded>\n" +
+                    "</net\\.ripe\\..*\\.ManifestCms>";
 
     @Before
     public void setUp() {

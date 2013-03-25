@@ -54,232 +54,232 @@ import org.junit.Test;
 
 public class X509ResourceCertificateParentChildValidatorTest {
 
-	private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
-	private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
-	private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
-	private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1));
+    private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
+    private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
+    private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
+    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1));
 
-	private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=First Child, C=NL");
-	private static final BigInteger FIRST_CHILD_SERIAL_NUMBER = ROOT_SERIAL_NUMBER.add(BigInteger.valueOf(1));
-	private static final X500Principal SECOND_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=Second Child, C=NL");
-	private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
-	private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMonths(2), new DateTime().minusMonths(1));
+    private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=First Child, C=NL");
+    private static final BigInteger FIRST_CHILD_SERIAL_NUMBER = ROOT_SERIAL_NUMBER.add(BigInteger.valueOf(1));
+    private static final X500Principal SECOND_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=Second Child, C=NL");
+    private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
+    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMonths(2), new DateTime().minusMonths(1));
 
-	private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-	private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-	private static final KeyPair SECOND_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair SECOND_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
-	private static final ValidationLocation CHILD_VALIDATION_LOCATION = new ValidationLocation("child");
+    private static final ValidationLocation CHILD_VALIDATION_LOCATION = new ValidationLocation("child");
 
-	private X509ResourceCertificate root;
-	private X509ResourceCertificate child;
+    private X509ResourceCertificate root;
+    private X509ResourceCertificate child;
 
-	private X509Crl rootCrl;
+    private X509Crl rootCrl;
 
-	private ValidationResult result;
+    private ValidationResult result;
 
-	private ValidationOptions options;
+    private ValidationOptions options;
 
-	@Before
-	public void setUp() {
-		root = getRootResourceCertificate();
-		child = createChildCertificateBuilder().build();
-		rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
-		result = ValidationResult.withLocation("n/a");
-		options = new ValidationOptions();
-	}
+    @Before
+    public void setUp() {
+        root = getRootResourceCertificate();
+        child = createChildCertificateBuilder().build();
+        rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
+        result = ValidationResult.withLocation("n/a");
+        options = new ValidationOptions();
+    }
 
-	private void validate(X509ResourceCertificateParentChildValidator validator, X509ResourceCertificate certificate) {
-		String location = "child";
-		validator.validate(location, certificate);
-	}
+    private void validate(X509ResourceCertificateParentChildValidator validator, X509ResourceCertificate certificate) {
+        String location = "child";
+        validator.validate(location, certificate);
+    }
 
-	@Test
-	public void shouldAcceptHappyFlowChildCertificate() {
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+    @Test
+    public void shouldAcceptHappyFlowChildCertificate() {
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 
-		validate(validator, child);
+        validate(validator, child);
 
-		assertFalse(result.hasFailures());
-	}
+        assertFalse(result.hasFailures());
+    }
 
-	@Test
-	public void shouldRejectInvalidSignature() {
-		child = createChildCertificateBuilder().withSigningKeyPair(SECOND_CHILD_KEY_PAIR).build();
+    @Test
+    public void shouldRejectInvalidSignature() {
+        child = createChildCertificateBuilder().withSigningKeyPair(SECOND_CHILD_KEY_PAIR).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-		assertTrue(result.hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-		assertTrue(ValidationString.SIGNATURE_VALID.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
-	}
+        assertTrue(result.hasFailures());
+        assertTrue(result.hasFailureForLocation(CHILD_VALIDATION_LOCATION));
+        assertTrue(ValidationString.SIGNATURE_VALID.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+    }
 
-	@Test
-	public void shouldAcceptSelfSignedSignature() {
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+    @Test
+    public void shouldAcceptSelfSignedSignature() {
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
 
-		validate(validator, root);
+        validate(validator, root);
 
-		assertFalse(result.hasFailures());
-	}
+        assertFalse(result.hasFailures());
+    }
 
-	@Test
-	public void shouldRejectRevokedCertificate() {
-		rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plusDays(2)).build(ROOT_KEY_PAIR.getPrivate());
+    @Test
+    public void shouldRejectRevokedCertificate() {
+        rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plusDays(2)).build(ROOT_KEY_PAIR.getPrivate());
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.CERT_NOT_REVOKED.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
-	}
+        assertTrue(result.hasFailures());
+        assertTrue(ValidationString.CERT_NOT_REVOKED.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+    }
 
-	@Test
-	public void shouldRejectIfCrlAbsentForNonRootCertificate() {
-		rootCrl = null;
+    @Test
+    public void shouldRejectIfCrlAbsentForNonRootCertificate() {
+        rootCrl = null;
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-	}
+        assertTrue(result.hasFailures());
+    }
 
-	@Test
-	public void shouldRejectCertificateWithWrongValidity() {
-		child = createChildCertificateBuilder().withValidityPeriod(EXPIRED_VALIDITY_PERIOD).build();
+    @Test
+    public void shouldRejectCertificateWithWrongValidity() {
+        child = createChildCertificateBuilder().withValidityPeriod(EXPIRED_VALIDITY_PERIOD).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.NOT_VALID_AFTER.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertTrue(result.hasFailures());
+        assertTrue(ValidationString.NOT_VALID_AFTER.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
 
-	}
+    }
 
-	@Test
-	public void shouldRejectInvalidIssuer() {
-		child = createChildCertificateBuilder().withIssuerDN(SECOND_CHILD_CERTIFICATE_NAME).build();
+    @Test
+    public void shouldRejectInvalidIssuer() {
+        child = createChildCertificateBuilder().withIssuerDN(SECOND_CHILD_CERTIFICATE_NAME).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertTrue(result.hasFailures());
+        assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
 
-	}
+    }
 
-	@Test
-	public void shouldWarnOnInvalidKeyUsage() {
-		child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
+    @Test
+    public void shouldWarnOnInvalidKeyUsage() {
+        child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertFalse(result.hasFailures());
-		assertEquals(result.getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_CERT_SIGN), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_CERT_SIGN));
-	}
+        assertFalse(result.hasFailures());
+        assertEquals(result.getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_CERT_SIGN), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_CERT_SIGN));
+    }
 
-	@Test
-	public void shouldWarnOnMisingKeyUsage() {
-		child = createChildCertificateBuilder().withKeyUsage(0).build();
+    @Test
+    public void shouldWarnOnMisingKeyUsage() {
+        child = createChildCertificateBuilder().withKeyUsage(0).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertFalse(result.hasFailures());
-		assertEquals(result.getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_USAGE_EXT_PRESENT), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_USAGE_EXT_PRESENT));
-	}
+        assertFalse(result.hasFailures());
+        assertEquals(result.getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_USAGE_EXT_PRESENT), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_USAGE_EXT_PRESENT));
+    }
 
-	@Test
-	public void shouldRejectMissingAuthorityKeyIdentifier() {
-		child = createChildCertificateBuilder().withAuthorityKeyIdentifier(false).build();
+    @Test
+    public void shouldRejectMissingAuthorityKeyIdentifier() {
+        child = createChildCertificateBuilder().withAuthorityKeyIdentifier(false).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-		assertTrue(ValidationString.AKI_PRESENT.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
-	}
+        assertTrue(result.hasFailures());
+        assertTrue(ValidationString.AKI_PRESENT.equals(result.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+    }
 
-	@Test
-	public void shouldRejectInvalidResorceSet() {
-		child = createChildCertificateBuilder().withInheritedResourceTypes(EnumSet.noneOf(IpResourceType.class)).withResources(INVALID_CHILD_RESOURCE_SET).build();
+    @Test
+    public void shouldRejectInvalidResorceSet() {
+        child = createChildCertificateBuilder().withInheritedResourceTypes(EnumSet.noneOf(IpResourceType.class)).withResources(INVALID_CHILD_RESOURCE_SET).build();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-	}
+        assertTrue(result.hasFailures());
+    }
 
-	@Test
-	public void shouldRejectInheritedResourcesForSelfSignedCertificate() {
-		root = getRootResourceCertificateWithInheritedResources();
-		child = getRootResourceCertificateWithInheritedResources();
+    @Test
+    public void shouldRejectInheritedResourcesForSelfSignedCertificate() {
+        root = getRootResourceCertificateWithInheritedResources();
+        child = getRootResourceCertificateWithInheritedResources();
 
-		X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
-		validate(validator, child);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
 
-		assertTrue(result.hasFailures());
-	}
-
-
-	private X509ResourceCertificate getRootResourceCertificate() {
-		return createRootCertificateBuilder().build();
-	}
-
-	private X509ResourceCertificate getRootResourceCertificateWithInheritedResources() {
-		return createRootCertificateBuilder().withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).withResources(new IpResourceSet()).build();
-	}
-
-	private X509ResourceCertificateBuilder createRootCertificateBuilder() {
-		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-
-		builder.withSubjectDN(ROOT_CERTIFICATE_NAME);
-		builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-		builder.withSerial(ROOT_SERIAL_NUMBER);
-		builder.withValidityPeriod(VALIDITY_PERIOD);
-		builder.withPublicKey(ROOT_KEY_PAIR.getPublic());
-		builder.withCa(true);
-		builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
-		builder.withAuthorityKeyIdentifier(true);
-		builder.withSubjectKeyIdentifier(true);
-		builder.withResources(ROOT_RESOURCE_SET);
-		builder.withAuthorityKeyIdentifier(false);
-		builder.withSigningKeyPair(ROOT_KEY_PAIR);
-
-		return builder;
-	}
-
-	private X509ResourceCertificateBuilder createChildCertificateBuilder() {
-		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-
-		builder.withSubjectDN(FIRST_CHILD_CERTIFICATE_NAME);
-		builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-		builder.withSerial(FIRST_CHILD_SERIAL_NUMBER);
-		builder.withPublicKey(FIRST_CHILD_KEY_PAIR.getPublic());
-		builder.withAuthorityKeyIdentifier(true);
-		builder.withSigningKeyPair(ROOT_KEY_PAIR);
-		builder.withCa(true);
-		builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
-		builder.withAuthorityKeyIdentifier(true);
-		builder.withSubjectKeyIdentifier(true);
-		builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
-		builder.withValidityPeriod(VALIDITY_PERIOD);
-		return builder;
-	}
+        assertTrue(result.hasFailures());
+    }
 
 
-	private X509CrlBuilder getRootCRL() {
-		X509CrlBuilder builder = new X509CrlBuilder();
+    private X509ResourceCertificate getRootResourceCertificate() {
+        return createRootCertificateBuilder().build();
+    }
 
-		builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-		builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-		builder.withNextUpdateTime(new DateTime().plusMonths(1));
-		builder.withNumber(BigInteger.valueOf(1));
-		builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
-		builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-		return builder;
-	}
+    private X509ResourceCertificate getRootResourceCertificateWithInheritedResources() {
+        return createRootCertificateBuilder().withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).withResources(new IpResourceSet()).build();
+    }
+
+    private X509ResourceCertificateBuilder createRootCertificateBuilder() {
+        X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
+
+        builder.withSubjectDN(ROOT_CERTIFICATE_NAME);
+        builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
+        builder.withSerial(ROOT_SERIAL_NUMBER);
+        builder.withValidityPeriod(VALIDITY_PERIOD);
+        builder.withPublicKey(ROOT_KEY_PAIR.getPublic());
+        builder.withCa(true);
+        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
+        builder.withAuthorityKeyIdentifier(true);
+        builder.withSubjectKeyIdentifier(true);
+        builder.withResources(ROOT_RESOURCE_SET);
+        builder.withAuthorityKeyIdentifier(false);
+        builder.withSigningKeyPair(ROOT_KEY_PAIR);
+
+        return builder;
+    }
+
+    private X509ResourceCertificateBuilder createChildCertificateBuilder() {
+        X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
+
+        builder.withSubjectDN(FIRST_CHILD_CERTIFICATE_NAME);
+        builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
+        builder.withSerial(FIRST_CHILD_SERIAL_NUMBER);
+        builder.withPublicKey(FIRST_CHILD_KEY_PAIR.getPublic());
+        builder.withAuthorityKeyIdentifier(true);
+        builder.withSigningKeyPair(ROOT_KEY_PAIR);
+        builder.withCa(true);
+        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
+        builder.withAuthorityKeyIdentifier(true);
+        builder.withSubjectKeyIdentifier(true);
+        builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
+        builder.withValidityPeriod(VALIDITY_PERIOD);
+        return builder;
+    }
+
+
+    private X509CrlBuilder getRootCRL() {
+        X509CrlBuilder builder = new X509CrlBuilder();
+
+        builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
+        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
+        builder.withNextUpdateTime(new DateTime().plusMonths(1));
+        builder.withNumber(BigInteger.valueOf(1));
+        builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
+        builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+        return builder;
+    }
 
 }

@@ -44,7 +44,7 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 @XStreamConverter(CertificateElementConverter.class)
 public class CertificateElement {
-    
+
     private List<URI> issuerCertificatePublicationLocationUris;
 
     private IpResourceSet allocatedAsn;
@@ -60,7 +60,7 @@ public class CertificateElement {
         this.issuerCertificatePublicationLocationUris = issuerCertificatePublicationLocation;
         return this;
     }
-    
+
     CertificateElement setCertificate(X509ResourceCertificate certificate) {
         this.certificate = certificate;
         return this;
@@ -70,9 +70,9 @@ public class CertificateElement {
         allocatedAsn = new IpResourceSet();
         allocatedIpv4 = new IpResourceSet();
         allocatedIpv6 = new IpResourceSet();
-        
+
         Iterator<IpResource> iter = ipResourceSet.iterator();
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             IpResource resource = iter.next();
             if (resource.getType().equals(IpResourceType.ASN)) {
                 allocatedAsn.add(resource);
@@ -82,7 +82,7 @@ public class CertificateElement {
                 allocatedIpv6.add(resource);
             }
         }
-        
+
         return this;
     }
 
@@ -90,15 +90,15 @@ public class CertificateElement {
     public List<URI> getIssuerCertificatePublicationUris() {
         return issuerCertificatePublicationLocationUris;
     }
-    
+
     public URI getRsyncAIAPointer() {
-        for (URI uri: issuerCertificatePublicationLocationUris) {
+        for (URI uri : issuerCertificatePublicationLocationUris) {
             if (uri.toString().startsWith("rsync")) {
                 return uri;
             }
         }
         return null;
-        
+
     }
 
     public IpResourceSet getAllocatedAsn() {
@@ -128,7 +128,7 @@ public class CertificateElement {
     public void setAllocatedIpv6(IpResourceSet allocatedIpv6) {
         this.allocatedIpv6 = allocatedIpv6;
     }
-    
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

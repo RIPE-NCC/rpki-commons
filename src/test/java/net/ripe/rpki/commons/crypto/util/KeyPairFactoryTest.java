@@ -76,18 +76,18 @@ public class KeyPairFactoryTest {
         assertEquals(KeyPairFactory.RPKI_KEY_PAIR_SIZE, rsaPublicKey.getModulus().bitLength());
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void shouldKeypairGenerationFailOnInvalidProvider() {
         new KeyPairFactory("invalid_provider").generate();
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void shouldDecodePublicKeyFailOnInvalidInput() {
-        KeyPairFactory.decodePublicKey(new byte[] {0});
+        KeyPairFactory.decodePublicKey(new byte[]{0});
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void shouldDecodePrivateKeyFailOnInvalidInput() {
-        KeyPairFactory.decodePrivateKey(new byte[] {0});
+        KeyPairFactory.decodePrivateKey(new byte[]{0});
     }
 }

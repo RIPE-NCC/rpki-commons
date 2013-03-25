@@ -35,7 +35,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.joda.time.DateTime;
 
 /**
- * Helper class for the creation or ResourceCertificate using CMS objects. 
+ * Helper class for the creation or ResourceCertificate using CMS objects.
  */
 public class RpkiSignedObjectInfo {
 

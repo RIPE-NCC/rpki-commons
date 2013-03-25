@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpAddress;
@@ -54,7 +55,7 @@ import org.bouncycastle.asn1.DERTaggedObject;
 /**
  * Encodes the certificate resource extensions as specified in RFC3779. Resource
  * inheritance is not yet supported.
- *
+ * <p/>
  * The methods in this class are named after the grammar rules in RFC3779,
  * suffixed with "ToDer".
  */
@@ -85,12 +86,9 @@ public class ResourceExtensionEncoder {
      * Encode the IP Address Block extension for Resource Certificates. This
      * extension is identified by {@link #OID_IP_ADDRESS_BLOCKS}.
      *
-     * @param inheritIpv4
-     *            inherit IPv4 resources from signing certificate.
-     * @param inheritIpv6
-     *            inherit IPv6 resources from signing certificate.
-     * @param resources
-     *            the set of IPv4 and IPv6 resources.
+     * @param inheritIpv4 inherit IPv4 resources from signing certificate.
+     * @param inheritIpv6 inherit IPv6 resources from signing certificate.
+     * @param resources   the set of IPv4 and IPv6 resources.
      * @return the DER encoding of the IP Address Block Extension.
      */
     public ASN1Object encodeIpAddressBlocks(boolean inheritIpv4, boolean inheritIpv6, IpResourceSet resources) {
@@ -116,10 +114,8 @@ public class ResourceExtensionEncoder {
      * "asnum" part is encoded, since we do not use the "rdi" (routing domain
      * identifiers).
      *
-     * @param inherit
-     *            inherit ASNs from signing certificate.
-     * @param resources
-     *            the set of ASNs.
+     * @param inherit   inherit ASNs from signing certificate.
+     * @param resources the set of ASNs.
      * @return the DER encoding of the AS Identifier extension.
      */
     public ASN1Object encodeAsIdentifiers(boolean inherit, IpResourceSet resources) {
@@ -180,7 +176,7 @@ public class ResourceExtensionEncoder {
      * ASRange ::= SEQUENCE { min ASId, max ASId }
      */
     DERSequence asRangeToDer(IpResourceRange range) {
-        ASN1Encodable[] seq = { asIdToDer((Asn) range.getStart()), asIdToDer((Asn) range.getEnd()) };
+        ASN1Encodable[] seq = {asIdToDer((Asn) range.getStart()), asIdToDer((Asn) range.getEnd())};
         return new DERSequence(seq);
     }
 
@@ -249,7 +245,7 @@ public class ResourceExtensionEncoder {
      * IPAddressRange ::= SEQUENCE { min IPAddress, max IPAddress }
      */
     DERSequence ipRangeToDer(IpRange range) {
-        ASN1Encodable[] encodables = { startIpAddressToDer((IpAddress) range.getStart()), endIpAddressToDer((IpAddress) range.getEnd()) };
+        ASN1Encodable[] encodables = {startIpAddressToDer((IpAddress) range.getStart()), endIpAddressToDer((IpAddress) range.getEnd())};
         return new DERSequence(encodables);
     }
 

@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.crypto.rfc3779;
 
 import static net.ripe.rpki.commons.crypto.rfc3779.AddressFamily.*;
 import static org.junit.Assert.*;
+
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.ipresource.IpResourceType;
 
@@ -79,31 +80,31 @@ public class AddressFamilyTest {
 
     @Test
     public void shouldConvertToDerOctetString() {
-        byte[] encodedIpv4 = { 0x00, 0x01 };
+        byte[] encodedIpv4 = {0x00, 0x01};
         assertArrayEquals(encodedIpv4, IPV4.toDer().getOctets());
 
-        byte[] encodedIpv4Multicast = { 0x00, 0x01, 0x02 };
+        byte[] encodedIpv4Multicast = {0x00, 0x01, 0x02};
         assertArrayEquals(encodedIpv4Multicast, IPV4_2.toDer().getOctets());
 
-        byte[] encodedIpv6 = { 0x00, 0x02 };
+        byte[] encodedIpv6 = {0x00, 0x02};
         assertArrayEquals(encodedIpv6, IPV6.toDer().getOctets());
 
-        byte[] encoded = { (byte) 0x80, (byte) 0xf0, (byte) 0x88 };
+        byte[] encoded = {(byte) 0x80, (byte) 0xf0, (byte) 0x88};
         assertArrayEquals(encoded, new AddressFamily(0x80f0, 0x88).toDer().getOctets());
     }
 
     @Test
     public void shouldConstructFromDer() {
-        byte[] encodedIpv4 = { 0x04, 0x02, 0x00, 0x01 };
+        byte[] encodedIpv4 = {0x04, 0x02, 0x00, 0x01};
         assertEquals(IPV4, fromDer(Asn1Util.decode(encodedIpv4)));
 
-        byte[] encodedIpv4Multicast = { 0x04, 0x03, 0x00, 0x01, 0x02 };
+        byte[] encodedIpv4Multicast = {0x04, 0x03, 0x00, 0x01, 0x02};
         assertEquals(IPV4_2, fromDer(Asn1Util.decode(encodedIpv4Multicast)));
 
-        byte[] encodedIpv6 = { 0x04, 0x02, 0x00, 0x02 };
+        byte[] encodedIpv6 = {0x04, 0x02, 0x00, 0x02};
         assertEquals(IPV6, fromDer(Asn1Util.decode(encodedIpv6)));
 
-        byte[] encoded = { 0x04, 0x03, (byte) 0x80, (byte) 0xf0, (byte) 0x88 };
+        byte[] encoded = {0x04, 0x03, (byte) 0x80, (byte) 0xf0, (byte) 0x88};
         assertEquals(new AddressFamily(0x80f0, 0x88), fromDer(Asn1Util.decode(encoded)));
 
     }
@@ -114,7 +115,7 @@ public class AddressFamilyTest {
         assertEquals(IpResourceType.IPv6, IPV6.toIpResourceType());
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void shouldFailToConvertToIpResourceTypeForUnknownAfi() {
         new AddressFamily(25).toIpResourceType();
     }

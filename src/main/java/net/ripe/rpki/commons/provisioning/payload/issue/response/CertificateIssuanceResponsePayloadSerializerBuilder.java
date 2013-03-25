@@ -37,7 +37,7 @@ public class CertificateIssuanceResponsePayloadSerializerBuilder extends Provisi
     public CertificateIssuanceResponsePayloadSerializerBuilder() {
         super(CertificateIssuanceResponsePayload.class);
     }
-    
+
     @Override
     public XStreamXmlSerializer<CertificateIssuanceResponsePayload> build() {
         getXStream().processAnnotations(CertificateIssuanceResponsePayload.class);

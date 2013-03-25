@@ -35,6 +35,7 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.EnumSet;
 import javax.security.auth.x500.X500Principal;
+
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
@@ -131,7 +132,7 @@ public abstract class GenericRpkiCertificateBuilder {
 
         builder.withValidityPeriod(validityPeriod);
 
-        if(!isSelfSigned()) {
+        if (!isSelfSigned()) {
             builder.withCrlDistributionPoints(crlUri);
 
             X509CertificateInformationAccessDescriptor[] aiaDescriptors = {

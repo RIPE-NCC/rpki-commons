@@ -79,20 +79,20 @@ public class ProvisioningIdentityCertificateBuilderTest {
         assertNotNull(identityCert);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSelfSigningKeyPair() {
         subject = new ProvisioningIdentityCertificateBuilder();
         subject.withSelfSigningSubject(ProvisioningIdentityCertificateBuilderTest.SELF_SIGNING_DN);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSelfSigningDN() {
         subject.withSelfSigningSubject(null);
         subject.build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRequireSignatureProvider() {
         subject.withSignatureProvider(null);
         subject.build();
@@ -149,7 +149,7 @@ public class ProvisioningIdentityCertificateBuilderTest {
         boolean[] keyUsage = TEST_IDENTITY_CERT.getCertificate().getKeyUsage();
         assertNotNull(keyUsage);
         // For KeyUsage flags order see bouncy castle KeyUsage class
-        assertTrue(Arrays.equals(new boolean[] { false, false, false, false, false, true, true, false, false }, keyUsage));
+        assertTrue(Arrays.equals(new boolean[]{false, false, false, false, false, true, true, false, false}, keyUsage));
     }
 }
 

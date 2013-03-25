@@ -53,82 +53,82 @@ import static org.junit.Assert.assertTrue;
 
 public class CertificateRepositoryObjectFactoryTest {
 
-	private ValidationResult validationResult;
+    private ValidationResult validationResult;
 
-	@Before
-	public void setUp() {
-		validationResult = ValidationResult.withLocation("unknown.crl");
-	}
+    @Before
+    public void setUp() {
+        validationResult = ValidationResult.withLocation("unknown.crl");
+    }
 
-	@Test
-	public void unknownFileExtensionsShouldProduceAWarning() {
+    @Test
+    public void unknownFileExtensionsShouldProduceAWarning() {
 
-		String unknownFilename = "foo.crl.gbr";
-		byte[] encoded = null; // this will not get inspected, so we don't care what's in it
-		ValidationLocation validationLocation = new ValidationLocation(unknownFilename);
-		validationResult.setLocation(validationLocation);
+        String unknownFilename = "foo.crl.gbr";
+        byte[] encoded = null; // this will not get inspected, so we don't care what's in it
+        ValidationLocation validationLocation = new ValidationLocation(unknownFilename);
+        validationResult.setLocation(validationLocation);
 
-		CertificateRepositoryObject cro = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, validationResult);
-		assertTrue(cro instanceof UnknownCertificateRepositoryObject);
+        CertificateRepositoryObject cro = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, validationResult);
+        assertTrue(cro instanceof UnknownCertificateRepositoryObject);
 
-		UnknownCertificateRepositoryObject unknownCertificateRepositoryObject = (UnknownCertificateRepositoryObject) cro;
-		assertTrue(Arrays.equals(unknownCertificateRepositoryObject.getEncoded(), encoded));
+        UnknownCertificateRepositoryObject unknownCertificateRepositoryObject = (UnknownCertificateRepositoryObject) cro;
+        assertTrue(Arrays.equals(unknownCertificateRepositoryObject.getEncoded(), encoded));
 
-		List<ValidationCheck> warnings = validationResult.getWarnings();
-		assertTrue("we should find exactly one warning", warnings.size() == 1);
-		ValidationCheck warning = warnings.get(0);
-		assertTrue(warning.getStatus() == ValidationStatus.WARNING);
-		assertTrue(warning.getKey().equals(CertificateRepositoryObjectFactory.CERTIFICATE_REPOSITORY_UNKNOWN_OBJECT_TYPE_MESSAGE_KEY));
-		assertTrue("the name of the object will appear in the user feedback", Arrays.asList(warning.getParams()).contains(unknownFilename));
-	}
+        List<ValidationCheck> warnings = validationResult.getWarnings();
+        assertTrue("we should find exactly one warning", warnings.size() == 1);
+        ValidationCheck warning = warnings.get(0);
+        assertTrue(warning.getStatus() == ValidationStatus.WARNING);
+        assertTrue(warning.getKey().equals(CertificateRepositoryObjectFactory.CERTIFICATE_REPOSITORY_UNKNOWN_OBJECT_TYPE_MESSAGE_KEY));
+        assertTrue("the name of the object will appear in the user feedback", Arrays.asList(warning.getParams()).contains(unknownFilename));
+    }
 
-	@Test(expected = CertificateRepositoryObjectParserException.class)
-	public void shouldNotParseIllegalByteString() {
-		validationResult.setLocation(new ValidationLocation("foo.cer"));
-		byte[] encoded = new byte[]{0};
-		CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, validationResult);
-		assertNull(object);
-	}
+    @Test(expected = CertificateRepositoryObjectParserException.class)
+    public void shouldNotParseIllegalByteString() {
+        validationResult.setLocation(new ValidationLocation("foo.cer"));
+        byte[] encoded = new byte[]{0};
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, validationResult);
+        assertNull(object);
+    }
 
-	@Test
-	public void shouldParseResourceCertificate() {
+    @Test
+    public void shouldParseResourceCertificate() {
 
-		validationResult.setLocation(new ValidationLocation("foo.cer"));
+        validationResult.setLocation(new ValidationLocation("foo.cer"));
 
-		X509ResourceCertificate cert = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
-		CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(cert.getEncoded(), validationResult);
-		assertEquals(cert, object);
-		assertTrue(validationResult.getResult(validationResult.getCurrentLocation(), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
-	}
+        X509ResourceCertificate cert = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(cert.getEncoded(), validationResult);
+        assertEquals(cert, object);
+        assertTrue(validationResult.getResult(validationResult.getCurrentLocation(), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
+    }
 
-	@Test
-	public void shouldParseRoaCms() {
+    @Test
+    public void shouldParseRoaCms() {
 
-		validationResult.setLocation(new ValidationLocation("foo.roa"));
+        validationResult.setLocation(new ValidationLocation("foo.roa"));
 
-		RoaCms roaCms = RoaCmsTest.getRoaCms();
-		CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(roaCms.getEncoded(), validationResult);
-		assertEquals(roaCms, object);
-	}
+        RoaCms roaCms = RoaCmsTest.getRoaCms();
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(roaCms.getEncoded(), validationResult);
+        assertEquals(roaCms, object);
+    }
 
-	@Test
-	public void shouldParseManifestCms() {
+    @Test
+    public void shouldParseManifestCms() {
 
-		validationResult.setLocation(new ValidationLocation("foo.mft"));
+        validationResult.setLocation(new ValidationLocation("foo.mft"));
 
-		ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
-		CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(manifestCms.getEncoded(), validationResult);
-		assertEquals(manifestCms, object);
-	}
+        ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(manifestCms.getEncoded(), validationResult);
+        assertEquals(manifestCms, object);
+    }
 
-	@Test
-	public void shouldParseCrl() {
+    @Test
+    public void shouldParseCrl() {
 
-		validationResult.setLocation(new ValidationLocation("foo.crl"));
+        validationResult.setLocation(new ValidationLocation("foo.crl"));
 
-		X509Crl crl = X509CrlTest.createCrl();
-		CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(crl.getEncoded(), validationResult);
-		assertEquals(crl, object);
-	}
+        X509Crl crl = X509CrlTest.createCrl();
+        CertificateRepositoryObject object = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(crl.getEncoded(), validationResult);
+        assertEquals(crl, object);
+    }
 }
 

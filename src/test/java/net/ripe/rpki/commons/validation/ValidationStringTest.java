@@ -42,7 +42,7 @@ public class ValidationStringTest {
     public void shouldHaveMessageForEachField() throws Exception {
         Class<?> c = ValidationString.class;
         List<String> missingFields = new ArrayList<String>();
-        for (Field f: c.getFields()) {
+        for (Field f : c.getFields()) {
             String key = (String) f.get(null);
             ValidationCheck validationCheck = new ValidationCheck(ValidationStatus.PASSED, key);
             try {

@@ -44,27 +44,27 @@ public class ChildIdentity extends EqualsSupport {
 
     public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
     public static final String CHILD_IDENTITY_NODE_NAME = "identity";
-    
+
     @SuppressWarnings("unused")
     @XStreamAsAttribute
     @XStreamAlias("version")
     private final int version = VERSION;
-    
+
     @XStreamAsAttribute
     @XStreamAlias("handle")
     private String handle;
-    
+
     @XStreamAlias("bpki_ta")
     private ProvisioningIdentityCertificate identityCertificate;
-    
-    
+
+
     /**
      * Create a child identity to offer to your parent with a random UUID based handle.
      */
     public ChildIdentity(ProvisioningIdentityCertificate identityCertificate) {
         this(UUID.randomUUID().toString(), identityCertificate);
     }
-    
+
     /**
      * Create a child identity to offer to your parent, including a suggested handle. Note that
      * your parent may ignore this handle!
@@ -77,7 +77,7 @@ public class ChildIdentity extends EqualsSupport {
     public String getHandle() {
         return handle;
     }
-    
+
     public ProvisioningIdentityCertificate getIdentityCertificate() {
         return identityCertificate;
     }

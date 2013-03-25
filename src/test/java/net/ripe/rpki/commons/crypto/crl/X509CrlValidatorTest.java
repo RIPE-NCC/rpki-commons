@@ -56,103 +56,103 @@ import org.junit.Test;
 public class X509CrlValidatorTest {
 
 
-	// Test data
-	private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
-	private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
-	private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
-	private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1));
+    // Test data
+    private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
+    private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
+    private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
+    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1));
 
-	private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-	private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
-	private X509CrlValidator subject;
-	private X509ResourceCertificate parent;
+    private X509CrlValidator subject;
+    private X509ResourceCertificate parent;
 
-	private ValidationOptions options;
-	private ValidationResult result;
-
-
-	@Before
-	public void setUp() {
-		parent = getRootResourceCertificate();
-		options = new ValidationOptions();
-		result = ValidationResult.withLocation("location");
-		subject = new X509CrlValidator(options, result, parent);
-	}
-
-	@Test
-	public void shouldValidateHappyflowCrl() {
-		X509Crl crl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
-		subject.validate("location", crl);
-
-		result = subject.getValidationResult();
-		assertFalse(result.hasFailures());
-		assertEquals(new ValidationLocation("location"), result.getCurrentLocation());
-	}
-
-	@Test
-	public void shouldRejectCrlSignedByOthers() {
-		X509Crl crl = getRootCRL().build(FIRST_CHILD_KEY_PAIR.getPrivate());
-		subject.validate("location", crl);
-
-		result = subject.getValidationResult();
-		assertTrue(result.hasFailures());
-		assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_SIGNATURE_VALID), result.getResult(new ValidationLocation("location"), CRL_SIGNATURE_VALID));
-	}
-
-	@Test
-	public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
-
-		options.setMaxStaleDays(1);
-
-		DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
-		X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
-		subject.validate("location", crl);
-
-		result = subject.getValidationResult();
-		assertFalse(result.hasFailures());
-		assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
-	}
-
-	@Test
-	public void shouldRejectWhenNextUpdateTooLongAgo() {
-		DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
-		X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
-		subject.validate("location", crl);
-
-		result = subject.getValidationResult();
-		assertTrue(result.hasFailures());
-		assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
-	}
+    private ValidationOptions options;
+    private ValidationResult result;
 
 
-	private X509ResourceCertificate getRootResourceCertificate() {
-		X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
+    @Before
+    public void setUp() {
+        parent = getRootResourceCertificate();
+        options = new ValidationOptions();
+        result = ValidationResult.withLocation("location");
+        subject = new X509CrlValidator(options, result, parent);
+    }
 
-		builder.withSubjectDN(ROOT_CERTIFICATE_NAME);
-		builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-		builder.withSerial(ROOT_SERIAL_NUMBER);
-		builder.withValidityPeriod(VALIDITY_PERIOD);
-		builder.withPublicKey(ROOT_KEY_PAIR.getPublic());
-		builder.withCa(true);
-		builder.withKeyUsage(KeyUsage.keyCertSign);
-		builder.withAuthorityKeyIdentifier(true);
-		builder.withSubjectKeyIdentifier(true);
-		builder.withResources(ROOT_RESOURCE_SET);
-		builder.withAuthorityKeyIdentifier(false);
-		builder.withSigningKeyPair(ROOT_KEY_PAIR);
-		return builder.build();
-	}
+    @Test
+    public void shouldValidateHappyflowCrl() {
+        X509Crl crl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
 
-	private X509CrlBuilder getRootCRL() {
-		X509CrlBuilder builder = new X509CrlBuilder();
+        result = subject.getValidationResult();
+        assertFalse(result.hasFailures());
+        assertEquals(new ValidationLocation("location"), result.getCurrentLocation());
+    }
 
-		builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-		builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-		builder.withNextUpdateTime(new DateTime().plusMonths(1));
-		builder.withNumber(BigInteger.valueOf(1));
-		builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
-		builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-		return builder;
-	}
+    @Test
+    public void shouldRejectCrlSignedByOthers() {
+        X509Crl crl = getRootCRL().build(FIRST_CHILD_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_SIGNATURE_VALID), result.getResult(new ValidationLocation("location"), CRL_SIGNATURE_VALID));
+    }
+
+    @Test
+    public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
+
+        options.setMaxStaleDays(1);
+
+        DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
+        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertFalse(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+    }
+
+    @Test
+    public void shouldRejectWhenNextUpdateTooLongAgo() {
+        DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
+        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+    }
+
+
+    private X509ResourceCertificate getRootResourceCertificate() {
+        X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
+
+        builder.withSubjectDN(ROOT_CERTIFICATE_NAME);
+        builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
+        builder.withSerial(ROOT_SERIAL_NUMBER);
+        builder.withValidityPeriod(VALIDITY_PERIOD);
+        builder.withPublicKey(ROOT_KEY_PAIR.getPublic());
+        builder.withCa(true);
+        builder.withKeyUsage(KeyUsage.keyCertSign);
+        builder.withAuthorityKeyIdentifier(true);
+        builder.withSubjectKeyIdentifier(true);
+        builder.withResources(ROOT_RESOURCE_SET);
+        builder.withAuthorityKeyIdentifier(false);
+        builder.withSigningKeyPair(ROOT_KEY_PAIR);
+        return builder.build();
+    }
+
+    private X509CrlBuilder getRootCRL() {
+        X509CrlBuilder builder = new X509CrlBuilder();
+
+        builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
+        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
+        builder.withNextUpdateTime(new DateTime().plusMonths(1));
+        builder.withNumber(BigInteger.valueOf(1));
+        builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
+        builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+        return builder;
+    }
 }

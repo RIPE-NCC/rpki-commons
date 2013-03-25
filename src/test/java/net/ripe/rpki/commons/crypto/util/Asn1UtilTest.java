@@ -48,13 +48,13 @@ public class Asn1UtilTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailToParseNonZeroPadBits() {
-        byte[] WRONG_ENCODED_IPV4_10_5_0_0_23 = { 0x03, 0x04, 0x01, 0x0a, 0x05, 0x01 };
+        byte[] WRONG_ENCODED_IPV4_10_5_0_0_23 = {0x03, 0x04, 0x01, 0x0a, 0x05, 0x01};
         parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailIPv4ParsingWhenNoValidDerBitStringFoundP() {
-        byte[] WRONG_ENCODED_IPV4_10_5_0_0_23 = { 0x05, 0x04, 0x01, 0x0a, 0x05, 0x01 };
+        byte[] WRONG_ENCODED_IPV4_10_5_0_0_23 = {0x05, 0x04, 0x01, 0x0a, 0x05, 0x01};
         parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23));
     }
 
@@ -70,7 +70,7 @@ public class Asn1UtilTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailToParseNonZeroPadBitsIpv4Address() {
-        byte[] WRONG_ENCODED_IPV4_10_5_0_0 = { 0x03, 0x03, 0x01, 0x0a, 0x05 };
+        byte[] WRONG_ENCODED_IPV4_10_5_0_0 = {0x03, 0x03, 0x01, 0x0a, 0x05};
         parseIpAddress(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0), false);
     }
 

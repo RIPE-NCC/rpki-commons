@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.crypto.rfc3779;
 
 import java.io.Serializable;
+
 import net.ripe.rpki.commons.util.EqualsSupport;
 import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
@@ -138,7 +139,7 @@ public class AddressFamily extends EqualsSupport implements Comparable<AddressFa
         Validate.isTrue(bytes.length == AFI_OCTET_COUNT_WITHOUT_SAFI || bytes.length == AFI_OCTET_COUNT_WITH_SAFI, "Byte array must consist of "
                 + AFI_OCTET_COUNT_WITHOUT_SAFI + " or " + AFI_OCTET_COUNT_WITH_SAFI + " elements");
 
-        int thisAddressFamilyIdentifier = (unsignedByteToInt(bytes[0]) << Byte.SIZE) | unsignedByteToInt(bytes[1]) ;
+        int thisAddressFamilyIdentifier = (unsignedByteToInt(bytes[0]) << Byte.SIZE) | unsignedByteToInt(bytes[1]);
 
         AddressFamily addressFamily;
         if (bytes.length == 2) {
@@ -157,23 +158,23 @@ public class AddressFamily extends EqualsSupport implements Comparable<AddressFa
 
     public static AddressFamily fromIpResourceType(IpResourceType type) {
         switch (type) {
-        case IPv4:
-            return IPV4;
-        case IPv6:
-            return IPV6;
-        default:
-            throw new IllegalArgumentException("no address family for type: " + type);
+            case IPv4:
+                return IPV4;
+            case IPv6:
+                return IPV6;
+            default:
+                throw new IllegalArgumentException("no address family for type: " + type);
         }
     }
 
     public IpResourceType toIpResourceType() {
         switch (addressFamilyIdentifier) {
-        case AFI_IPV4:
-            return IpResourceType.IPv4;
-        case AFI_IPV6:
-            return IpResourceType.IPv6;
-        default:
-            throw new IllegalStateException("no IP resource type for AFI: " + addressFamilyIdentifier);
+            case AFI_IPV4:
+                return IpResourceType.IPv4;
+            case AFI_IPV6:
+                return IpResourceType.IPv6;
+            default:
+                throw new IllegalStateException("no IP resource type for AFI: " + addressFamilyIdentifier);
         }
     }
 

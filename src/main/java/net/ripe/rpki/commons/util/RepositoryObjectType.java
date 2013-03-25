@@ -31,31 +31,31 @@ package net.ripe.rpki.commons.util;
 
 public enum RepositoryObjectType {
 
-	Manifest, Roa, Certificate, Crl;
+    Manifest, Roa, Certificate, Crl;
 
-	public static RepositoryObjectType parse(String name) {
-		if (!name.contains(".")) {
-			return null;
-		}
+    public static RepositoryObjectType parse(String name) {
+        if (!name.contains(".")) {
+            return null;
+        }
 
-		String extension = name.substring(name.lastIndexOf(".") + 1);
+        String extension = name.substring(name.lastIndexOf(".") + 1);
 
-		if (extension.equals("mft")) {
-			return Manifest;
-		}
+        if (extension.equals("mft")) {
+            return Manifest;
+        }
 
-		if (extension.equals("roa")) {
-			return Roa;
-		}
+        if (extension.equals("roa")) {
+            return Roa;
+        }
 
-		if (extension.equals("cer")) {
-			return Certificate;
-		}
+        if (extension.equals("cer")) {
+            return Certificate;
+        }
 
-		if (extension.equals("crl")) {
-			return Crl;
-		}
+        if (extension.equals("crl")) {
+            return Crl;
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

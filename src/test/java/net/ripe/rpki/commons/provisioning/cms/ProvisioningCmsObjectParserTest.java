@@ -61,9 +61,9 @@ public class ProvisioningCmsObjectParserTest {
         assertEquals(cmsObject, subject.getProvisioningCmsObject());
     }
 
-    @Test(expected=ProvisioningCmsObjectParserException.class)
+    @Test(expected = ProvisioningCmsObjectParserException.class)
     public void shouldFailOnInvalidObject() {
-        subject.parseCms("test-location", new byte[] {0});
+        subject.parseCms("test-location", new byte[]{0});
 
         ValidationResult validationResult = subject.getValidationResult();
         assertTrue(validationResult.hasFailures());

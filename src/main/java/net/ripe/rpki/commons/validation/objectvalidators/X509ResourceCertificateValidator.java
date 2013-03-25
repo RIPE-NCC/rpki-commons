@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.validation.objectvalidators;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 
-public interface X509ResourceCertificateValidator extends CertificateRepositoryObjectValidator<X509ResourceCertificate>{
+public interface X509ResourceCertificateValidator extends CertificateRepositoryObjectValidator<X509ResourceCertificate> {
 
     @Override
     ValidationResult getValidationResult();

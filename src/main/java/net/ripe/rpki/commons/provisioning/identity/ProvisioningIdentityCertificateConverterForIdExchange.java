@@ -45,31 +45,31 @@ import net.ripe.rpki.commons.validation.ValidationResult;
  */
 public class ProvisioningIdentityCertificateConverterForIdExchange implements Converter {
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public boolean canConvert(Class type) {
-		return ProvisioningIdentityCertificate.class.equals(type);
-	}
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean canConvert(Class type) {
+        return ProvisioningIdentityCertificate.class.equals(type);
+    }
 
-	@Override
-	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-		ProvisioningIdentityCertificate certificate = (ProvisioningIdentityCertificate) source;
-		context.convertAnother(certificate.getEncoded());
-	}
+    @Override
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        ProvisioningIdentityCertificate certificate = (ProvisioningIdentityCertificate) source;
+        context.convertAnother(certificate.getEncoded());
+    }
 
-	@Override
-	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-		byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
 
-		ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-		ValidationResult result = ValidationResult.withLocation("unknown.cer");
-		parser.parse(result, encoded);
+        ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
+        ValidationResult result = ValidationResult.withLocation("unknown.cer");
+        parser.parse(result, encoded);
 
-		if (result.hasFailureForCurrentLocation()) {
-			throw new IllegalArgumentException("Could not parse certificate: " + result.getFailuresForCurrentLocation());
-		}
+        if (result.hasFailureForCurrentLocation()) {
+            throw new IllegalArgumentException("Could not parse certificate: " + result.getFailuresForCurrentLocation());
+        }
 
-		return parser.getCertificate();
-	}
+        return parser.getCertificate();
+    }
 
 }
