@@ -78,7 +78,7 @@ public class CertificateRepositoryObjectFactoryTest {
         assertTrue("we should find exactly one warning", warnings.size() == 1);
         ValidationCheck warning = warnings.get(0);
         assertTrue(warning.getStatus() == ValidationStatus.WARNING);
-        assertTrue(warning.getKey().equals(CertificateRepositoryObjectFactory.CERTIFICATE_REPOSITORY_UNKNOWN_OBJECT_TYPE_MESSAGE_KEY));
+        assertTrue(warning.getKey().equals(ValidationString.VALIDATOR_REPOSITORY_UNKNOWN_FILE_EXTENSION));
         assertTrue("the name of the object will appear in the user feedback", Arrays.asList(warning.getParams()).contains(unknownFilename));
     }
 

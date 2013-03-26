@@ -177,27 +177,6 @@ public final class ValidationString {
     public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconcistent";
     public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unkown";
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_IN_CACHE = "validator.repository.object.not.in.cache";
+    public static final String VALIDATOR_REPOSITORY_UNKNOWN_FILE_EXTENSION = "validator.repository.unknown.file.extension";
 
-
-    ////////////////////////////////
-    // FIELD VALIDATION
-    ////////////////////////////////
-
-    // Roa Specification
-    public static final String ROA_SPECIFICATION_NAME_REQUIRED = "roaSpecification.nameRequired";
-    public static final String ROA_SPECIFICATION_NAME_ALREADY_EXISTS = "roaSpecification.nameExists";
-    public static final String ROA_SPECIFICATION_NAME_PATTERN = "roaSpecification.namePattern";
-    public static final String ROA_SPECIFICATION_NAME_LENGTH = "roaSpecification.nameLength";
-
-    public static final String ROA_SPECIFICATION_ASN_REQUIRED = "roaSpecification.asnRequired";
-    public static final String ROA_SPECIFICATION_ASN_VALID = "roaSpecification.asnValid";
-
-    public static final String ROA_SPECIFICATION_DATE_TIME_REQUIRED = "roaSpecification.dateTimeRequired";
-    public static final String ROA_SPECIFICATION_DATE_TIME_VALID = "roaSpecification.dateTimeValid";
-
-    public static final String ROA_SPECIFICATION_PREFIX_REQUIRED = "roaSpecification.prefixRequired";
-    public static final String ROA_SPECIFICATION_PREFIX_VALID = "roaSpecification.illegalPrefix";
-    public static final String ROA_SPECIFICATION_PREFIX_NOT_HELD_BY_CA = "roaSpecification.notOwnerOfResource";
-
-    public static final String ROA_SPECIFICATION_MAX_LENGTH_VALID = "roaSpecification.invalidMaximumLength";
 }

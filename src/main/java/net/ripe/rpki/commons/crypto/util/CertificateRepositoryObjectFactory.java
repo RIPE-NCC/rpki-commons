@@ -40,10 +40,10 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.util.RepositoryObjectType;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.ValidationString;
 
 public final class CertificateRepositoryObjectFactory {
 
-    public static final String CERTIFICATE_REPOSITORY_UNKNOWN_OBJECT_TYPE_MESSAGE_KEY = "certificateRepository.unknownObjectType";
 
     private CertificateRepositoryObjectFactory() {
     }
@@ -60,7 +60,7 @@ public final class CertificateRepositoryObjectFactory {
 
         RepositoryObjectType objectType = RepositoryObjectType.parse(name);
         if (objectType == null) {
-            validationResult.warn(CERTIFICATE_REPOSITORY_UNKNOWN_OBJECT_TYPE_MESSAGE_KEY, name);
+            validationResult.warn(ValidationString.VALIDATOR_REPOSITORY_UNKNOWN_FILE_EXTENSION, name);
             return new UnknownCertificateRepositoryObject(encoded);
         }
 
