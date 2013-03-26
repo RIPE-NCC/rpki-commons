@@ -42,7 +42,7 @@
 
         <easymock.version>3.0</easymock.version>
 
-        <bouncycastle.version>1.47</bouncycastle.version>
+        <bouncycastle.version>1.48</bouncycastle.version>
         <joda-time.version>1.6.2</joda-time.version>
 
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
