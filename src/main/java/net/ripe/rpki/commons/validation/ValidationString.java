@@ -174,8 +174,8 @@ public final class ValidationString {
 
     // Problems with repository
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
-    public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconcistent";
-    public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unkown";
+    public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconsistent";
+    public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unknown";
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_IN_CACHE = "validator.repository.object.not.in.cache";
     public static final String VALIDATOR_REPOSITORY_UNKNOWN_FILE_EXTENSION = "validator.repository.unknown.file.extension";
 
