@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
-
+import static org.mockito.Mockito.*;
+import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,8 +42,6 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.util.EnumSet;
-import javax.security.auth.x500.X500Principal;
-
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -57,10 +55,11 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.easymock.IAnswer;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 
 public class X509ResourceCertificateTest {
@@ -137,7 +136,7 @@ public class X509ResourceCertificateTest {
 
     @Before
     public void setUp() {
-        crlLocator = createMock(CrlLocator.class);
+        crlLocator = mock(CrlLocator.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -267,11 +266,8 @@ public class X509ResourceCertificateTest {
         ValidationResult result = ValidationResult.withLocation(CERT_URI);
         X509ResourceCertificate selfSignedCert = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, selfSignedCert);
-        replay(crlLocator);
 
         selfSignedCert.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
-
-        verify(crlLocator);
     }
 
     @Test
@@ -285,21 +281,18 @@ public class X509ResourceCertificateTest {
                 .build();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, rootCertificate);
 
-        expect(crlLocator.getCrl(CRL_DP, context, result)).andAnswer(new IAnswer<X509Crl>() {
+        when(crlLocator.getCrl(CRL_DP, context, result)).thenAnswer(new Answer<X509Crl>() {
             @Override
-            public X509Crl answer() throws Throwable {
-
+            public X509Crl answer(InvocationOnMock invocationOnMock) throws Throwable {
                 assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
                 result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
                 return null;
             }
         });
-        replay(crlLocator);
 
         result.setLocation(new ValidationLocation(CERT_URI));
         subject.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
-        verify(crlLocator);
         assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());
         assertTrue("certificate should have errors", result.hasFailureForCurrentLocation());
         assertTrue("crl should have errors", result.hasFailureForLocation(CRL_DP_VALIDATION_LOCATION));
@@ -317,12 +310,10 @@ public class X509ResourceCertificateTest {
         X509Crl crl = X509CrlTest.createCrl();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, rootCertificate);
 
-        expect(crlLocator.getCrl(CRL_DP, context, result)).andReturn(crl);
-        replay(crlLocator);
+        when(crlLocator.getCrl(CRL_DP, context, result)).thenReturn(crl);
 
         subject.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
-        verify(crlLocator);
         assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());
         assertEquals("[]", result.getFailuresForCurrentLocation().toString());
         assertFalse(result.hasFailureForLocation(CERT_URI_VALIDATION_LOCATION));

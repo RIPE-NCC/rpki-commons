@@ -47,7 +47,7 @@ import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_K
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest.createSelfSignedCaResourceCertificate;
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 public class X509CrlTest {
@@ -90,15 +90,11 @@ public class X509CrlTest {
     public void shouldValidateCrl() {
         X509Crl subject = createCrl();
         ValidationResult result = ValidationResult.withLocation(ROOT_MANIFEST_CRL_LOCATION);
-        CrlLocator crlLocator = createMock(CrlLocator.class);
+        CrlLocator crlLocator = mock(CrlLocator.class);
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_MANIFEST_CRL_LOCATION, createSelfSignedCaResourceCertificate());
 
-        replay(crlLocator);
-
         subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
-
-        verify(crlLocator);
 
         assertFalse(result.hasFailures());
     }
@@ -107,15 +103,11 @@ public class X509CrlTest {
     public void shouldNotValidateInvalidCrl() {
         X509Crl subject = getCrlWithKeyPair(SECOND_TEST_KEY_PAIR);
         ValidationResult result = ValidationResult.withLocation(ROOT_MANIFEST_CRL_LOCATION);
-        CrlLocator crlLocator = createMock(CrlLocator.class);
+        CrlLocator crlLocator = mock(CrlLocator.class);
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_MANIFEST_CRL_LOCATION, createSelfSignedCaResourceCertificate());
 
-        replay(crlLocator);
-
         subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
-
-        verify(crlLocator);
 
         assertTrue(result.hasFailures());
         assertTrue(result.getValidatedLocations().size() == 1);

@@ -39,12 +39,8 @@
 
     <properties>
         <net.ripe.ipresource.version>1.45</net.ripe.ipresource.version>
-
-        <easymock.version>3.0</easymock.version>
-
         <bouncycastle.version>1.48</bouncycastle.version>
         <joda-time.version>1.6.2</joda-time.version>
-
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.clover.reportPath>target/site/clover/clover.xml</sonar.clover.reportPath>
     </properties>
@@ -100,9 +96,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>${easymock.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>

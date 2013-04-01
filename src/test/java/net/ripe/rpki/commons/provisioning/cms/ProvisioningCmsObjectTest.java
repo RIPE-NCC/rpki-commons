@@ -30,23 +30,21 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
-import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import org.junit.Test;
 
 public class ProvisioningCmsObjectTest {
 
-
     @Test
     public void shouldImplementEquals() {
-        X509Certificate certificate1 = createMock(X509Certificate.class);
-        X509CRL crl = createMock(X509CRL.class);
+        X509Certificate certificate1 = mock(X509Certificate.class);
+        X509CRL crl = mock(X509CRL.class);
         byte[] encodedContent = new byte[]{'f', 'o', 'o'};
         ProvisioningCmsObject cms1 = new ProvisioningCmsObject(encodedContent, certificate1, Collections.<X509Certificate>emptySet(), crl, null);
 
@@ -57,9 +55,9 @@ public class ProvisioningCmsObjectTest {
 
     @Test
     public void shouldCompareOnlyTheContentForEquality() {
-        X509Certificate certificate1 = createMock(X509Certificate.class);
-        X509Certificate certificate2 = createMock(X509Certificate.class);
-        X509CRL crl = createMock(X509CRL.class);
+        X509Certificate certificate1 = mock(X509Certificate.class);
+        X509Certificate certificate2 = mock(X509Certificate.class);
+        X509CRL crl = mock(X509CRL.class);
 
         byte[] encodedContent = new byte[]{'f', 'o', 'o'};
 
@@ -71,9 +69,9 @@ public class ProvisioningCmsObjectTest {
 
     @Test
     public void shouldUseOnlyTheContentForHashcode() {
-        X509Certificate certificate1 = createMock(X509Certificate.class);
-        X509Certificate certificate2 = createMock(X509Certificate.class);
-        X509CRL crl = createMock(X509CRL.class);
+        X509Certificate certificate1 = mock(X509Certificate.class);
+        X509Certificate certificate2 = mock(X509Certificate.class);
+        X509CRL crl = mock(X509CRL.class);
 
         byte[] encodedContent = new byte[]{'f', 'o', 'o'};
 
