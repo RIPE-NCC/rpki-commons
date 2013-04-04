@@ -29,12 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto;
 
+import java.net.URI;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-
-import java.net.URI;
 
 public class UnknownCertificateRepositoryObject implements CertificateRepositoryObject {
 
@@ -48,11 +47,11 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
     }
 
     public URI getCrlUri() {
-        return null;
+        throw new UnsupportedOperationException("Unknown object type");
     }
 
     public URI getParentCertificateUri() {
-        return null;
+        throw new UnsupportedOperationException("Unknown object type");
     }
 
     public byte[] getEncoded() {

@@ -27,30 +27,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.util;
+package net.ripe.rpki.commons.validation;
 
-public enum RepositoryObjectType {
+import static net.ripe.rpki.commons.util.RepositoryObjectType.Unknown;
+import static net.ripe.rpki.commons.validation.ValidationString.KNOWN_OBJECT_TYPE;
+import net.ripe.rpki.commons.util.RepositoryObjectType;
 
-    Manifest, Roa, Certificate, Crl, GhostbustersRecord, Unknown;
+public final class ValidationChecks {
 
-    public static RepositoryObjectType parse(String name) {
-        if (name.endsWith(".mft")) {
-            return Manifest;
+    private ValidationChecks() {
+    }
 
-        } else if (name.endsWith(".roa")) {
-            return Roa;
-
-        } else if (name.endsWith(".cer")) {
-            return Certificate;
-
-        } else if (name.endsWith(".crl")) {
-            return Crl;
-
-        } else if (name.endsWith(".gbr")) {
-            return GhostbustersRecord;
-
+    public static void knownObjectType(RepositoryObjectType objectType, ValidationResult validationResult) {
+        if (objectType == Unknown) {
+            validationResult.error(KNOWN_OBJECT_TYPE, validationResult.getCurrentLocation().getName());
         } else {
-            return Unknown;
+            validationResult.pass(KNOWN_OBJECT_TYPE, validationResult.getCurrentLocation().getName());
         }
     }
 }

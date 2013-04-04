@@ -27,14 +27,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto.util;
+package net.ripe.rpki.commons.crypto;
 
-public class CertificateRepositoryObjectParserException extends RuntimeException {
+import java.net.URI;
+import net.ripe.rpki.commons.crypto.crl.CrlLocator;
+import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 
-    private static final long serialVersionUID = 1L;
+public class GhostbustersRecord implements CertificateRepositoryObject {
 
+    private final byte[] encoded;
 
-    public CertificateRepositoryObjectParserException(String message) {
-        super(message);
+    public GhostbustersRecord(byte[] encoded) {
+        this.encoded = encoded;
     }
+
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    }
+
+    public URI getCrlUri() {
+        throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
+    }
+
+    public URI getParentCertificateUri() {
+        throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
+    }
+
+    public byte[] getEncoded() {
+        return encoded;
+    }
+
 }

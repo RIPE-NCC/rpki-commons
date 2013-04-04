@@ -162,7 +162,15 @@ public class ValidationResult implements Serializable {
     }
 
     public boolean hasFailures() {
-        return getFailuresForAllLocations().size() > 0;
+        return !getFailuresForAllLocations().isEmpty();
+    }
+
+    public boolean hasWarnings() {
+        return !getWarnings().isEmpty();
+    }
+
+    public boolean hasNoFailuresOrWarnings() {
+        return !hasFailures() && !hasWarnings();
     }
 
     public Set<ValidationCheck> getFailuresForCurrentLocation() {
@@ -206,6 +214,10 @@ public class ValidationResult implements Serializable {
     }
 
 
+    public List<ValidationCheck> getAllValidationChecksForCurrentLocation() {
+        return getAllValidationChecksForLocation(currentLocation);
+    }
+
     public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
         ArrayList<ValidationCheck> allChecks = new ArrayList<ValidationCheck>();
         if (results.containsKey(location)) {
@@ -216,6 +228,10 @@ public class ValidationResult implements Serializable {
         }
 
         return allChecks;
+    }
+
+    public ValidationCheck getResultForCurrentLocation(String checkKey) {
+        return getResult(currentLocation, checkKey);
     }
 
     public ValidationCheck getResult(ValidationLocation location, String checkKey) {

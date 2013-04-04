@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.GhostbustersRecord;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
@@ -39,6 +40,7 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.util.RepositoryObjectType;
+import net.ripe.rpki.commons.validation.ValidationChecks;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 
@@ -50,44 +52,35 @@ public final class CertificateRepositoryObjectFactory {
 
     /**
      * @param encoded the DER encoded object.
-     * @throws CertificateRepositoryObjectParserException
-     *          when encoded object has a valid location, but its contents can not be parsed
+     *
+     * @return a parsed {@link CertificateRepositoryObject} or {@code null} in case the encoded object has a valid location
+     * but its contents can not be parsed.
      */
     public static CertificateRepositoryObject createCertificateRepositoryObject(byte[] encoded, ValidationResult validationResult) {
 
-        // find the file-extension of the current location and see if it is known to us
-        String name = validationResult.getCurrentLocation().getName();
+        RepositoryObjectType objectType = RepositoryObjectType.parse(validationResult.getCurrentLocation().getName());
 
-        RepositoryObjectType objectType = RepositoryObjectType.parse(name);
-        if (objectType == null) {
-            validationResult.warn(ValidationString.VALIDATOR_REPOSITORY_UNKNOWN_FILE_EXTENSION, name);
-            return new UnknownCertificateRepositoryObject(encoded);
-        }
+        ValidationChecks.knownObjectType(objectType, validationResult);
 
-        CertificateRepositoryObject result = null;
         switch (objectType) {
             case Manifest:
-                result = tryParseAsManifest(encoded, validationResult);
-                break;
+                return parseManifest(encoded, validationResult);
             case Roa:
-                result = tryParseAsROA(encoded, validationResult);
-                break;
+                return parseRoa(encoded, validationResult);
             case Certificate:
-                result = tryParseAsX509ResourceCertificate(encoded, validationResult);
-                break;
+                return parseX509ResourceCertificate(encoded, validationResult);
             case Crl:
-                result = tryParseAsCrl(encoded);
-                break;
+                return parseCrl(encoded);
+            case GhostbustersRecord:
+                return parseGhostbustersRecord(encoded, validationResult);
+            case Unknown:
+                return new UnknownCertificateRepositoryObject(encoded);
+            default:
+                throw new IllegalArgumentException("Unrecognized repository object type");
         }
-
-        if (result == null) {
-            throw new CertificateRepositoryObjectParserException("Could not parse encoded object");
-        }
-        return result;
     }
 
-
-    private static CertificateRepositoryObject tryParseAsCrl(byte[] encoded) {
+    private static X509Crl parseCrl(byte[] encoded) {
         try {
             return X509Crl.parseDerEncoded(encoded);
         } catch (IllegalArgumentException e) {
@@ -95,7 +88,7 @@ public final class CertificateRepositoryObjectFactory {
         }
     }
 
-    private static X509ResourceCertificate tryParseAsX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
+    private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         parser.parse(validationResult, encoded);
         if (parser.isSuccess()) {
@@ -105,7 +98,7 @@ public final class CertificateRepositoryObjectFactory {
         }
     }
 
-    private static RoaCms tryParseAsROA(byte[] encoded, ValidationResult validationResult) {
+    private static RoaCms parseRoa(byte[] encoded, ValidationResult validationResult) {
         RoaCmsParser parser = new RoaCmsParser();
         parser.parse(validationResult, encoded);
         if (parser.isSuccess()) {
@@ -115,7 +108,7 @@ public final class CertificateRepositoryObjectFactory {
         }
     }
 
-    private static ManifestCms tryParseAsManifest(byte[] encoded, ValidationResult validationResult) {
+    private static ManifestCms parseManifest(byte[] encoded, ValidationResult validationResult) {
         ManifestCmsParser parser = new ManifestCmsParser();
         parser.parse(validationResult, encoded);
         if (parser.isSuccess()) {
@@ -123,5 +116,10 @@ public final class CertificateRepositoryObjectFactory {
         } else {
             return null;
         }
+    }
+
+    private static GhostbustersRecord parseGhostbustersRecord(byte[] encoded, ValidationResult validationResult) {
+        validationResult.warn(ValidationString.VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
+        return new GhostbustersRecord(encoded);
     }
 }
