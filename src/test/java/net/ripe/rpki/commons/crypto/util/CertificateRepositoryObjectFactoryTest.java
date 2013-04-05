@@ -163,9 +163,10 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertTrue(object instanceof X509Crl);
         assertEquals(crl, object);
-        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+        assertTrue(validationResult.getResultForCurrentLocation(CRL_PARSED).isOk());
     }
 
     @Test
@@ -176,8 +177,9 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+        assertFalse(validationResult.getResultForCurrentLocation(CRL_PARSED).isOk());
     }
 
     @Test

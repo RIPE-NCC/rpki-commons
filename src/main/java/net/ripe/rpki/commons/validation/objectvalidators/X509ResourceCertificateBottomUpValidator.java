@@ -101,7 +101,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
             String childLocation = certificateWithLocation.getLocation().getName();
             X509ResourceCertificate child = certificateWithLocation.getCertificate();
 
-            X509Crl crl = getCRL(child);
+            X509Crl crl = getCRL(child, result);
 
             X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, parent, crl, resources);
             validator.validate(childLocation, child);
@@ -143,12 +143,12 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
     }
 
-    private X509Crl getCRL(X509ResourceCertificate certificate) {
+    private X509Crl getCRL(X509ResourceCertificate certificate, ValidationResult validationResult) {
         CertificateRepositoryObjectFile<X509Crl> crlFile = locator.findCrl(certificate);
         if (crlFile == null) {
             return null;
         }
-        return X509Crl.parseDerEncoded(crlFile.getContent());
+        return X509Crl.parseDerEncoded(crlFile.getContent(), validationResult);
     }
 
     private void checkTrustAnchor() {

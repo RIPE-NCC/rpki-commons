@@ -30,7 +30,7 @@
 package net.ripe.rpki.commons.crypto.crl;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -52,14 +52,13 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import javax.security.auth.x500.X500Principal;
-
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.util.EqualsSupport;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -104,8 +103,15 @@ public class X509Crl implements CertificateRepositoryObject {
         return crl;
     }
 
-    public static X509Crl parseDerEncoded(byte[] encoded) {
-        return new X509Crl(makeX509CRLFromEncoded(encoded));
+    public static X509Crl parseDerEncoded(byte[] encoded, ValidationResult validationResult) {
+        try {
+            X509Crl crl = new X509Crl(makeX509CRLFromEncoded(encoded));
+            validationResult.pass(ValidationString.CRL_PARSED);
+            return crl;
+        } catch (IllegalArgumentException e) {
+            validationResult.error(ValidationString.CRL_PARSED);
+            throw e;
+        }
     }
 
     private static X509CRL makeX509CRLFromEncoded(byte[] encoded) {
