@@ -29,18 +29,17 @@
  */
 package net.ripe.rpki.commons.validation;
 
+import org.apache.commons.lang.Validate;
+
 import java.io.Serializable;
 import java.net.URI;
-
-import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang.Validate;
 
 
 /**
  * The validation location key that is used to associate validation checks with
  * a specific object or step. Typically the URI is used as the key.
  */
-public class ValidationLocation extends EqualsSupport implements Serializable {
+public class ValidationLocation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,4 +58,20 @@ public class ValidationLocation extends EqualsSupport implements Serializable {
         return name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ValidationLocation that = (ValidationLocation) o;
+
+        if (!name.equals(that.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

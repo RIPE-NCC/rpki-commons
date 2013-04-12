@@ -89,9 +89,12 @@ public final class CertificateRepositoryObjectFactory {
     }
 
     private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
+    private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(validationResult, encoded);
+        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        parser.parse(temp, encoded);
         if (parser.isSuccess()) {
+            validationResult.addAll(temp);
             return parser.getCertificate();
         } else {
             return null;
@@ -100,8 +103,10 @@ public final class CertificateRepositoryObjectFactory {
 
     private static RoaCms parseRoa(byte[] encoded, ValidationResult validationResult) {
         RoaCmsParser parser = new RoaCmsParser();
-        parser.parse(validationResult, encoded);
+        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        parser.parse(temp, encoded);
         if (parser.isSuccess()) {
+            validationResult.addAll(temp);
             return parser.getRoaCms();
         } else {
             return null;
@@ -110,7 +115,8 @@ public final class CertificateRepositoryObjectFactory {
 
     private static ManifestCms parseManifest(byte[] encoded, ValidationResult validationResult) {
         ManifestCmsParser parser = new ManifestCmsParser();
-        parser.parse(validationResult, encoded);
+        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        parser.parse(temp, encoded);
         if (parser.isSuccess()) {
             return parser.getManifestCms();
         } else {
