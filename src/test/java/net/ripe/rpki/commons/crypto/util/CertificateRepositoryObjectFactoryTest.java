@@ -94,9 +94,8 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
-        assertFalse(validationResult.getResultForCurrentLocation(CERTIFICATE_PARSED).isOk());
     }
 
     @Test
@@ -121,10 +120,8 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(3, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
-        assertFalse(validationResult.getResultForCurrentLocation(CMS_DATA_PARSING).isOk());
-        assertFalse(validationResult.getResultForCurrentLocation(ROA_CONTENT_TYPE).isOk());
     }
 
     @Test
@@ -136,7 +133,7 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertTrue(object instanceof ManifestCms);
         assertEquals(manifestCms, object);
-        assertEquals(40, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }
@@ -149,9 +146,8 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
-        assertFalse(validationResult.getResultForCurrentLocation(CMS_DATA_PARSING).isOk());
     }
 
     @Test

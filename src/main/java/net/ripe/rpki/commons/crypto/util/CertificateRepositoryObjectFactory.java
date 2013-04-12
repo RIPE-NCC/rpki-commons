@@ -89,7 +89,6 @@ public final class CertificateRepositoryObjectFactory {
     }
 
     private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
-    private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
         ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
