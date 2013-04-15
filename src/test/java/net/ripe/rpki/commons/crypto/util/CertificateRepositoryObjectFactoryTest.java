@@ -29,11 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.*;
-import static net.ripe.rpki.commons.validation.ValidationStatus.*;
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-import static org.junit.Assert.*;
-import java.util.Arrays;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.GhostbustersRecord;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
@@ -49,6 +44,14 @@ import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.junit.Test;
+
+import java.util.Arrays;
+
+import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.createCertificateRepositoryObject;
+import static net.ripe.rpki.commons.validation.ValidationStatus.ERROR;
+import static net.ripe.rpki.commons.validation.ValidationStatus.WARNING;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static org.junit.Assert.*;
 
 
 public class CertificateRepositoryObjectFactoryTest {
@@ -94,8 +97,9 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+        assertFalse(validationResult.getResultForCurrentLocation(CERTIFICATE_PARSED).isOk());
     }
 
     @Test
@@ -120,8 +124,10 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(3, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+        assertFalse(validationResult.getResultForCurrentLocation(CMS_DATA_PARSING).isOk());
+        assertFalse(validationResult.getResultForCurrentLocation(ROA_CONTENT_TYPE).isOk());
     }
 
     @Test
@@ -133,7 +139,7 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertTrue(object instanceof ManifestCms);
         assertEquals(manifestCms, object);
-        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(40, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }
@@ -146,8 +152,9 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(1, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+        assertFalse(validationResult.getResultForCurrentLocation(CMS_DATA_PARSING).isOk());
     }
 
     @Test
@@ -194,4 +201,3 @@ public class CertificateRepositoryObjectFactoryTest {
         assertEquals(WARNING, validationResult.getResultForCurrentLocation(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD).getStatus());
     }
 }
-

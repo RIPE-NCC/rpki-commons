@@ -78,6 +78,7 @@ public final class CertificateRepositoryObjectFactory {
             default:
                 throw new IllegalArgumentException("Unrecognized repository object type");
         }
+
     }
 
     private static X509Crl parseCrl(byte[] encoded, ValidationResult validationResult) {
@@ -90,10 +91,8 @@ public final class CertificateRepositoryObjectFactory {
 
     private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
-        parser.parse(temp, encoded);
+        parser.parse(validationResult, encoded);
         if (parser.isSuccess()) {
-            validationResult.addAll(temp);
             return parser.getCertificate();
         } else {
             return null;
@@ -102,10 +101,8 @@ public final class CertificateRepositoryObjectFactory {
 
     private static RoaCms parseRoa(byte[] encoded, ValidationResult validationResult) {
         RoaCmsParser parser = new RoaCmsParser();
-        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
-        parser.parse(temp, encoded);
+        parser.parse(validationResult, encoded);
         if (parser.isSuccess()) {
-            validationResult.addAll(temp);
             return parser.getRoaCms();
         } else {
             return null;
@@ -114,8 +111,7 @@ public final class CertificateRepositoryObjectFactory {
 
     private static ManifestCms parseManifest(byte[] encoded, ValidationResult validationResult) {
         ManifestCmsParser parser = new ManifestCmsParser();
-        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
-        parser.parse(temp, encoded);
+        parser.parse(validationResult, encoded);
         if (parser.isSuccess()) {
             return parser.getManifestCms();
         } else {
