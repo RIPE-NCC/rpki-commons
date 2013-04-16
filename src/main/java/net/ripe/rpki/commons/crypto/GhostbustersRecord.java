@@ -37,6 +37,8 @@ import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryOb
 
 public class GhostbustersRecord implements CertificateRepositoryObject {
 
+    private static final long serialVersionUID = 1L;
+
     private final byte[] encoded;
 
     public GhostbustersRecord(byte[] encoded) {
