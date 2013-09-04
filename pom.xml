@@ -38,7 +38,7 @@
 
     <properties>
         <net.ripe.ipresource.version>1.45</net.ripe.ipresource.version>
-        <bouncycastle.version>1.48</bouncycastle.version>
+        <bouncycastle.version>1.49</bouncycastle.version>
         <joda-time.version>1.6.2</joda-time.version>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.clover.reportPath>target/site/clover/clover.xml</sonar.clover.reportPath>
