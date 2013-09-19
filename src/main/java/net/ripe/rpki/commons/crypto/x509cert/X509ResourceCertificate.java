@@ -60,16 +60,12 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
     private static final long serialVersionUID = 2L;
 
-    private EnumSet<IpResourceType> inheritedResourceTypes;
-    private IpResourceSet resources;
+    private final EnumSet<IpResourceType> inheritedResourceTypes;
+    private final IpResourceSet resources;
 
 
     protected X509ResourceCertificate(X509Certificate certificate) {
         super(certificate);
-        parseResourceExtensions();
-    }
-
-    private void parseResourceExtensions() {
         ResourceExtensionParser parser = new ResourceExtensionParser();
 
         inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
@@ -100,7 +96,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
     }
 
     public IpResourceSet getResources() {
-        return resources;
+        return new IpResourceSet(resources);
     }
 
     public EnumSet<IpResourceType> getInheritedResourceTypes() {

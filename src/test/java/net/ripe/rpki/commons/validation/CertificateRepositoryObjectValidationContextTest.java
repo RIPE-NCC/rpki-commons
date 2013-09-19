@@ -74,7 +74,7 @@ public class CertificateRepositoryObjectValidationContextTest {
     public void shouldContainLocationAndCertificateAndResources() {
         assertSame(location, subject.getLocation());
         assertSame(certificate, subject.getCertificate());
-        assertSame(certificate.getResources(), subject.getResources());
+        assertEquals(certificate.getResources(), subject.getResources());
     }
 
     @Test

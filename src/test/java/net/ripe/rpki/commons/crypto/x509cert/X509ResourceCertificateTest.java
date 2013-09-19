@@ -318,4 +318,14 @@ public class X509ResourceCertificateTest {
         assertEquals("[]", result.getFailuresForCurrentLocation().toString());
         assertFalse(result.hasFailureForLocation(CERT_URI_VALIDATION_LOCATION));
     }
+
+    @Test
+    public void shouldReturnImmutableResources() {
+        X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
+
+        IpResourceSet resources = cert.getResources();
+        resources.removeAll(new IpResourceSet(resources));
+
+        assertFalse(cert.getResources().isEmpty());
+    }
 }
