@@ -36,7 +36,7 @@ import org.apache.commons.lang.Validate;
 
 /**
  * Builder for 'Certificate Issuance Response'<br >
- * See: <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2</a>
+ * See: <a href="http://tools.ietf.org/html/rfc6492#section-3.4.2">http://tools.ietf.org/html/rfc6492#section-3.4.2</a>
  */
 public class CertificateIssuanceResponsePayloadBuilder extends AbstractPayloadBuilder<CertificateIssuanceResponsePayload> {
 

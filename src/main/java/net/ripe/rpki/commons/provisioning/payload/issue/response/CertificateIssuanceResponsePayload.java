@@ -34,6 +34,9 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ * See: http://tools.ietf.org/html/rfc6492#section-3.4.2
+ */
 @XStreamAlias("message")
 public class CertificateIssuanceResponsePayload extends AbstractProvisioningResponsePayload {
 

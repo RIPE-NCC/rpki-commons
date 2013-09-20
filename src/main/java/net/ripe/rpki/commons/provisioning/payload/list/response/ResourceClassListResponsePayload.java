@@ -41,6 +41,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+/**
+ * See http://tools.ietf.org/html/rfc6492#section-3.3.2
+ */
 @XStreamAlias("message")
 public class ResourceClassListResponsePayload extends AbstractProvisioningResponsePayload {
 
