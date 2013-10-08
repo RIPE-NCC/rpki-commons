@@ -33,7 +33,13 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERIA5String;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -42,7 +48,7 @@ import java.text.ParseException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 /**

@@ -29,10 +29,9 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
+import com.thoughtworks.xstream.converters.SingleValueConverter;
 import org.joda.time.ReadablePeriod;
 import org.joda.time.format.ISOPeriodFormat;
-
-import com.thoughtworks.xstream.converters.SingleValueConverter;
 
 public class ReadablePeriodConverter implements SingleValueConverter {
 

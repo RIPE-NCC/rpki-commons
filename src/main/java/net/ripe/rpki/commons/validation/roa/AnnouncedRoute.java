@@ -29,13 +29,12 @@
  */
 package net.ripe.rpki.commons.validation.roa;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
-
 import org.apache.commons.lang.Validate;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * A route announced on BGP.

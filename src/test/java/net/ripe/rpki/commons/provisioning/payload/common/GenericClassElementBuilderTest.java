@@ -29,12 +29,11 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.common;
 
+import org.junit.Test;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-
-import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElementBuilder;
-import org.junit.Test;
 
 public class GenericClassElementBuilderTest {
 

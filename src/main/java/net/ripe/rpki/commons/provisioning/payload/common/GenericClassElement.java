@@ -33,11 +33,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
 import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
-import net.ripe.ipresource.IpResource;
-import net.ripe.ipresource.IpResourceSet;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.DateTime;
 

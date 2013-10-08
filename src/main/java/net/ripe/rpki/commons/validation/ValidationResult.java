@@ -29,6 +29,11 @@
  */
 package net.ripe.rpki.commons.validation;
 
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.joda.time.DateTimeUtils;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -39,11 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.joda.time.DateTimeUtils;
 
 public class ValidationResult implements Serializable {
 

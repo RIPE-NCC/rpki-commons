@@ -29,17 +29,15 @@
  */
 package net.ripe.rpki.commons.provisioning.payload;
 
+import com.thoughtworks.xstream.XStream;
+import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
-
-import org.apache.commons.io.IOUtils;
-
-import com.thoughtworks.xstream.XStream;
 
 class ProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> extends XStreamXmlSerializer<T> {
 

@@ -30,20 +30,19 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 
-import static net.ripe.rpki.commons.provisioning.ProvisioningObjectMother.*;
-import static org.junit.Assert.*;
-
-import java.util.Set;
-
+import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Set;
+
+import static net.ripe.rpki.commons.provisioning.ProvisioningObjectMother.*;
+import static org.junit.Assert.*;
 
 public class ProvisioningCmsObjectValidatorTest {
 

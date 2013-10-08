@@ -29,9 +29,8 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
-import net.ripe.ipresource.IpResource;
-
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import net.ripe.ipresource.IpResource;
 
 public class IpResourceConverter extends AbstractSingleValueConverter {
 

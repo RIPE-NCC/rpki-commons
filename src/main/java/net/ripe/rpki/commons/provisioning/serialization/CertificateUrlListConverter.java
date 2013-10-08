@@ -29,13 +29,12 @@
  */
 package net.ripe.rpki.commons.provisioning.serialization;
 
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import org.apache.commons.lang.StringUtils;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
 public class CertificateUrlListConverter extends AbstractSingleValueConverter {
 

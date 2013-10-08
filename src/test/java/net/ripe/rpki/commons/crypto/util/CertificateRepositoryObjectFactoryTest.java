@@ -47,9 +47,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.createCertificateRepositoryObject;
-import static net.ripe.rpki.commons.validation.ValidationStatus.ERROR;
-import static net.ripe.rpki.commons.validation.ValidationStatus.WARNING;
+import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.*;
+import static net.ripe.rpki.commons.validation.ValidationStatus.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.junit.Assert.*;
 

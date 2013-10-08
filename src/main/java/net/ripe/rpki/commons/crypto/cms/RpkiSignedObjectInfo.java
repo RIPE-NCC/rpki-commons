@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.crypto.cms;
 
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.joda.time.DateTime;
 

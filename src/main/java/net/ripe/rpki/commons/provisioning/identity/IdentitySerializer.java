@@ -36,10 +36,9 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import net.ripe.rpki.commons.xml.converters.URIConverter;
 
 import javax.xml.namespace.QName;
-
-import net.ripe.rpki.commons.xml.converters.URIConverter;
 
 
 public abstract class IdentitySerializer<T> {

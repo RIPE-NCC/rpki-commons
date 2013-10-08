@@ -29,13 +29,12 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation;
 
-import java.security.PublicKey;
-
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
-
 import org.apache.commons.lang.Validate;
+
+import java.security.PublicKey;
 
 public abstract class AbstractCertificateRevocationPayloadBuilder<T extends AbstractProvisioningPayload> extends AbstractPayloadBuilder<T> {
 

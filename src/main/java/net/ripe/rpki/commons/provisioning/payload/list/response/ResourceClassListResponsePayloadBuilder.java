@@ -29,10 +29,10 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.response;
 
+import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
 
 /**
  * Builder for 'Resource Class List Response'<br >

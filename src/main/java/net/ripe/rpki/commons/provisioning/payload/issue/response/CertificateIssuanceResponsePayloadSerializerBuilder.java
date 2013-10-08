@@ -29,8 +29,8 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 import net.ripe.rpki.commons.provisioning.payload.ProvisioningPayloadXmlSerializerBuilder;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 
 public class CertificateIssuanceResponsePayloadSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<CertificateIssuanceResponsePayload> {
 

@@ -29,6 +29,14 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTime;
+
+import javax.security.auth.x500.X500Principal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,14 +48,6 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import javax.security.auth.x500.X500Principal;
-
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 
 /**
  * Caches generated keys in a key store so that they can be reused in the next test run. FOR TESTING ONLY!

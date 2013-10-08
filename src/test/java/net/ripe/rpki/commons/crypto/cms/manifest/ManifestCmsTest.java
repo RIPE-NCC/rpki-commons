@@ -29,18 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.KeyPair;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -69,6 +57,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.KeyPair;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 
 public class ManifestCmsTest {

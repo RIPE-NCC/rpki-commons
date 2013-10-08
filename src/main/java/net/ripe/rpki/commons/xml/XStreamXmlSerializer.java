@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.xml;
 
-import java.io.Writer;
-
 import com.thoughtworks.xstream.XStream;
+
+import java.io.Writer;
 
 public class XStreamXmlSerializer<T> implements XmlSerializer<T> {
 

@@ -29,15 +29,7 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
-
 import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -47,6 +39,13 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.joda.time.DateTime;
+
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
 
 
 public class ProvisioningCmsObject {

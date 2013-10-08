@@ -29,20 +29,19 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1UtilTest.*;
-import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
-import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest.*;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
+import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
-import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
-
-import org.junit.Before;
-import org.junit.Test;
+import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
+import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1UtilTest.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
 
 
 public class RoaCmsBuilderTest {

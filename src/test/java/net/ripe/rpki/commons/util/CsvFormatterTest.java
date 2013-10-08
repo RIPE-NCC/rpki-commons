@@ -34,7 +34,6 @@ package net.ripe.rpki.commons.util;
  *         Date: 1/26/11 11:53 AM
  */
 
-import net.ripe.rpki.commons.util.CsvFormatter;
 import net.ripe.rpki.commons.util.CsvFormatter.CsvColumn;
 import org.junit.Assert;
 import org.junit.Before;

@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.xml.converters;
 import com.thoughtworks.xstream.XStream;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsTest;
-import net.ripe.rpki.commons.xml.converters.ManifestCmsConverter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

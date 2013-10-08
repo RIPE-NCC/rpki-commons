@@ -29,11 +29,10 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import static junit.framework.Assert.*;
-
 import net.ripe.ipresource.IpRange;
-
 import org.junit.Test;
+
+import static junit.framework.Assert.*;
 
 
 public class RoaPrefixTest {

@@ -29,13 +29,13 @@
  */
 package net.ripe.rpki.commons.validation.objectvalidators;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-
+import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.ipresource.IpResourceSet;
+
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
 public class X509ResourceCertificateParentChildValidator extends X509CertificateParentChildValidator<X509ResourceCertificate> implements X509ResourceCertificateValidator {

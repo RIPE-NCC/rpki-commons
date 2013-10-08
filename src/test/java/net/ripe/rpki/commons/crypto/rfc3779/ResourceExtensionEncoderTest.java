@@ -29,11 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import net.ripe.rpki.commons.crypto.util.Asn1UtilTest;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.util.Asn1UtilTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,8 +41,7 @@ import java.io.IOException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 //ESCA-JAVA0076:
 public class ResourceExtensionEncoderTest {

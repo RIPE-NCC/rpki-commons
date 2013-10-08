@@ -29,13 +29,13 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import java.io.Serializable;
-
-import net.ripe.rpki.commons.util.EqualsSupport;
 import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DEROctetString;
+
+import java.io.Serializable;
 
 /**
  * See {@link http://www.ietf.org/rfc/rfc3779.txt},

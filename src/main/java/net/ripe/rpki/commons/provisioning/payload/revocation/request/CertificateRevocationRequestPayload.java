@@ -29,11 +29,10 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation.request;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("message")
 public class CertificateRevocationRequestPayload extends AbstractProvisioningQueryPayload {

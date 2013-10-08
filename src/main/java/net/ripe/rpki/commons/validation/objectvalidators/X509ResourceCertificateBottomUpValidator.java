@@ -29,21 +29,21 @@
  */
 package net.ripe.rpki.commons.validation.objectvalidators;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.rpki.commons.crypto.CertificateRepositoryObjectFile;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
+import net.ripe.rpki.commons.validation.ValidationLocation;
+import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.validation.ValidationResult;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.ripe.rpki.commons.crypto.CertificateRepositoryObjectFile;
-import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationOptions;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
-import net.ripe.ipresource.IpResourceSet;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
 public class X509ResourceCertificateBottomUpValidator implements X509ResourceCertificateValidator {

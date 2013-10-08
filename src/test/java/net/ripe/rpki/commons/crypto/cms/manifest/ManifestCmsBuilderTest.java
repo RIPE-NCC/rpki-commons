@@ -29,20 +29,19 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1UtilTest.*;
-import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.*;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.math.BigInteger;
-
 import net.ripe.rpki.commons.FixedDateRule;
-
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.math.BigInteger;
+
+import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1UtilTest.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
 
 
 public class ManifestCmsBuilderTest {

@@ -29,15 +29,13 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
+import net.ripe.ipresource.IpResourceSet;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 
-import net.ripe.ipresource.IpResourceSet;
-
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class X509CertificateUtilTest {

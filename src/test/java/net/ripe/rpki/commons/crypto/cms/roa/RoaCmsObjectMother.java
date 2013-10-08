@@ -29,24 +29,22 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import org.joda.time.DateTime;
 
+import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.x500.X500Principal;
-
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.ipresource.Asn;
-import net.ripe.ipresource.IpRange;
-import net.ripe.ipresource.IpResourceSet;
-
-import org.joda.time.DateTime;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 
 public class RoaCmsObjectMother {
 

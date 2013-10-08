@@ -30,14 +30,14 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class ProvisioningCmsObjectTest {
 

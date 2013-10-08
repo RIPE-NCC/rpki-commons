@@ -29,32 +29,31 @@
  */
 package net.ripe.rpki.commons.provisioning.payload;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayload;
+import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
+import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
+import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
+import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayload;
+import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayload;
+import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayload;
+import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadSerializerBuilder;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.ValidationString;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayload;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationString;
-import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
-import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
-import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadSerializerBuilder;
-
-import org.apache.commons.lang.NotImplementedException;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
 public final class PayloadParser {

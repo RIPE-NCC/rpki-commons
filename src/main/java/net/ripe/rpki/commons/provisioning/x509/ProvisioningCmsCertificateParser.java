@@ -31,7 +31,7 @@ package net.ripe.rpki.commons.provisioning.x509;
 
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateParser;
 
-import static net.ripe.rpki.commons.validation.ValidationString.RESOURCE_EXT_NOT_PRESENT;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class ProvisioningCmsCertificateParser extends X509CertificateParser<ProvisioningCmsCertificate> {
 

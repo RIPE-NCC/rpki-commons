@@ -38,7 +38,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 @Ignore
 //TODO Tim fix this test, or remove it.

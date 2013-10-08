@@ -29,18 +29,16 @@
  */
 package net.ripe.rpki.commons.provisioning.serialization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializerBuilder;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.regex.Pattern;
 
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class ProvisioningCmsObjectXstreamConverterTest {

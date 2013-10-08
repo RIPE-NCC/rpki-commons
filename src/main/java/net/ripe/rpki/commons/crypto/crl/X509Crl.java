@@ -29,7 +29,21 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
+import net.ripe.rpki.commons.util.EqualsSupport;
+import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.ValidationString;
+import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -52,20 +66,8 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
-import net.ripe.rpki.commons.util.EqualsSupport;
-import net.ripe.rpki.commons.validation.ValidationOptions;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationString;
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 
 public class X509Crl implements CertificateRepositoryObject {
 

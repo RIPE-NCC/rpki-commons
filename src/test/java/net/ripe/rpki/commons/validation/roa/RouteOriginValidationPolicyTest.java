@@ -29,23 +29,22 @@
  */
 package net.ripe.rpki.commons.validation.roa;
 
-import static junit.framework.Assert.*;
-import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpRange;
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.etree.NestedIntervalMap;
+import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
+import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
+import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
-import net.ripe.ipresource.Asn;
-import net.ripe.ipresource.IpRange;
-import net.ripe.ipresource.IpResource;
-import net.ripe.ipresource.etree.NestedIntervalMap;
-
-import org.junit.Before;
-import org.junit.Test;
+import static junit.framework.Assert.*;
+import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
 
 
 public class RouteOriginValidationPolicyTest {

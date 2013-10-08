@@ -29,11 +29,10 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
-import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
-import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
+import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
+import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
 /**
  * See: http://tools.ietf.org/html/rfc6492#section-3.4.1

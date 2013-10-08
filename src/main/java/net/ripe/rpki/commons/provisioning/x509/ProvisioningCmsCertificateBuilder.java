@@ -29,17 +29,15 @@
  */
 package net.ripe.rpki.commons.provisioning.x509;
 
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.joda.time.DateTime;
+
+import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PublicKey;
-
-import javax.security.auth.x500.X500Principal;
-
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
-
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
 
 
 public class ProvisioningCmsCertificateBuilder {

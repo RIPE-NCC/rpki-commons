@@ -29,18 +29,8 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
-import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import javax.security.auth.x500.X500Principal;
-
 import net.ripe.rpki.commons.crypto.crl.X509Crl.Entry;
+import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -53,6 +43,15 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.joda.time.DateTime;
+
+import javax.security.auth.x500.X500Principal;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
 
 public class X509CrlBuilder {
 

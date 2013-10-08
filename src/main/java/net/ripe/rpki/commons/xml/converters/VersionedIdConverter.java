@@ -29,9 +29,8 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
-import net.ripe.rpki.commons.util.VersionedId;
-
 import com.thoughtworks.xstream.converters.SingleValueConverter;
+import net.ripe.rpki.commons.util.VersionedId;
 
 /**
  * Handles old id consisting of just a "long" (without version) for backwards

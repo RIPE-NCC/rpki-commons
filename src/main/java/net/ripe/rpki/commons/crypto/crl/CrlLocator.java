@@ -29,10 +29,10 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
-import java.net.URI;
-
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+
+import java.net.URI;
 
 
 public interface CrlLocator {

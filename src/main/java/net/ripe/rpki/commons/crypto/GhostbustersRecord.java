@@ -29,11 +29,12 @@
  */
 package net.ripe.rpki.commons.crypto;
 
-import java.net.URI;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+
+import java.net.URI;
 
 public class GhostbustersRecord implements CertificateRepositoryObject {
 

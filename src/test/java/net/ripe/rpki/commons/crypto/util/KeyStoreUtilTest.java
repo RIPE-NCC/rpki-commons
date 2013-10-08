@@ -29,18 +29,18 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import static net.ripe.rpki.commons.crypto.util.KeyStoreUtil.*;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
+import org.junit.Test;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
-import org.junit.Test;
+import static net.ripe.rpki.commons.crypto.util.KeyStoreUtil.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
 
 public class KeyStoreUtilTest {
 

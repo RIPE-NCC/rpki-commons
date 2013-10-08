@@ -29,18 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static net.ripe.rpki.commons.provisioning.ProvisioningObjectMother.*;
-import static org.bouncycastle.cms.CMSSignedGenerator.*;
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayInputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertStoreException;
-import java.security.cert.X509CRL;
-import java.util.Collection;
-
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
@@ -70,6 +58,18 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertStoreException;
+import java.security.cert.X509CRL;
+import java.util.Collection;
+
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.provisioning.ProvisioningObjectMother.*;
+import static org.bouncycastle.cms.CMSSignedGenerator.*;
+import static org.junit.Assert.*;
 
 public class ProvisioningCmsObjectBuilderTest {
 

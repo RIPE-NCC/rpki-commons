@@ -29,12 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpAddress;
 import net.ripe.ipresource.IpRange;
@@ -42,6 +36,7 @@ import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -51,6 +46,11 @@ import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Encodes the certificate resource extensions as specified in RFC3779. Resource

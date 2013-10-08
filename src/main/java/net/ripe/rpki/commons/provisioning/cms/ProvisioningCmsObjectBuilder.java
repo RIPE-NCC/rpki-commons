@@ -29,28 +29,14 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.security.PrivateKey;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -73,6 +59,20 @@ import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.joda.time.DateTimeUtils;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.security.PrivateKey;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509Extension;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
 
 
 public class ProvisioningCmsObjectBuilder {

@@ -29,20 +29,19 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
-import static net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoderTest.*;
-import static org.junit.Assert.*;
-
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.ipresource.Ipv4Address;
 import net.ripe.ipresource.UniqueIpResource;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERBitString;
 import org.junit.Test;
+
+import static net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoderTest.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
+import static org.junit.Assert.*;
 
 public class Asn1UtilTest {
 

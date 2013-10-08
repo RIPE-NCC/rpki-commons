@@ -29,15 +29,15 @@
  */
 package net.ripe.rpki.commons.provisioning.x509;
 
-import static net.ripe.rpki.commons.provisioning.ProvisioningObjectMother.*;
-import static org.junit.Assert.*;
-
-import java.security.KeyPair;
-import java.util.Arrays;
-import javax.security.auth.x500.X500Principal;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.security.auth.x500.X500Principal;
+import java.security.KeyPair;
+import java.util.Arrays;
+
+import static net.ripe.rpki.commons.provisioning.ProvisioningObjectMother.*;
+import static org.junit.Assert.*;
 
 public class ProvisioningIdentityCertificateBuilderTest {
 

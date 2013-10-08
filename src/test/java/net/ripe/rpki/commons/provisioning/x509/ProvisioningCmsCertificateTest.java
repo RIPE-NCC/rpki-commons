@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.x509;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class ProvisioningCmsCertificateTest {
 

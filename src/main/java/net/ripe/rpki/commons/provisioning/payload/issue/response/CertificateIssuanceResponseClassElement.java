@@ -29,10 +29,10 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
-import java.util.Arrays;
-
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
+
+import java.util.Arrays;
 
 /**
  * See: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2

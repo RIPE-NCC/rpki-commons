@@ -29,12 +29,6 @@
  */
 package net.ripe.rpki.commons.xml;
 
-import static org.junit.Assert.*;
-
-import java.sql.Timestamp;
-import java.util.regex.Pattern;
-import javax.security.auth.x500.X500Principal;
-
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -50,6 +44,12 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;
+
+import javax.security.auth.x500.X500Principal;
+import java.sql.Timestamp;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.*;
 
 
 public class XStreamXmlSerializerBuilderTest {

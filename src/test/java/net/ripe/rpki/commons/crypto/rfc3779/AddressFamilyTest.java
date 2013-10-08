@@ -29,13 +29,12 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
+import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
+import org.junit.Test;
+
 import static net.ripe.rpki.commons.crypto.rfc3779.AddressFamily.*;
 import static org.junit.Assert.*;
-
-import net.ripe.rpki.commons.crypto.util.Asn1Util;
-import net.ripe.ipresource.IpResourceType;
-
-import org.junit.Test;
 
 
 // ESCA-JAVA0076:

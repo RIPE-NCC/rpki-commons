@@ -29,16 +29,16 @@
  */
 package net.ripe.rpki.commons.validation.roa;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
+import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpRange;
 import net.ripe.rpki.commons.crypto.cms.roa.Roa;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import net.ripe.ipresource.Asn;
-import net.ripe.ipresource.IpRange;
 import org.apache.commons.lang.Validate;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

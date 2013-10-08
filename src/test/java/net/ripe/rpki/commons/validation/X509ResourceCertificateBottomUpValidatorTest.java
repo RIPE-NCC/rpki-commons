@@ -29,31 +29,31 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
-
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.cert.CRLException;
-import java.util.EnumSet;
-import javax.security.auth.x500.X500Principal;
-
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObjectFile;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceCertificateLocator;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.validation.objectvalidators.ResourceCertificateLocator;
+import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.cert.CRLException;
+import java.util.EnumSet;
+
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
 
 
 public class X509ResourceCertificateBottomUpValidatorTest {

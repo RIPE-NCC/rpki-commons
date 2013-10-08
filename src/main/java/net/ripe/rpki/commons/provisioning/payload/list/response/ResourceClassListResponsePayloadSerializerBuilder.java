@@ -29,8 +29,8 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.response;
 
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 import net.ripe.rpki.commons.provisioning.payload.ProvisioningPayloadXmlSerializerBuilder;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 
 public class ResourceClassListResponsePayloadSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<ResourceClassListResponsePayload> {
 

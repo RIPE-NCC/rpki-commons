@@ -30,11 +30,10 @@
 package net.ripe.rpki.commons.xml.converters;
 
 import net.ripe.rpki.commons.util.VersionedId;
-import net.ripe.rpki.commons.xml.converters.VersionedIdConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 public class VersionedIdConverterTest {

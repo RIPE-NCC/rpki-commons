@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.xml.converters;
 import com.thoughtworks.xstream.XStream;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
-import net.ripe.rpki.commons.xml.converters.X509ResourceCertificateConverter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

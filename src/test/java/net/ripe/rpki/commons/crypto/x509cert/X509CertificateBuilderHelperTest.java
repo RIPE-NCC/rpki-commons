@@ -29,19 +29,17 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
-
-import java.math.BigInteger;
-
-import javax.security.auth.x500.X500Principal;
-
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.ipresource.IpResourceSet;
-
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 
 
 public class X509CertificateBuilderHelperTest {

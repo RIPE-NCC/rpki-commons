@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
-import net.ripe.rpki.commons.xml.converters.ReadablePeriodConverter;
 import org.joda.time.DateTime;
 import org.joda.time.MutablePeriod;
 import org.joda.time.Period;

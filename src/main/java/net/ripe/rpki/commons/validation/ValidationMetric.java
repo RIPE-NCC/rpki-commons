@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import java.io.Serializable;
-
 import net.ripe.rpki.commons.util.EqualsSupport;
+
+import java.io.Serializable;
 
 /**
  * Captures interesting statistics related to validation.

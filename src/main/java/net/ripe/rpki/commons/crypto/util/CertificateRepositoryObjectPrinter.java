@@ -29,10 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import java.io.PrintWriter;
-import java.util.Map;
-import java.util.SortedSet;
-
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
@@ -40,8 +36,11 @@ import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509Crl.Entry;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-
 import org.bouncycastle.util.encoders.Hex;
+
+import java.io.PrintWriter;
+import java.util.Map;
+import java.util.SortedSet;
 
 public final class CertificateRepositoryObjectPrinter {
 

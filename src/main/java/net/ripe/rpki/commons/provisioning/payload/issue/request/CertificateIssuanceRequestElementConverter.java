@@ -35,12 +35,11 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-
-import java.io.IOException;
-
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElementConverter;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+
+import java.io.IOException;
 
 public class CertificateIssuanceRequestElementConverter implements Converter {
 

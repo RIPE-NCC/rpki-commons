@@ -29,12 +29,12 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.ipresource.IpResourceSet;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,9 +47,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
 
 
 public class RoaCmsTest {

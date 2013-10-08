@@ -29,17 +29,17 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import org.apache.commons.lang.Validate;
+
+import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.EnumSet;
-import javax.security.auth.x500.X500Principal;
-
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
-import org.apache.commons.lang.Validate;
 
 public abstract class GenericRpkiCertificateBuilder {
 

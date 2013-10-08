@@ -29,16 +29,15 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
-import java.security.SignatureException;
-
+import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidator;
-import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
-
 import org.joda.time.DateTime;
+
+import java.security.SignatureException;
 
 public class X509CrlValidator implements CertificateRepositoryObjectValidator<X509Crl> {
 

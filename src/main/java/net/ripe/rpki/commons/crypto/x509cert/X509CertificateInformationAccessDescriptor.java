@@ -29,20 +29,19 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.rpki.commons.util.EqualsSupport;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import net.ripe.rpki.commons.util.EqualsSupport;
-
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
 public class X509CertificateInformationAccessDescriptor extends EqualsSupport implements Serializable {
 

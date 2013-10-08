@@ -29,10 +29,10 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import java.util.List;
-
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.ipresource.Asn;
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
+
+import java.util.List;
 
 public interface Roa {
 

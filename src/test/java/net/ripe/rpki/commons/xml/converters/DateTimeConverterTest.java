@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
-import net.ripe.rpki.commons.xml.converters.DateTimeConverter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;

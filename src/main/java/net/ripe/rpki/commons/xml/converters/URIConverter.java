@@ -29,11 +29,10 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
-import java.net.URI;
-
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import org.apache.commons.lang.StringUtils;
 
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import java.net.URI;
 
 
 public class URIConverter extends AbstractSingleValueConverter {

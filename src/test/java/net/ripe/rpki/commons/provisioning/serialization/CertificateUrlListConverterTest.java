@@ -29,13 +29,12 @@
  */
 package net.ripe.rpki.commons.provisioning.serialization;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.net.URI;
 import java.util.Arrays;
 
-import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class CertificateUrlListConverterTest {

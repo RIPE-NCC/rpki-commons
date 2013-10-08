@@ -29,12 +29,10 @@
  */
 package net.ripe.rpki.commons.provisioning.serialization;
 
-import static org.junit.Assert.*;
-
 import net.ripe.ipresource.IpResourceSet;
-
-import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class IpResourceSetProvisioningConverterTest {
     private IpResourceSetProvisioningConverter subject = new IpResourceSetProvisioningConverter();

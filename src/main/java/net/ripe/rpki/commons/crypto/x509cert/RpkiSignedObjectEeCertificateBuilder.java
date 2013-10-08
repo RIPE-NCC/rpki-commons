@@ -29,10 +29,10 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import java.net.URI;
-
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
+
+import java.net.URI;
 
 /**
  * Builder for Embedded EE Certificates used in RpkiSignedObjects

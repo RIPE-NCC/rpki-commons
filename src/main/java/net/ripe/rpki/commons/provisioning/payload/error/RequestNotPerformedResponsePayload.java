@@ -29,11 +29,10 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.error;
 
-import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
+import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
+import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
 @XStreamAlias("message")
 public class RequestNotPerformedResponsePayload extends AbstractProvisioningResponsePayload {

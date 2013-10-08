@@ -29,18 +29,16 @@
  */
 package net.ripe.rpki.commons.provisioning.serialization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.regex.Pattern;
-
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 import net.ripe.rpki.commons.xml.XStreamXmlSerializerBuilder;
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.*;
 
 
 public class ProvisioningIdentityCertificateXstreamConverterTest {

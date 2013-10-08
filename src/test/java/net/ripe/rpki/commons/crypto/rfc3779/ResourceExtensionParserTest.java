@@ -29,19 +29,19 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import static net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoderTest.*;
-import static org.junit.Assert.*;
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.ripe.rpki.commons.crypto.util.Asn1Util;
-import net.ripe.ipresource.IpResource;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.junit.Before;
-import org.junit.Test;
+import static net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoderTest.*;
+import static org.junit.Assert.*;
 
 
 //ESCA-JAVA0076:

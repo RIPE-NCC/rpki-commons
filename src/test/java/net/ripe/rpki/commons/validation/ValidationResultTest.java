@@ -29,17 +29,16 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collections;
-
 import net.ripe.rpki.commons.FixedDateRule;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 
 public class ValidationResultTest {

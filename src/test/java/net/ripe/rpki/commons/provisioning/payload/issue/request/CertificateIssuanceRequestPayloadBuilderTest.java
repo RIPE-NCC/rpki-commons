@@ -29,18 +29,18 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
-import static org.junit.Assert.*;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import net.ripe.ipresource.IpResourceSet;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import static org.junit.Assert.*;
 
 
 public class CertificateIssuanceRequestPayloadBuilderTest {

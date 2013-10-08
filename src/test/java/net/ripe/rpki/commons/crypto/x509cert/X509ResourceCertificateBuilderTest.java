@@ -29,22 +29,22 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
-import static org.junit.Assert.*;
-
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.PublicKey;
-import javax.security.auth.x500.X500Principal;
-
+import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
-import net.ripe.ipresource.IpResourceSet;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.PublicKey;
+
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static org.junit.Assert.*;
 
 public class X509ResourceCertificateBuilderTest {
 

@@ -36,9 +36,6 @@ import com.thoughtworks.xstream.converters.reflection.Sun14ReflectionProvider;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
-
-import javax.security.auth.x500.X500Principal;
-
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -51,8 +48,19 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.VersionedId;
 import net.ripe.rpki.commons.validation.roa.AnnouncedRoute;
 import net.ripe.rpki.commons.validation.roa.RouteValidityState;
-import net.ripe.rpki.commons.xml.converters.*;
+import net.ripe.rpki.commons.xml.converters.DateTimeConverter;
+import net.ripe.rpki.commons.xml.converters.IpResourceConverter;
+import net.ripe.rpki.commons.xml.converters.IpResourceSetConverter;
+import net.ripe.rpki.commons.xml.converters.JavaUtilTimestampConverter;
+import net.ripe.rpki.commons.xml.converters.ManifestCmsConverter;
+import net.ripe.rpki.commons.xml.converters.ReadablePeriodConverter;
+import net.ripe.rpki.commons.xml.converters.RoaCmsConverter;
+import net.ripe.rpki.commons.xml.converters.VersionedIdConverter;
+import net.ripe.rpki.commons.xml.converters.X500PrincipalConverter;
+import net.ripe.rpki.commons.xml.converters.X509ResourceCertificateConverter;
 import org.joda.time.DateTime;
+
+import javax.security.auth.x500.X500Principal;
 
 public class XStreamXmlSerializerBuilder<T> {
 

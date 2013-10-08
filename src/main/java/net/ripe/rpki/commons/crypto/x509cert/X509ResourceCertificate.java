@@ -29,12 +29,9 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import java.net.URI;
-import java.security.cert.X509Certificate;
-import java.util.EnumSet;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-
+import net.ripe.ipresource.IpResource;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
@@ -48,10 +45,13 @@ import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
-import net.ripe.ipresource.IpResource;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang.Validate;
+
+import java.net.URI;
+import java.security.cert.X509Certificate;
+import java.util.EnumSet;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.

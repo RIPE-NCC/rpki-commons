@@ -29,7 +29,19 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
-import static org.junit.Assert.*;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
+import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
+import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
+import net.ripe.rpki.commons.provisioning.payload.common.CertificateElementBuilder;
+import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElementBuilder;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -39,20 +51,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
-import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
-import net.ripe.rpki.commons.provisioning.payload.common.CertificateElementBuilder;
-import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElementBuilder;
-import net.ripe.ipresource.IpResourceSet;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import static org.junit.Assert.*;
 
 
 public class CertificateIssuanceResponsePayloadBuilderTest {

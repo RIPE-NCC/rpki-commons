@@ -29,10 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * See: http://tools.ietf.org/html/rfc6492#section-3.4.2

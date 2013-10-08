@@ -29,9 +29,10 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import static net.ripe.rpki.commons.util.RepositoryObjectType.Unknown;
-import static net.ripe.rpki.commons.validation.ValidationString.KNOWN_OBJECT_TYPE;
 import net.ripe.rpki.commons.util.RepositoryObjectType;
+
+import static net.ripe.rpki.commons.util.RepositoryObjectType.*;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public final class ValidationChecks {
 

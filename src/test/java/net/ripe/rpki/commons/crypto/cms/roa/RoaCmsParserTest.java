@@ -39,8 +39,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.decode;
-import static org.junit.Assert.assertEquals;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
+import static org.junit.Assert.*;
 
 public class RoaCmsParserTest {
 

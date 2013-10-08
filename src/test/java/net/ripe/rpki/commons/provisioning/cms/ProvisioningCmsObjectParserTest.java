@@ -29,16 +29,13 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
-import static net.ripe.rpki.commons.validation.ValidationString.CMS_DATA_PARSING;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
-
+import net.ripe.rpki.commons.validation.ValidationResult;
 import org.junit.Before;
 import org.junit.Test;
+
+import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static org.junit.Assert.*;
 
 
 public class ProvisioningCmsObjectParserTest {

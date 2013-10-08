@@ -29,16 +29,14 @@
  */
 package net.ripe.rpki.commons.provisioning.serialization;
 
-import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
-import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
-
-import org.apache.commons.lang.Validate;
-
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
+import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import org.apache.commons.lang.Validate;
 
 /**
  * A converter to be used when (de)serializing a ProvisioningCmsObject to/from xml using XStream.

@@ -30,14 +30,13 @@
 package net.ripe.rpki.commons.provisioning.x509;
 
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-import static org.junit.Assert.*;
-
 import net.ripe.rpki.commons.validation.ValidationResult;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static org.junit.Assert.*;
 
 public class ProvisioningIdentityCertificateParserTest {
 

@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
@@ -37,7 +37,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class KeyPairFactoryTest {

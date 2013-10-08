@@ -29,14 +29,13 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import java.io.Serializable;
-
-import net.ripe.rpki.commons.util.EqualsSupport;
 import net.ripe.ipresource.IpRange;
-
+import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+
+import java.io.Serializable;
 
 public class RoaPrefix extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;

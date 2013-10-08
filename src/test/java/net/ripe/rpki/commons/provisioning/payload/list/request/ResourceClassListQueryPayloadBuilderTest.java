@@ -29,15 +29,14 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.request;
 
-import static org.junit.Assert.*;
+import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
-import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import static org.junit.Assert.*;
 
 public class ResourceClassListQueryPayloadBuilderTest {
 

@@ -29,15 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto.cms;
 
-import java.net.URI;
-import java.util.Arrays;
-
-import javax.security.auth.x500.X500Principal;
-
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -45,11 +41,13 @@ import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTime;
+
+import javax.security.auth.x500.X500Principal;
+import java.net.URI;
+import java.util.Arrays;
 
 public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 

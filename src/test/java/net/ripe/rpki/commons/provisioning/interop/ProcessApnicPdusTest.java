@@ -29,21 +29,20 @@
  */
 package net.ripe.rpki.commons.provisioning.interop;
 
-import static org.junit.Assert.*;
+import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
+import net.ripe.rpki.commons.validation.ValidationCheck;
+import net.ripe.rpki.commons.validation.ValidationLocation;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.ValidationString;
+import org.apache.commons.io.FileUtils;
+import org.bouncycastle.cms.CMSException;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import net.ripe.rpki.commons.validation.ValidationCheck;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationString;
-import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
-
-import org.apache.commons.io.FileUtils;
-import org.bouncycastle.cms.CMSException;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class ProcessApnicPdusTest {

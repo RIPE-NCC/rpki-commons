@@ -29,14 +29,13 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
-import static org.junit.Assert.*;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+import org.junit.Test;
 
 import java.net.URI;
 
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
-
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class ParentIdentitySerializerTest {

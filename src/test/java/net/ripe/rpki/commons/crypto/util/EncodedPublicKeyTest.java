@@ -29,11 +29,10 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import static org.junit.Assert.*;
-
-import net.ripe.rpki.commons.crypto.util.EncodedPublicKey;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 public class EncodedPublicKeyTest {

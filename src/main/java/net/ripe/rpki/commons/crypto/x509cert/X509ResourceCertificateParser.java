@@ -44,7 +44,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.util.regex.Pattern;
 
-import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
+import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 

@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.x509;
 
-import java.security.cert.X509Certificate;
-
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
+
+import java.security.cert.X509Certificate;
 
 public class ProvisioningCertificate extends AbstractX509CertificateWrapper {
 

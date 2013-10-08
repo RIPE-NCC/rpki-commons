@@ -45,11 +45,11 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.createProvisioningCmsObjectForPayload;
-import static net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadBuilderTest.TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD;
-import static net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilderTest.TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD;
-import static net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilderTest.TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD;
-import static org.junit.Assert.assertTrue;
+import static net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.*;
+import static net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadBuilderTest.*;
+import static net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilderTest.*;
+import static net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilderTest.*;
+import static org.junit.Assert.*;
 
 public class CreateObjectsForInteropTesting {
 

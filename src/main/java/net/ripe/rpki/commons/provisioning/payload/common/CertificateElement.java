@@ -29,18 +29,16 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.common;
 
-import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
-
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.thoughtworks.xstream.annotations.XStreamConverter;
+import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
 
 @XStreamConverter(CertificateElementConverter.class)
 public class CertificateElement {

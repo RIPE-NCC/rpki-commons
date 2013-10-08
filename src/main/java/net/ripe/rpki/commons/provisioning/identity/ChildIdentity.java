@@ -29,13 +29,12 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
-import java.util.UUID;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.util.EqualsSupport;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import java.util.UUID;
 
 @XStreamAlias(ChildIdentity.CHILD_IDENTITY_NODE_NAME)
 public class ChildIdentity extends EqualsSupport {

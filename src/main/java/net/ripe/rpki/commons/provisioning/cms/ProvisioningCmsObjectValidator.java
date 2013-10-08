@@ -31,11 +31,11 @@ package net.ripe.rpki.commons.provisioning.cms;
 
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlValidator;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningCertificateValidator;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningCertificateValidator;
 
 public class ProvisioningCmsObjectValidator {
 

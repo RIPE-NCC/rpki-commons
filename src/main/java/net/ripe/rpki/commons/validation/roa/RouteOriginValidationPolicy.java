@@ -29,13 +29,13 @@
  */
 package net.ripe.rpki.commons.validation.roa;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.etree.IpResourceIntervalStrategy;
 import net.ripe.ipresource.etree.NestedIntervalMap;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**

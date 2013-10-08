@@ -29,20 +29,19 @@
  */
 package net.ripe.rpki.commons.rsync;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.IOException;
-
+import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
-import net.ripe.ipresource.IpResourceSet;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 
 public class RemoteCertificateFetcherTest {

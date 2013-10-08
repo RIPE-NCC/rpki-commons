@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation.request;
 
+import net.ripe.rpki.commons.provisioning.payload.ProvisioningPayloadXmlSerializerBuilder;
 import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
 import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import net.ripe.rpki.commons.provisioning.payload.ProvisioningPayloadXmlSerializerBuilder;
 
 public class CertificateRevocationRequestPayloadSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<CertificateRevocationRequestPayload> {
 

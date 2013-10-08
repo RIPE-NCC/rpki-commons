@@ -29,23 +29,12 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
-
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.security.auth.x500.X500Principal;
-
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
 import org.bouncycastle.asn1.BERTags;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -53,6 +42,17 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.security.auth.x500.X500Principal;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static org.junit.Assert.*;
 
 
 public class ManifestCmsParserTest {

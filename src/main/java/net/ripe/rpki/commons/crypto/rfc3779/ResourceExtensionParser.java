@@ -29,11 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
-
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import net.ripe.ipresource.IpAddress;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
@@ -49,6 +44,11 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERBitString;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 
 /**
  * Parses the certificate resource extensions as specified in RFC3779. Resource

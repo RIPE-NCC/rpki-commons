@@ -29,11 +29,11 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.response;
 
-import java.util.List;
-
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
+import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
+
+import java.util.List;
 
 
 /**

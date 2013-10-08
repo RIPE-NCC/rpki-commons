@@ -29,20 +29,19 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import static org.junit.Assert.*;
-
 import com.gargoylesoftware.base.testing.EqualsTester;
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
+import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.net.URI;
 import java.util.EnumSet;
 
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 public class CertificateRepositoryObjectValidationContextTest {

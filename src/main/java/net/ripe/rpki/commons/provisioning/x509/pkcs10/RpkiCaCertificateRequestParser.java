@@ -29,11 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.x509.pkcs10;
 
-import java.io.IOException;
-import java.net.URI;
-import java.security.PublicKey;
-import java.util.Enumeration;
-
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -51,6 +46,11 @@ import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
+
+import java.io.IOException;
+import java.net.URI;
+import java.security.PublicKey;
+import java.util.Enumeration;
 
 
 /**

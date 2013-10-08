@@ -29,19 +29,18 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation.response;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.regex.Pattern;
-
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
-
+import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 import org.junit.Test;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.*;
 
 
 public class CertificateRevocationResponsePayloadBuilderTest {

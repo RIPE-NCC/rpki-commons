@@ -29,10 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.request;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("message")
 public class ResourceClassListQueryPayload extends AbstractProvisioningQueryPayload {
