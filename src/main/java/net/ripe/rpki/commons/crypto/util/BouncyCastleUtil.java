@@ -56,7 +56,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class BouncyCastleUtil {
+public final class BouncyCastleUtil {
 
     public static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER = new BcDigestCalculatorProvider();
 

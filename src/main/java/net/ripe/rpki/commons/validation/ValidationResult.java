@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class ValidationResult implements Serializable {
+public final class ValidationResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

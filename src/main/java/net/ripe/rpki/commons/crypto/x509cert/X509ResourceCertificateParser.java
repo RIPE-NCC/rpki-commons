@@ -51,7 +51,7 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
 
     // ASN.1 PrintableString type
-    private final static Pattern PRINTABLE_STRING = Pattern.compile("[-A-Za-z0-9 '()+,./:=?]+");
+    private static final Pattern PRINTABLE_STRING = Pattern.compile("[-A-Za-z0-9 '()+,./:=?]+");
 
     @Override
     public X509ResourceCertificate getCertificate() {
