@@ -47,7 +47,7 @@ public class ProvisioningIdentityCertificateXstreamConverterTest {
 
     @Before
     public void given() {
-        XStreamXmlSerializerBuilder<ProvisioningIdentityCertificate> xStreamXmlSerializerBuilder = new XStreamXmlSerializerBuilder<ProvisioningIdentityCertificate>(ProvisioningIdentityCertificate.class);
+        XStreamXmlSerializerBuilder<ProvisioningIdentityCertificate> xStreamXmlSerializerBuilder = XStreamXmlSerializerBuilder.newForgivingXmlSerializerBuilder(ProvisioningIdentityCertificate.class);
         xStreamXmlSerializerBuilder.withConverter(new ProvisioningIdentityCertificateXstreamConverter());
         xStreamXmlSerializerBuilder.withAliasType("ProvisioningIdentityCertificate", ProvisioningIdentityCertificate.class);
         serializer = xStreamXmlSerializerBuilder.build();

@@ -64,18 +64,33 @@ import javax.security.auth.x500.X500Principal;
 
 public class XStreamXmlSerializerBuilder<T> {
 
+    private static final boolean STRICT = true;
+    private static final boolean NOT_STRICT = false;
     private XStream xStream;
 
     private Class<T> objectType;
 
 
-    public XStreamXmlSerializerBuilder(Class<T> objectType) {
-        this.objectType = objectType;
-        createDefaultXStream();  // NOPMD
+    public static <C> XStreamXmlSerializerBuilder<C> newStrictXmlSerializerBuilder(Class<C> objectType) {
+        return new XStreamXmlSerializerBuilder<C>(objectType, STRICT);
     }
 
-    private void createDefaultXStream() {
-        xStream = new MyXStream(getStreamDriver());
+    public static <C> XStreamXmlSerializerBuilder<C> newForgivingXmlSerializerBuilder(Class<C> objectType) {
+        return new XStreamXmlSerializerBuilder<C>(objectType, NOT_STRICT);
+    }
+
+    protected XStreamXmlSerializerBuilder(Class<T> objectType, boolean strict) {
+        this.objectType = objectType;
+        createDefaultXStream(strict);  // NOPMD
+    }
+
+    private void createDefaultXStream(boolean strict) {
+        if(strict) {
+            xStream = new XStream();
+        } else {
+            xStream = new MyXStream(getStreamDriver());
+        }
+
         xStream.setMode(XStream.NO_REFERENCES);
 
         registerIpResourceRelated();
@@ -182,7 +197,15 @@ public class XStreamXmlSerializerBuilder<T> {
                 public boolean shouldSerializeMember(Class definedIn, String fieldName) {
                     return definedIn != Object.class && super.shouldSerializeMember(definedIn, fieldName);
                 }
+
+
+
             };
+
+
+
+
+
         }
     }
 }

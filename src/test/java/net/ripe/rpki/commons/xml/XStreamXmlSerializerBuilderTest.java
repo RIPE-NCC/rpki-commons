@@ -55,9 +55,11 @@ import static org.junit.Assert.*;
 public class XStreamXmlSerializerBuilderTest {
 
 
+    private static final boolean NOT_STRICT = false;
+
     @Test
     public void shouldCreateSerializer() {
-        XStreamXmlSerializerBuilder<String> builder = new XStreamXmlSerializerBuilder<String>(String.class);
+        XStreamXmlSerializerBuilder<String> builder = new XStreamXmlSerializerBuilder<String>(String.class, NOT_STRICT);
         XStreamXmlSerializer<String> serializer = builder.build();
 
         String serializedData = serializer.serialize("foo");
@@ -66,7 +68,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldAliasCommonsPackage() {
-        XStreamXmlSerializerBuilder<ValidityPeriod> builder = new XStreamXmlSerializerBuilder<ValidityPeriod>(ValidityPeriod.class);
+        XStreamXmlSerializerBuilder<ValidityPeriod> builder = new XStreamXmlSerializerBuilder<ValidityPeriod>(ValidityPeriod.class, NOT_STRICT);
         XStreamXmlSerializer<ValidityPeriod> serializer = builder.build();
 
         String serializedData = serializer.serialize(new ValidityPeriod());
@@ -75,7 +77,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldAliasIpResourceAndUseConverter() {
-        XStreamXmlSerializerBuilder<IpResource> builder = new XStreamXmlSerializerBuilder<IpResource>(IpResource.class);
+        XStreamXmlSerializerBuilder<IpResource> builder = new XStreamXmlSerializerBuilder<IpResource>(IpResource.class, NOT_STRICT);
         XStreamXmlSerializer<IpResource> serializer = builder.build();
         IpResource ipResource = IpResource.parse("10/8");
 
@@ -86,7 +88,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldAliasIpResourceSetAndUseConverter() {
-        XStreamXmlSerializerBuilder<IpResourceSet> builder = new XStreamXmlSerializerBuilder<IpResourceSet>(IpResourceSet.class);
+        XStreamXmlSerializerBuilder<IpResourceSet> builder = new XStreamXmlSerializerBuilder<IpResourceSet>(IpResourceSet.class, NOT_STRICT);
         XStreamXmlSerializer<IpResourceSet> serializer = builder.build();
         IpResourceSet ipResourceSet = IpResourceSet.parse("10/8");
 
@@ -97,7 +99,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldAliasDateTimeAndUseConverter() {
-        XStreamXmlSerializerBuilder<DateTime> builder = new XStreamXmlSerializerBuilder<DateTime>(DateTime.class);
+        XStreamXmlSerializerBuilder<DateTime> builder = new XStreamXmlSerializerBuilder<DateTime>(DateTime.class, NOT_STRICT);
         XStreamXmlSerializer<DateTime> serializer = builder.build();
         DateTime dateTime = new DateTime(2011, 1, 31, 13, 59, 59, 0, DateTimeZone.UTC);
 
@@ -108,7 +110,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldConvertDateTimeFromTimeStamp() {
-        XStreamXmlSerializerBuilder<Timestamp> builder = new XStreamXmlSerializerBuilder<Timestamp>(Timestamp.class);
+        XStreamXmlSerializerBuilder<Timestamp> builder = new XStreamXmlSerializerBuilder<Timestamp>(Timestamp.class, NOT_STRICT);
         XStreamXmlSerializer<Timestamp> serializer = builder.build();
         Timestamp timestamp = new Timestamp(new DateTime(2011, 1, 31, 13, 59, 59, 0, DateTimeZone.UTC).getMillis());
 
@@ -119,7 +121,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldConvertDateTimeFromReadablePeriod() {
-        XStreamXmlSerializerBuilder<Period> builder = new XStreamXmlSerializerBuilder<Period>(Period.class);
+        XStreamXmlSerializerBuilder<Period> builder = new XStreamXmlSerializerBuilder<Period>(Period.class, NOT_STRICT);
         XStreamXmlSerializer<Period> serializer = builder.build();
         DateTime now = new DateTime();
         Period period = new Period(now, now.plusHours(1));
@@ -131,7 +133,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldAliasPrincipalAndUseConverter() {
-        XStreamXmlSerializerBuilder<X500Principal> builder = new XStreamXmlSerializerBuilder<X500Principal>(X500Principal.class);
+        XStreamXmlSerializerBuilder<X500Principal> builder = new XStreamXmlSerializerBuilder<X500Principal>(X500Principal.class, NOT_STRICT);
         XStreamXmlSerializer<X500Principal> serializer = builder.build();
         X500Principal principal = new X500Principal("CN=nl.bluelight");
 
@@ -142,7 +144,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldConvertVersionedId() {
-        XStreamXmlSerializerBuilder<VersionedId> builder = new XStreamXmlSerializerBuilder<VersionedId>(VersionedId.class);
+        XStreamXmlSerializerBuilder<VersionedId> builder = new XStreamXmlSerializerBuilder<VersionedId>(VersionedId.class, NOT_STRICT);
         XStreamXmlSerializer<VersionedId> serializer = builder.build();
         VersionedId versionedId = new VersionedId(1l, 2l);
 
@@ -153,7 +155,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldConvertX509ResourceCertificate() {
-        XStreamXmlSerializerBuilder<X509ResourceCertificate> builder = new XStreamXmlSerializerBuilder<X509ResourceCertificate>(X509ResourceCertificate.class);
+        XStreamXmlSerializerBuilder<X509ResourceCertificate> builder = new XStreamXmlSerializerBuilder<X509ResourceCertificate>(X509ResourceCertificate.class, NOT_STRICT);
         XStreamXmlSerializer<X509ResourceCertificate> serializer = builder.build();
         X509ResourceCertificate resourceCertificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
 
@@ -164,7 +166,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldConvertManifestCms() {
-        XStreamXmlSerializerBuilder<ManifestCms> builder = new XStreamXmlSerializerBuilder<ManifestCms>(ManifestCms.class);
+        XStreamXmlSerializerBuilder<ManifestCms> builder = new XStreamXmlSerializerBuilder<ManifestCms>(ManifestCms.class, NOT_STRICT);
         XStreamXmlSerializer<ManifestCms> serializer = builder.build();
         ManifestCms manifestCms = ManifestCmsTest.getRootManifestCms();
 
@@ -175,7 +177,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldConvertRoaCms() {
-        XStreamXmlSerializerBuilder<RoaCms> builder = new XStreamXmlSerializerBuilder<RoaCms>(RoaCms.class);
+        XStreamXmlSerializerBuilder<RoaCms> builder = new XStreamXmlSerializerBuilder<RoaCms>(RoaCms.class, NOT_STRICT);
         XStreamXmlSerializer<RoaCms> serializer = builder.build();
         RoaCms roaCms = RoaCmsTest.getRoaCms();
 
@@ -186,7 +188,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldIgnoreUnknownElements() {
-        XStreamXmlSerializerBuilder<String> builder = new XStreamXmlSerializerBuilder<String>(String.class);
+        XStreamXmlSerializerBuilder<String> builder = new XStreamXmlSerializerBuilder<String>(String.class, NOT_STRICT);
         XStreamXmlSerializer<String> serializer = builder.build();
 
         String deserializedData = serializer.deserialize("<string>sample string</string><foo/>");
@@ -195,7 +197,7 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldAliasPackage() {
-        XStreamXmlSerializerBuilder<SerializeMe> builder = new XStreamXmlSerializerBuilder<SerializeMe>(SerializeMe.class);
+        XStreamXmlSerializerBuilder<SerializeMe> builder = new XStreamXmlSerializerBuilder<SerializeMe>(SerializeMe.class, NOT_STRICT);
         builder.withAliasPackage("test-alias", SerializeMe.class.getPackage().getName());
         XStreamXmlSerializer<SerializeMe> serializer = builder.build();
 

@@ -37,8 +37,10 @@ import net.ripe.rpki.commons.xml.XStreamXmlSerializerBuilder;
 
 public class ProvisioningPayloadXmlSerializerBuilder<T extends AbstractProvisioningPayload> extends XStreamXmlSerializerBuilder<T> {
 
+    private static final boolean NOT_STRICT = false;
+
     public ProvisioningPayloadXmlSerializerBuilder(Class<T> objectType) {
-        super(objectType);
+        super(objectType, NOT_STRICT);
     }
 
     @Override

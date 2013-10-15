@@ -43,11 +43,12 @@ import static org.junit.Assert.*;
 
 public class ProvisioningCmsObjectXstreamConverterTest {
 
+    private static final boolean NOT_STRICT = false;
     private XStreamXmlSerializer<ProvisioningCmsObject> serializer;
 
     @Before
     public void given() {
-        XStreamXmlSerializerBuilder<ProvisioningCmsObject> xStreamXmlSerializerBuilder = new XStreamXmlSerializerBuilder<ProvisioningCmsObject>(ProvisioningCmsObject.class);
+        XStreamXmlSerializerBuilder<ProvisioningCmsObject> xStreamXmlSerializerBuilder = XStreamXmlSerializerBuilder.newForgivingXmlSerializerBuilder(ProvisioningCmsObject.class);
         xStreamXmlSerializerBuilder.withConverter(new ProvisioningCmsObjectXstreamConverter());
         xStreamXmlSerializerBuilder.withAliasType("ProvisioningCmsObject", ProvisioningCmsObject.class);
         serializer = xStreamXmlSerializerBuilder.build();
