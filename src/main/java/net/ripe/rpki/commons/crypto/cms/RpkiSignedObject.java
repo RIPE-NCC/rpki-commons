@@ -42,6 +42,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryOb
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTime;
 
@@ -53,7 +54,13 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String ENCRYPTION_ALGORITHM_OID = CMSSignedDataGenerator.ENCRYPTION_RSA;
+    public static final String RSA_ENCRYPTION_OID = CMSSignedDataGenerator.ENCRYPTION_RSA;
+
+    // The "sha256WithRsa" Object Id is defined in RFC6485 but no existing implementations, at least bouncy castle and
+    // openssl support this. There is a plan to issue an erratum for RFC6485 to just go with plain "rsa" as existing
+    // implementations are doing. Until that time, we had better accept both when doing validation.
+    public static final String SHA256WITHRSA_ENCRYPTION_OID = PKCSObjectIdentifiers.sha256WithRSAEncryption.getId();
+
     /**
      * The digestAlgorithms set MUST include only SHA-256, the OID for which is
      * 2.16.840.1.101.3.4.2.1. [RFC4055] It MUST NOT contain any other
