@@ -1,0 +1,432 @@
+RPKI Syntax Conformance Test Cases
+
+This test suite checks for "syntax" conformance (i.e. that which can
+be tested using a single file).  It does not include cases where
+determining validity would require checking the relationship *between*
+files.
+
+# Directory layout of rsync://rpki.bbn.com/conformance/
+root.cer
+[bad|good]Root*.cer
+root/root.crl
+     root.mft
+     [bad|good]Cert*.cer
+     [bad|good]CMS*.roa
+     [bad|good]ROA*.roa
+     [bad|good]GBR*.gbr
+     CRL*.cer
+     CRL*/[bad|good]CRL*.crl
+          CRL*.mft
+      :
+      :
+     MFT*.cer
+     MFT*/MFT*.crl
+          [bad|good]MFT*.mft
+      :
+      :
+     NAM*.cer
+     NAM*/[bad|good]CRL*.crl
+          [bad|good]MFT*.mft
+          [bad|good]Cert*.cer
+      :
+      :
+
+We chose to give each CRL and MFT test case its own subdirectory; this
+is because we wanted to test the way a validator handles individual
+files, not how it handles a convoluted repository structure. Additionally,
+some tests of issuer fields (in CRLs and certificates) have their own
+subdirectories (NAM*) so that the issuer field being tested can match the
+parent's subject field.
+
+In theory, a conforming RPKI validator should reject any file whose
+filename begins with "bad", and accept any file that begins with
+"good".  Other files, i.e. those that begin with neither "bad" nor
+"good", MIGHT be rejected or accepted depending on a particular
+validator's gray-area configuration.
+
+
+CA Certificates
+
+101 AIA2AccessDescHtRs  # (good) AIA with two access descriptions (http+rsync) 6487#4.8.7
+195 AIA2AccessDescRsRs  # (good) AIA with two access descriptions (2 rsync) 6487#4.8.7
+102 AIABadAccess        # wrong accessMethod for rsync URI 6487#4.8.7
+103 AIAAccessLoc        # single HTTP accessLoc, no rsync 6487#4.8.7
+104 AIACrit             # wrongly mark AIA extension as critical 6487#4.8.7
+105 AKIHash             # AKI doesn't match parent SKI -- NOTE: not syntax check 6487#4.8.3
+106 AKIShort            # AKI is too short 6487#4.8.3
+196 AKILong             # AKI is too long 6487#4.8.3
+197 AKIHasACIACSN       # AKI has authorityCertIssuer and authorityCertSerialNumber present  6487#4.8.3
+209 AKIHasACI           # AKI has authorityCertIssuer but not authorityCertSerialNumber present 6487#4.8.3 5280#A.2
+210 AKIHasACSN          # AKI has authorityCertSerialNumber but not authorityCertIssuer present  6487#4.8.3 5280#A.2
+107 UnkExtension        # unrecognized non-critical extension (PolicyMappings) 6487#1,4.8,8
+215 UnkExtensionCrit    # unrecognized critical extension (PolicyMappings) 5280#4.2
+109 BasicConstrNoCA     # BasicConstr present, but cA not set 6487#4.8.1
+110 BasicConstrNoCrit   # BasicConstr present, crit bit unset 6487#4.8.1
+111 BasicConstrPathLth  # BasicConstr path length present 6487#4.8.1
+112 Cpol2oid1correct    # One correct, one incorrect Cert Policy OID 6487#4.8.9 6484#1.2
+211 Cpol2oid2correct    # Two correct Cert Policy OIDs 6487#4.8.9 6484#1.2
+198 CpolBadOid          # One incorrect Cert Policy OID 6487#4.8.9 6484#1.2
+113 CpolNoCrit          # CertPolicy extension, crit bit unset 6487#4.8.9
+212 CpolQualCps         # (good) correct Cert Policy OID with a certification practice statement (CPS) qualifier 6487#4.8.9 5280#4.2.1.4 draft-ietf-sidr-policy-qualifiers-00#2
+213 CpolQualCpsUnotice  # correct Cert Policy OID with CPS and user notice qualifiers 6487#4.8.9 5280#4.2.1.4 draft-ietf-sidr-policy-qualifiers-00#2
+214 CpolQualUnotice     # correct Cert Policy OID with user notice qualifier 6487#4.8.9 5280#4.2.1.4 draft-ietf-sidr-policy-qualifiers-00#2
+114 CRLDP2DistPt        # (good) CRL Dist Pt has 2 Dist points 6487#4.8.6
+115 CRLDPCrit           # CRL Dist Pt marked critical 6487#4.8.6
+116 CRLDPCrlIssuer      # CRL Dist Pt has CRL Issuer 6487#4.8.6
+118 CRLDPReasons        # CRL Dist Pt has reasons 6487#4.8.6
+119 EKU                 # has Extended KeyUsage 6487#4.8.5
+120 InnerSigAlg         # wrong signature algorithm in toBeSigned (i.e. mismatch) 6485#2, 5280#4.1.2.3
+216 BothSigAlg          # wrong signature algorithms (but matching each other) 6485#2
+121 IssuerOID           # issuer name is not id_commonName 6487#4.4
+122 Issuer2ComName      # issuer name has 2 common names (same set) 6487#4.4
+123 IssuerUtf           # issuer name has utf name 6487#4.4
+124 Issuer2SetComName   # issuer name has 2 sets with common names 6487#4.4
+125 IssuerSerNum        # issuer name has only a serial number 6487#4.4
+126 IssUID              # has issuer unique ID 6487#4
+127 KUsageExtra         # has disallowed key usage bit (nonRepudiation) 6487#4.8.4
+217 KUsageDigitalSig    # has disallowed key usage bit (digitalSignature) 6487#4.8.4
+128 KUsageNoCertSign    # lacks bit for signing certificates 6487#4.8.4
+129 KUsageNoCrit        # key usage extension not critical 6487#4.8.4
+131 KUsageNoCRLSign     # lacks bit for signing CRLs 6487#4.8.4
+134 OuterSigAlg         # wrong signature algorithm in cert.algorithm (i.e. mismatch) 6485#2, 5280#4.1.2.3
+135 PubKeyAlg           # wrong SubjectPublicKey algorithm 6485#3.1 Is this right???
+136 PubKeyExp           # wrong SubjectPublicKey exponent 6485#3
+137 PubKeyShort         # SubjectPublicKey is 2047-bit 6485#3
+199 PubKeyLong          # SubjectPublicKey is 2049-bit 6485#3
+138 ResourcesASNoCrit   # AS number extension not critical 6487#4.8.11
+139 ResourcesBadAFI     # invalid IP address family 6487#4.8.10, IANA address-family-numbers
+140 ResourcesBadASOrder # AS numbers out of order 3779 (but full set is pending)
+141 ResourcesBadV4Order # IPv4 addresses out of order 3779 (but full set is pending)
+142 ResourcesBadV6Order # IPv6 addresses out of order 3779 (but full set is pending)
+143 ResourcesIPNoCrit   # IP address extension not critical 6487#4.8.10
+144 ResourcesNone       # neither AS nor IP 3779 extensions 6487#4.8.10
+192 ResourcesIPEmpty    # empty set of IP addresses 6487#4.8.10
+193 ResourcesASEmpty    # empty set of AS numbers 6487#4.8.11
+145 ResourcesSAFI       # IP addresses has SAFI digit 6487#4.8.10
+218 ResourcesIP6Inherit # (good) inherit IPv6 resources only, others explicit 6487#4.8.10
+219 ResourcesIP4Inherit # (good) inherit IPv4 resources only, others explicit 6487#4.8.10
+220 ResourcesASInherit  # (good) inherit AS resources only, others explicit 6487#4.8.11
+221 ResourcesAllInherit # (good) inherit all resources 6487#4.8.10
+222 ResourcesIP6InhOnly # (good) inherit IPv6 resources only, others not present 6487#4.8.10
+223 ResourcesIP4InhOnly # (good) inherit IPv4 resources only, others not present 6487#4.8.10
+224 ResourcesASInhOnly  # (good) inherit AS resources only, others not present 6487#4.8.11
+147 SIARepoNoRsync      # SIA has no rsync locator for id-ad-caRepository 6487#4.8.8
+200 SIAMFTNoRsync       # SIA has no rsync locator for id-ad-rpkiManifest 6487#4.8.8
+201 SIARepo2Rsync       # (good) SIA has 2 rsync locators for id-ad-caRepository 6487#4.8.8
+202 SIAMFT2Rsync        # (good) SIA has 2 rsync locators for id-ad-rpkiManifest 6487#4.8.8
+203 SIARepoHtRs         # (good) SIA has http+rsync locators for id-ad-caRepository 6487#4.8.8
+204 SIAMFTHtRs          # (good) SIA has http+rsync locators for id-ad-rpkiManifest 6487#4.8.8
+225 SIARepoHasNonURI    # (good) SIA has rsync+non-URI locators for id-ad-caRepository 6487#4.8.8
+226 SIAMFTHasNonURI     # (good) SIA has rsync+non-URI locators for id-ad-rpkiManifest 6487#4.8.8
+148 SIAAccessMethod     # SIA has bad access method in addition to good accessMethods 6487#4.8.8
+205 SIANoMFT            # SIA has no id-ad-rpkiManifest 6487#4.8.8
+206 SIANoRepo           # SIA has no id-ad-caRepository 6487#4.8.8
+150 SKIHash             # incorrect subject key identifier 6487#4.8.2
+151 SKILong             # SKI length 21 octets 6487#4.8.2
+194 SKIShort            # SKI length 19 octets 6487#4.8.2
+152 SubjectOID          # subject name is not id_commonName 6487#4.5
+153 Subject2ComName     # subject name has 2 common names (same set) 6487#4.5
+154 SubjectUtf          # subject name has utf name 6487#4.5
+155 Subject2SetComName  # subject name has 2 sets with common names 6487#4.5
+156 SubjectSerNum       # subject name has only a serial number 6487#4.5
+157 SubjUID             # has subject unique ID 6487#4
+158 ValCrossed          # beginning validity date > ending date 6487#4.6
+159 ValFromFuture       # starting validity date is in future 6487#4.6.1
+160 ValFromTyp          # starting validity is of wrong type (gen vs utc) 5280#4.1.2.5
+162 ValToPast           # ending validity date has passed 6487#4.6.2
+163 ValToTyp            # ending date is of wrong type (gen vs utc) 5280#4.1.2.5
+164 VersionNeg          # version number is negative 5280#4.1.2.1
+165 Version1            # version number is v1, i.e. 0 6487#4.1
+166 Version2            # version number is v2, i.e. 1 6487#4.1
+167 Version4            # version number is v4, i.e. 3 6487#4.1
+168 SerNum              # negative serial number 6487#4.2 5280#4.1.2.2
+207 SerNum0             # zero serial number 6487#4.2 5280#4.1.2.2
+190 SerNumMax           # (good) serial number is maximum allowable 5280#4.1.2.2
+191 SerNumTooBig        # serial number is one more than maximum allowable 5280#4.1.2.2
+169 AIA2x               # two authority info access extensions 5280#4.2
+170 SIA2x               # two SIAs 5280#4.2
+171 NoAIA               # no authority info access extension 6487#4.8,4.8.7
+172 NoSIA               # no SIA 6487#4.8,4.8.8
+173 NoBasicConstr       # no basic constraints extension 6487#4.8,4.8.1
+174 2BasicConstr        # two basic constraints extensions 5280#4.2
+175 NoSKI               # no subject key identifier extension 6487#4.8,4.8.2
+176 2SKI                # two subject key identifier extensions 5280#4.2
+177 NoAKI               # no authority key identifier extension 6487#4.8,4.8.3
+178 2AKI                # two authority key identifier extensions 5280#4.2
+179 NoKeyUsage          # no key usage extension 6487#4.8,4.8.4
+180 2KeyUsage           # two key usage extensions 5280#4.2
+181 2CRLDP              # two CRLDP extensions 5280#4.2
+182 NoCRLDP             # no CRLDP extension 6487#4.8,4.8.6
+183 NoCpol              # no certificate policies extension 6487#4.8,4.8.9
+184 2Cpol               # two certificate policies extensions 5280#4.2
+185 2IPAddr             # two IP address extensions 5280#4.2
+186 2ASNum              # two AS number extensions 5280#4.2
+187 CRLDPNoRsyncDistPt  # no rsync URI in CRLDP 6487#4.8.6
+188 IssuerSet2SerNums   # issuer name has 2 serial numbers (same set) 6487#4.4
+189 SubjectSet2SerNums  # subject name has 2 serial numbers (same set) 6487#4.5
+228 IssuerSeq2SerNums   # issuer name has 2 serial numbers (split across sets) 6487#4.4
+229 SubjectSeq2SerNums  # subject name has 2 serial numbers (split across sets) 6487#4.5
+208 BadSig              # signature is invalid 5280#4.1.1.3
+
+
+CMS signed objects, generic (using ROAs)
+
+512 ContentType              # wrong content type 6488#2
+513 NoCerts                  # no certificate 6488#2.1
+514 2Certs                   # two certificates 6488#2.1
+515 Version2                 # version 2 6488#2.1.1
+516 Version4                 # version 4 6488#2.1.1
+517 DigestAlgSameWrong       # wrong digest algorithm (same in both places) 6488#2.1.2 6485#2
+546 DigestAlgWrongOuter      # wrong digest algorithm (in SignedData) 6488#2.1.2 6485#2
+518 2DigestAlgs              # two digest algorithms 6488#2.1.2
+519 NoDigestAlgs             # no digest algorithm 6488#2.1.2
+520 HasCRL                   # has a CRL 6488#2.1.5
+521 NoSigInfo                # empty set of SignerInfos 6488#2.1
+721 2SigInfo                 # multiple SignerInfo objects in set 6488#2.1
+523 SigInfoVersion           # wrong Signer Info version (2) 6488#2.1.6.1
+524 SigInfoVersion4          # wrong Signer Info version (4) 6488#2.1.6.1
+525 SigInfoNoSid             # no Signer Identifier 6488#2.1.6.2
+526 SigInfoWrongSid          # wrong choice of Signer Identifier 6488#2.1.6.2
+527 SigInfoBadSid            # bad Signer Identifier (wrong SKI) 6488#2.1.6.2
+528 SigInfoHashAlg           # wrong digest algorithm (in SignerInfo) 6488#2.1.6.3 6485#2
+529 SigInfoNoAttrs           # no set of attributes in SignerInfo 6488#2.1.6.4
+722 SigInfoForbiddenAttr     # extra, forbidden attribute 6488#2.1.6.4
+530 SigInfoAttrsNoContType   # no content type in Signer Info 6488#2.1.6.4.1
+531 SigInfoAttrsContTypeOid  # content type OID does not match eContentType 6488#2.1.6.4.1
+533 SigInfoAttrsNoMsgDigest  # no message digest 6488#2.1.6.4.2
+548 SigInfoAttrsWrongDigest  # incorrect SHA-256 message digest 6488#2.1.6.4.2
+534 SigInfoAttrs2ContType    # duplicate content type attributes 6488#2.1.6.4
+535 SigInfoAttrs2MsgDigest   # duplicate digest attributes 6488#2.1.6.4
+536 SigInfoAttrs2SigTime     # duplicate signing time attributes 6488#2.1.6.4
+537 SigInfoAttrs2BinSigTime  # duplicate binary signing time attributes 6488#2.1.6.4
+549 SigInfoAttrsContType2Val    # duplicate content type attribute values 6488#2.1.6.4
+564 SigInfoAttrsMsgDigest2Val   # duplicate digest attribute values 6488#2.1.6.4
+565 SigInfoAttrsSigTime2Val     # duplicate signing time attribute values 6488#2.1.6.4
+566 SigInfoAttrsBinSigTime2Val  # duplicate binary signing time attribute values 6488#2.1.6.4
+567 SigInfoAttrsContType0Val    # empty set of content type attribute values 6488#2.1.6.4
+568 SigInfoAttrsMsgDigest0Val   # empty set of digest attribute values 6488#2.1.6.4
+570 SigInfoAttrsSigTime0Val     # empty set of signing time attribute values 6488#2.1.6.4
+569 SigInfoAttrsBinSigTime0Val  # empty set of binary signing time attribute values 6488#2.1.6.4
+538 SigInfoUnSigAttrs        # has unsigned attribute 6488#2.1.6.7
+539 SigInfoNoSig             # no signature 6488#2.1.6.6
+540 SigInfo2Sig              # has two signatures 6488#2.1.6.6
+571 SigInfoBadSigVal         # incorrect signature 6488#2.1.6.6
+542 SigInfoWrongSigAlg       # has wrong signature algorithm 6488#2.1.6.5 6485#2
+543 SigInfoNoHashAlg         # had no hash algorithm 6488#2.1.6.3
+
+EE Certificates (embedded in ROAs)
+
+572 HasBasicConstraints      # basic constraints extension present 6487#4.8.1
+575 HasCABasicConstraint     # basic constraints extension present with CA bool set to true 6487#4.8.1
+544 KeyUsageCABits           # KU has only keyCertSign and CRLSign (like CA) 6487#4.8.4
+573 KeyUsageNoDigitalSig     # KU missing digitalSignature bit 6487#4.8.4
+574 KeyUsageHasKeyCertSign   # KU has digitalSignature and keyCertSign but no CA basic constraint 6487#4.8.4
+576 KeyUsageHasKeyCertSignCABool   # KU has digitalSignature and keyCertSign and CA basic constraint 6487#4.8.4
+577 KeyUsageHasCRLSign       # KU has digitalSignature and CRLSign 6487#4.8.4
+578 KeyUsageHasNonRepu       # KU has digitalSignature and nonRepudiation 6487#4.8.4
+581 HasEKU                   # Has EKU 6487#4.8.5
+545 SIAWrongAccessMethod     # improper accessMethod (id-ad-rpkiManifest) in SIA 6487#4.8.8.2
+579 SIAExtraAccessMethod     # (good) extra copy of accessMethod (id-ad-signedObject) in SIA 6487#4.8.8.2
+580 SIAExtraWrongAccessMethod # extra, improper accessMethod (id-ad-rpkiManifest) in SIA 6487#4.8.8.2
+582 SIANoRsync       # SIA has no rsync locator for id-ad-signedObject 6487#4.8.8.2
+583 SIA2Rsync        # (good) SIA has 2 rsync locators for id-ad-signedObject 6487#4.8.8.2
+584 SIAHtRs          # (good) SIA has http+rsync locators for id-ad-signedObject 6487#4.8.8.2
+716 SIAHasNonURI     # (good) SIA has rsync+non-URI locators for id-ad-signedObject 6487#4.8.8.2
+717 BadSig                   # signature is invalid 5280#4.1.1.3
+
+ROAs
+
+550 NothingWrong             # (good) nothing wrong
+718 WrongType                # wrong eContentType (and signedAttrs content-type) 6482#2
+551 ASIDSmall                # AS number out of bounds (too low) 6482#3.2
+552 ASIDLarge                # AS number out of bounds (too high) 6482#3.2
+560 ASIDZero                 # (good) AS 0 is allowed 6482#3.2, 6483#5, 6491
+561 ASIDMax                  # (good) AS 2^32-1 is allowed 6482#3.2, 4893#7
+553 Family                   # invalid family 6482#3.3
+554 FamilyLth                # family name too long 6482#3.3
+719 IPv4PrefixLong           # IPv4 prefix greater than 32 bits 6482#3.3
+720 IPv6PrefixLong           # IPv6 prefix greater than 128 bits 6482#3.3
+555 IPv4MaxLthLong            # IP max length too long (greater than 32) 6482#3.3
+585 IPv4MaxLthShort           # IP max length shorter than prefix length 6482#3.3
+586 IPv6MaxLthLong            # IP max length too long (greater than 128) 6482#3.3
+587 IPv6MaxLthShort           # IP max length shorter than prefix length 6482#3.3
+588 IPv4DupPrefixSameMaxLen   # (good) IPv4 two copies of same prefix, same maxlength 6482#3.3
+589 IPv6DupPrefixSameMaxLen   # (good) IPv6 two copies of same prefix, same maxlength 6482#3.3
+590 IPv4DupPrefixDiffMaxLen   # (good) IPv4 two copies of same prefix, different maxlength 6482#3.3
+591 IPv6DupPrefixDiffMaxLen   # (good) IPv6 two copies of same prefix, different maxlength 6482#3.3
+562 IPv4Inherit              # IPv4 uses inherit (errata 3166)
+563 IPv6Inherit              # IPv6 uses inherit (errata 3166)
+593 IPv4OnlyPfxBelowPfxNoGap              # EE has one IPv4 prefix; ROA has one directly below it 6482#4
+631 IPv4OnlyPfxBelowRangeNoGap            # EE has one IPv4 range; ROA has one prefix directly below it 6482#4
+594 IPv4OnlyPfxAbovePfxNoGap              # like IPv4OnlyPfxBelowPfxNoGap, but the ROA's is above 6482#4
+632 IPv4OnlyPfxAboveRangeNoGap            # like IPv4OnlyPfxBelowRangeNoGap, but the ROA's is above 6482#4
+595 IPv4OnlyPfxBetweenPfxPfxNoGaps        # EE has two IPv4 prefixes; ROA has a prefix in the middle, directly adjacent to both EE prefixes 6482#4
+633 IPv4OnlyPfxBetweenPfxRangeNoGaps      # like IPv4OnlyPfxBetweenPfxPfxNoGaps, but the higher EE prefix is a range instead 6482#4
+634 IPv4OnlyPfxBetweenRangePfxNoGaps      # like IPv4OnlyPfxBetweenPfxPfxNoGaps, but the lower EE prefix is a range instead 6482#4
+635 IPv4OnlyPfxBetweenRangeRangeNoGaps    # like IPv4OnlyPfxBetweenPfxPfxNoGaps, but both EE prefixes are ranges instead 6482#4
+636 IPv4OnlyPfxTouchRanges                # EE has two IPv4 ranges; ROA has one prefix from the top of the lower range to the bottom of the upper range 6482#4
+596 IPv4OnlyPfxSpanPfxes                  # EE has two IPv4 prefixes; ROA has one prefix from the bottom of the EE's lower prefix to the top of the EE's upper prefix 6482#4
+637 IPv4OnlyPfxSpanRanges                 # EE has two IPv4 ranges; ROA has one prefix from the middle of the lower range to the middle of the upper range 6482#4
+638 IPv4OnlyPfxSupersetLowRange           # ROA has an IPv4 prefix; EE has a range of min(prefix) to max(prefix)-1 6482#4
+639 IPv4OnlyPfxSupersetHighRange          # ROA has an IPv4 prefix; EE has a range of min(prefix)+1 to max(prefix) 6482#4
+597 IPv4OnlyPfxSupersetLowPfx             # ROA has an IPv4 prefix; EE has the bottom half of the prefix 6482#4
+598 IPv4OnlyPfxSupersetHighPfx            # ROA has an IPv4 prefix; EE has the top half of the prefix 6482#4
+686 IPv4OnlyPfxOverlapLowRange            # ROA has an IPv4 prefix; EE has a range from min(prefix)-1 to max(prefix)-1 6482#4
+687 IPv4OnlyPfxOverlapHighRange           # ROA has an IPv4 prefix; EE has a range from min(prefix)+1 to max(prefix)+1 6482#4
+599 IPv4ExtraPfxBelowPfx                  # EE has one IPv4 prefix; ROA has one equal prefix and one disjoint prefix below 6482#4
+688 IPv4ExtraPfxBelowRange                # EE has one IPv4 range; ROA has one subset prefix and one disjoint prefix below 6482#4
+608 IPv4ExtraPfxAbovePfx                  # EE has one IPv4 prefix; ROA has one equal prefix and one disjoint prefix above 6482#4
+689 IPv4ExtraPfxAboveRange                # EE has one IPv4 range; ROA has one subset prefix and one disjoint prefix above 6482#4
+609 IPv4PfxEqualPfx                       # (good) ROA and EE have a single, identical IPv4 prefix 6482#4
+690 IPv4PfxesEqualRange                   # (good) EE has a single IPv4 range; ROA has a set of maximal prefixes covering the range 6482#4
+610 IPv4PfxesEqualPfxes                   # (good) EE has two IPv4 prefixes; ROA has two identical prefixes 6482#4
+691 IPv4PfxesEqualRanges                  # (good) EE has two IPv4 ranges; ROA has a set of maximal prefixes covering the ranges 6482#4
+611 IPv4ExtraSubPfxInPfxMiddle            # (good) like IPv4PfxEqualPfx, with an extra ROA prefix in the middle of the existing ROA prefix 6482#4
+692 IPv4ExtraSubPfxInRangeMiddle          # (good) like IPv4PfxesEqualRange, with an extra ROA prefix in the middle of one of the existing ROA prefixes 6482#4
+612 IPv4OnlyPfxInPfxLow                   # (good) EE has a single IPv4 prefix; ROA has one smaller prefix at the bottom 6482#4
+613 IPv4OnlyPfxInPfxHigh                  # (good) EE has a single IPv4 prefix; ROA has one smaller prefix at the top 6482#4
+693 IPv4OnlyPfxInRangeLow                 # (good) EE has a single IPv4 range; ROA has one prefix at the bottom of the range 6482#4
+694 IPv4OnlyPfxInRangeHigh                # (good) EE has a single IPv4 range; ROA has one prefix at the top of the range 6482#4
+614 IPv4OnlyPfxesInPfxesMiddle            # (good) EE has two IPv4 prefixes; ROA has two prefixes, one in the middle of each 6482#4
+695 IPv4OnlyPfxesInRangesMiddle           # (good) EE has two IPv4 ranges; ROA has two prefixes, one in the middle of each 6482#4
+615 IPv6OnlyPfxBelowPfxNoGap              # EE has one IPv6 prefix; ROA has one directly below it 6482#4
+696 IPv6OnlyPfxBelowRangeNoGap            # EE has one IPv6 range; ROA has one prefix directly below it 6482#4
+616 IPv6OnlyPfxAbovePfxNoGap              # like IPv6OnlyPfxBelowPfxNoGap, but the ROA's is above 6482#4
+697 IPv6OnlyPfxAboveRangeNoGap            # like IPv6OnlyPfxBelowRangeNoGap, but the ROA's is above 6482#4
+617 IPv6OnlyPfxBetweenPfxPfxNoGaps        # EE has two IPv6 prefixes; ROA has a prefix in the middle, directly adjacent to both EE prefixes 6482#4
+698 IPv6OnlyPfxBetweenPfxRangeNoGaps      # like IPv6OnlyPfxBetweenPfxPfxNoGaps, but the higher EE prefix is a range instead 6482#4
+699 IPv6OnlyPfxBetweenRangePfxNoGaps      # like IPv6OnlyPfxBetweenPfxPfxNoGaps, but the lower EE prefix is a range instead 6482#4
+700 IPv6OnlyPfxBetweenRangeRangeNoGaps    # like IPv6OnlyPfxBetweenPfxPfxNoGaps, but both EE prefixes are ranges instead 6482#4
+701 IPv6OnlyPfxTouchRanges                # EE has two IPv6 ranges; ROA has one prefix from the top of the lower range to the bottom of the upper range 6482#4
+618 IPv6OnlyPfxSpanPfxes                  # EE has two IPv6 prefixes; ROA has one prefix from the bottom of the EE's lower prefix to the top of the EE's upper prefix 6482#4
+702 IPv6OnlyPfxSpanRanges                 # EE has two IPv6 ranges; ROA has one prefix from the middle of the lower range to the middle of the upper range 6482#4
+703 IPv6OnlyPfxSupersetLowRange           # ROA has an IPv6 prefix; EE has a range of min(prefix) to max(prefix)-1 6482#4
+704 IPv6OnlyPfxSupersetHighRange          # ROA has an IPv6 prefix; EE has a range of min(prefix)+1 to max(prefix) 6482#4
+619 IPv6OnlyPfxSupersetLowPfx             # ROA has an IPv6 prefix; EE has the bottom half of the prefix 6482#4
+620 IPv6OnlyPfxSupersetHighPfx            # ROA has an IPv6 prefix; EE has the top half of the prefix 6482#4
+705 IPv6OnlyPfxOverlapLowRange            # ROA has an IPv6 prefix; EE has a range from min(prefix)-1 to max(prefix)-1 6482#4
+706 IPv6OnlyPfxOverlapHighRange           # ROA has an IPv6 prefix; EE has a range from min(prefix)+1 to max(prefix)+1 6482#4
+621 IPv6ExtraPfxBelowPfx                  # EE has one IPv6 prefix; ROA has one equal prefix and one disjoint prefix below 6482#4
+707 IPv6ExtraPfxBelowRange                # EE has one IPv6 range; ROA has one subset prefix and one disjoint prefix below 6482#4
+622 IPv6ExtraPfxAbovePfx                  # EE has one IPv6 prefix; ROA has one equal prefix and one disjoint prefix above 6482#4
+708 IPv6ExtraPfxAboveRange                # EE has one IPv6 range; ROA has one subset prefix and one disjoint prefix above 6482#4
+623 IPv6PfxEqualPfx                       # (good) ROA and EE have a single, identical IPv6 prefix 6482#4
+709 IPv6PfxesEqualRange                   # (good) EE has a single IPv6 range; ROA has a set of maximal prefixes covering the range 6482#4
+624 IPv6PfxesEqualPfxes                   # (good) EE has two IPv6 prefixes; ROA has two identical prefixes 6482#4
+710 IPv6PfxesEqualRanges                  # (good) EE has two IPv6 ranges; ROA has a set of maximal prefixes covering the ranges 6482#4
+625 IPv6ExtraSubPfxInPfxMiddle            # (good) like IPv6PfxEqualPfx, with an extra ROA prefix in the middle of the existing ROA prefix 6482#4
+711 IPv6ExtraSubPfxInRangeMiddle          # (good) like IPv6PfxesEqualRange, with an extra ROA prefix in the middle of one of the existing ROA prefixes 6482#4
+626 IPv6OnlyPfxInPfxLow                   # (good) EE has a single IPv6 prefix; ROA has one smaller prefix at the bottom 6482#4
+627 IPv6OnlyPfxInPfxHigh                  # (good) EE has a single IPv6 prefix; ROA has one smaller prefix at the top 6482#4
+712 IPv6OnlyPfxInRangeLow                 # (good) EE has a single IPv6 range; ROA has one prefix at the bottom of the range 6482#4
+713 IPv6OnlyPfxInRangeHigh                # (good) EE has a single IPv6 range; ROA has one prefix at the top of the range 6482#4
+628 IPv6OnlyPfxesInPfxesMiddle            # (good) EE has two IPv6 prefixes; ROA has two prefixes, one in the middle of each 6482#4
+714 IPv6OnlyPfxesInRangesMiddle           # (good) EE has two IPv6 ranges; ROA has two prefixes, one in the middle of each 6482#4
+629 IPv4GoodIPv6Bad                       # EE has one IPv4 prefix and one IPv6 prefix; ROA has an equal IPv4 prefix and a superset IPv6 prefix 6482#4
+630 IPv6GoodIPv4Bad                       # EE has one IPv4 prefix and one IPv6 prefix; ROA has a superset IPv4 prefix and an equal IPv6 prefix 6482#4
+715 ComplexResources                      # (good) EE has an assortment of IPv4 and IPv6 prefixes and ranges; ROA has an assortment of prefixes that form a strict subset 6482#4
+557 VersionV1Explicit        # explicit V1 version (int 0) applied before signature 6482#3
+558 VersionV1ExplicitBadSig  # explicit V1 version (int 0) applied after signature 6482#3
+559 VersionV2                # Version V2 (int 1) 6482#3.1
+
+Ghostbusters
+
+600 NothingWrong             # (good) nothing wrong
+601 NotVCard                 # the eContent is not valid vCard 6493#5
+606 ExtraProperty            # a vCard property not listed in 6493#5 is present
+607 NoContact                # none of ADR, TEL, or EMAIL are present 6493#5
+602 WrongOID                 # the wrong OID is used in both the eContentType and the content-type 6493#6
+603 IPv4NotInherit           # the EE cert has IPv4 resources not set to inherit 6493#6
+604 IPv6NotInherit           # the EE cert has IPv6 resources not set to inherit 6493#6
+605 ASNotInherit             # the EE cert has AS resources not set to inherit 6493#6
+
+CRLs
+
+640 CRLNoVersion             # no CRL version field 6487#5
+641 CRLVersion0              # CRL version v1 (integer value 0) 6487#5
+676 CRLVersion2              # CRL version v3 (integer value 2) 6487#5
+642 CRLSigAlgInner           # wrong signature algorithm ID in toBeSigned 6487#5 6485#2
+643 CRLSigAlgOuter           # wrong outer signature algorithm ID 6487#5 6485#2
+677 CRLSigAlgMatchButWrong   # matching inner/outer signature algorithm IDs, but wrong 6487#5 6485#2
+644 CRLIssuerOID             # wrong OID for issuer name 6487#5 6487#4.4
+645 CRLIssuer2Sets           # issuer name has 2 sets with common names 6487#5 6487#4.4
+646 CRLIssuerUTF             # issuer name in utf not printable string 6487#5 6487#4.4
+647 CRLIssuer2Seq            # issuer name has 2 common names (same set) 6487#5 6487#4.4
+648 CRLIssuerSet2SerNums     # issuer name has 2 serial numbers (same set) 6487#5 6487#4.4
+678 CRLIssuerSeq2SerNums     # issuer name has 2 serial numbers (split across sets) 6487#5 6487#4.4
+679 CRLIssuerSerNum          # issuer name has only a serial number 6487#5 6487#4.4
+650 CRLThisUpdateTyp         # wrong type of date in thisUpdate (should be UTC) 5280#5.1.2.4
+651 CRLNextUpdatePast        # next update is in the past (STALE CRL, maybe OK) 5280#5.1.2.5
+652 CRLNextUpdateTyp         # wrong type of date in next update (should be UTC) 5280#5.1.2.5
+653 CRLUpdatesCrossed        # last date is later then next date 5280#5.1.2.4,5.1.2.5
+654 CRLIssAltName            # has issuer alternative name extension 6487#5
+655 CRLIssDistPt             # has issuing distribution point extension 6487#5
+656 CRLDeltaCRLInd           # has delta CRL indicator extension 6487#5
+657 CRLNoAKI                 # has no authority key identifier extension 6487#5
+658 CRLNoCRLNum              # has no CRL number 6487#5
+659 CRLEntryReason           # entry has a revocation reason 6487#5
+680 CRLEntryHasExtension     # entry has a CRL entry extension InvalidityDate 6487#5
+669 CRLNumber2Big            # has too long a CRL number 5280#5.2.3
+673 CRLNumberMax             # (good) has the maximum allowed 20-octet CRL number 5280#5.2.3
+674 CRLNumberZero            # (good) CRL number is zero 5280#5.2.3
+675 CRLNumberNeg             # CRL number is negative 5280#5.2.3
+670 CRL2CRLNums              # has 2 CRL numbers 6487#errata
+684 CRLEntrySerNumNeg        # CRL has entry with negative serial number 5280#5.1.2.6 6487#4.2 5280#4.1.2.2
+685 CRLEntrySerNum0          # CRL has entry with zero serial number 5280#5.1.2.6 6487#4.2 5280#4.1.2.2
+671 CRLEntrySerNumMax        # (good) CRL has entry with maximum serial number 5280#5.1.2.6, 5280#4.1.2.2
+672 CRLEntrySerNumTooBig     # CRL has entry with serial number that is one more than maximum allowable 5280#5.1.2.6, 5280#4.1.2.2
+
+Manifests
+
+768 MFTWrongType             # wrong eContentType (and signedAttrs content-type) 6486#4.1
+769 MFTVersion0              # non-default version 0 6486#4.1
+770 MFTVersion1              # version 1 6486#4.2.1
+771 MFTNoNum                 # no manifest number 6486#4.2.1
+785 MFTNumMax                # (good) maximum manifest number (20 octets) 6486#4.2.1
+786 MFTNumZero               # (good) manifest number is zero 6486#4.2
+787 MFTNumTooBig             # manifest number exceeds max 6486#4.2.1
+772 MFTNegNum                # negative manifest number 6486#4.2.1
+773 MFTThisUpdUTC            # thisUpdate in UTC 6486#4.2
+774 MFTThisUpdFuture         # thisUpdate in future 6486#4.2.1
+775 MFTNextUpdUTC            # nextUpdate in UTC 6486#4.2
+776 MFTNextUpdPast           # nextUpdate in past (stale manifest, good/bad depends on config) 6486#4.2.1
+789 MFTUpdCrossed            # thisUpdate postdates nextUpdate 6486#4.4
+790 MFTStartCrossed          # thisUpdate predates EE notBefore 6486#5.1
+791 MFTEndCrossed            # nextUpdate postdates EE notAfter 6486#5.1
+777 MFTHashAlg               # wrong hash algorithm OID, with a hash length appropriate for the OID 6486#4.2.1,6485#2
+795 MFTHashAlgSameLength     # wrong hash algorithm OID, but with correct SHA-256 hashes 6486#4.2.1,6485#2
+779 MFTFileHashShort         # too short hash of a file 6486#4.2.1,6485#2
+780 MFTFileHashLong          # too long hash of a file 6486#4.2.1,6485#2
+781 MFTFileNotIA5            # file name not IA5 6486#4.2
+782 MFTHashOctetStr          # file hash is octet, not bit string 6486#4.2
+783 MFTDuplicateFileOneHash  # duplicate file name with same hash 6486#4.2.1
+784 MFTDuplicateFileTwoHashes # duplicate filename with diff hash 6486#4.2.1
+788 MFTUnkownFileExtension   # (good) file name has an unrecognized extension 6486#4.2.1
+792 MFTIPv4NotInherit        # the EE cert has IPv4 resources not set to inherit 6486#5.1
+793 MFTIPv6NotInherit        # the EE cert has IPv6 resources not set to inherit 6486#5.1
+794 MFTASNotInherit          # the EE cert has AS resources not set to inherit 6486#5.1
+
+Name tests
+
+900 NAMSeqNameSer            # subject with name before serial number (2 sets) 6487#4.4, 6487#4.5
+       MFTMatch              # (good) MFT's EE's issuer matches parent's subject 6487#4.4
+       CRLMatch              # (good) CRL's issuer matches parent's subject 6487#5 6487#4.4
+       CertMatch             # (good) CA Cert's issuer matches parent's subject 6487#4.4
+901 NAMSeqSerName            # subject with serial number before name (2 sets) 6487#4.4, 6487#4.5
+       MFTMatch              # (good) MFT's EE's issuer matches parent's subject 6487#4.4
+       CRLMatch              # (good) CRL's issuer matches parent's subject 6487#5 6487#4.4
+       CertMatch             # (good) CA Cert's issuer matches parent's subject 6487#4.4
+902 NAMSetNameSer            # subject with serial number and name (1 set) 6487#4.4, 6487#4.5
+       MFTMatch              # (good) MFT's EE's issuer matches parent's subject 6487#4.4
+       CRLMatch              # (good) CRL's issuer matches parent's subject 6487#5 6487#4.4
+       CertMatch             # (good) CA Cert's issuer matches parent's subject 6487#4.4
+
+Trust Anchor (self-signed) certificates
+
+100 RootBadAKI              # AKI does not match SKI 6487#4.8.3
+103 RootAKIMatches          # (good) AKI present, matches SKI 6487#4.8.3
+104 RootAKIOmitted          # (good) AKI omitted 6487#4.8.3
+101 RootBadCRLDP            # CRLDP is present in the trust anchor 6487#4.8.6
+102 RootNameDiff            # Subject and Issuer don't match (tricky, will be interpreted as non-self-signed) 5280#3.2
+105 RootBadAIA              # AIA is present in the trust anchor 6487#4.8.7
+106 RootBadSig              # signature is invalid 5280#4.1.1.3
