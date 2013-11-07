@@ -81,11 +81,7 @@ public final class CertificateRepositoryObjectFactory {
     }
 
     private static X509Crl parseCrl(byte[] encoded, ValidationResult validationResult) {
-        try {
-            return X509Crl.parseDerEncoded(encoded, validationResult);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return X509Crl.parseDerEncoded(encoded, validationResult);
     }
 
     private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {

@@ -112,7 +112,7 @@ public class X509Crl implements CertificateRepositoryObject {
             return crl;
         } catch (IllegalArgumentException e) {
             validationResult.error(ValidationString.CRL_PARSED);
-            throw e;
+            return null;
         }
     }
 

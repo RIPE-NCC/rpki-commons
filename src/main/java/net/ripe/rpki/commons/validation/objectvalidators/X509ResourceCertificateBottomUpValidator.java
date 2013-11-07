@@ -102,6 +102,10 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
             X509ResourceCertificate child = certificateWithLocation.getCertificate();
 
             X509Crl crl = getCRL(child, result);
+            if (result.hasFailures()) {
+                // stop validation: crl cannot be parsed
+                return;
+            }
 
             X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, parent, crl, resources);
             validator.validate(childLocation, child);
