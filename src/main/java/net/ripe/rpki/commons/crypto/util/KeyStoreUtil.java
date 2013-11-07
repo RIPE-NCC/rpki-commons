@@ -30,12 +30,24 @@
 package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.output.NullOutputStream;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jcajce.provider.keystore.BC;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
@@ -43,12 +55,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.EnumSet;
 
 
 public final class KeyStoreUtil {
@@ -67,8 +83,8 @@ public final class KeyStoreUtil {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType, keyStoreProvider);
             keyStore.load(null, KEYSTORE_PASSPHRASE);
             keyStore.aliases();
-            X509ResourceCertificate certificate = createCertificate(keyPair, signatureProvider);
-            keyStore.setKeyEntry(KEYSTORE_KEY_ALIAS, keyPair.getPrivate(), KEYSTORE_PASSPHRASE, new Certificate[]{certificate.getCertificate()});
+            X509Certificate certificate = generateCertificate(keyPair, signatureProvider);
+            keyStore.setKeyEntry(KEYSTORE_KEY_ALIAS, keyPair.getPrivate(), KEYSTORE_PASSPHRASE, new Certificate[]{certificate});
             return keyStore;
         } catch (GeneralSecurityException e) {
             throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
@@ -117,11 +133,7 @@ public final class KeyStoreUtil {
 
     private static KeyPair getKeyPairFromKeyStore(KeyStore keyStore) {
         try {
-            Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
-            X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-
-            parser.parse(ValidationResult.withLocation("unknown.cer"), c.getEncoded());
-            X509ResourceCertificate certificate = parser.getCertificate();
+            Certificate certificate = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
             PublicKey publicKey = certificate.getPublicKey();
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);
             return new KeyPair(publicKey, privateKey);
@@ -142,17 +154,21 @@ public final class KeyStoreUtil {
         }
     }
 
-    private static X509ResourceCertificate createCertificate(KeyPair keyPair, String signatureProvider) {
-        X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        builder.withSignatureProvider(signatureProvider);
-        builder.withSerial(BigInteger.ONE);
-        builder.withValidityPeriod(new ValidityPeriod(new DateTime().minusYears(2), new DateTime().minusYears(1)));
-        builder.withCa(false);
-        builder.withIssuerDN(new X500Principal("CN=issuer"));
-        builder.withSubjectDN(new X500Principal("CN=subject"));
-        builder.withResources(IpResourceSet.parse("AS1-AS10,10/8,ffc0::/16"));
-        builder.withSigningKeyPair(keyPair);
-        builder.withPublicKey(keyPair.getPublic());
-        return builder.build();
+    public static X509Certificate generateCertificate(KeyPair keyPair, String signatureProvider) {
+        X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
+                new X500Principal("CN=issuer"),
+                BigInteger.ONE,
+                new DateTime().minusYears(2).toDate(),
+                new DateTime().minusYears(1).toDate(),
+                new X500Principal("CN=subject"),
+                keyPair.getPublic());
+        try {
+            ContentSigner sigGen = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(keyPair.getPrivate());
+            return new JcaX509CertificateConverter().getCertificate(builder.build(sigGen));
+        } catch (OperatorCreationException e) {
+            throw new RuntimeException(e);
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

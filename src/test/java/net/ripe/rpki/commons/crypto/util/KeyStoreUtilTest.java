@@ -31,12 +31,15 @@ package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
+import org.joda.time.DateTime;
 import org.junit.Test;
+import sun.security.x509.X509CertImpl;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
+import java.util.Date;
 
 import static net.ripe.rpki.commons.crypto.util.KeyStoreUtil.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -60,13 +63,8 @@ public class KeyStoreUtilTest {
         keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
         keyStoreData = storeKeyStore(keyStore);
 
-        Certificate c = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
-        String location = "unknown.cer";
-        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(location, c.getEncoded());
-        X509ResourceCertificate certificate = parser.getCertificate();
-
-        assertTrue(certificate.getValidityPeriod().isExpiredNow());
+        X509CertImpl certificate = new X509CertImpl(keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0].getEncoded());
+        assertTrue(certificate.getNotAfter().before(new Date()));
     }
 
     @Test
