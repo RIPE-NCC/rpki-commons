@@ -171,12 +171,14 @@ public final class ValidationString {
     public static final String VALIDATOR_FETCHED_OBJECT_IS_MANIFEST = "validator.fetched.object.is.manifest";
     public static final String VALIDATOR_FETCHED_OBJECT_IS_CRL = "validator.fetched.object.is.crl";
     public static final String VALIDATOR_MANIFEST_DOES_NOT_CONTAIN_FILE = "validator.manifest.does.not.contain.file";
+    public static final String VALIDATOR_OBJECT_PROCESSING_EXCEPTION = "validator.object.processing.exception";
 
     // Problems with repository
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
     public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconsistent";
     public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unknown";
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_IN_CACHE = "validator.repository.object.not.in.cache";
+    public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_FOUND = "validator.repository.object.not.found";
     public static final String VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD = "validator.repository.unsupported.ghostbusters.record";
 
 }

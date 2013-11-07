@@ -126,6 +126,13 @@ public final class ValidationResult implements Serializable {
         setLocation(locationBefore);
     }
 
+    public void warnForLocation(ValidationLocation location, String key, String... param) {
+        ValidationLocation locationBefore = currentLocation;
+        setLocation(location);
+        setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
+        setLocation(locationBefore);
+    }
+
     public boolean rejectIfFalse(boolean condition, String key, String... param) {
         Validate.notNull(key, "key is required");
         if (condition) {
