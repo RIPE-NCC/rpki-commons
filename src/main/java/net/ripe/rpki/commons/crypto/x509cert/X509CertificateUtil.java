@@ -29,21 +29,47 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.apache.commons.lang.Validate;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509Extension;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public final class X509CertificateUtil {
 
@@ -59,7 +85,7 @@ public final class X509CertificateUtil {
             }
             return SubjectKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException("Cannot get SubjectKeyIdentifier for certificate", e);
+            throw new X509CertificateOperationException("Cannot get SubjectKeyIdentifier for certificate", e);
         }
     }
 
@@ -71,7 +97,7 @@ public final class X509CertificateUtil {
             }
             return AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException("Can not get AuthorityKeyIdentifier for certificate", e);
+            throw new X509CertificateOperationException("Can not get AuthorityKeyIdentifier for certificate", e);
         }
     }
 
@@ -84,7 +110,7 @@ public final class X509CertificateUtil {
     /**
      * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
      *
-     * @throws AbstractX509CertificateWrapperException
+     * @throws X509CertificateOperationException
      *
      * @throws IOException
      */
@@ -94,7 +120,7 @@ public final class X509CertificateUtil {
         try {
             tbsCertificate = certificate.getTBSCertificate();
         } catch (CertificateEncodingException e) {
-            throw new AbstractX509CertificateWrapperException("Can't extract TBSCertificate from certificate", e);
+            throw new X509CertificateOperationException("Can't extract TBSCertificate from certificate", e);
         }
         ASN1Sequence tbsCertificateSequence = (ASN1Sequence) Asn1Util.decode(tbsCertificate);
         TBSCertificateStructure tbsCertificateStructure = new TBSCertificateStructure(tbsCertificateSequence);
@@ -108,7 +134,172 @@ public final class X509CertificateUtil {
             out.flush();
             return out.toString();
         } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException("Can't encode SubjectPublicKeyInfo for certificate", e);
+            throw new X509CertificateOperationException("Can't encode SubjectPublicKeyInfo for certificate", e);
+        }
+    }
+
+    public static boolean isRoot(X509Certificate certificate) {
+        return certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal());
+    }
+
+    public static boolean isCa(X509Certificate certificate) {
+        try {
+            byte[] basicConstraintsExtension = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.basicConstraints.getId());
+            if (basicConstraintsExtension == null) {
+                /**
+                 * The Basic Constraints extension field [...] MUST be present when
+                 * the Subject is a CA, and MUST NOT be present otherwise.
+                 * http://tools.ietf.org/html/draft-ietf-sidr-res-certs-21#section-4.9.1
+                 */
+                return false;
+            }
+            BasicConstraints constraints = BasicConstraints.getInstance(X509ExtensionUtil.fromExtensionValue(basicConstraintsExtension));
+            return constraints.isCA();
+        } catch (IOException e) {
+            throw new X509CertificateOperationException(e);
+        }
+    }
+
+    public static boolean isEe(X509Certificate certificate) {
+        return !isCa(certificate);
+    }
+
+    public static X509CertificateInformationAccessDescriptor[] getAuthorityInformationAccess(X509Certificate certificate) {
+        try {
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.authorityInfoAccess.getId());
+            if (extensionValue == null) {
+                return null;
+            }
+            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
+            return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
+        } catch (IOException e) {
+            throw new X509CertificateOperationException(e);
+        }
+    }
+
+    public static X509CertificateInformationAccessDescriptor[] getSubjectInformationAccess(X509Certificate certificate) {
+        try {
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.subjectInfoAccess.getId());
+            if (extensionValue == null) {
+                return null;
+            }
+            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
+            return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
+        } catch (IOException e) {
+            throw new X509CertificateOperationException(e);
+        }
+    }
+
+    public static URI findFirstAuthorityInformationAccessByMethod(X509Certificate certificate, ASN1ObjectIdentifier method) {
+        Validate.notNull(method, "method is null");
+        return findFirstByMethod(method, "rsync", getAuthorityInformationAccess(certificate));
+    }
+
+    public static URI findFirstSubjectInformationAccessByMethod(X509Certificate certificate, ASN1ObjectIdentifier method) {
+        Validate.notNull(method, "method is null");
+        return findFirstByMethod(method, "rsync", getSubjectInformationAccess(certificate));
+    }
+
+    private static URI findFirstByMethod(ASN1ObjectIdentifier method, String scheme, X509CertificateInformationAccessDescriptor[] accessDescriptor) {
+        if (accessDescriptor == null) {
+            return null;
+        }
+        for (X509CertificateInformationAccessDescriptor ad : accessDescriptor) {
+            if ((method.equals(ad.getMethod())) && (ad.getLocation().getScheme().equals(scheme))) {
+                return ad.getLocation();
+            }
+        }
+        return null;
+    }
+
+    public static URI[] getCrlDistributionPoints(X509Certificate certificate) {
+        try {
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.cRLDistributionPoints.getId());
+            if (extensionValue == null) {
+                return null;
+            }
+            CRLDistPoint crldp = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            return convertCrlDistributionPointToUris(crldp);
+        } catch (IOException e) {
+            throw new X509CertificateOperationException(e);
+        }
+    }
+
+    private static URI[] convertCrlDistributionPointToUris(CRLDistPoint crldp) {
+        List<URI> result = new ArrayList<URI>();
+        for (DistributionPoint dp : crldp.getDistributionPoints()) {
+            Validate.isTrue(dp.getCRLIssuer() == null, "crlIssuer MUST be omitted");
+            Validate.isTrue(dp.getReasons() == null, "reasons MUST be omitted");
+            Validate.notNull(dp.getDistributionPoint(), "distributionPoint MUST be present");
+            Validate.isTrue(dp.getDistributionPoint().getType() == DistributionPointName.FULL_NAME, "distributionPoint type MUST be FULL_NAME");
+            GeneralNames names = (GeneralNames) dp.getDistributionPoint().getName();
+            for (GeneralName name : names.getNames()) {
+                Validate.isTrue(name.getTagNo() == GeneralName.uniformResourceIdentifier, "name MUST be a uniformResourceIdentifier");
+                DERIA5String uri = (DERIA5String) name.getName();
+                try {
+                    result.add(new URI(uri.getString()));
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+        }
+        return result.toArray(new URI[result.size()]);
+    }
+
+    public static URI findFirstRsyncCrlDistributionPoint(X509Certificate certificate) {
+        URI[] crlDistributionPoints = getCrlDistributionPoints(certificate);
+        if (crlDistributionPoints == null) {
+            return null;
+        }
+        for (URI uri : crlDistributionPoints) {
+            if (uri.getScheme().equals("rsync")) {
+                return uri;
+            }
+        }
+        return null;
+    }
+
+    public static URI getManifestUri(X509Certificate certificate) {
+        return findFirstSubjectInformationAccessByMethod(certificate, X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST);
+    }
+
+    public static URI getRepositoryUri(X509Certificate certificate) {
+        return findFirstSubjectInformationAccessByMethod(certificate, X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY);
+    }
+
+    public static boolean isObjectIssuer(X509Certificate certificate) {
+        return getManifestUri(certificate) != null;
+    }
+
+    public static ValidityPeriod getValidityPeriod(X509Certificate certificate) {
+        return new ValidityPeriod(certificate.getNotBefore(), certificate.getNotAfter());
+    }
+
+    public static BigInteger getSerialNumber(X509Certificate certificate) {
+        return certificate.getSerialNumber();
+    }
+
+    public static X500Principal getSubject(X509Certificate certificate) {
+        return certificate.getSubjectX500Principal();
+    }
+
+    public static X500Principal getIssuer(X509Certificate certificate) {
+        return certificate.getIssuerX500Principal();
+    }
+
+    public static PublicKey getPublicKey(X509Certificate certificate) {
+        return certificate.getPublicKey();
+    }
+
+    public static void verify(X509Certificate certificate, PublicKey publicKey) throws InvalidKeyException, SignatureException {
+        try {
+            certificate.verify(publicKey, DEFAULT_SIGNATURE_PROVIDER);
+        } catch (CertificateException e) {
+            throw new IllegalArgumentException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
+        } catch (NoSuchProviderException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 }

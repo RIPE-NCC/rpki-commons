@@ -37,7 +37,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
@@ -86,6 +85,14 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         return certificate;
     }
 
+    public byte[] getEncoded() {
+        try {
+            return certificate.getEncoded();
+        } catch (CertificateEncodingException e) {
+            throw new AbstractX509CertificateWrapperException(e);
+        }
+    }
+
     public ASN1ObjectIdentifier getCertificatePolicy() {
         return POLICY_OID;
     }
@@ -113,41 +120,27 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
     }
 
     public boolean isEe() {
-        return !isCa();
+        return X509CertificateUtil.isEe(certificate);
     }
 
     public boolean isCa() {
-        try {
-            byte[] basicConstraintsExtension = certificate.getExtensionValue(X509Extension.basicConstraints.getId());
-            if (basicConstraintsExtension == null) {
-                /**
-                 * The Basic Constraints extension field [...] MUST be present when
-                 * the Subject is a CA, and MUST NOT be present otherwise.
-                 * http://tools.ietf.org/html/draft-ietf-sidr-res-certs-21#section-4.9.1
-                 */
-                return false;
-            }
-            BasicConstraints constraints = BasicConstraints.getInstance(X509ExtensionUtil.fromExtensionValue(basicConstraintsExtension));
-            return constraints.isCA();
-        } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException(e);
-        }
+        return X509CertificateUtil.isCa(certificate);
     }
 
     public boolean isRoot() {
-        return certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal());
+        return X509CertificateUtil.isRoot(certificate);
     }
 
     public URI getManifestUri() {
-        return findFirstSubjectInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST);
+        return X509CertificateUtil.getManifestUri(certificate);
     }
 
     public URI getRepositoryUri() {
-        return findFirstSubjectInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY);
+        return X509CertificateUtil.getRepositoryUri(certificate);
     }
 
     public boolean isObjectIssuer() {
-        return getManifestUri() != null;
+        return X509CertificateUtil.isObjectIssuer(certificate);
     }
 
     public byte[] getSubjectKeyIdentifier() {
@@ -159,139 +152,50 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
     }
 
     public X500Principal getSubject() {
-        return certificate.getSubjectX500Principal();
+        return X509CertificateUtil.getSubject(certificate);
     }
 
     public X500Principal getIssuer() {
-        return certificate.getIssuerX500Principal();
+        return X509CertificateUtil.getIssuer(certificate);
     }
 
     public PublicKey getPublicKey() {
-        return certificate.getPublicKey();
+        return X509CertificateUtil.getPublicKey(certificate);
     }
 
     public ValidityPeriod getValidityPeriod() {
-        return new ValidityPeriod(certificate.getNotBefore(), certificate.getNotAfter());
+        return X509CertificateUtil.getValidityPeriod(certificate);
     }
 
     public BigInteger getSerialNumber() {
-        return getCertificate().getSerialNumber();
+        return X509CertificateUtil.getSerialNumber(certificate);
     }
 
     public X509CertificateInformationAccessDescriptor[] getAuthorityInformationAccess() {
-        try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extension.authorityInfoAccess.getId());
-            if (extensionValue == null) {
-                return null;
-            }
-            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
-            return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
-        } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException(e);
-        }
+        return X509CertificateUtil.getAuthorityInformationAccess(certificate);
     }
 
     public URI findFirstAuthorityInformationAccessByMethod(ASN1ObjectIdentifier method) {
-        Validate.notNull(method, "method is null");
-        return findFirstByMethod(method, "rsync", getAuthorityInformationAccess());
-    }
-
-    private URI findFirstByMethod(ASN1ObjectIdentifier method, String scheme, X509CertificateInformationAccessDescriptor[] accessDescriptor) {
-        if (accessDescriptor == null) {
-            return null;
-        }
-        for (X509CertificateInformationAccessDescriptor ad : accessDescriptor) {
-            if ((method.equals(ad.getMethod())) && (ad.getLocation().getScheme().equals(scheme))) {
-                return ad.getLocation();
-            }
-        }
-        return null;
+        return X509CertificateUtil.findFirstAuthorityInformationAccessByMethod(certificate, method);
     }
 
     public X509CertificateInformationAccessDescriptor[] getSubjectInformationAccess() {
-        try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extension.subjectInfoAccess.getId());
-            if (extensionValue == null) {
-                return null;
-            }
-            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
-            return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
-        } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException(e);
-        }
+        return X509CertificateUtil.getSubjectInformationAccess(certificate);
     }
 
     public URI findFirstSubjectInformationAccessByMethod(ASN1ObjectIdentifier method) {
-        Validate.notNull(method, "method is null");
-        return findFirstByMethod(method, "rsync", getSubjectInformationAccess());
+        return X509CertificateUtil.findFirstSubjectInformationAccessByMethod(certificate, method);
     }
 
     public URI[] getCrlDistributionPoints() {
-        try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extension.cRLDistributionPoints.getId());
-            if (extensionValue == null) {
-                return null;
-            }
-            CRLDistPoint crldp = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
-            return convertCrlDistributionPointToUris(crldp);
-        } catch (IOException e) {
-            throw new AbstractX509CertificateWrapperException(e);
-        }
+        return X509CertificateUtil.getCrlDistributionPoints(certificate);
     }
 
     public URI findFirstRsyncCrlDistributionPoint() {
-        URI[] crlDistributionPoints = getCrlDistributionPoints();
-        if (crlDistributionPoints == null) {
-            return null;
-        }
-        for (URI uri : crlDistributionPoints) {
-            if (uri.getScheme().equals("rsync")) {
-                return uri;
-            }
-        }
-        return null;
+        return X509CertificateUtil.findFirstRsyncCrlDistributionPoint(certificate);
     }
-
-    private URI[] convertCrlDistributionPointToUris(CRLDistPoint crldp) {
-        List<URI> result = new ArrayList<URI>();
-        for (DistributionPoint dp : crldp.getDistributionPoints()) {
-            Validate.isTrue(dp.getCRLIssuer() == null, "crlIssuer MUST be omitted");
-            Validate.isTrue(dp.getReasons() == null, "reasons MUST be omitted");
-            Validate.notNull(dp.getDistributionPoint(), "distributionPoint MUST be present");
-            Validate.isTrue(dp.getDistributionPoint().getType() == DistributionPointName.FULL_NAME, "distributionPoint type MUST be FULL_NAME");
-            GeneralNames names = (GeneralNames) dp.getDistributionPoint().getName();
-            for (GeneralName name : names.getNames()) {
-                Validate.isTrue(name.getTagNo() == GeneralName.uniformResourceIdentifier, "name MUST be a uniformResourceIdentifier");
-                DERIA5String uri = (DERIA5String) name.getName();
-                try {
-                    result.add(new URI(uri.getString()));
-                } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException(e);
-                }
-            }
-        }
-        return result.toArray(new URI[result.size()]);
-    }
-
 
     public void verify(PublicKey publicKey) throws InvalidKeyException, SignatureException {
-        try {
-            getCertificate().verify(publicKey, DEFAULT_SIGNATURE_PROVIDER);
-        } catch (CertificateException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchProviderException e) {
-            throw new IllegalArgumentException(e);
-        }
+        X509CertificateUtil.verify(certificate, publicKey);
     }
-
-    public byte[] getEncoded() {
-        try {
-            return certificate.getEncoded();
-        } catch (CertificateEncodingException e) {
-            throw new AbstractX509CertificateWrapperException(e);
-        }
-    }
-
 }
