@@ -226,15 +226,19 @@ public abstract class RpkiSignedObjectParser {
         }
 
         Collection<?> signers = signerStore.getSigners();
-        validationResult.rejectIfFalse(signers.size() == 1, ONLY_ONE_SIGNER);
-
-        return (SignerInformation) signers.iterator().next();
+        if (validationResult.rejectIfFalse(signers.size() == 1, ONLY_ONE_SIGNER)) {
+            return (SignerInformation) signers.iterator().next();
+        } else {
+            return null;
+        }
     }
 
     private SignerInformationStore getSignerStore(CMSSignedDataParser sp) {
         try {
             return sp.getSignerInfos();
         } catch (CMSException e) {
+            return null; // Caller will validate that the SignerInformationStore is not null
+        } catch (RuntimeException e) {
             return null; // Caller will validate that the SignerInformationStore is not null
         }
     }
