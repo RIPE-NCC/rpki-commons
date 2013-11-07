@@ -82,6 +82,8 @@ public final class ValidationString {
 
     //certificate (parser)
     public static final String CERTIFICATE_PARSED = "cert.parsed";
+    public static final String CRLDP_PRESENT = "cert.crldp.present";
+    public static final String CRLDP_OMITTED = "cert.crldp.omitted";
     public static final String CRITICAL_EXT_PRESENT = "cert.critical.exts.present";
     public static final String POLICY_EXT_CRITICAL = "cert.policy.ext.critical";
     public static final String POLICY_EXT_VALUE = "cert.policy.ext.value";

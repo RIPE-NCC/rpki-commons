@@ -45,6 +45,7 @@ import java.security.cert.CertificateEncodingException;
 import java.util.regex.Pattern;
 
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
@@ -66,6 +67,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         validateIssuerAndSubjectDN();
         validateCertificatePolicy();
         validateResourceExtensionsForResourceCertificates();
+        validateCrlDistributionPoints();
     }
 
     private void validateIssuerAndSubjectDN() {
@@ -135,6 +137,14 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     private void validateResourceExtensionsForResourceCertificates() {
         if (result.rejectIfFalse(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
             result.rejectIfTrue(false, AS_OR_IP_RESOURCE_PRESENT);
+        }
+    }
+
+    private void validateCrlDistributionPoints() {
+        if (isRoot(certificate)) {
+            result.rejectIfNotNull(getCrlDistributionPoints(certificate), CRLDP_OMITTED);
+        } else {
+           result.rejectIfNull(getCrlDistributionPoints(certificate), CRLDP_PRESENT);
         }
     }
 }

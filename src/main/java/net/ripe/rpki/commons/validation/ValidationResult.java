@@ -144,6 +144,10 @@ public final class ValidationResult implements Serializable {
         return rejectIfTrue(object == null, key, param);
     }
 
+    public boolean rejectIfNotNull(Object object, String key, String... param) {
+        return rejectIfTrue(object != null, key, param);
+    }
+
     public void addMetric(String name, String value) {
         if (!metrics.containsKey(currentLocation)) {
             metrics.put(currentLocation, new ArrayList<ValidationMetric>());

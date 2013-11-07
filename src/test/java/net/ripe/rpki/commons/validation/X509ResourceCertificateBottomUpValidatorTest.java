@@ -48,6 +48,7 @@ import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.security.cert.CRLException;
 import java.util.EnumSet;
@@ -265,6 +266,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withSubjectKeyIdentifier(true);
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(VALIDITY_PERIOD);
+        builder.withCrlDistributionPoints(new URI[]{URI.create("rsync://localhost/ta.crl")});
         return builder;
     }
 
@@ -283,6 +285,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withAuthorityKeyIdentifier(true);
         builder.withSubjectKeyIdentifier(true);
         builder.withResources(CHILD_RESOURCE_SET);
+        builder.withCrlDistributionPoints(new URI[]{URI.create("rsync://localhost/prod.crl")});
         return builder;
     }
 

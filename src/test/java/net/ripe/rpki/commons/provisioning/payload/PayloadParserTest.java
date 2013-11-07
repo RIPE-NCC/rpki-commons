@@ -33,12 +33,14 @@ import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssu
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class PayloadParserTest {
 
+    @Ignore
     @Test
     public void shouldParseIssueResponse() {
         String message = createIssueResponseMessage(1);
@@ -50,6 +52,7 @@ public class PayloadParserTest {
         assertEquals(CertificateIssuanceResponsePayload.class, wrapper.getClass());
     }
 
+    @Ignore
     @Test
     public void shouldRejectWrongVersion() {
         String message = createIssueResponseMessage(2);
