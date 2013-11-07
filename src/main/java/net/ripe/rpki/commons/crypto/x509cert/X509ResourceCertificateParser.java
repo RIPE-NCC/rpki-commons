@@ -31,16 +31,23 @@ package net.ripe.rpki.commons.crypto.x509cert;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import java.io.IOException;
+import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.util.regex.Pattern;
 
@@ -66,7 +73,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     protected void doTypeSpecificValidation() {
         validateIssuerAndSubjectDN();
         validateCertificatePolicy();
-        validateResourceExtensionsForResourceCertificates();
+        validateResourceExtensions();
         validateCrlDistributionPoints();
     }
 
@@ -134,17 +141,64 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         }
     }
 
-    private void validateResourceExtensionsForResourceCertificates() {
+    private void validateResourceExtensions() {
         if (result.rejectIfFalse(isResourceExtensionPresent(), RESOURCE_EXT_PRESENT)) {
             result.rejectIfTrue(false, AS_OR_IP_RESOURCE_PRESENT);
         }
     }
 
     private void validateCrlDistributionPoints() {
+        byte[] extensionValue = certificate.getExtensionValue(X509Extension.cRLDistributionPoints.getId());
+
         if (isRoot(certificate)) {
-            result.rejectIfNotNull(getCrlDistributionPoints(certificate), CRLDP_OMITTED);
+            // early ripe ncc ta certificates have crldp set so for now only warn here
+            result.warnIfNotNull(extensionValue, CRLDP_OMITTED);
+            return;
         } else {
-           result.rejectIfNull(getCrlDistributionPoints(certificate), CRLDP_PRESENT);
+            if (!result.rejectIfNull(extensionValue, CRLDP_PRESENT)) {
+                return;
+            }
+        }
+
+        CRLDistPoint crlDistPoint;
+        try {
+            crlDistPoint = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            result.pass(CRLDP_EXTENSION_PARSED);
+        } catch (IOException e) {
+            result.error(CRLDP_EXTENSION_PARSED);
+            return;
+        }
+        testCrlDistributionPointsToUrisConversion(crlDistPoint);
+
+        if (!result.hasFailureForCurrentLocation()) {
+            result.rejectIfNull(findFirstRsyncCrlDistributionPoint(certificate), CRLDP_RSYNC_URI_PRESENT);
+        }
+    }
+
+    private void testCrlDistributionPointsToUrisConversion(CRLDistPoint crldp) {
+        for (DistributionPoint dp : crldp.getDistributionPoints()) {
+            result.rejectIfNotNull(dp.getCRLIssuer(), CRLDP_ISSUER_OMITTED);
+            result.rejectIfNotNull(dp.getReasons(), CRLDP_REASONS_OMITTED);
+            if (!result.rejectIfNull(dp.getDistributionPoint(), CRLDP_PRESENT)) {
+                return;
+            }
+            if (!result.rejectIfFalse(dp.getDistributionPoint().getType() == DistributionPointName.FULL_NAME, CRLDP_TYPE_FULL_NAME)) {
+                return;
+            }
+            
+            GeneralNames names = (GeneralNames) dp.getDistributionPoint().getName();
+            for (GeneralName name : names.getNames()) {
+                if (!result.rejectIfFalse(name.getTagNo() == GeneralName.uniformResourceIdentifier, CRLDP_NAME_IS_A_URI)) {
+                    return;
+                }
+                DERIA5String uri = (DERIA5String) name.getName();
+                try {
+                    URI.create(uri.getString());
+                } catch (IllegalArgumentException e) {
+                    result.error(CRLDP_URI_SYNTAX);
+                    return;
+                }
+            }
         }
     }
 }

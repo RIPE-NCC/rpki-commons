@@ -84,6 +84,13 @@ public final class ValidationString {
     public static final String CERTIFICATE_PARSED = "cert.parsed";
     public static final String CRLDP_PRESENT = "cert.crldp.present";
     public static final String CRLDP_OMITTED = "cert.crldp.omitted";
+    public static final String CRLDP_EXTENSION_PARSED = "cert.crldp.ext.parsed";
+    public static final String CRLDP_ISSUER_OMITTED = "cert.crldp.issuer.omitted";
+    public static final String CRLDP_REASONS_OMITTED = "cert.crldp.reasons.omitted";
+    public static final String CRLDP_TYPE_FULL_NAME = "cert.crldp.type.full.name";
+    public static final String CRLDP_NAME_IS_A_URI = "cert.crldp.name.is.a.uri";
+    public static final String CRLDP_URI_SYNTAX = "cert.crldp.uri.syntax";
+    public static final String CRLDP_RSYNC_URI_PRESENT = "cert.crldp.rsync.uri.present";
     public static final String CRITICAL_EXT_PRESENT = "cert.critical.exts.present";
     public static final String POLICY_EXT_CRITICAL = "cert.policy.ext.critical";
     public static final String POLICY_EXT_VALUE = "cert.policy.ext.value";

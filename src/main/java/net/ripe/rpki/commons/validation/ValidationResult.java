@@ -119,6 +119,10 @@ public final class ValidationResult implements Serializable {
         return warnIfTrue(object == null, key, param);
     }
 
+    public boolean warnIfNotNull(Object object, String key, String... param) {
+        return warnIfTrue(object != null, key, param);
+    }
+
     public void rejectForLocation(ValidationLocation location, String key, String... param) {
         ValidationLocation locationBefore = currentLocation;
         setLocation(location);

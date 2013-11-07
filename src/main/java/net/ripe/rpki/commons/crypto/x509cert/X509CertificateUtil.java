@@ -213,34 +213,25 @@ public final class X509CertificateUtil {
     }
 
     public static URI[] getCrlDistributionPoints(X509Certificate certificate) {
+        byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.cRLDistributionPoints.getId());
+        if (extensionValue == null) {
+            return null;
+        }
         try {
-            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.cRLDistributionPoints.getId());
-            if (extensionValue == null) {
-                return null;
-            }
             CRLDistPoint crldp = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
             return convertCrlDistributionPointToUris(crldp);
         } catch (IOException e) {
-            throw new X509CertificateOperationException(e);
+            return null;
         }
     }
 
     private static URI[] convertCrlDistributionPointToUris(CRLDistPoint crldp) {
         List<URI> result = new ArrayList<URI>();
         for (DistributionPoint dp : crldp.getDistributionPoints()) {
-            Validate.isTrue(dp.getCRLIssuer() == null, "crlIssuer MUST be omitted");
-            Validate.isTrue(dp.getReasons() == null, "reasons MUST be omitted");
-            Validate.notNull(dp.getDistributionPoint(), "distributionPoint MUST be present");
-            Validate.isTrue(dp.getDistributionPoint().getType() == DistributionPointName.FULL_NAME, "distributionPoint type MUST be FULL_NAME");
             GeneralNames names = (GeneralNames) dp.getDistributionPoint().getName();
             for (GeneralName name : names.getNames()) {
-                Validate.isTrue(name.getTagNo() == GeneralName.uniformResourceIdentifier, "name MUST be a uniformResourceIdentifier");
                 DERIA5String uri = (DERIA5String) name.getName();
-                try {
-                    result.add(new URI(uri.getString()));
-                } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException(e);
-                }
+                result.add(URI.create(uri.getString()));
             }
         }
         return result.toArray(new URI[result.size()]);

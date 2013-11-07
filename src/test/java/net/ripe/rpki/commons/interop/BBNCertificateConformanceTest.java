@@ -32,6 +32,7 @@ package net.ripe.rpki.commons.interop;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -43,10 +44,25 @@ public class BBNCertificateConformanceTest {
 
     private static final String PATH_TO_BBN_OBJECTS = "src/test/resources/conformance/";
 
+    @Ignore("Early ripe ncc ta certificates have crldp set")
     @Test
     public void shouldRejectSelfSignedCertificateWithCRLDP() throws IOException {
         // CRLDP is present in the trust anchor 6487#4.8.6
         boolean hasFailure = parseCertificate("badRootBadCRLDP.cer");
+        assertTrue(hasFailure);
+    }
+
+    @Test
+    public void shouldRejectCertificateWithCRLDPWithReasonFieldNotOmitted() throws IOException {
+        // CRL Dist Pt has reasons 6487#4.8.6
+        boolean hasFailure = parseCertificate("root/badCertCRLDPReasons.cer");
+        assertTrue(hasFailure);
+    }
+
+    @Test
+    public void shouldRejectCertificateWithCRLDPWithCrlIssuer() throws IOException {
+        // CRL Dist Pt has CRL Issuer 6487#4.8.6
+        boolean hasFailure = parseCertificate("root/badCertCRLDPCrlIssuer.cer");
         assertTrue(hasFailure);
     }
 

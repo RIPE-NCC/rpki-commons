@@ -138,7 +138,7 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertTrue(object instanceof ManifestCms);
         assertEquals(manifestCms, object);
-        assertEquals(41, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(48, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }
