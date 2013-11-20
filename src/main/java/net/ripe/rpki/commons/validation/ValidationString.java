@@ -41,9 +41,9 @@ public final class ValidationString {
     //////////////////////////////////////////////
 
     // generic
+    public static final String OBJECTS_GENERAL_PARSING = "objects.general.parsing";
     public static final String OBJECTS_CRL_VALID = "objects.crl.valid";
     public static final String KNOWN_OBJECT_TYPE = "known.object.type";
-    public static final String VALIDATOR_INTERNAL_ERROR = "validator.internal.error";
 
     // Trust anchor
     public static final String TRUST_ANCHOR_PUBLIC_KEY_MATCH = "trust.anchor.public.key.match";

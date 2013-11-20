@@ -57,13 +57,13 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
     public ValidityPeriod(ReadableInstant notValidBefore, ReadableInstant notValidAfter) {
         this.notValidBefore = (notValidBefore == null) ? null : new DateTime(truncatedMillis(notValidBefore.getMillis()), DateTimeZone.UTC);
         this.notValidAfter = (notValidAfter == null) ? null : new DateTime(truncatedMillis(notValidAfter.getMillis()), DateTimeZone.UTC);
-        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter));
+        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
     public ValidityPeriod(Date notValidBefore, Date notValidAfter) {
         this.notValidBefore = (notValidBefore == null) ? null : new DateTime(truncatedMillis(notValidBefore.getTime()), DateTimeZone.UTC);
         this.notValidAfter = (notValidAfter == null) ? null : new DateTime(truncatedMillis(notValidAfter.getTime()), DateTimeZone.UTC);
-        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter));
+        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
     private static boolean isDateOrderingValid(DateTime notValidBefore, DateTime notValidAfter) {
