@@ -66,10 +66,14 @@ import static org.mockito.Mockito.*;
 
 public class X509ResourceCertificateTest {
 
-    private static final URI CERT_URI = URI.create("rsync://host.foo/bar/ta.cer");
-    private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(CERT_URI);
+    public static final URI TEST_TA_URI = URI.create("rsync://host.foo/ta.cer");
+    private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_URI);
 
-    private static final URI CRL_DP = URI.create("rsync://host/foo/crl");
+    private static final URI CRL_DP = URI.create("rsync://host.foo/bar/ta.crl");
+    private static final URI MFT_URI = URI.create("rsync://host.foo/bar/ta.mft");
+    private static final URI PUB_DIR_URI = URI.create("rsync://host.foo/bar/");
+
+
     private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(CRL_DP);
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
     private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
@@ -97,11 +101,11 @@ public class X509ResourceCertificateTest {
         builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         builder.withAuthorityKeyIdentifier(true);
 
+        builder.withCrlDistributionPoints(CRL_DP);
+
         X509CertificateInformationAccessDescriptor[] descriptors = {
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY,
-                        URI.create("rsync://foo.host/bar/")),
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY,
-                        URI.create("http://foo.host/bar/"))};
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, PUB_DIR_URI),
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, MFT_URI)};
         builder.withSubjectInformationAccess(descriptors);
 
         return builder;
@@ -265,23 +269,23 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldIgnoreCrlWhenValidatingRootCertificate() {
-        ValidationResult result = ValidationResult.withLocation(CERT_URI);
+        ValidationResult result = ValidationResult.withLocation(TEST_TA_URI);
         X509ResourceCertificate selfSignedCert = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, selfSignedCert);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, selfSignedCert);
 
-        selfSignedCert.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+        selfSignedCert.validate(TEST_TA_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
     }
 
     @Test
     public void shouldFailWhenCrlCannotBeLocated() {
-        final ValidationResult result = ValidationResult.withLocation(CERT_URI);
+        final ValidationResult result = ValidationResult.withLocation(TEST_TA_URI);
         X509ResourceCertificate rootCertificate = createSelfSignedCaResourceCertificate();
         X509ResourceCertificate subject = createSelfSignedCaResourceCertificateBuilder()
                 .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
                 .withSubjectDN(new X500Principal("CN=child"))
                 .withCrlDistributionPoints(CRL_DP)
                 .build();
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, rootCertificate);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
 
         when(crlLocator.getCrl(CRL_DP, context, result)).thenAnswer(new Answer<X509Crl>() {
             @Override
@@ -292,8 +296,8 @@ public class X509ResourceCertificateTest {
             }
         });
 
-        result.setLocation(new ValidationLocation(CERT_URI));
-        subject.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+        result.setLocation(new ValidationLocation(TEST_TA_URI));
+        subject.validate(TEST_TA_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
         assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());
         assertTrue("certificate should have errors", result.hasFailureForCurrentLocation());
@@ -302,7 +306,7 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldValidateWhenCrlOk() {
-        final ValidationResult result = ValidationResult.withLocation(CERT_URI);
+        final ValidationResult result = ValidationResult.withLocation(TEST_TA_URI);
         X509ResourceCertificate rootCertificate = createSelfSignedCaResourceCertificate();
         X509ResourceCertificate subject = createSelfSignedCaResourceCertificateBuilder()
                 .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
@@ -310,11 +314,11 @@ public class X509ResourceCertificateTest {
                 .withCrlDistributionPoints(CRL_DP)
                 .build();
         X509Crl crl = X509CrlTest.createCrl();
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(CERT_URI, rootCertificate);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
 
         when(crlLocator.getCrl(CRL_DP, context, result)).thenReturn(crl);
 
-        subject.validate(CERT_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+        subject.validate(TEST_TA_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
         assertEquals(CERT_URI_VALIDATION_LOCATION, result.getCurrentLocation());
         assertEquals("[]", result.getFailuresForCurrentLocation().toString());
