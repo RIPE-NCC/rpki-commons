@@ -69,12 +69,12 @@ public class X509ResourceCertificateTest {
     public static final URI TEST_TA_URI = URI.create("rsync://host.foo/ta.cer");
     private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_URI);
 
-    private static final URI CRL_DP = URI.create("rsync://host.foo/bar/ta.crl");
+    public static final URI TEST_TA_CRL = URI.create("rsync://host.foo/bar/ta.crl");
     private static final URI MFT_URI = URI.create("rsync://host.foo/bar/ta.mft");
     private static final URI PUB_DIR_URI = URI.create("rsync://host.foo/bar/");
 
 
-    private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(CRL_DP);
+    private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_CRL);
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
     private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private CrlLocator crlLocator;
@@ -100,8 +100,6 @@ public class X509ResourceCertificateTest {
         builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         builder.withAuthorityKeyIdentifier(true);
-
-        builder.withCrlDistributionPoints(CRL_DP);
 
         X509CertificateInformationAccessDescriptor[] descriptors = {
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, PUB_DIR_URI),
@@ -283,11 +281,11 @@ public class X509ResourceCertificateTest {
         X509ResourceCertificate subject = createSelfSignedCaResourceCertificateBuilder()
                 .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
                 .withSubjectDN(new X500Principal("CN=child"))
-                .withCrlDistributionPoints(CRL_DP)
+                .withCrlDistributionPoints(TEST_TA_CRL)
                 .build();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
 
-        when(crlLocator.getCrl(CRL_DP, context, result)).thenAnswer(new Answer<X509Crl>() {
+        when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenAnswer(new Answer<X509Crl>() {
             @Override
             public X509Crl answer(InvocationOnMock invocationOnMock) throws Throwable {
                 assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
@@ -311,12 +309,12 @@ public class X509ResourceCertificateTest {
         X509ResourceCertificate subject = createSelfSignedCaResourceCertificateBuilder()
                 .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
                 .withSubjectDN(new X500Principal("CN=child"))
-                .withCrlDistributionPoints(CRL_DP)
+                .withCrlDistributionPoints(TEST_TA_CRL)
                 .build();
         X509Crl crl = X509CrlTest.createCrl();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
 
-        when(crlLocator.getCrl(CRL_DP, context, result)).thenReturn(crl);
+        when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenReturn(crl);
 
         subject.validate(TEST_TA_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
