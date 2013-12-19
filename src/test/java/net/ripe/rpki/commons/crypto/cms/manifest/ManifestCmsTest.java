@@ -92,7 +92,9 @@ public class ManifestCmsTest {
     private static byte[] FILE2_CONTENTS = {'d', 'e', 'f'};
 
     private static final DateTime THIS_UPDATE_TIME = new DateTime(2008, 9, 1, 22, 43, 29, 0, DateTimeZone.UTC);
-    private static final DateTime NEXT_UPDATE_TIME = new DateTime(2008, 9, 2, 6, 43, 29, 0, DateTimeZone.UTC);
+    private static final DateTime MFT_EE_NOT_BEFORE = THIS_UPDATE_TIME.minusMinutes(5);
+    private static final DateTime NEXT_UPDATE_TIME = THIS_UPDATE_TIME.plusHours(24);
+    private static final DateTime MFT_EE_NOT_AFTER = THIS_UPDATE_TIME.plusDays(7);
 
     // Test Manifest entries
     private static Map<String, byte[]> files = new HashMap<String, byte[]>();
@@ -208,9 +210,10 @@ public class ManifestCmsTest {
         assertFalse(result.hasFailures());
         assertEquals(0, result.getFailuresForCurrentLocation().size());
 
+
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
+                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
 
@@ -235,10 +238,10 @@ public class ManifestCmsTest {
 
         assertTrue(result.hasFailures());
 
-        assertEquals(
-                new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
-        );
+//        assertEquals(
+//                new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME.toString()),
+//                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
+//        );
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
@@ -246,30 +249,35 @@ public class ManifestCmsTest {
         );
     }
 
-
     @Test
-    public void shouldWarnAboutInconsistentValidityTimes() {
-        ManifestCms mft = getManifestWithInconsistentValidityTimes();
-
+    public void shouldRejectWhenCertificateIsExpired() {
         X509Crl crl = getRootCrl();
+
+        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(8).getMillis());
+
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
+
+        ValidationOptions options = new ValidationOptions();
+        options.setMaxStaleDays(100);
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
-        result.setLocation(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION));
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
 
-        mft.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
 
-        assertEquals(0, result.getFailuresForCurrentLocation().size());
-        assertFalse(result.hasFailures());
+        assertTrue(result.hasFailures());
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT)
+                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
 
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, MFT_EE_NOT_AFTER.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
+        );
     }
 
     @Test
@@ -332,26 +340,20 @@ public class ManifestCmsTest {
         return builder;
     }
 
-    private static ManifestCms getManifestWithInconsistentValidityTimes() {
-        ManifestCmsBuilder builder = getRootManifestBuilder();
-        builder.withCertificate(getManifestEEResourceCertificateBuilder(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME.plusDays(1))).build());
-        return builder.build(MANIFEST_KEY_PAIR.getPrivate());
-    }
-
     public static ManifestCmsBuilder getRootManifestBuilder() {
         return getRootManifestBuilder(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
     }
 
     public static ManifestCmsBuilder getRootManifestBuilder(ValidityPeriod validityPeriod) {
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
-        builder.withCertificate(getManifestEEResourceCertificateBuilder(validityPeriod).build());
+        builder.withCertificate(getManifestEEResourceCertificateBuilder().build());
         builder.withManifestNumber(BigInteger.valueOf(68));
         builder.withThisUpdateTime(validityPeriod.getNotValidBefore()).withNextUpdateTime(validityPeriod.getNotValidAfter());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         return builder;
     }
 
-    private static X509ResourceCertificateBuilder getManifestEEResourceCertificateBuilder(ValidityPeriod validityPeriod) {
+    private static X509ResourceCertificateBuilder getManifestEEResourceCertificateBuilder() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
         builder.withCa(false);
@@ -363,7 +365,7 @@ public class ManifestCmsTest {
         builder.withPublicKey(MANIFEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
-        builder.withValidityPeriod(validityPeriod);
+        builder.withValidityPeriod(new ValidityPeriod(MFT_EE_NOT_BEFORE, MFT_EE_NOT_AFTER));
         builder.withCrlDistributionPoints(ROOT_MANIFEST_CRL_LOCATION);
         return builder;
     }

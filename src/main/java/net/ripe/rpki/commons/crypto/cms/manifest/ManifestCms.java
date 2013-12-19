@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
@@ -40,6 +39,7 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -159,17 +159,13 @@ public class ManifestCms extends RpkiSignedObject {
         }
 
         result.setLocation(new ValidationLocation(location));
-        checkManifestAndEeCertificateValidityTimes(options, result);
-        ManifestCmsEeCertificateValidator validator = new ManifestCmsEeCertificateValidator(options, result, context.getCertificate(), crl, context.getResources());
+        checkManifestValidityTimes(options, result);
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, getCertificate());
     }
 
 
-    private void checkManifestAndEeCertificateValidityTimes(ValidationOptions options, ValidationResult result) {
-        ValidityPeriod certificateValidity = getCertificate().getValidityPeriod();
-        result.warnIfFalse(certificateValidity.getNotValidBefore().equals(getThisUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
-        result.warnIfFalse(certificateValidity.getNotValidAfter().equals(getNextUpdateTime()), ValidationString.MANIFEST_VALIDITY_TIMES_INCONSISTENT);
-
+    private void checkManifestValidityTimes(ValidationOptions options, ValidationResult result) {
         DateTime now = new DateTime();
         DateTime nextUpdateTime = getNextUpdateTime();
 
@@ -180,8 +176,6 @@ public class ManifestCms extends RpkiSignedObject {
                 result.rejectIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
             }
         }
-
-
     }
 
     /**

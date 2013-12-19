@@ -64,8 +64,8 @@ public class CertificateRepositoryObjectPrinterTest {
         StringWriter output = new StringWriter();
         CertificateRepositoryObjectPrinter.print(new PrintWriter(output), manifest);
 
-        assertEquals("Object Type: RPKI Manifest\n" + "Signing time: 2008-09-01T22:43:29.000Z\n" + "Version: 0\n" + "Number: 68\n"
-                + "This update time: 2008-09-01T22:43:29.000Z\n" + "Next update time: 2008-09-02T06:43:29.000Z\n" + "Filenames and hashes:\n"
+        assertEquals("Object Type: RPKI Manifest\n" + "Signing time: 2008-09-01T22:38:29.000Z\n" + "Version: 0\n" + "Number: 68\n"
+                + "This update time: 2008-09-01T22:43:29.000Z\n" + "Next update time: 2008-09-02T22:43:29.000Z\n" + "Filenames and hashes:\n"
                 + "    filename1 ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\n"
                 + "    filename2 cb8379ac2098aa165029e3938a51da0bcecfc008fd6795f401178647f96c5b34\n", output.getBuffer().toString());
     }

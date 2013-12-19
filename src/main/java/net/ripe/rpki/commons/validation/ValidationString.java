@@ -164,7 +164,6 @@ public final class ValidationString {
     public static final String MANIFEST_FILE_HASH_ALGORITHM = "mf.file.hash.algorithm";
     public static final String MANIFEST_DECODE_FILELIST = "mf.decode.filelist";
     public static final String MANIFEST_RESOURCE_INHERIT = "mf.resource.inherit";
-    public static final String MANIFEST_VALIDITY_TIMES_INCONSISTENT = "mf.validity.inconsistent";
     public static final String MANIFEST_PAST_NEXT_UPDATE_TIME = "mf.past.next.update";
 
     //validator
