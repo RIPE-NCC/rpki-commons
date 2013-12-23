@@ -180,7 +180,6 @@ public final class ValidationString {
     public static final String VALIDATOR_OBJECT_PROCESSING_EXCEPTION = "validator.object.processing.exception";
 
     // Problems with repository
-    public static final String VALIDATOR_REPOSITORY_OBJECT_DROP = "validator.repository.object.drop";
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
     public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconsistent";
     public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unknown";
