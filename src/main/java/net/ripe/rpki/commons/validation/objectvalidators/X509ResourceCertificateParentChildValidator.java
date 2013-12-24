@@ -60,11 +60,12 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
         IpResourceSet childResourceSet = child.deriveResources(resources);
 
         if (child.isRoot()) {
-            // root certificate cannot have inherited resources
-            result.rejectIfTrue(child.isResourceSetInherited(), RESOURCE_RANGE);
+            result.rejectIfTrue(child.isResourceSetInherited(), ROOT_INHERITS_RESOURCES);
         } else {
-            // otherwise the child resources cannot exceed the specified resources
-            result.rejectIfFalse(resources.contains(childResourceSet), RESOURCE_RANGE);
+            IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
+            overclaiming.removeAll(resources);
+
+            result.rejectIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
         }
     }
 

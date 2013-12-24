@@ -57,6 +57,7 @@ public final class ValidationString {
     public static final String NOT_VALID_BEFORE = "cert.not.valid.before";
     public static final String NOT_VALID_AFTER = "cert.not.valid.after";
     public static final String RESOURCE_RANGE = "cert.resource.range.is.valid";
+    public static final String ROOT_INHERITS_RESOURCES = "cert.root.resource.uses.inherit";
     public static final String PREV_SUBJECT_EQ_ISSUER = "cert.issuer.eq.prev.subject";
     public static final String KEY_USAGE_EXT_PRESENT = "cert.key.usage.extension.present";
     public static final String PUBLIC_KEY_CERT_ALGORITHM = "cert.public.key.algorithm";
