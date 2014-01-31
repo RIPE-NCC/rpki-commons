@@ -29,16 +29,12 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import sun.security.x509.X509CertImpl;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
-import java.security.cert.Certificate;
 import java.util.Date;
 
 import static net.ripe.rpki.commons.crypto.util.KeyStoreUtil.*;
