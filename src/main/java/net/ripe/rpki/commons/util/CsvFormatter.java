@@ -44,7 +44,7 @@ public class CsvFormatter {
 
     private static final char QUOTE_CHAR = '"';
 
-    private static final String SEPERATOR = ",";
+    private static final String SEPARATOR = ",";
 
     private List<CsvColumn> columns = new ArrayList<CsvColumn>();
 
@@ -52,6 +52,15 @@ public class CsvFormatter {
 
     private int rows = 0;
 
+    private final String separator;
+
+    public CsvFormatter() {
+        this(SEPARATOR);
+    }
+
+    public CsvFormatter(String separator) {
+        this.separator = separator;
+    }
 
     public CsvFormatter addColumn(String heading) {
         addColumn(heading, false);
@@ -87,7 +96,7 @@ public class CsvFormatter {
             CsvColumn column = columns.get(columnIndex);
 
             if (!column.hasQuoteValues()) {
-                Validate.isTrue(!value.contains(SEPERATOR));
+                Validate.isTrue(!value.contains(separator));
             }
 
             rowValues.get(column).add(value);
@@ -131,7 +140,7 @@ public class CsvFormatter {
         for (CsvColumn col : columns) {
             headerLine.append(col.getHeading());
             if (columnNumber < numberOfColmns) {
-                headerLine.append(SEPERATOR);
+                headerLine.append(separator);
             }
             columnNumber++;
         }
@@ -142,12 +151,12 @@ public class CsvFormatter {
         StringBuilder rowOutput = new StringBuilder();
 
         int columnNumber = 1;
-        int numberOfColmns = columns.size();
+        int numberOfColumns = columns.size();
 
         for (CsvColumn col : columns) {
             printValue(i, rowOutput, col);
-            if (columnNumber < numberOfColmns) {
-                rowOutput.append(SEPERATOR);
+            if (columnNumber < numberOfColumns) {
+                rowOutput.append(separator);
             }
             columnNumber++;
         }
