@@ -83,7 +83,7 @@ public class CsvFormatterTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldRejectLinesWhenSeperatorIsUsedInUnquotedField() {
+    public void shouldRejectLinesWhenSeparatorIsUsedInUnquotedField() {
         subject.addColumn("heading1");
 
         String val = "offending , in text";
@@ -103,6 +103,23 @@ public class CsvFormatterTest {
         subject.printWithoutHeaders(writer);
 
         Assert.assertEquals("some text,\"more stuff\"\n", writer.toString());
+    }
+
+
+    @Test
+    public void shouldChangeSeparator() throws IOException {
+        subject = new CsvFormatter(";");
+        subject.addColumn("heading1");
+        subject.addColumn("heading2");
+
+        String val1 = "text";
+        String val2 = "stuff";
+        subject.addLine(val1, val2);
+
+        StringWriter writer = new StringWriter();
+        subject.printWithoutHeaders(writer);
+
+        Assert.assertEquals("text;stuff\n", writer.toString());
     }
 
     @Test
