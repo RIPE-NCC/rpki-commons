@@ -40,17 +40,14 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.io.DigestOutputStream;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.Arrays;
@@ -196,24 +193,11 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     public static byte[] hashContents(byte[] contents) {
-        DigestOutputStream digestOut = null;
-        try {
-            Digest digest = new SHA256Digest();
-            digestOut = new DigestOutputStream(digest);
-
-            digestOut.write(contents);
-            digestOut.flush();
-
-            byte[] digestValue = new byte[digest.getDigestSize()];
-            digest.doFinal(digestValue, 0);
-            return digestValue;
-        } catch (IOException e) {
-            throw new ManifestCmsException(e);
-        } finally {
-            if (digestOut != null) {
-                IOUtils.closeQuietly(digestOut);
-            }
-        }
+        final Digest digest = new SHA256Digest();
+        digest.update(contents, 0, contents.length);
+        final byte[] digestValue = new byte[digest.getDigestSize()];
+        digest.doFinal(digestValue, 0);
+        return digestValue;
     }
 
     public static class FileContentSpecification implements Specification<byte[]> {
