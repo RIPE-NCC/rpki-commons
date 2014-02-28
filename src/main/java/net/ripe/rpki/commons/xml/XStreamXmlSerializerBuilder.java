@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.xml;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
-import com.thoughtworks.xstream.converters.reflection.Sun14ReflectionProvider;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
@@ -182,7 +182,7 @@ public class XStreamXmlSerializerBuilder<T> {
     private final class MyXStream extends XStream {
 
         private MyXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
-            super(new Sun14ReflectionProvider(), hierarchicalStreamDriver);
+            super(new SunUnsafeReflectionProvider(), hierarchicalStreamDriver);
         }
 
         /*

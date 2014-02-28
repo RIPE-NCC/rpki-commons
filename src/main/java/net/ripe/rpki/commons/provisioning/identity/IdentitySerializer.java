@@ -30,7 +30,7 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.Sun14ReflectionProvider;
+import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 import com.thoughtworks.xstream.io.xml.QNameMap;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
@@ -57,7 +57,7 @@ public abstract class IdentitySerializer<T> {
 
         XmlFriendlyNameCoder replacer = new XmlFriendlyNameCoder("_-", "_");
 
-        xStream = new XStream(new Sun14ReflectionProvider(), new StaxDriver(qNameMap, replacer)) {
+        xStream = new XStream(new SunUnsafeReflectionProvider(), new StaxDriver(qNameMap, replacer)) {
             @Override
             protected MapperWrapper wrapMapper(MapperWrapper next) {
                 return new IgnoreUnknownFieldsMapperWrapper(next);
