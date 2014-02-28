@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.provisioning.interop;
 
+import com.google.common.io.BaseEncoding;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectValidator;
@@ -46,7 +47,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
@@ -156,12 +156,13 @@ public class ProcessIscUpdownPdusTest {
         // dtag-outbound-1.der
 
         String[] Files = new String[]{"dtag-outbound-1.der", "dtag-outbound-9.der"};
+        final BaseEncoding decoder = BaseEncoding.base64().withSeparator("\n", 76);
 
         for (String fileName : Files) {
 
             String base64Encoded = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/" + fileName));
 
-            byte[] encoded = Base64.decodeBase64(base64Encoded);
+            final byte[] encoded = decoder.decode(base64Encoded);
 
             ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
             parser.parseCms("cms", encoded);
