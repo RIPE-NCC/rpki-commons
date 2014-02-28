@@ -29,12 +29,12 @@
  */
 package net.ripe.rpki.commons.rsync;
 
+import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -92,7 +92,7 @@ public class RemoteCertificateFetcherTest {
                     encoded = TEST_CRL.getEncoded();
                 }
 
-                FileUtils.writeByteArrayToFile(new File(getDestination()), encoded);
+                Files.write(encoded, new File(getDestination()));
                 return 0;
             } catch (IOException e) {
                 return 1;

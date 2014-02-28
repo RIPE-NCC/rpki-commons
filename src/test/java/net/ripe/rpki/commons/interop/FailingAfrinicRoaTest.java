@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.interop;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -45,7 +45,7 @@ public class FailingAfrinicRoaTest {
 
     @Test
     public void shouldParseAfrinicRoaWithSigningTimeOutsideOfCertificateValidityTime() throws IOException {
-        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_OBJECTS + "/6C76EDB2225D11E286C4BD8F7A2F2747.roa"));
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_OBJECTS + "/6C76EDB2225D11E286C4BD8F7A2F2747.roa"));
 
         String location = "afrinic.roa";
         ValidationResult result = ValidationResult.withLocation(location);

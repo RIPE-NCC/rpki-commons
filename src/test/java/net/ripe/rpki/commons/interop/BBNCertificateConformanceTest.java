@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.interop;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -68,7 +68,7 @@ public class BBNCertificateConformanceTest {
 
     private boolean parseCertificate(String certificate) throws IOException {
         File file = new File(PATH_TO_BBN_OBJECTS, certificate);
-        byte[] encoded = FileUtils.readFileToByteArray(file);
+        byte[] encoded = Files.toByteArray(file);
         ValidationResult result = ValidationResult.withLocation(file.getName());
         new X509ResourceCertificateParser().parse(result, encoded);
         return result.hasFailures();

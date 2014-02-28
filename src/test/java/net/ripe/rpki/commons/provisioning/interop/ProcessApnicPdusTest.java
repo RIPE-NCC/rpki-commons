@@ -29,12 +29,12 @@
  */
 package net.ripe.rpki.commons.provisioning.interop;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
-import org.apache.commons.io.FileUtils;
 import org.bouncycastle.cms.CMSException;
 import org.junit.Test;
 
@@ -51,7 +51,7 @@ public class ProcessApnicPdusTest {
 
     @Test
     public void apnic_pdu_2011_08_15_1_has_errors() throws IOException, CMSException {
-        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/A971C.1"));
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/A971C.1"));
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("cms", encoded);
@@ -63,7 +63,7 @@ public class ProcessApnicPdusTest {
 
     @Test
     public void apnic_pdu_2011_08_15_3_has_errors() throws IOException, CMSException {
-        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/A971C.3"));
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/A971C.3"));
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("cms", encoded);

@@ -29,12 +29,12 @@
  */
 package net.ripe.rpki.commons.rsync;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class RemoteCertificateFetcher {
 
             int rc = rsync.execute();
             if (rc == 0) {
-                byte[] encoded = FileUtils.readFileToByteArray(tempDestinationFile);
+                final byte[] encoded = Files.toByteArray(tempDestinationFile);
                 return CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, ValidationResult.withLocation(sourcePath));
             }
             return null;

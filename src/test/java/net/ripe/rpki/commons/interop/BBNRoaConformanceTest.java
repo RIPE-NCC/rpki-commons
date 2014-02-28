@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.interop;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -60,7 +60,7 @@ public class BBNRoaConformanceTest {
 
     private boolean parseRoa(String roa) throws IOException {
         File file = new File(PATH_TO_BBN_OBJECTS, roa);
-        byte[] encoded = FileUtils.readFileToByteArray(file);
+        byte[] encoded = Files.toByteArray(file);
         ValidationResult result = ValidationResult.withLocation(file.getName());
         new RoaCmsParser().parse(result, encoded);
         return result.hasFailures();

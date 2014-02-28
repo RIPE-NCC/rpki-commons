@@ -29,9 +29,9 @@
  */
 package net.ripe.rpki.commons.interop;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -80,7 +80,7 @@ public class BBNCrlConformanceTest {
 
     private boolean parseCrl(String crl) throws IOException {
         File file = new File(PATH_TO_BBN_OBJECTS, crl);
-        byte[] encoded = FileUtils.readFileToByteArray(file);
+        byte[] encoded = Files.toByteArray(file);
         ValidationResult result = ValidationResult.withLocation(file.getName());
         X509Crl.parseDerEncoded(encoded, result);
         return result.hasFailures();

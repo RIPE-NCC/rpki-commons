@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.provisioning.interop;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectValidator;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
@@ -38,7 +39,6 @@ import net.ripe.rpki.commons.provisioning.payload.revocation.response.Certificat
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -90,7 +90,7 @@ public class CreateObjectsForInteropTesting {
 
     private void writeToDisk(String fileName, byte[] encoded) throws IOException {
         File file = new File(outputDirPath + "/" + fileName);
-        FileUtils.writeByteArrayToFile(file, encoded);
+        Files.write(encoded, file);
     }
 
 }

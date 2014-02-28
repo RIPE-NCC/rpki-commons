@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.validation.interop;
 
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
@@ -55,7 +56,7 @@ public class BBNConformanceTest {
         while (fileIterator.hasNext()) {
             objectCount++;
             File file = fileIterator.next();
-            byte[] encoded = FileUtils.readFileToByteArray(file);
+            byte[] encoded = Files.toByteArray(file);
             ValidationResult result = ValidationResult.withLocation(file.getName());
 
             try {

@@ -29,7 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.interop;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.BaseEncoding;
+import com.google.common.io.Files;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectValidator;
@@ -47,7 +49,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
-import org.apache.commons.io.FileUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
 
@@ -64,7 +65,7 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldParseCertificateIssuanceRequest() throws IOException, RpkiCaCertificateRequestParserException {
-        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("cms", encoded);
         ValidationResult validationResult = parser.getValidationResult();
@@ -91,14 +92,14 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldReadIscIssuerXml() throws IOException {
-        String parentXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), "UTF-8");
+        String parentXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), Charsets.UTF_8);
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
         ParentIdentity parentId = serializer.deserialize(parentXml);
         assertNotNull(parentId);
     }
 
     public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException {
-        String childIdXml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), "UTF-8");
+        String childIdXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), Charsets.UTF_8);
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
         ChildIdentity childId = serializer.deserialize(childIdXml);
         ProvisioningIdentityCertificate childCert = childId.getIdentityCertificate();
@@ -109,7 +110,7 @@ public class ProcessIscUpdownPdusTest {
     public void shouldValidateRequest() throws IOException {
 
         // Note this object expired 30 June 2012. Maybe get a new one sometime?
-        byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("cms", encoded);
         ProvisioningCmsObject provisioningCmsObject = parser.getProvisioningCmsObject();
@@ -135,7 +136,7 @@ public class ProcessIscUpdownPdusTest {
         String[] files = new String[]{"pdu.170.der", "pdu.171.der", "pdu.172.der", "pdu.173.der", "pdu.180.der", "pdu.183.der", "pdu.184.der",
                 "pdu.189.der", "pdu.196.der", "pdu.199.der", "pdu.200.der", "pdu.205.der"};
         for (String fileName : files) {
-            byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
+            byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
             ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
             parser.parseCms("cms", encoded);
             assertTrue("Error parsing file: " + fileName + " and giving up!", !parser.getValidationResult().hasFailures());
@@ -144,7 +145,7 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldParseRpkidParentResponseXml() throws IOException {
-        String xml = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), "UTF-8");
+        String xml = Files.toString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), Charsets.UTF_8);
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
         ParentIdentity parentId = serializer.deserialize(xml);
@@ -160,7 +161,7 @@ public class ProcessIscUpdownPdusTest {
 
         for (String fileName : files) {
 
-            String base64Encoded = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/" + fileName));
+            String base64Encoded = Files.toString(new File(PATH_TO_TEST_PDUS + "/" + fileName), Charsets.UTF_8);
 
             final byte[] encoded = decoder.decode(base64Encoded);
 
