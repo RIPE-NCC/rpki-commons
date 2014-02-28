@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.crypto.cms.roa;
 import net.ripe.ipresource.IpRange;
 import org.junit.Test;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 
 public class RoaPrefixTest {

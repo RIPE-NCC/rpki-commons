@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
 
 
