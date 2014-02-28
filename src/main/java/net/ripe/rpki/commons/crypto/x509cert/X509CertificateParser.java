@@ -29,13 +29,14 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.io.Closer;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
@@ -102,15 +103,21 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     private void parse() {
-        InputStream input = null;
         try {
-            input = new ByteArrayInputStream(encoded);
-            CertificateFactory factory = CertificateFactory.getInstance("X.509");
-            certificate = (X509Certificate) factory.generateCertificate(input);
-        } catch (CertificateException e) {
+            final Closer closer = Closer.create();
+            try {
+                final InputStream input = closer.register(new ByteArrayInputStream(encoded));
+                final CertificateFactory factory = CertificateFactory.getInstance("X.509");
+                certificate = (X509Certificate) factory.generateCertificate(input);
+            } catch (final CertificateException e) {
+                certificate = null;
+            } catch (final Throwable t) {
+                throw closer.rethrow(t);
+            } finally {
+                closer.close();
+            }
+        } catch (final IOException e) {
             certificate = null;
-        } finally {
-            IOUtils.closeQuietly(input);
         }
         result.rejectIfNull(certificate, CERTIFICATE_PARSED);
     }

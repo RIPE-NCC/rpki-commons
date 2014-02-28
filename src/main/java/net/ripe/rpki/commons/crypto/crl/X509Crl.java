@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
+import com.google.common.io.Closer;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.util.EqualsSupport;
@@ -36,7 +37,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.X509Extension;
@@ -117,23 +117,31 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     private static X509CRL makeX509CRLFromEncoded(byte[] encoded) {
-        if (encoded == null) {
-            return null;
-        }
-        ByteArrayInputStream in = null;
-        try {
-            in = new ByteArrayInputStream(encoded);
-            CertificateFactory factory = CertificateFactory.getInstance("X.509");
-            return (X509CRL) factory.generateCRL(in);
-        } catch (CertificateException e) {
-            throw new IllegalArgumentException(e);
-        } catch (CRLException e) {
-            throw new IllegalArgumentException(e);
-        } finally {
-            if (in != null) {
-                IOUtils.closeQuietly(in);
+        final X509CRL crl;
+        if (null != encoded) {
+            try {
+                final Closer closer = Closer.create();
+                try {
+                    final ByteArrayInputStream in = new ByteArrayInputStream(encoded);
+                    final CertificateFactory factory = CertificateFactory.getInstance("X.509");
+                    crl = (X509CRL) factory.generateCRL(in);
+                } catch (final CertificateException e) {
+                    throw closer.rethrow(new IllegalArgumentException(e));
+                } catch (final CRLException e) {
+                    throw closer.rethrow(new IllegalArgumentException(e));
+                } catch (final Throwable t) {
+                    throw closer.rethrow(t);
+                } finally {
+                    closer.close();
+                }
+            } catch (final IOException e) {
+                throw new RuntimeException("Error managing CRL I/O stream", e);
             }
+        } else {
+            crl = null;
         }
+        return crl;
+
     }
 
     @Override

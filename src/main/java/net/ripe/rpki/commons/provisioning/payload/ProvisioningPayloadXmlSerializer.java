@@ -29,10 +29,11 @@
  */
 package net.ripe.rpki.commons.provisioning.payload;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Closer;
 import com.thoughtworks.xstream.XStream;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
 import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,24 +56,21 @@ class ProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> ex
     }
 
     private String serializeUTF8Encoded(T payload) throws IOException {
-        ByteArrayOutputStream outputStream = null;
-        Writer writer = null;
-
+        final String xml;
+        final Closer closer = Closer.create();
         try {
-            outputStream = new ByteArrayOutputStream();
-
-            writer = new OutputStreamWriter(outputStream, "UTF-8");
+            final ByteArrayOutputStream outputStream = closer.register(new ByteArrayOutputStream());
+            final Writer writer = closer.register(new OutputStreamWriter(outputStream, Charsets.UTF_8));
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writer.write(System.getProperty("line.separator"));
-
             super.serialize(payload, writer);
-
-            String xml = outputStream.toString("UTF-8");
-
-            return xml.replace("<message", "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"");
+            final String rawXml = new String(outputStream.toByteArray(), Charsets.UTF_8);
+            xml = rawXml.replace("<message", "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"");
+        } catch (final Throwable t) {
+            throw closer.rethrow(t);
         } finally {
-            IOUtils.closeQuietly(writer);
-            IOUtils.closeQuietly(outputStream);
+            closer.close();
         }
+        return xml;
     }
 }

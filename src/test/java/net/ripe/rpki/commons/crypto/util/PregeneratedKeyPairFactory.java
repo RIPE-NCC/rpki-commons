@@ -29,11 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
+import com.google.common.io.Closer;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -69,19 +70,24 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
     }
 
     private void initKeyStore() {
-        InputStream input;
         try {
-            input = new FileInputStream(keyStoreFile);
-        } catch (FileNotFoundException e) {
-            input = null;
-        }
-        try {
-            pregeneratedKeys = KeyStore.getInstance("JKS", "SUN");
-            pregeneratedKeys.load(input, PASSPHRASE);
-        } catch (Exception e) {
+            final Closer closer = Closer.create();
+            try {
+                InputStream input;
+                try {
+                    input = closer.register(new FileInputStream(keyStoreFile));
+                } catch (FileNotFoundException e) {
+                    input = null;
+                }
+                pregeneratedKeys = KeyStore.getInstance("JKS", "SUN");
+                pregeneratedKeys.load(input, PASSPHRASE);
+            } catch (final Throwable t) {
+                throw closer.rethrow(t);
+            } finally {
+                closer.close();
+            }
+        } catch (final IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            IOUtils.closeQuietly(input);
         }
     }
 
@@ -105,11 +111,14 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
             if (key == null) {
                 result = super.generate();
                 pregeneratedKeys.setKeyEntry(alias, result.getPrivate(), PASSPHRASE, new Certificate[]{createCertificate(result).getCertificate()});
-                OutputStream output = new FileOutputStream(keyStoreFile);
+                final Closer closer = Closer.create();
                 try {
+                    final OutputStream output = new FileOutputStream(keyStoreFile);
                     pregeneratedKeys.store(output, PASSPHRASE);
+                } catch (final Throwable t) {
+                    throw closer.rethrow(t);
                 } finally {
-                    IOUtils.closeQuietly(output);
+                    closer.close();
                 }
             } else {
                 Certificate certificate = pregeneratedKeys.getCertificateChain(alias)[0];
