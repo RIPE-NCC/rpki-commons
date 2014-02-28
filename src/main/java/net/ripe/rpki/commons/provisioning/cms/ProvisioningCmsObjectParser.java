@@ -29,6 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
@@ -37,7 +40,6 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -53,7 +55,6 @@ import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.CMSSignedGenerator;
-import org.bouncycastle.cms.CMSTypedStream;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
@@ -186,10 +187,13 @@ public class ProvisioningCmsObjectParser {
      */
     private void parseContent() {
         try {
-            CMSTypedStream signedContent = sp.getSignedContent();
-            InputStream signedContentStream = signedContent.getContentStream();
-
-            String payloadXml = IOUtils.toString(signedContentStream, "UTF-8");
+            final InputSupplier<InputStream> supplier = new InputSupplier<InputStream>() {
+                @Override
+                public InputStream getInput() throws IOException {
+                    return sp.getSignedContent().getContentStream();
+                }
+            };
+            final String payloadXml = CharStreams.toString(CharStreams.newReaderSupplier(supplier, Charsets.UTF_8));
             payload = PayloadParser.parse(payloadXml, validationResult);
 
             validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
