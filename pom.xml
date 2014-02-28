@@ -10,6 +10,10 @@
         <version>7</version>
     </parent>
 
+    <prerequisites>
+        <maven>2.2.1</maven>
+    </prerequisites>
+
     <name>RPKI Commmons</name>
     <description>Resource Public Key Infrastructure - RPKI objects, HSM integration</description>
     <url>https://github.com/RIPE-NCC/rpki-commons</url>
