@@ -29,8 +29,8 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
+import com.google.common.io.ByteStreams;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
-import org.apache.commons.io.output.NullOutputStream;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
@@ -108,7 +108,7 @@ public final class KeyStoreUtil {
         try {
             if (keyStore.containsAlias(KEYSTORE_KEY_ALIAS)) {
                 keyStore.deleteEntry(KEYSTORE_KEY_ALIAS);
-                keyStore.store(new NullOutputStream(), KEYSTORE_PASSPHRASE);
+                keyStore.store(ByteStreams.nullOutputStream(), KEYSTORE_PASSPHRASE);
             }
             return keyStore;
         } catch (GeneralSecurityException e) {
