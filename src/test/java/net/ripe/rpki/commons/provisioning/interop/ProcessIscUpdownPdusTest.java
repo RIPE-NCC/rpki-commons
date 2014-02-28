@@ -132,9 +132,9 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldParseAllIscUpDownMessages() throws IOException {
-        String[] Files = new String[]{"pdu.170.der", "pdu.171.der", "pdu.172.der", "pdu.173.der", "pdu.180.der", "pdu.183.der", "pdu.184.der",
+        String[] files = new String[]{"pdu.170.der", "pdu.171.der", "pdu.172.der", "pdu.173.der", "pdu.180.der", "pdu.183.der", "pdu.184.der",
                 "pdu.189.der", "pdu.196.der", "pdu.199.der", "pdu.200.der", "pdu.205.der"};
-        for (String fileName : Files) {
+        for (String fileName : files) {
             byte[] encoded = FileUtils.readFileToByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
             ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
             parser.parseCms("cms", encoded);
@@ -155,10 +155,10 @@ public class ProcessIscUpdownPdusTest {
     public void shouldParseRpkidMessageFromDeutscheTelekom() throws IOException {
         // dtag-outbound-1.der
 
-        String[] Files = new String[]{"dtag-outbound-1.der", "dtag-outbound-9.der"};
+        String[] files = new String[]{"dtag-outbound-1.der", "dtag-outbound-9.der"};
         final BaseEncoding decoder = BaseEncoding.base64().withSeparator("\n", 76);
 
-        for (String fileName : Files) {
+        for (String fileName : files) {
 
             String base64Encoded = FileUtils.readFileToString(new File(PATH_TO_TEST_PDUS + "/" + fileName));
 
