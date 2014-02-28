@@ -106,12 +106,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>1.5.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.thaiopensource</groupId>
             <artifactId>jing</artifactId>
             <version>20091111</version>
