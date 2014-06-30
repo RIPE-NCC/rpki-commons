@@ -86,6 +86,9 @@ public class CertificateRepositoryObjectValidationContext {
         return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.deriveResources(resources));
     }
 
+    public void addOverclaiming(IpResourceSet overclaiming) {
+    }
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(location).append(certificate).append(resources).toHashCode();

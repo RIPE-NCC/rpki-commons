@@ -90,16 +90,16 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
     private void verifySignature() {
         result.rejectIfFalse(parent.isCa(), ISSUER_IS_CA);
 
-        boolean errorOccured = false;
+        boolean errorOccurred = false;
         try {
             child.verify(parent.getPublicKey()); // signed with issuer's public key
         } catch (SignatureException e) {
-            errorOccured = true;
+            errorOccurred = true;
         } catch (InvalidKeyException e) {
-            errorOccured = true;
+            errorOccurred = true;
         }
 
-        result.rejectIfTrue(errorOccured, SIGNATURE_VALID);
+        result.rejectIfTrue(errorOccurred, SIGNATURE_VALID);
     }
 
     private void verifyCrl() {
@@ -108,14 +108,14 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
             return;
         }
 
-        boolean errorOccured = false;
+        boolean errorOccurred = false;
         try {
             crl.verify(parent.getPublicKey());
         } catch (SignatureException e) {
-            errorOccured = true;
+            errorOccurred = true;
         }
 
-        result.rejectIfTrue(errorOccured, CRL_SIGNATURE_VALID);
+        result.rejectIfTrue(errorOccurred, CRL_SIGNATURE_VALID);
         result.rejectIfTrue(crl.isRevoked(child.getCertificate()), CERT_NOT_REVOKED);
     }
 

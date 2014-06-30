@@ -40,12 +40,18 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class X509ResourceCertificateParentChildValidator extends X509CertificateParentChildValidator<X509ResourceCertificate> implements X509ResourceCertificateValidator {
 
+    private CertificateRepositoryObjectValidationContext context;
     private IpResourceSet resources;
-
 
     public X509ResourceCertificateParentChildValidator(ValidationOptions options, ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
         super(options, result, parent, crl);
         this.resources = resources;
+    }
+
+    public X509ResourceCertificateParentChildValidator(ValidationOptions options, ValidationResult result, X509Crl crl, CertificateRepositoryObjectValidationContext context) {
+        super(options, result, context.getCertificate(), crl);
+        this.resources = context.getResources();
+        this.context = context;
     }
 
     @Override
@@ -55,9 +61,9 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
     }
 
     private void verifyResources() {
-        ValidationResult result = getValidationResult();
-        X509ResourceCertificate child = getChild();
-        IpResourceSet childResourceSet = child.deriveResources(resources);
+        final ValidationResult result = getValidationResult();
+        final X509ResourceCertificate child = getChild();
+        final IpResourceSet childResourceSet = child.deriveResources(resources);
 
         if (child.isRoot()) {
             result.rejectIfTrue(child.isResourceSetInherited(), ROOT_INHERITS_RESOURCES);
@@ -66,6 +72,9 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
             overclaiming.removeAll(resources);
 
             result.rejectIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
+            if (context != null) {
+                context.addOverclaiming(overclaiming);
+            }
         }
     }
 

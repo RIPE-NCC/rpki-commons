@@ -157,7 +157,7 @@ public class ManifestCms extends RpkiSignedObject {
 
         result.setLocation(new ValidationLocation(location));
         checkManifestValidityTimes(options, result);
-        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, crl, context);
         validator.validate(location, getCertificate());
     }
 
