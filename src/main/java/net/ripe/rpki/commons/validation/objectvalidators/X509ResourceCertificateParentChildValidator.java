@@ -71,9 +71,11 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
             IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
             overclaiming.removeAll(resources);
 
-            result.rejectIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
             if (context != null) {
                 context.addOverclaiming(overclaiming);
+                result.warnIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
+            } else {
+                result.rejectIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
             }
         }
     }
