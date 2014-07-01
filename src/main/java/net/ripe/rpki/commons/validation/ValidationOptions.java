@@ -37,6 +37,8 @@ public class ValidationOptions {
 
     private int maxStaleDays = 0;
 
+    private boolean looseValidationEnabled = false;
+
     public void setMaxStaleDays(int maxStaleDays) {
         this.maxStaleDays = maxStaleDays;
     }
@@ -45,4 +47,11 @@ public class ValidationOptions {
         return maxStaleDays;
     }
 
+    public boolean isLooseValidationEnabled() {
+        return looseValidationEnabled;
+    }
+
+    public void setLooseValidationEnabled(boolean looseValidationEnabled) {
+        this.looseValidationEnabled = looseValidationEnabled;
+    }
 }
