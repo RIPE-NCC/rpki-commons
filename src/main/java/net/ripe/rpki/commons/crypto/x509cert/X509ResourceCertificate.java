@@ -144,7 +144,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
                 return;
             }
         }
-        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, crl, context);
+        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, this);
     }
 

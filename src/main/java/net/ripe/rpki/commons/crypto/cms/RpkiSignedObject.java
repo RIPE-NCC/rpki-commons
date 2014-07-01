@@ -146,7 +146,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
             return;
         }
 
-        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, crl, context);
+        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
         validator.validate(location, getCertificate());
     }
 

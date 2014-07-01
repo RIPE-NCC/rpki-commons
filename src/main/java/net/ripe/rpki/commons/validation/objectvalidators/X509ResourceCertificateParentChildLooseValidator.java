@@ -30,38 +30,45 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.validation.ValidationResult;
 
-import java.net.URI;
+import static net.ripe.rpki.commons.validation.ValidationString.RESOURCE_RANGE;
+import static net.ripe.rpki.commons.validation.ValidationString.ROOT_INHERITS_RESOURCES;
 
-public class LooseCertificateRepositoryObjectValidationContext extends CertificateRepositoryObjectValidationContext {
 
-    private IpResourceSet overclaiming = new IpResourceSet();
+public class X509ResourceCertificateParentChildLooseValidator extends X509CertificateParentChildValidator<X509ResourceCertificate> implements X509ResourceCertificateValidator {
 
-    public LooseCertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
-        super(location, certificate);
-    }
+    private final CertificateRepositoryObjectValidationContext context;
 
-    public LooseCertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources) {
-        super(location, certificate, resources);
-    }
-
-    @Override
-    public IpResourceSet getResources() {
-        IpResourceSet resources = new IpResourceSet(super.getResources());
-        resources.removeAll(overclaiming);
-        return resources;
+    public X509ResourceCertificateParentChildLooseValidator(ValidationOptions options, ValidationResult result, X509Crl crl, CertificateRepositoryObjectValidationContext context) {
+        super(options, result, context.getCertificate(), crl);
+        this.context = context;
     }
 
     @Override
-    public void addOverclaiming(IpResourceSet overclaiming) {
-        this.overclaiming.addAll(overclaiming);
+    public void validate(String location, X509ResourceCertificate certificate) {
+        super.validate(location, certificate);
+        verifyResources();
     }
 
-    @Override
-    public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-        IpResourceSet resources = new IpResourceSet(super.getResources());
-        resources.removeAll(overclaiming);
-        return new LooseCertificateRepositoryObjectValidationContext(childLocation, childCertificate, resources);
+    private void verifyResources() {
+        final ValidationResult result = getValidationResult();
+        final X509ResourceCertificate child = getChild();
+        final IpResourceSet resources = context.getResources();
+        final IpResourceSet childResourceSet = child.deriveResources(resources);
+
+        if (child.isRoot()) {
+            result.rejectIfTrue(child.isResourceSetInherited(), ROOT_INHERITS_RESOURCES);
+        } else {
+            IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
+            overclaiming.removeAll(resources);
+
+            context.addOverclaiming(overclaiming);
+            result.warnIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
+        }
     }
+
 }

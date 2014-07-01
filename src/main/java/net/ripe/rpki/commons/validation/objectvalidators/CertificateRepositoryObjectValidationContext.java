@@ -52,6 +52,8 @@ public class CertificateRepositoryObjectValidationContext {
 
     private final IpResourceSet resources;
 
+    private IpResourceSet overclaiming = new IpResourceSet();
+
     public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
         this(location, certificate, certificate.getResources());
     }
@@ -70,10 +72,6 @@ public class CertificateRepositoryObjectValidationContext {
         return certificate;
     }
 
-    public IpResourceSet getResources() {
-        return resources;
-    }
-
     public URI getManifestURI() {
         return certificate.getManifestUri();
     }
@@ -82,11 +80,18 @@ public class CertificateRepositoryObjectValidationContext {
         return certificate.getRepositoryUri();
     }
 
-    public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.deriveResources(resources));
+    public void addOverclaiming(IpResourceSet overclaiming) {
+        this.overclaiming.addAll(overclaiming);
     }
 
-    public void addOverclaiming(IpResourceSet overclaiming) {
+    public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
+        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.deriveResources(getResources()));
+    }
+
+    public IpResourceSet getResources() {
+        IpResourceSet effectiveResources = new IpResourceSet(resources);
+        effectiveResources.removeAll(overclaiming);
+        return effectiveResources;
     }
 
     @Override
