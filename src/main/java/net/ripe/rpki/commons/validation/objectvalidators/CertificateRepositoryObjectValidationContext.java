@@ -85,7 +85,10 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, childCertificate.deriveResources(getResources()));
+        IpResourceSet resources1 = getResources();
+        IpResourceSet resources2 = childCertificate.deriveResources(resources1);
+        resources2.removeAll(overclaiming);
+        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, resources2);
     }
 
     public IpResourceSet getResources() {
