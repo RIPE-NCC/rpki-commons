@@ -39,6 +39,7 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -157,7 +158,7 @@ public class ManifestCms extends RpkiSignedObject {
 
         result.setLocation(new ValidationLocation(location));
         checkManifestValidityTimes(options, result);
-        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
+        X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
         validator.validate(location, getCertificate());
     }
 

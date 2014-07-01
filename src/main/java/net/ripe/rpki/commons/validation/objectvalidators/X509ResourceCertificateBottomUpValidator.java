@@ -107,7 +107,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
                 return;
             }
 
-            X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, parent, crl, resources);
+            X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateParentChildStrictValidator(options, result, parent, resources, crl);
             validator.validate(childLocation, child);
 
             resources = child.deriveResources(resources);

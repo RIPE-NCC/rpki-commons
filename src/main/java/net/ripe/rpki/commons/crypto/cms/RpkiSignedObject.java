@@ -39,7 +39,7 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
+import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -142,12 +142,10 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
         result.setLocation(savedCurrentLocation);
         result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
-        if (crl == null) {
-            return;
+        if (crl != null) {
+            X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
+            validator.validate(location, getCertificate());
         }
-
-        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
-        validator.validate(location, getCertificate());
     }
 
     @Override

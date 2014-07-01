@@ -43,7 +43,7 @@ public class X509ResourceCertificateParentChildLooseValidator extends X509Certif
 
     private final CertificateRepositoryObjectValidationContext context;
 
-    public X509ResourceCertificateParentChildLooseValidator(ValidationOptions options, ValidationResult result, X509Crl crl, CertificateRepositoryObjectValidationContext context) {
+    X509ResourceCertificateParentChildLooseValidator(ValidationOptions options, ValidationResult result, X509Crl crl, CertificateRepositoryObjectValidationContext context) {
         super(options, result, context.getCertificate(), crl);
         this.context = context;
     }

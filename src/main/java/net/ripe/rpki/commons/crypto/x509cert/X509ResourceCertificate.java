@@ -43,6 +43,7 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import org.apache.commons.lang.Validate;
@@ -144,7 +145,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
                 return;
             }
         }
-        X509ResourceCertificateValidator validator = new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
+        X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateValidator(context, options, result, crl);
         validator.validate(location, this);
     }
 
