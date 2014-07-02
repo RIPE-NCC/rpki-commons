@@ -85,21 +85,23 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-        IpResourceSet resources1 = getResources();
-        IpResourceSet resources2 = childCertificate.deriveResources(resources1);
-        resources2.removeAll(overclaiming);
-        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, resources2);
+        IpResourceSet effectiveResources = getEffectiveResources(childCertificate.deriveResources(resources));
+        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, effectiveResources);
     }
 
     public IpResourceSet getResources() {
-        IpResourceSet effectiveResources = new IpResourceSet(resources);
+        return getEffectiveResources(resources);
+    }
+
+    private IpResourceSet getEffectiveResources(IpResourceSet r) {
+        IpResourceSet effectiveResources = new IpResourceSet(r);
         effectiveResources.removeAll(overclaiming);
         return effectiveResources;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(location).append(certificate).append(resources).toHashCode();
+        return new HashCodeBuilder().append(location).append(certificate).append(resources).append(overclaiming).toHashCode();
     }
 
     @Override
@@ -114,7 +116,8 @@ public class CertificateRepositoryObjectValidationContext {
         return new EqualsBuilder()
                 .append(this.getLocation(), that.getLocation())
                 .append(this.getCertificate(), that.getCertificate())
-                .append(this.getResources(), that.getResources())
+                .append(this.resources, that.resources)
+                .append(this.overclaiming, that.overclaiming)
                 .isEquals();
     }
 
