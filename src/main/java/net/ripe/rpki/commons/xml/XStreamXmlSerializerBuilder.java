@@ -197,15 +197,7 @@ public class XStreamXmlSerializerBuilder<T> {
                 public boolean shouldSerializeMember(Class definedIn, String fieldName) {
                     return definedIn != Object.class && super.shouldSerializeMember(definedIn, fieldName);
                 }
-
-
-
             };
-
-
-
-
-
         }
     }
 }
