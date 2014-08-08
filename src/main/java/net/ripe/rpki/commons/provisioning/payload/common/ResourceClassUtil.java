@@ -29,8 +29,8 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.common;
 
-import java.net.URI;
-import java.util.List;
+import java.net.*;
+import java.util.*;
 
 public final class ResourceClassUtil {
 
@@ -38,6 +38,14 @@ public final class ResourceClassUtil {
     }
 
     static boolean hasRsyncUri(List<URI> uris) {
+        return hasProtocolUri("rsync", uris);
+    }
+
+    static boolean hasHttpUri(List<URI> uris) {
+        return hasProtocolUri("http", uris);
+    }
+
+    static boolean hasProtocolUri(String protocol, List<URI> uris) {
         boolean rsyncUriFound = false;
 
         if (uris == null) {
@@ -45,7 +53,7 @@ public final class ResourceClassUtil {
         }
 
         for (URI uri : uris) {
-            if (uri.toString().startsWith("rsync:")) {
+            if (uri.toString().startsWith(protocol + ":")) {
                 rsyncUriFound = true;
                 break;
             }

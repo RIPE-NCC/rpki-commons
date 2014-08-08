@@ -90,7 +90,8 @@ public class GenericClassElementBuilder {
     private void validateFields() {
         Validate.notNull(className, "No className provided");
         boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(certificateAuthorityUri);
-        Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
+        boolean httpUriFound = ResourceClassUtil.hasHttpUri(certificateAuthorityUri);
+        Validate.isTrue(rsyncUriFound || httpUriFound, "No RSYNC or HTTP URI provided");
 
         Validate.notNull(issuer, "issuer certificate is required");
 
