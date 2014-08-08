@@ -29,10 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.x509.KeyUsage;
+import java.net.*;
+import java.util.*;
 
-import java.net.URI;
+import org.apache.commons.lang.*;
+import org.bouncycastle.asn1.x509.*;
 
 /**
  * Builder for X509ResourceCertificates used by RPKI CAs
@@ -41,6 +42,7 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
 
     private URI caRepositoryUri;
     private URI manifestUri;
+    private URI rrdpNotifyUri;
 
     public void withCaRepositoryUri(URI caRepositoryUri) {
         validateIsRsyncUri(caRepositoryUri);
@@ -50,6 +52,10 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
     public void withManifestUri(URI manifestUri) {
         validateIsRsyncUri(manifestUri);
         this.manifestUri = manifestUri;
+    }
+
+    public void withRrdpNotifyUri(URI rrdpNotifyUri) {
+        this.rrdpNotifyUri = rrdpNotifyUri;
     }
 
     public X509ResourceCertificate build() {
@@ -62,12 +68,13 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
 
-
-        X509CertificateInformationAccessDescriptor[] descriptors = {
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri),
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri)};
-
-        builder.withSubjectInformationAccess(descriptors);
+        List<X509CertificateInformationAccessDescriptor> sias = new ArrayList<X509CertificateInformationAccessDescriptor>();
+        sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri));
+        sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri));
+        if (rrdpNotifyUri != null) {
+            sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY, rrdpNotifyUri));
+        }
+        builder.withSubjectInformationAccess(sias.toArray(new X509CertificateInformationAccessDescriptor[sias.size()]));
 
         return builder.build();
     }

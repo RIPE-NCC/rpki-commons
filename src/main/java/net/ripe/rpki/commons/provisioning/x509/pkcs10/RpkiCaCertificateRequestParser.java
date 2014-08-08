@@ -29,28 +29,21 @@
  */
 package net.ripe.rpki.commons.provisioning.x509.pkcs10;
 
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCSException;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
+import java.io.*;
+import java.net.*;
+import java.security.*;
+import java.util.*;
 
-import java.io.IOException;
-import java.net.URI;
-import java.security.PublicKey;
-import java.util.Enumeration;
+import net.ripe.rpki.commons.crypto.x509cert.*;
+
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.pkcs.*;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.operator.*;
+import org.bouncycastle.operator.jcajce.*;
+import org.bouncycastle.pkcs.*;
+import org.bouncycastle.pkcs.jcajce.*;
 
 
 /**
@@ -61,11 +54,13 @@ public class RpkiCaCertificateRequestParser {
 
     private static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
-    private JcaPKCS10CertificationRequest pkcs10CertificationRequest;
+    private final JcaPKCS10CertificationRequest pkcs10CertificationRequest;
 
     private URI caRepositoryUri;
 
     private URI manifestUri;
+
+    private URI rrdpNotifyUri;
 
     private PublicKey publicKey;
 
@@ -90,6 +85,10 @@ public class RpkiCaCertificateRequestParser {
 
     public URI getManifestUri() {
         return manifestUri;
+    }
+
+    public URI getRrdpNotifyUri() {
+        return rrdpNotifyUri;
     }
 
     public PublicKey getPublicKey() {
@@ -127,6 +126,8 @@ public class RpkiCaCertificateRequestParser {
                     caRepositoryUri = accessDescriptor.getLocation();
                 } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST)) {
                     manifestUri = accessDescriptor.getLocation();
+                } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY)) {
+                    rrdpNotifyUri = accessDescriptor.getLocation();
                 } else {
                     throw new RpkiCaCertificateRequestParserException("Don't understand access descriptor using method: " + oid);
                 }
@@ -144,7 +145,7 @@ public class RpkiCaCertificateRequestParser {
         if (extensionRequestElement instanceof Extensions) {
             return (Extensions) extensionRequestElement;
         } else if (extensionRequestElement instanceof ASN1Sequence) {
-            return Extensions.getInstance((ASN1Sequence) extensionRequestElement);
+            return Extensions.getInstance(extensionRequestElement);
         } else {
             throw new RpkiCaCertificateRequestParserException("Encountered an element I do not understand, type: "
                     + extensionRequestElement.getClass().getSimpleName());

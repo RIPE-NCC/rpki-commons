@@ -29,45 +29,27 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.util.Asn1Util;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.util.encoders.Base64Encoder;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 
-import javax.security.auth.x500.X500Principal;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.io.*;
+import java.math.*;
+import java.net.*;
+import java.security.*;
+import java.security.cert.*;
 import java.security.cert.X509Extension;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import javax.security.auth.x500.*;
+
+import net.ripe.rpki.commons.crypto.*;
+import net.ripe.rpki.commons.crypto.util.*;
+import net.ripe.rpki.commons.validation.*;
+
+import org.apache.commons.lang.*;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.util.encoders.*;
+import org.bouncycastle.x509.extension.*;
 
 public final class X509CertificateUtil {
 
@@ -254,6 +236,10 @@ public final class X509CertificateUtil {
 
     public static URI getRepositoryUri(X509Certificate certificate) {
         return findFirstSubjectInformationAccessByMethod(certificate, X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY);
+    }
+
+    public static URI getRrdpNotifyUri(X509Certificate certificate) {
+        return findFirstByMethod(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY, "rrdp", getSubjectInformationAccess(certificate));
     }
 
     public static boolean isObjectIssuer(X509Certificate certificate) {

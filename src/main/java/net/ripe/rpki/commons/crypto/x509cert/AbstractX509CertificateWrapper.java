@@ -29,22 +29,20 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.PolicyInformation;
+import java.io.*;
+import java.math.*;
+import java.net.*;
+import java.security.*;
+import java.security.cert.*;
 
-import javax.security.auth.x500.X500Principal;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
+import javax.security.auth.x500.*;
+
+import net.ripe.rpki.commons.crypto.*;
+
+import org.apache.commons.lang.*;
+import org.apache.commons.lang.builder.*;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.x509.*;
 
 public abstract class AbstractX509CertificateWrapper implements Serializable {
 
@@ -118,6 +116,10 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public URI getRepositoryUri() {
         return X509CertificateUtil.getRepositoryUri(certificate);
+    }
+
+    public URI getRrdpNotifyUri() {
+        return X509CertificateUtil.getRrdpNotifyUri(certificate);
     }
 
     public boolean isObjectIssuer() {

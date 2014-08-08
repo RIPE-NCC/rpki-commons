@@ -29,26 +29,22 @@
  */
 package net.ripe.rpki.commons.provisioning.x509.pkcs10;
 
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import java.io.*;
+import java.net.*;
+import java.security.*;
+import java.util.*;
 
-import javax.security.auth.x500.X500Principal;
-import java.io.IOException;
-import java.net.URI;
-import java.security.KeyPair;
-import java.util.ArrayList;
-import java.util.List;
+import javax.security.auth.x500.*;
+
+import net.ripe.rpki.commons.crypto.x509cert.*;
+
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.pkcs.*;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.operator.*;
+import org.bouncycastle.operator.jcajce.*;
+import org.bouncycastle.pkcs.*;
+import org.bouncycastle.pkcs.jcajce.*;
 
 
 /**
@@ -61,6 +57,8 @@ public class RpkiCaCertificateRequestBuilder {
     private URI caRepositoryUri;
 
     private URI manifestUri;
+
+    private URI rrdpNotifyUri;
 
     private String signatureAlgorithm = "SHA256withRSA";
 
@@ -80,6 +78,13 @@ public class RpkiCaCertificateRequestBuilder {
         this.manifestUri = manifestUri;
         return this;
     }
+
+    public RpkiCaCertificateRequestBuilder withRrdpNotifyUri(URI rrdpNotifyUri) {
+        this.rrdpNotifyUri = rrdpNotifyUri;
+        return this;
+    }
+
+
 
     /**
      * Default: SunRsaSign
@@ -120,10 +125,14 @@ public class RpkiCaCertificateRequestBuilder {
         // http://www.bouncycastle.org/wiki/display/JA1/X.509+Public+Key+Certificate+and+Certification+Request+Generation
         List<Extension> extensions = new ArrayList<Extension>();
 
-        X509CertificateInformationAccessDescriptor[] descriptors = new X509CertificateInformationAccessDescriptor[]{
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri),
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri),};
-        AccessDescription[] subjectInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(descriptors);
+        List<X509CertificateInformationAccessDescriptor> sias = new ArrayList<X509CertificateInformationAccessDescriptor>();
+        sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri));
+        sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri));
+        if (rrdpNotifyUri != null) {
+            sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY, rrdpNotifyUri));
+        }
+
+        AccessDescription[] subjectInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(sias.toArray(new X509CertificateInformationAccessDescriptor[sias.size()]));
         DERSequence derSequence = new DERSequence(subjectInformationAccess);
 
         extensions.add(new Extension(Extension.subjectInfoAccess, false, new DEROctetString(derSequence.getEncoded())));

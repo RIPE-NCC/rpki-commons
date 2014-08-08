@@ -29,19 +29,15 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import net.ripe.rpki.commons.util.*;
+
+import org.apache.commons.lang.*;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.x509.*;
 
 public class X509CertificateInformationAccessDescriptor extends EqualsSupport implements Serializable {
 
@@ -57,6 +53,8 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
 
     public static final ASN1ObjectIdentifier ID_AD_RPKI_MANIFEST = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".10");
 
+    public static final ASN1ObjectIdentifier ID_AD_RRDP_NOTIFY = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".12");
+
     private String method;
     private URI location;
 
@@ -69,6 +67,7 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
         map.put(ID_AD_SIGNED_OBJECT_REPOSITORY, "signed object repository");
         map.put(ID_AD_SIGNED_OBJECT, "signed object");
         map.put(ID_AD_RPKI_MANIFEST, "manifest");
+        map.put(ID_AD_RRDP_NOTIFY, "rrdp notify pointer");
         METHOD_STRING_TABLE = Collections.unmodifiableMap(map);
     }
 
