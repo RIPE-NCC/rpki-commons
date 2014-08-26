@@ -40,7 +40,7 @@ import java.util.List;
  * See: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
  * <p/>
  * This type of class element contains a current certificate element for each key pair,
- * as oposed to just one in the CertificateIssuanceResponse.
+ * as opposed to just one in the CertificateIssuanceResponse.
  */
 public class ResourceClassListResponseClassElement extends GenericClassElement {
 
