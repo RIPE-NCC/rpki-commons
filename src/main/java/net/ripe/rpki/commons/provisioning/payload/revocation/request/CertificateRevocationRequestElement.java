@@ -27,30 +27,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.provisioning.payload.issue.request;
+package net.ripe.rpki.commons.provisioning.payload.revocation.request;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
-import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * See: http://tools.ietf.org/html/rfc6492#section-3.5.1
+ * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1</a>
  */
-@XStreamAlias("message")
-public class CertificateRevocationRequestPayload extends AbstractProvisioningQueryPayload {
+public class CertificateRevocationRequestElement {
 
-    @XStreamAlias("request")
-    @XStreamConverter(CertificateRevocationRequestElementConverter.class)
-    private CertificateRevocationRequestElement requestElement;
+    private String className;
+    private String subjectPublicKey;
 
-    public CertificateRevocationRequestPayload(CertificateRevocationRequestElement requestElement) {
-        super(PayloadMessageType.revoke);
-
-        this.requestElement = requestElement;
+    public String getClassName() {
+        return className;
     }
 
-    public CertificateRevocationRequestElement getRequestElement() {
-        return requestElement;
+    CertificateRevocationRequestElement setClassName(String className) {
+        this.className = className;
+        return this;
     }
+
+    public String getSubjectPublicKey() {
+        return subjectPublicKey;
+    }
+
+    public CertificateRevocationRequestElement setSubjectPublicKey(String subjectPublicKey) {
+        this.subjectPublicKey = subjectPublicKey;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
+
 }
