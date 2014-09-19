@@ -129,7 +129,7 @@ public class RpkiCaCertificateRequestBuilder {
         sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri));
         sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri));
         if (rrdpNotifyUri != null) {
-            sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY, rrdpNotifyUri));
+            sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY, rrdpNotifyUri));
         }
 
         AccessDescription[] subjectInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(sias.toArray(new X509CertificateInformationAccessDescriptor[sias.size()]));

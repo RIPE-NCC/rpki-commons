@@ -53,7 +53,7 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
 
     public static final ASN1ObjectIdentifier ID_AD_RPKI_MANIFEST = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".10");
 
-    public static final ASN1ObjectIdentifier ID_AD_RRDP_NOTIFY = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".12");
+    public static final ASN1ObjectIdentifier ID_AD_RPKI_NOTIFY = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".13");
 
     private String method;
     private URI location;
@@ -67,7 +67,7 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
         map.put(ID_AD_SIGNED_OBJECT_REPOSITORY, "signed object repository");
         map.put(ID_AD_SIGNED_OBJECT, "signed object");
         map.put(ID_AD_RPKI_MANIFEST, "manifest");
-        map.put(ID_AD_RRDP_NOTIFY, "rrdp notify pointer");
+        map.put(ID_AD_RPKI_NOTIFY, "rrdp notify pointer");
         METHOD_STRING_TABLE = Collections.unmodifiableMap(map);
     }
 

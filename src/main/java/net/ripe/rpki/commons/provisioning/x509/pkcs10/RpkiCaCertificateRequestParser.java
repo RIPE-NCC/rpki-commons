@@ -60,7 +60,7 @@ public class RpkiCaCertificateRequestParser {
 
     private URI manifestUri;
 
-    private URI rrdpNotifyUri;
+    private URI rpkiNotifyUri;
 
     private PublicKey publicKey;
 
@@ -87,8 +87,8 @@ public class RpkiCaCertificateRequestParser {
         return manifestUri;
     }
 
-    public URI getRrdpNotifyUri() {
-        return rrdpNotifyUri;
+    public URI getRpkiNotifyUri() {
+        return rpkiNotifyUri;
     }
 
     public PublicKey getPublicKey() {
@@ -126,8 +126,8 @@ public class RpkiCaCertificateRequestParser {
                     caRepositoryUri = accessDescriptor.getLocation();
                 } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST)) {
                     manifestUri = accessDescriptor.getLocation();
-                } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY)) {
-                    rrdpNotifyUri = accessDescriptor.getLocation();
+                } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY)) {
+                    rpkiNotifyUri = accessDescriptor.getLocation();
                 } else {
                     throw new RpkiCaCertificateRequestParserException("Don't understand access descriptor using method: " + oid);
                 }

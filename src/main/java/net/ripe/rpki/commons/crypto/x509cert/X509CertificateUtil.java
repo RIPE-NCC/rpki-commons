@@ -239,7 +239,7 @@ public final class X509CertificateUtil {
     }
 
     public static URI getRrdpNotifyUri(X509Certificate certificate) {
-        return findFirstByMethod(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY, "rrdp", getSubjectInformationAccess(certificate));
+        return findFirstByMethod(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY, "rrdp", getSubjectInformationAccess(certificate));
     }
 
     public static boolean isObjectIssuer(X509Certificate certificate) {

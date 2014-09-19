@@ -42,7 +42,7 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
 
     private URI caRepositoryUri;
     private URI manifestUri;
-    private URI rrdpNotifyUri;
+    private URI rpkiNotifyUri;
 
     public void withCaRepositoryUri(URI caRepositoryUri) {
         validateIsRsyncUri(caRepositoryUri);
@@ -54,8 +54,8 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
         this.manifestUri = manifestUri;
     }
 
-    public void withRrdpNotifyUri(URI rrdpNotifyUri) {
-        this.rrdpNotifyUri = rrdpNotifyUri;
+    public void withRpkiNotifyUri(URI rpkiNotifyUri) {
+        this.rpkiNotifyUri = rpkiNotifyUri;
     }
 
     public X509ResourceCertificate build() {
@@ -71,8 +71,8 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
         List<X509CertificateInformationAccessDescriptor> sias = new ArrayList<X509CertificateInformationAccessDescriptor>();
         sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri));
         sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri));
-        if (rrdpNotifyUri != null) {
-            sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RRDP_NOTIFY, rrdpNotifyUri));
+        if (rpkiNotifyUri != null) {
+            sias.add(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY, rpkiNotifyUri));
         }
         builder.withSubjectInformationAccess(sias.toArray(new X509CertificateInformationAccessDescriptor[sias.size()]));
 
