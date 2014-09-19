@@ -180,6 +180,11 @@ public final class ValidationString {
     public static final String VALIDATOR_MANIFEST_DOES_NOT_CONTAIN_FILE = "validator.manifest.does.not.contain.file";
     public static final String VALIDATOR_OBJECT_PROCESSING_EXCEPTION = "validator.object.processing.exception";
 
+    // validator - rrdp
+    public static final String VALIDATOR_TA_RETRIEVE = "validator.trust.anchor.retrieve";
+
+
+
     // Problems with repository
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
     public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconsistent";
