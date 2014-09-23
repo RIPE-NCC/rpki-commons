@@ -65,7 +65,8 @@ public class RouteOriginValidationPolicy {
                 switch (validate(allowedRoute, announcedRoute)) {
                     case VALID:
                         return RouteValidityState.VALID;
-                    case INVALID:
+                    case INVALID_ASN:
+                    case INVALID_LENGTH:
                         result = RouteValidityState.INVALID;
                         break;
                     case UNKNOWN:
@@ -76,20 +77,55 @@ public class RouteOriginValidationPolicy {
         return result;
     }
 
-    private RouteValidityState validate(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
+    private SpecificRouteValidityState validate(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
         IpRange announcedPrefix = announcedRoute.getPrefix();
 
-        if (!allowedRoute.getPrefix().contains(announcedPrefix)) {
-            // non-intersecting or covering-aggregate
-            return RouteValidityState.UNKNOWN;
-        } else if (announcedPrefix.getPrefixLength() <= allowedRoute.getMaximumLength()) {
-            if (allowedRoute.getAsn().equals(announcedRoute.getOriginAsn())) {
-                return RouteValidityState.VALID;
-            } else {
-                return RouteValidityState.INVALID;
-            }
+        if (isUnknown(allowedRoute, announcedPrefix)) {
+            return SpecificRouteValidityState.UNKNOWN;
         }
-        return RouteValidityState.INVALID;
+
+        if (isAsnInvalid(allowedRoute, announcedRoute)) {
+            return SpecificRouteValidityState.INVALID_ASN;
+        }
+
+        if (isLengthInvalid(allowedRoute, announcedPrefix)) {
+            return SpecificRouteValidityState.INVALID_LENGTH;
+        }
+
+        return SpecificRouteValidityState.VALID;
     }
 
+    private boolean isUnknown(AllowedRoute allowedRoute, IpRange announcedPrefix) {
+        // non-intersecting or covering-aggregate
+        return !allowedRoute.getPrefix().contains(announcedPrefix);
+    }
+
+    private boolean isLengthInvalid(AllowedRoute allowedRoute, IpRange announcedPrefix) {
+        return !(announcedPrefix.getPrefixLength() <= allowedRoute.getMaximumLength());
+    }
+
+    private boolean isAsnInvalid(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
+        return !allowedRoute.getAsn().equals(announcedRoute.getOriginAsn());
+    }
+
+    public SpecificRouteValidityState validateAnnouncedRouteWithSpecificInvalidInfo(NestedIntervalMap<IpResource, List<AllowedRoute>> allowedRoutes, AnnouncedRoute announcedRoute) {
+        SpecificRouteValidityState result = SpecificRouteValidityState.UNKNOWN;
+        for (Iterable<? extends AllowedRoute> routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.getPrefix())) {
+            for (AllowedRoute allowedRoute : routes) {
+                switch (validate(allowedRoute, announcedRoute)) {
+                    case VALID:
+                        return SpecificRouteValidityState.VALID;
+                    case INVALID_ASN:
+                        result = SpecificRouteValidityState.INVALID_ASN;
+                        break;
+                    case INVALID_LENGTH:
+                        result = SpecificRouteValidityState.INVALID_LENGTH;
+                        break;
+                    case UNKNOWN:
+                        break;
+                }
+            }
+        }
+        return result;
+    }
 }

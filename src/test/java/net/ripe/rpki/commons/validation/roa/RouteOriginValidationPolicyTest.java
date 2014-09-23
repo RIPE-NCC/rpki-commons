@@ -113,6 +113,26 @@ public class RouteOriginValidationPolicyTest {
     }
 
     @Test
+    public void routes_with_matching_prefix_but_non_matching_ASN_should_be_INVALID_ANS() {
+        testSpecificValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/20", SpecificRouteValidityState.INVALID_ASN);
+    }
+
+    @Test
+    public void routes_with_more_specific_prefix_and_matching_ASN_should_be_INVALID_LENGTH() {
+        testSpecificValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.168.0.0/21", SpecificRouteValidityState.INVALID_LENGTH);
+    }
+
+    @Test
+    public void routes_with_more_specific_prefix_and_non_matching_ASN_should_be_INVALID_ASN() {
+        testSpecificValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/21", SpecificRouteValidityState.INVALID_ASN);
+    }
+
+    @Test
+    public void routes_with_more_specific_prefix_and_roa_with_default_maxlength_and_matching_ASN_should_be_INVALID_LENGTH() {
+        testSpecificValidatityDetermination("192.168.0.0/16", 16, TEST_ASN, "192.168.0.0/20", SpecificRouteValidityState.INVALID_LENGTH);
+    }
+
+    @Test
     public void routes_with_any_matching_prefix_and_ASN_should_be_VALID() {
         NestedIntervalMap<IpResource, List<AllowedRoute>> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("192.169.0.0/16"), 20));
 
@@ -144,6 +164,13 @@ public class RouteOriginValidationPolicyTest {
         NestedIntervalMap<IpResource, List<AllowedRoute>> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
         AnnouncedRoute route = new AnnouncedRoute(routeAsn, IpRange.parse(routePrefix));
         RouteValidityState validityStateFound = subject.validateAnnouncedRoute(rtrPrefixes, route);
+        assertEquals(expectedResult, validityStateFound);
+    }
+
+    private void testSpecificValidatityDetermination(String roaIpPrefix, int roaMaxLength, Asn routeAsn, String routePrefix, SpecificRouteValidityState expectedResult) {
+        NestedIntervalMap<IpResource, List<AllowedRoute>> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
+        AnnouncedRoute route = new AnnouncedRoute(routeAsn, IpRange.parse(routePrefix));
+        SpecificRouteValidityState validityStateFound = subject.validateAnnouncedRouteWithSpecificInvalidInfo(rtrPrefixes, route);
         assertEquals(expectedResult, validityStateFound);
     }
 }
