@@ -66,8 +66,10 @@ public class RouteOriginValidationPolicy {
                     case VALID:
                         return RouteValidityState.VALID;
                     case INVALID_ASN:
+                        result = RouteValidityState.INVALID_ASN;
+                        break;
                     case INVALID_LENGTH:
-                        result = RouteValidityState.INVALID;
+                        result = RouteValidityState.INVALID_LENGTH;
                         break;
                     case UNKNOWN:
                         break;
@@ -77,22 +79,22 @@ public class RouteOriginValidationPolicy {
         return result;
     }
 
-    private SpecificRouteValidityState validate(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
+    private RouteValidityState validate(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
         IpRange announcedPrefix = announcedRoute.getPrefix();
 
         if (isUnknown(allowedRoute, announcedPrefix)) {
-            return SpecificRouteValidityState.UNKNOWN;
+            return RouteValidityState.UNKNOWN;
         }
 
         if (isAsnInvalid(allowedRoute, announcedRoute)) {
-            return SpecificRouteValidityState.INVALID_ASN;
+            return RouteValidityState.INVALID_ASN;
         }
 
         if (isLengthInvalid(allowedRoute, announcedPrefix)) {
-            return SpecificRouteValidityState.INVALID_LENGTH;
+            return RouteValidityState.INVALID_LENGTH;
         }
 
-        return SpecificRouteValidityState.VALID;
+        return RouteValidityState.VALID;
     }
 
     private boolean isUnknown(AllowedRoute allowedRoute, IpRange announcedPrefix) {
@@ -108,24 +110,4 @@ public class RouteOriginValidationPolicy {
         return !allowedRoute.getAsn().equals(announcedRoute.getOriginAsn());
     }
 
-    public SpecificRouteValidityState validateAnnouncedRouteWithSpecificInvalidInfo(NestedIntervalMap<IpResource, List<AllowedRoute>> allowedRoutes, AnnouncedRoute announcedRoute) {
-        SpecificRouteValidityState result = SpecificRouteValidityState.UNKNOWN;
-        for (Iterable<? extends AllowedRoute> routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.getPrefix())) {
-            for (AllowedRoute allowedRoute : routes) {
-                switch (validate(allowedRoute, announcedRoute)) {
-                    case VALID:
-                        return SpecificRouteValidityState.VALID;
-                    case INVALID_ASN:
-                        result = SpecificRouteValidityState.INVALID_ASN;
-                        break;
-                    case INVALID_LENGTH:
-                        result = SpecificRouteValidityState.INVALID_LENGTH;
-                        break;
-                    case UNKNOWN:
-                        break;
-                }
-            }
-        }
-        return result;
-    }
 }

@@ -30,5 +30,5 @@
 package net.ripe.rpki.commons.validation.roa;
 
 public enum RouteValidityState {
-    VALID, INVALID, UNKNOWN
+    VALID, INVALID_ASN, INVALID_LENGTH, UNKNOWN
 }

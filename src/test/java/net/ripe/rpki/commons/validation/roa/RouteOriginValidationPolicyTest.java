@@ -93,43 +93,23 @@ public class RouteOriginValidationPolicyTest {
     }
 
     @Test
-    public void routes_with_matching_prefix_but_non_matching_ASN_should_be_INVALID() {
-        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/20", RouteValidityState.INVALID);
-    }
-
-    @Test
-    public void routes_with_more_specific_prefix_and_matching_ASN_should_be_INVALID() {
-        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.168.0.0/21", RouteValidityState.INVALID);
-    }
-
-    @Test
-    public void routes_with_more_specific_prefix_and_non_matching_ASN_should_be_INVALID() {
-        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/21", RouteValidityState.INVALID);
-    }
-
-    @Test
-    public void routes_with_more_specific_prefix_and_roa_with_default_maxlength_and_matching_ASN_should_be_INVALID() {
-        testValidatityDetermination("192.168.0.0/16", 16, TEST_ASN, "192.168.0.0/20", RouteValidityState.INVALID);
-    }
-
-    @Test
     public void routes_with_matching_prefix_but_non_matching_ASN_should_be_INVALID_ANS() {
-        testSpecificValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/20", SpecificRouteValidityState.INVALID_ASN);
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/20", RouteValidityState.INVALID_ASN);
     }
 
     @Test
     public void routes_with_more_specific_prefix_and_matching_ASN_should_be_INVALID_LENGTH() {
-        testSpecificValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.168.0.0/21", SpecificRouteValidityState.INVALID_LENGTH);
+        testValidatityDetermination("192.168.0.0/16", 20, TEST_ASN, "192.168.0.0/21", RouteValidityState.INVALID_LENGTH);
     }
 
     @Test
     public void routes_with_more_specific_prefix_and_non_matching_ASN_should_be_INVALID_ASN() {
-        testSpecificValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/21", SpecificRouteValidityState.INVALID_ASN);
+        testValidatityDetermination("192.168.0.0/16", 20, Asn.parse("AS124"), "192.168.0.0/21", RouteValidityState.INVALID_ASN);
     }
 
     @Test
     public void routes_with_more_specific_prefix_and_roa_with_default_maxlength_and_matching_ASN_should_be_INVALID_LENGTH() {
-        testSpecificValidatityDetermination("192.168.0.0/16", 16, TEST_ASN, "192.168.0.0/20", SpecificRouteValidityState.INVALID_LENGTH);
+        testValidatityDetermination("192.168.0.0/16", 16, TEST_ASN, "192.168.0.0/20", RouteValidityState.INVALID_LENGTH);
     }
 
     @Test
@@ -156,7 +136,7 @@ public class RouteOriginValidationPolicyTest {
 
         AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/24"));
         RouteValidityState validityStateFound = subject.validateAnnouncedRoute(prefixes, route);
-        assertEquals(RouteValidityState.INVALID, validityStateFound);
+        assertEquals(RouteValidityState.INVALID_LENGTH, validityStateFound);
 
     }
 
@@ -167,10 +147,4 @@ public class RouteOriginValidationPolicyTest {
         assertEquals(expectedResult, validityStateFound);
     }
 
-    private void testSpecificValidatityDetermination(String roaIpPrefix, int roaMaxLength, Asn routeAsn, String routePrefix, SpecificRouteValidityState expectedResult) {
-        NestedIntervalMap<IpResource, List<AllowedRoute>> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
-        AnnouncedRoute route = new AnnouncedRoute(routeAsn, IpRange.parse(routePrefix));
-        SpecificRouteValidityState validityStateFound = subject.validateAnnouncedRouteWithSpecificInvalidInfo(rtrPrefixes, route);
-        assertEquals(expectedResult, validityStateFound);
-    }
 }
