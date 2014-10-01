@@ -38,19 +38,14 @@ public final class ResourceClassUtil {
     }
 
     static boolean hasRsyncUri(List<URI> uris) {
-        boolean rsyncUriFound = false;
-
-        if (uris == null) {
-            return rsyncUriFound;
-        }
-
-        for (URI uri : uris) {
-            if (uri.toString().startsWith("rsync:")) {
-                rsyncUriFound = true;
-                break;
+        if (uris != null) {
+            for (URI uri : uris) {
+                if (uri.toString().startsWith("rsync:")) {
+                    return true;
+                }
             }
         }
-        return rsyncUriFound;
+        return false;
     }
 
     public static boolean validateAsn(String[] asNumbers) {
