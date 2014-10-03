@@ -150,8 +150,7 @@ public class Rsync {
         }
 
         Command rsync = new Command(args);
-        System.out.println("Starting rsync " + args);
-        
+        System.err.println("rsync == " + args);
         startedAt = DateTimeUtils.currentTimeMillis();
         try {
             rsync.execute();
