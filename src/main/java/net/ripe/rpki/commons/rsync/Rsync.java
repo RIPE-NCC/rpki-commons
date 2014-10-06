@@ -155,7 +155,11 @@ public class Rsync {
         try {
             rsync.execute();
             command = rsync;
-            return rsync.getExitStatus();
+            int exitStatus = rsync.getExitStatus();
+            System.err.println("rsync exit status: " + exitStatus);
+            System.err.println("rsync stderr: " + rsync.getErrors());
+            System.err.println("rsync stdout: " + rsync.getOutputs());
+            return exitStatus;
         } finally {
             finishedAt = DateTimeUtils.currentTimeMillis();
         }
