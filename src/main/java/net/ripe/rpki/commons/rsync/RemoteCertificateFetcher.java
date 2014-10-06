@@ -66,12 +66,11 @@ public class RemoteCertificateFetcher {
     }
 
     private CertificateRepositoryObject getRemoteObject(String sourcePath) {
-        String tempDestinationPath = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID();
+        String tempDestinationPath = System.getProperty("java.io.tmpdir") + "/rsync-tmp-" + UUID.randomUUID();
         File tempDestinationFile = new File(tempDestinationPath);
         try {
             rsync.reset();
             rsync.setSource(sourcePath);
-
             rsync.setDestination(tempDestinationPath);
 
             int rc = rsync.execute();
