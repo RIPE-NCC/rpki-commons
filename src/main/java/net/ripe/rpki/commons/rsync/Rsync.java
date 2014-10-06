@@ -150,15 +150,18 @@ public class Rsync {
         }
 
         Command rsync = new Command(args);
-        System.err.println("rsync == " + args);
         startedAt = DateTimeUtils.currentTimeMillis();
         try {
             rsync.execute();
             command = rsync;
             int exitStatus = rsync.getExitStatus();
-            System.err.println("rsync exit status: " + exitStatus);
-            System.err.println("rsync stderr: " + rsync.getErrors());
-            System.err.println("rsync stdout: " + rsync.getOutputs());
+            if (exitStatus != 0) {
+                // TODO Possibly change to some sort of proper logging
+                System.err.println("rsync command line: " + args);
+                System.err.println("rsync exit status: " + exitStatus);
+                System.err.println("rsync stderr: " + rsync.getErrors());
+                System.err.println("rsync stdout: " + rsync.getOutputs());
+            }
             return exitStatus;
         } finally {
             finishedAt = DateTimeUtils.currentTimeMillis();
