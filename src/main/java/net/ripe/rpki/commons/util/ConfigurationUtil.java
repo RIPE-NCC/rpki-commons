@@ -42,20 +42,7 @@ public class ConfigurationUtil {
         return dir.startsWith(USER_HOME);
     }
 
-    /**
-     * Return temporary directory location with specific suffix
-     * to make sure that the temporary directory name is not
-     * just "/tmp" but "/tmp/ZZZ" so that a SELinux context
-     * could be set for ZZZ.
-     */
     public static String getTempDirectory() {
-        String tmpdir = System.getProperty("java.io.tmpdir", "/tmp");
-        if ("/tmp".equals(tmpdir)) {
-            if (!tmpdir.endsWith("/")) {
-                tmpdir = tmpdir + "/";
-            }
-            return tmpdir + RPKI_RSYNC_DIR_SUFFIX;
-        }
-        return tmpdir;
+        return System.getProperty("java.io.tmpdir", "/tmp");
     }
 }
