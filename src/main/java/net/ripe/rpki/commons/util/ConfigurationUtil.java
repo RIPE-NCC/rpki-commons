@@ -32,6 +32,8 @@ package net.ripe.rpki.commons.util;
 public class ConfigurationUtil {
     private static final String USER_HOME = System.getProperty("user.home");
 
+    private static final String RPKI_RSYNC_DIR_SUFFIX = "RPKI-RSYNC";
+
     public static String interpolate(String value) {
         return value.replaceAll("\\$\\{HOME\\}", USER_HOME);
     }
@@ -39,5 +41,21 @@ public class ConfigurationUtil {
     public static boolean isTemporary(String dir) {
         return dir.startsWith(USER_HOME);
     }
-}
 
+    /**
+     * Return temporary directory location with specific suffix
+     * to make sure that the temporary directory name is not
+     * just "/tmp" but "/tmp/ZZZ" so that a SELinux context
+     * could be set for ZZZ.
+     */
+    public static String getTempDirectory() {
+        String tmpdir = System.getProperty("java.io.tmpdir", "/tmp");
+        if ("/tmp".equals(tmpdir)) {
+            if (!tmpdir.endsWith("/")) {
+                tmpdir = tmpdir + "/";
+            }
+            return tmpdir + RPKI_RSYNC_DIR_SUFFIX;
+        }
+        return tmpdir;
+    }
+}

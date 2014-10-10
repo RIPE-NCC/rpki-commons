@@ -34,6 +34,7 @@ import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.util.ConfigurationUtil;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
 import java.io.File;
@@ -66,7 +67,7 @@ public class RemoteCertificateFetcher {
     }
 
     private CertificateRepositoryObject getRemoteObject(String sourcePath) {
-        String tempDestinationPath = System.getProperty("java.io.tmpdir") + "/rsync-tmp-" + UUID.randomUUID();
+        String tempDestinationPath = ConfigurationUtil.getTempDirectory() + "/rsync-tmp-" + UUID.randomUUID();
         File tempDestinationFile = new File(tempDestinationPath);
         try {
             rsync.reset();
@@ -80,7 +81,7 @@ public class RemoteCertificateFetcher {
             }
             return null;
         } catch (IOException e) {
-            throw new RemoteCertificateFetcherException("I/O error occured trying to rsync from: " + rsync.getSource() + " to:" + rsync.getDestination(), e);
+            throw new RemoteCertificateFetcherException("I/O error occurred trying to rsync from: " + rsync.getSource() + " to:" + rsync.getDestination(), e);
         } catch (ClassCastException e) {
             throw new RemoteCertificateFetcherException("Remote object is not a resource certificate!", e);
         } finally {
