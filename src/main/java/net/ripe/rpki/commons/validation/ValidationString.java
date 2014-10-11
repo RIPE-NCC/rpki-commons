@@ -129,6 +129,7 @@ public final class ValidationString {
     public static final String CMS_SIGNER_INFO_SKI_ONLY = "cms.signer.info.ski.only";
     public static final String ENCRYPTION_ALGORITHM = "cms.encryption.algorithm";
     public static final String SIGNED_ATTRS_PRESENT = "cms.signed.attrs.present";
+    public static final String SIGNED_ATTRS_CORRECT = "cms.signed.attrs.correct";
     public static final String CONTENT_TYPE_ATTR_PRESENT = "cms.content.type.attr.present";
     public static final String CONTENT_TYPE_VALUE_COUNT = "cms.content.type.value.count";
     public static final String CONTENT_TYPE_VALUE = "cms.content.type.value";

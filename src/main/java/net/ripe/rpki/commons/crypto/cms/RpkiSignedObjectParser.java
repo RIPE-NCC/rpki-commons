@@ -34,7 +34,9 @@ import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperExcep
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
+
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -242,6 +244,40 @@ public abstract class RpkiSignedObjectParser {
             return null; // Caller will validate that the SignerInformationStore is not null
         }
     }
+    
+    private boolean isAllowedSignedAttribute(Attribute signedAttribute) {
+    	
+    	//This isn't in the bouncy castle file CMSAttributes, where the other CMS OID come from.
+    	ASN1ObjectIdentifier binarySigningTimeOID = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.2.46");
+    	ASN1ObjectIdentifier attributeOID = signedAttribute.getAttrType();
+    	
+    	//Check if the attribute is any of the allowed ones.
+    	return binarySigningTimeOID.equals(attributeOID) || CMSAttributes.signingTime.equals(attributeOID) || CMSAttributes.contentType.equals(attributeOID)
+    			|| CMSAttributes.messageDigest.equals(attributeOID);
+    }
+    
+    private boolean verifyOptionalSignedAttributes(SignerInformation signer) {
+
+    	//To loop over
+    	ASN1EncodableVector signedAttributes = signer.getSignedAttributes().toASN1EncodableVector();
+    	
+        boolean allAttributesCorrect = true;
+        for(int i = 0; i < signedAttributes.size(); i++){
+        	ASN1Encodable signedAttribute = signedAttributes.get(i);
+        	if(!isAllowedSignedAttribute((Attribute)signedAttribute)){
+        		allAttributesCorrect = false;
+        		break;
+        	}
+        }
+        
+        if(allAttributesCorrect){
+        	validationResult.pass(SIGNED_ATTRS_CORRECT);
+        } else {
+    		validationResult.warn(SIGNED_ATTRS_CORRECT);
+        }
+        
+        return allAttributesCorrect;
+    }
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
         validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
@@ -251,6 +287,15 @@ public abstract class RpkiSignedObjectParser {
         }
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
+        
+        //http://tools.ietf.org/html/rfc6488#section-2.1.6.4
+        //MUST include contentType and messageDigest
+        //MAY include signingTime, binary-signing-time, or both
+        //Other attributes MUST NOT be included
+        
+        //Check if the signedAttributes are allowed
+        verifyOptionalSignedAttributes(signer);
+        
         SignerId signerId = signer.getSID();
         try {
             validationResult.rejectIfFalse(signerId.match(new JcaX509CertificateHolder(certificate)), SIGNER_ID_MATCH);
