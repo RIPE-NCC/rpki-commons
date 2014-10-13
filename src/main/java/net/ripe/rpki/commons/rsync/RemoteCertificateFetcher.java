@@ -70,6 +70,9 @@ public class RemoteCertificateFetcher {
         String tempDestinationPath = ConfigurationUtil.getTempDirectory() + "/rsync-tmp-" + UUID.randomUUID();
         File tempDestinationFile = new File(tempDestinationPath);
         try {
+            if (!tempDestinationFile.exists()) {
+                tempDestinationFile.getParentFile().mkdir();
+            }
             rsync.reset();
             rsync.setSource(sourcePath);
             rsync.setDestination(tempDestinationPath);
