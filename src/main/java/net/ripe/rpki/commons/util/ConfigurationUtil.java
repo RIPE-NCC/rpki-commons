@@ -32,8 +32,6 @@ package net.ripe.rpki.commons.util;
 public class ConfigurationUtil {
     private static final String USER_HOME = System.getProperty("user.home");
 
-    private static final String RPKI_RSYNC_DIR_SUFFIX = "RPKI-RSYNC";
-
     public static String interpolate(String value) {
         return value.replaceAll("\\$\\{HOME\\}", USER_HOME);
     }
@@ -43,6 +41,13 @@ public class ConfigurationUtil {
     }
 
     public static String getTempDirectory() {
-        return System.getProperty("java.io.tmpdir", "/tmp");
+        String tmpdir = System.getProperty("java.io.tmpdir", "/tmp");
+        final String prefix = "/tmp/RPKI-";
+        if (tmpdir.startsWith(prefix)) {
+            // We want to have some stable directory to be
+            // able running tests on CI with SELinux set up
+            return tmpdir.replaceFirst("\\/tmp\\/", "/tmp/RPKI-RSYNC/");
+        }
+        return tmpdir;
     }
 }
