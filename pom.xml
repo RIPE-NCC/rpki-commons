@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.ripe.rpki</groupId>
     <artifactId>rpki-commons</artifactId>
-    <version>1.0.40-SNAPSHOT</version>
+    <version>1.0.40</version>
     <inceptionYear>2008</inceptionYear>
     <parent>
         <groupId>org.sonatype.oss</groupId>
