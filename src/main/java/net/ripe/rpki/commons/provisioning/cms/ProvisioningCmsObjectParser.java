@@ -40,6 +40,7 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -125,7 +126,7 @@ public class ProvisioningCmsObjectParser {
         try {
             sp = new CMSSignedDataParser(DIGEST_CALCULATOR_PROVIDER, encoded);
         } catch (CMSException e) {
-            validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
+            validationResult.rejectIfFalse(false, CMS_DATA_PARSING, extractMessages(e));
             return;
         }
         validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
@@ -138,6 +139,16 @@ public class ProvisioningCmsObjectParser {
         parseCertificates();
         parseCmsCrl();
         verifySignerInfos();
+    }
+
+    private String extractMessages(CMSException e) {
+        Throwable t = e;
+        final List<String> messages = new ArrayList<String>();
+        while (t != null && !messages.contains(t.getMessage())) {
+            messages.add(t.getMessage());
+            t = t.getCause();
+        }
+        return StringUtils.join(messages, ", reason: ");
     }
 
     public ProvisioningCmsObject getProvisioningCmsObject() {
