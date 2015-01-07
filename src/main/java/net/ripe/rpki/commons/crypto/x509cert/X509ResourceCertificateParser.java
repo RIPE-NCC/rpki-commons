@@ -32,6 +32,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -107,11 +108,13 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             return false;
         }
         ASN1Encodable firstCnValue = firstCn.getValue();
-        return firstCnValue != null && isPrintableString(firstCnValue.toString());
+        return firstCnValue != null && isPrintableString(firstCnValue);
     }
 
-    private boolean isPrintableString(String s) {
-        return PRINTABLE_STRING.matcher(s).matches();
+    //http://tools.ietf.org/html/rfc6487#section-4.4
+    //CN must be type PrintableString
+    private boolean isPrintableString(ASN1Encodable value){
+    	return value instanceof DERPrintableString;
     }
 
     private void validateCertificatePolicy() {
