@@ -80,6 +80,10 @@ public class CertificateRepositoryObjectValidationContext {
         return certificate.getRepositoryUri();
     }
 
+    public byte[] getSubjectKeyIdentifier() {
+        return certificate.getSubjectKeyIdentifier();
+    }
+
     public void addOverclaiming(IpResourceSet overclaiming) {
         this.overclaiming.addAll(overclaiming);
     }

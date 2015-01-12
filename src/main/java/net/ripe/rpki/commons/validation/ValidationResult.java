@@ -123,11 +123,12 @@ public final class ValidationResult implements Serializable {
         return warnIfTrue(object != null, key, param);
     }
 
-    public void rejectForLocation(ValidationLocation location, String key, String... param) {
+    public ValidationResult rejectForLocation(ValidationLocation location, String key, String... param) {
         ValidationLocation locationBefore = currentLocation;
         setLocation(location);
         setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
         setLocation(locationBefore);
+        return this;
     }
 
     public void warnForLocation(ValidationLocation location, String key, String... param) {
@@ -272,7 +273,7 @@ public final class ValidationResult implements Serializable {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
-    public void addAll(ValidationResult that) {
+    public ValidationResult addAll(ValidationResult that) {
         for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> resultsByLocation : that.results.entrySet()) {
             Map<ValidationStatus, List<ValidationCheck>> map = results.get(resultsByLocation.getKey());
             if (map == null) {
@@ -288,5 +289,6 @@ public final class ValidationResult implements Serializable {
                 list.addAll(checks.getValue());
             }
         }
+        return this;
     }
 }
