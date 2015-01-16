@@ -182,6 +182,7 @@ public final class ValidationString {
     public static final String VALIDATOR_OBJECT_PROCESSING_EXCEPTION = "validator.object.processing.exception";
     public static final String VALIDATOR_MANIFEST_LOCATION_MISMATCH = "validator.manifest.location.mismatch";
     public static final String VALIDATOR_CA_SHOULD_HAVE_MANIFEST = "validator.ca.should.have.manifest";
+    public static final String VALIDATOR_MULTIPLE_OBJECTS_SAME_URI = "validator.multiple.objects.same.uri";
 
     // Problems with repository
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
