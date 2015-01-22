@@ -179,6 +179,8 @@ public final class ValidationString {
     public static final String VALIDATOR_FETCHED_OBJECT_IS_MANIFEST = "validator.fetched.object.is.manifest";
     public static final String VALIDATOR_FETCHED_OBJECT_IS_CRL = "validator.fetched.object.is.crl";
     public static final String VALIDATOR_MANIFEST_DOES_NOT_CONTAIN_FILE = "validator.manifest.does.not.contain.file";
+    public static final String VALIDATOR_MANIFEST_CRL_URI_MISMATCH = "validator.manifest.crl.uri.mismatch";
+    public static final String VALIDATOR_MANIFEST_FILE_NOT_FOUND_BY_AKI = "validator.manifest.file.not.found.by.aki";
     public static final String VALIDATOR_OBJECT_PROCESSING_EXCEPTION = "validator.object.processing.exception";
     public static final String VALIDATOR_MANIFEST_LOCATION_MISMATCH = "validator.manifest.location.mismatch";
     public static final String VALIDATOR_CA_SHOULD_HAVE_MANIFEST = "validator.ca.should.have.manifest";
