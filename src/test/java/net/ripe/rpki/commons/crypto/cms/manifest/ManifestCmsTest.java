@@ -309,6 +309,12 @@ public class ManifestCmsTest {
         assertFalse(mft.matchesFiles(wrongFiles));
     }
 
+    @Test
+    public void shouldPastValidityTimeForCmsBeTheSameAsTheCertificate() {
+        ManifestCms subject = getRootManifestCms();
+        assertEquals(subject.getCertificate().isPastValidityTime(), subject.isPastValidityTime());
+    }
+
 
     private X509Crl getRootCrl() {
         return getRootCrlBuilder().build(ROOT_KEY_PAIR.getPrivate());

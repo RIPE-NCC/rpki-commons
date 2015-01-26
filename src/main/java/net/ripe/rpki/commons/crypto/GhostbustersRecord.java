@@ -49,6 +49,11 @@ public class GhostbustersRecord implements CertificateRepositoryObject {
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
     }
 
+    @Override
+    public boolean isPastValidityTime() {
+        throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
+    }
+
     public URI getCrlUri() {
         throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
     }

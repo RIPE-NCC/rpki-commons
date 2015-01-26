@@ -49,6 +49,11 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
     }
 
+    @Override
+    public boolean isPastValidityTime() {
+        throw new UnsupportedOperationException("Unknown object type");
+    }
+
     public URI getCrlUri() {
         throw new UnsupportedOperationException("Unknown object type");
     }

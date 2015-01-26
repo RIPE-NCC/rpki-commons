@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.crypto.cms.roa;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -144,5 +145,11 @@ public class RoaCmsTest {
     public void shouldUseNotValidBeforeTimeForSigningTime() {
         RoaCms roaCms = createRoaCms(allPrefixes);
         assertEquals(roaCms.getCertificate().getValidityPeriod().getNotValidBefore(), roaCms.getSigningTime());
+    }
+
+    @Test
+    public void shouldPastValidityTimeForCmsBeTheSameAsTheCertificate() {
+        RoaCms subject = getRoaCms();
+        assertEquals(subject.getCertificate().isPastValidityTime(), subject.isPastValidityTime());
     }
 }

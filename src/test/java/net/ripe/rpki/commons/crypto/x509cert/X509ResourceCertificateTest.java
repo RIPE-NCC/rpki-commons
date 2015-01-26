@@ -332,4 +332,10 @@ public class X509ResourceCertificateTest {
 
         assertFalse(cert.getResources().isEmpty());
     }
+
+    @Test
+    public void shouldNotBePastValidityTime() {
+        X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
+        assertEquals(cert.getValidityPeriod().isExpiredNow(), cert.isPastValidityTime());
+    }
 }

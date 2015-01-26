@@ -45,5 +45,7 @@ public interface CertificateRepositoryObject extends Serializable {
 
     void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result);
 
+    boolean isPastValidityTime();
+
     byte[] getEncoded();
 }

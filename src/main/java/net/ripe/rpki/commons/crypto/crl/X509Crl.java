@@ -190,6 +190,11 @@ public class X509Crl implements CertificateRepositoryObject {
         crlValidator.validate(location, this);
     }
 
+    @Override
+    public boolean isPastValidityTime() {
+        return getNextUpdateTime().isBeforeNow();
+    }
+
     public int getVersion() {
         return getCrl().getVersion();
     }

@@ -149,6 +149,11 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         validator.validate(location, this);
     }
 
+    @Override
+    public boolean isPastValidityTime() {
+        return getValidityPeriod().isExpiredNow();
+    }
+
     public IpResourceSet deriveResources(IpResourceSet parentResources) {
         IpResourceSet result = new IpResourceSet(getResources());
         for (IpResource ipResource : parentResources) {

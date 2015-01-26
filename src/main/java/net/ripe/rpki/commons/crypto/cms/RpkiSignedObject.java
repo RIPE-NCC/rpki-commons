@@ -149,6 +149,11 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     }
 
     @Override
+    public boolean isPastValidityTime() {
+        return getCertificate().isPastValidityTime();
+    }
+
+    @Override
     public int hashCode() {
         return Arrays.hashCode(getEncoded());
     }
