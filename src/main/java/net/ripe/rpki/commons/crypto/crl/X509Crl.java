@@ -195,6 +195,11 @@ public class X509Crl implements CertificateRepositoryObject {
         return getNextUpdateTime().isBeforeNow();
     }
 
+    @Override
+    public boolean isRevoked() {
+        return false;
+    }
+
     public int getVersion() {
         return getCrl().getVersion();
     }

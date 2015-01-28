@@ -54,6 +54,11 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
         throw new UnsupportedOperationException("Unknown object type");
     }
 
+    @Override
+    public boolean isRevoked() {
+        return false;
+    }
+
     public URI getCrlUri() {
         throw new UnsupportedOperationException("Unknown object type");
     }

@@ -54,6 +54,11 @@ public class GhostbustersRecord implements CertificateRepositoryObject {
         throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
     }
 
+    @Override
+    public boolean isRevoked() {
+        return false;
+    }
+
     public URI getCrlUri() {
         throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
     }

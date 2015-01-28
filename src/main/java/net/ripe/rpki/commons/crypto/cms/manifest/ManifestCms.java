@@ -143,19 +143,7 @@ public class ManifestCms extends RpkiSignedObject {
         return getCertificate().getParentCertificateUri();
     }
 
-    @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
-        ValidationLocation savedCurrentLocation = result.getCurrentLocation();
-        result.setLocation(new ValidationLocation(getCrlUri()));
-
-        X509Crl crl = crlLocator.getCrl(getCrlUri(), context, result);
-
-        result.setLocation(savedCurrentLocation);
-        result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
-        if (crl == null) {
-            return;
-        }
-
+    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
         result.setLocation(new ValidationLocation(location));
         checkManifestValidityTimes(options, result);
         X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);

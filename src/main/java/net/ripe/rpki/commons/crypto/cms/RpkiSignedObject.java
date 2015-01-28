@@ -34,10 +34,7 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationOptions;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationString;
+import net.ripe.rpki.commons.validation.*;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
@@ -49,6 +46,8 @@ import org.joda.time.DateTime;
 import javax.security.auth.x500.X500Principal;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
@@ -75,6 +74,8 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     private String oid; // Storing oid as String  so that this class is serializable
 
     private DateTime signingTime;
+
+    private Boolean revoked;
 
     protected RpkiSignedObject(RpkiSignedObjectInfo cmsObjectData) {
         this(cmsObjectData.getEncoded(), cmsObjectData.getCertificate(), cmsObjectData.getContentType(), cmsObjectData.getSigningTime());
@@ -143,14 +144,36 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         result.setLocation(savedCurrentLocation);
         result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
         if (crl != null) {
-            X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
-            validator.validate(location, getCertificate());
+            validateWithCrl(location, context, options, result, crl);
         }
+
+        revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
+    }
+
+    abstract protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl);
+
+    private boolean hasErrorInRevocationCheck(List<ValidationCheck> failures) {
+        Iterator<ValidationCheck> iterator = failures.iterator();
+        while (iterator.hasNext()) {
+            ValidationCheck validationCheck = iterator.next();
+            if (ValidationString.CERT_NOT_REVOKED.equals(validationCheck.getKey()) && validationCheck.getStatus() == ValidationStatus.ERROR) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean isPastValidityTime() {
         return getCertificate().isPastValidityTime();
+    }
+
+    @Override
+    public boolean isRevoked() {
+        if (revoked == null) {
+            throw new RuntimeException("isRevoked() could only be called after validate()");
+        }
+        return revoked;
     }
 
     @Override

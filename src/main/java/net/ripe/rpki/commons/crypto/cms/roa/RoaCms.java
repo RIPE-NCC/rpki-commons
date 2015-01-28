@@ -33,7 +33,12 @@ import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
+import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 import java.net.URI;
@@ -81,4 +86,8 @@ public class RoaCms extends RpkiSignedObject implements Roa {
         return parser.getRoaCms();
     }
 
+    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
+        X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
+        validator.validate(location, getCertificate());
+    }
 }

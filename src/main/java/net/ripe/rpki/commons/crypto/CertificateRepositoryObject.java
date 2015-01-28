@@ -47,5 +47,7 @@ public interface CertificateRepositoryObject extends Serializable {
 
     boolean isPastValidityTime();
 
+    boolean isRevoked();
+
     byte[] getEncoded();
 }

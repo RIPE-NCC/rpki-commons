@@ -154,6 +154,11 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         return getValidityPeriod().isExpiredNow();
     }
 
+    @Override
+    public boolean isRevoked() {
+        return false;// TODO
+    }
+
     public IpResourceSet deriveResources(IpResourceSet parentResources) {
         IpResourceSet result = new IpResourceSet(getResources());
         for (IpResource ipResource : parentResources) {
