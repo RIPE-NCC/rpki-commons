@@ -43,6 +43,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.bouncycastle.asn1.x509.X509Extension;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;

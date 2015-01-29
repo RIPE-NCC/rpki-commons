@@ -43,6 +43,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.ValidationStatus;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -111,8 +112,9 @@ public class CertificateRepositoryObjectFactoryTest {
         assertTrue(object instanceof RoaCms);
         assertEquals(roaCms, object);
         assertEquals(49, validationResult.getAllValidationChecksForCurrentLocation().size());
-        assertTrue(validationResult.hasNoFailuresOrWarnings());
+        assertFalse(validationResult.hasFailures());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+        assertEquals(ValidationStatus.WARNING, validationResult.getResultForCurrentLocation(CRLDP_OMITTED).getStatus());
     }
 
     @Test

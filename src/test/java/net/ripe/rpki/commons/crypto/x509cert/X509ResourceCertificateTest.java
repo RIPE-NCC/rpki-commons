@@ -44,6 +44,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryOb
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -343,6 +344,7 @@ public class X509ResourceCertificateTest {
     }
 
     @Test
+    @Ignore("Production code not implemented")
     public void shouldBeRevoked() {
         X509ResourceCertificate rootCert = createSelfSignedCaResourceCertificateBuilder()
                 .withResources(TEST_RESOURCE_SET)
