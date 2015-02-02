@@ -319,17 +319,16 @@ public class ManifestCmsTest {
     public void shouldBeRevoked() {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate);
         final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
-        result.setLocation(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION));
 
         X509Crl crl = getRootCrlBuilder()
-                .addEntry(subject.getNumber(), DateTime.now().minusMinutes(1))
+                .addEntry(subject.getCertificate().getSerialNumber(), DateTime.now().minusMinutes(1))
                 .build(ROOT_KEY_PAIR.getPrivate());
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
 
         subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
-        assertEquals(subject.isRevoked(), subject.getCertificate().isRevoked());
+        assertTrue(subject.isRevoked());
     }
 
 
