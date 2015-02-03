@@ -57,6 +57,8 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
 
     public static final ASN1ObjectIdentifier ID_AD_RPKI_MANIFEST = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".10");
 
+    public static final ASN1ObjectIdentifier ID_AD_RPKI_NOTIFY = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".13");
+
     private String method;
     private URI location;
 

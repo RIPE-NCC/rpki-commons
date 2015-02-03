@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.validation.objectvalidators;
 
+import com.google.common.base.Objects;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -77,7 +78,7 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public URI getRepositoryURI() {
-        return certificate.getRepositoryUri();
+        return Objects.firstNonNull(certificate.getRrdpNotifyUri(), certificate.getRepositoryUri());
     }
 
     public byte[] getSubjectKeyIdentifier() {

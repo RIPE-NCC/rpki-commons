@@ -120,6 +120,10 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         return X509CertificateUtil.getRepositoryUri(certificate);
     }
 
+    public URI getRrdpNotifyUri() {
+        return X509CertificateUtil.getRrdpNotifyUri(certificate);
+    }
+
     public boolean isObjectIssuer() {
         return X509CertificateUtil.isObjectIssuer(certificate);
     }
