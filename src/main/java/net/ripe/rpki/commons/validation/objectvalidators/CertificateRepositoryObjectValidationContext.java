@@ -78,7 +78,11 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public URI getRepositoryURI() {
-        return Objects.firstNonNull(certificate.getRrdpNotifyUri(), certificate.getRepositoryUri());
+        return certificate.getRepositoryUri();
+    }
+
+    public URI getRpkiNotifyURI() {
+        return certificate.getRrdpNotifyUri();
     }
 
     public byte[] getSubjectKeyIdentifier() {
