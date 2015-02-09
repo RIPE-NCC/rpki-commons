@@ -87,7 +87,7 @@ public class X509CertificateUtilTest {
     @Test
     public void shouldParseRrdpRepositoryUrl() throws java.security.cert.CertificateException {
         final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        X509Certificate certificate = (X509Certificate) factory.generateCertificate(IOUtils.toInputStream(CERT_WITH_RRDP_URL, Charset.forName("UTF-8")));
+        X509Certificate certificate = (X509Certificate) factory.generateCertificate(IOUtils.toInputStream(CERT_WITH_RRDP_URL, Charset.forName("ASCII")));
 
         URI rrdpNotifyUri = X509CertificateUtil.getRrdpNotifyUri(certificate);
 
