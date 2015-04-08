@@ -212,6 +212,10 @@ public final class ValidationResult implements Serializable {
         return getChecks(location, ValidationStatus.ERROR);
     }
 
+    public List<ValidationCheck> getWarnings(ValidationLocation location) {
+        return getChecks(location, ValidationStatus.WARNING);
+    }
+
     public boolean hasFailureForCurrentLocation() {
         return hasFailureForLocation(currentLocation);
     }
