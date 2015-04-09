@@ -173,7 +173,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     }
 
     @Test
-    public void testShouldWarnOnMisingKeyUsage() {
+    public void testShouldWarnOnMissingKeyUsage() {
         child = createChildBuilder().withKeyUsage(0).build();
 
         X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());

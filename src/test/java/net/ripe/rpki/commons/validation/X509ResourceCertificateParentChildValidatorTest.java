@@ -181,7 +181,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     }
 
     @Test
-    public void shouldWarnOnMisingKeyUsage() {
+    public void shouldWarnOnMissingKeyUsage() {
         child = createChildCertificateBuilder().withKeyUsage(0).build();
 
         X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
@@ -203,7 +203,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     }
 
     @Test
-    public void shouldRejectInvalidResorceSet() {
+    public void shouldRejectInvalidResourceSet() {
         child = createChildCertificateBuilder().withInheritedResourceTypes(EnumSet.noneOf(IpResourceType.class)).withResources(INVALID_CHILD_RESOURCE_SET).build();
 
         X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
