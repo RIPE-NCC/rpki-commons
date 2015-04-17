@@ -80,6 +80,7 @@ public final class ValidationString {
     public static final String CRL_REQUIRED = "crl.required";
     public static final String CRL_NEXT_UPDATE_BEFORE_NOW = "crl.next.update.before.now";
     public static final String CRL_MANIFEST_VALID = "crl.manifest.valid";
+    public static final String CRL_AKI_MISMATCH = "crl.aki.mismatch";
 
     //certificate (parser)
     public static final String CERTIFICATE_PARSED = "cert.parsed";
@@ -185,6 +186,7 @@ public final class ValidationString {
     public static final String VALIDATOR_MANIFEST_URI_MISMATCH = "validator.manifest.uri.mismatch";
     public static final String VALIDATOR_OBJECT_PROCESSING_EXCEPTION = "validator.object.processing.exception";
     public static final String VALIDATOR_MANIFEST_LOCATION_MISMATCH = "validator.manifest.location.mismatch";
+    public static final String VALIDATOR_MANIFEST_IS_INVALID = "validator.manifest.is.invalid";
     public static final String VALIDATOR_CA_SHOULD_HAVE_MANIFEST = "validator.ca.should.have.manifest";
 
     // Problems with repository
