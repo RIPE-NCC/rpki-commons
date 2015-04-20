@@ -266,7 +266,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withSubjectKeyIdentifier(true);
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(VALIDITY_PERIOD);
-        builder.withCrlDistributionPoints(new URI[]{URI.create("rsync://localhost/ta.crl")});
+        builder.withCrlDistributionPoints(URI.create("rsync://localhost/ta.crl"));
         return builder;
     }
 
@@ -285,7 +285,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withAuthorityKeyIdentifier(true);
         builder.withSubjectKeyIdentifier(true);
         builder.withResources(CHILD_RESOURCE_SET);
-        builder.withCrlDistributionPoints(new URI[]{URI.create("rsync://localhost/prod.crl")});
+        builder.withCrlDistributionPoints(URI.create("rsync://localhost/prod.crl"));
         return builder;
     }
 
