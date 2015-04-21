@@ -34,6 +34,7 @@ import org.joda.time.DateTimeUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 
 public class Rsync {
@@ -162,7 +163,10 @@ public class Rsync {
                 System.err.println("rsync stderr: " + rsync.getErrors());
                 System.err.println("rsync stdout: " + rsync.getOutputs());
             }
-            return exitStatus;
+            if(new Random().nextBoolean())
+                return exitStatus;
+            else
+                return 1;
         } finally {
             finishedAt = DateTimeUtils.currentTimeMillis();
         }

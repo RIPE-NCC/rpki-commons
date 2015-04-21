@@ -197,4 +197,7 @@ public final class ValidationString {
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_FOUND = "validator.repository.object.not.found";
     public static final String VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD = "validator.repository.unsupported.ghostbusters.record";
     public static final String VALIDATOR_REPOSITORY_EXPIRED_REVOKED_OBJECT = "validator.repository.expired.revoked.object";
+
+    // Problems fetching
+    public static final String VALIDATOR_REPO_EXECUTION = "validator.repo.execution";
 }
