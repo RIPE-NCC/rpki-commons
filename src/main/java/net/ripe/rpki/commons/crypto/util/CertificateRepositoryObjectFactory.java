@@ -101,11 +101,10 @@ public final class CertificateRepositoryObjectFactory {
         RoaCmsParser parser = new RoaCmsParser();
         ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
+        validationResult.addAll(temp);
         if (parser.isSuccess()) {
-            validationResult.addAll(temp);
             return parser.getRoaCms();
         } else {
-            validationResult.addAll(temp);
             return null;
         }
     }

@@ -162,6 +162,7 @@ public class Rsync {
                 System.err.println("rsync stderr: " + rsync.getErrors());
                 System.err.println("rsync stdout: " + rsync.getOutputs());
             }
+
             return exitStatus;
         } finally {
             finishedAt = DateTimeUtils.currentTimeMillis();

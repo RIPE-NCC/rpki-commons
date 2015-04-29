@@ -27,47 +27,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto;
+package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import net.ripe.rpki.commons.crypto.crl.CrlLocator;
+import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
+import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.joda.time.DateTime;
 
 import java.net.URI;
 
-public class UnknownCertificateRepositoryObject implements CertificateRepositoryObject {
+public class GhostbustersCms extends RpkiSignedObject {
 
-    private static final long serialVersionUID = 1L;
-
-    private final byte[] encoded;
-
-    public UnknownCertificateRepositoryObject(byte[] encoded) {
-        this.encoded = encoded;
-    }
-
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    protected GhostbustersCms(RpkiSignedObjectInfo cmsObjectData) {
+        super(cmsObjectData);
     }
 
     @Override
-    public boolean isPastValidityTime() {
-        throw new UnsupportedOperationException("Unknown object type");
+    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
+        //We do not handle Ghostbusters
     }
 
     @Override
-    public boolean isRevoked() {
-        return false;
-    }
-
-    public URI getCrlUri() {
-        throw new UnsupportedOperationException("Unknown object type");
-    }
-
     public URI getParentCertificateUri() {
-        throw new UnsupportedOperationException("Unknown object type");
-    }
-
-    public byte[] getEncoded() {
-        return encoded;
+        return getCertificate().getParentCertificateUri();
     }
 }

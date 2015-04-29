@@ -44,7 +44,9 @@ import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryOb
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -59,6 +61,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.util.EnumSet;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -67,6 +70,7 @@ import static org.mockito.Mockito.*;
 public class X509ResourceCertificateTest {
 
     public static final URI TEST_TA_URI = URI.create("rsync://host.foo/ta.cer");
+    public static final URI TEST_CA_URI = URI.create("rsync://host.foo/ca.cer");
     private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_URI);
 
     public static final URI TEST_TA_CRL = URI.create("rsync://host.foo/bar/ta.crl");
@@ -331,5 +335,41 @@ public class X509ResourceCertificateTest {
         resources.removeAll(new IpResourceSet(resources));
 
         assertFalse(cert.getResources().isEmpty());
+    }
+
+    @Test
+    public void shouldNotBePastValidityTime() {
+        X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
+        assertEquals(cert.getValidityPeriod().isExpiredNow(), cert.isPastValidityTime());
+    }
+
+    @Test
+    @Ignore("Production code not implemented")
+    public void shouldBeRevoked() {
+        X509ResourceCertificate rootCert = createSelfSignedCaResourceCertificateBuilder()
+                .withResources(TEST_RESOURCE_SET)
+                .withCrlDistributionPoints(TEST_TA_CRL)
+                .build();
+        BigInteger serialNumber = BigInteger.valueOf(new Random(new DateTime().getMillis()).nextLong());
+
+        X509ResourceCertificate subject = createBasicBuilder()
+                .withResources(TEST_RESOURCE_SET)
+                .withSerial(serialNumber)
+                .build();
+
+        X509Crl crl = X509CrlTest.getCrlBuilder()
+                .withAuthorityKeyIdentifier(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic())
+                .addEntry(serialNumber, DateTime.now().minusDays(1))
+                .build(KeyPairFactoryTest.TEST_KEY_PAIR.getPrivate());
+
+        CrlLocator crlLocator = Mockito.mock(CrlLocator.class);
+        Mockito.when(crlLocator.getCrl(Mockito.any(URI.class), Mockito.any(CertificateRepositoryObjectValidationContext.class), Mockito.any(ValidationResult.class))).thenReturn(crl);
+
+        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCert);
+
+        subject.validate(TEST_CA_URI.toString(), validationContext, crlLocator, new ValidationOptions(), ValidationResult.withLocation(TEST_CA_URI));
+
+        assertTrue("Certificate must be revoked", subject.isRevoked());
+
     }
 }

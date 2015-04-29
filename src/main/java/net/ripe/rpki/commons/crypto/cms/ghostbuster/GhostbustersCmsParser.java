@@ -27,47 +27,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto;
+package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import net.ripe.rpki.commons.crypto.crl.CrlLocator;
-import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
+import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.bouncycastle.asn1.ASN1Encodable;
 
-import java.net.URI;
+public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
-public class UnknownCertificateRepositoryObject implements CertificateRepositoryObject {
-
-    private static final long serialVersionUID = 1L;
-
-    private final byte[] encoded;
-
-    public UnknownCertificateRepositoryObject(byte[] encoded) {
-        this.encoded = encoded;
-    }
-
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    @Override
+    public void parse(ValidationResult result, byte[] encoded) {
+        super.parse(result, encoded);
     }
 
     @Override
-    public boolean isPastValidityTime() {
-        throw new UnsupportedOperationException("Unknown object type");
+    public void decodeContent(ASN1Encodable encoded) { }
+
+    public GhostbustersCms getGhostbustersCms() {
+        RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
+        return new GhostbustersCms(cmsObjectData);
     }
 
-    @Override
-    public boolean isRevoked() {
-        return false;
+    public boolean isSuccess() {
+        return true;
     }
 
-    public URI getCrlUri() {
-        throw new UnsupportedOperationException("Unknown object type");
-    }
-
-    public URI getParentCertificateUri() {
-        throw new UnsupportedOperationException("Unknown object type");
-    }
-
-    public byte[] getEncoded() {
-        return encoded;
-    }
 }

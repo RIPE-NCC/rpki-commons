@@ -71,7 +71,7 @@ public final class ValidationResult implements Serializable {
         return new ValidationResult(location);
     }
 
-    public void setLocation(ValidationLocation location) {
+    public ValidationResult setLocation(ValidationLocation location) {
         currentLocation = location;
 
         if (!results.containsKey(currentLocation)) {
@@ -81,24 +81,29 @@ public final class ValidationResult implements Serializable {
             locationResults.put(ValidationStatus.PASSED, new ArrayList<ValidationCheck>());
             results.put(currentLocation, locationResults);
         }
+        return this;
     }
 
-    private void setValidationCheckForCurrentLocation(ValidationStatus status, String key, String... param) {
+    private ValidationResult setValidationCheckForCurrentLocation(ValidationStatus status, String key, String... param) {
         Map<ValidationStatus, List<ValidationCheck>> currentResults = results.get(currentLocation);
         List<ValidationCheck> checksForStatus = currentResults.get(status);
         checksForStatus.add(new ValidationCheck(status, key, param));
+        return this;
     }
 
-    public void pass(String key, String... param) {
+    public ValidationResult pass(String key, String... param) {
         setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+        return this;
     }
 
-    public void warn(String key, String... param) {
+    public ValidationResult warn(String key, String... param) {
         setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
+        return this;
     }
 
-    public void error(String key, String... param) {
+    public ValidationResult error(String key, String... param) {
         setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
+        return this;
     }
 
     public boolean warnIfFalse(boolean condition, String key, String... param) {
@@ -123,18 +128,20 @@ public final class ValidationResult implements Serializable {
         return warnIfTrue(object != null, key, param);
     }
 
-    public void rejectForLocation(ValidationLocation location, String key, String... param) {
+    public ValidationResult rejectForLocation(ValidationLocation location, String key, String... param) {
         ValidationLocation locationBefore = currentLocation;
         setLocation(location);
         setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
         setLocation(locationBefore);
+        return this;
     }
 
-    public void warnForLocation(ValidationLocation location, String key, String... param) {
+    public ValidationResult warnForLocation(ValidationLocation location, String key, String... param) {
         ValidationLocation locationBefore = currentLocation;
         setLocation(location);
         setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
         setLocation(locationBefore);
+        return this;
     }
 
     public boolean rejectIfFalse(boolean condition, String key, String... param) {
@@ -159,11 +166,12 @@ public final class ValidationResult implements Serializable {
         return rejectIfTrue(object != null, key, param);
     }
 
-    public void addMetric(String name, String value) {
+    public ValidationResult addMetric(String name, String value) {
         if (!metrics.containsKey(currentLocation)) {
             metrics.put(currentLocation, new ArrayList<ValidationMetric>());
         }
         metrics.get(currentLocation).add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+        return this;
     }
 
     // Accessors
@@ -202,6 +210,10 @@ public final class ValidationResult implements Serializable {
 
     public List<ValidationCheck> getFailures(ValidationLocation location) {
         return getChecks(location, ValidationStatus.ERROR);
+    }
+
+    public List<ValidationCheck> getWarnings(ValidationLocation location) {
+        return getChecks(location, ValidationStatus.WARNING);
     }
 
     public boolean hasFailureForCurrentLocation() {
@@ -272,7 +284,7 @@ public final class ValidationResult implements Serializable {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
-    public void addAll(ValidationResult that) {
+    public ValidationResult addAll(ValidationResult that) {
         for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> resultsByLocation : that.results.entrySet()) {
             Map<ValidationStatus, List<ValidationCheck>> map = results.get(resultsByLocation.getKey());
             if (map == null) {
@@ -288,5 +300,6 @@ public final class ValidationResult implements Serializable {
                 list.addAll(checks.getValue());
             }
         }
+        return this;
     }
 }

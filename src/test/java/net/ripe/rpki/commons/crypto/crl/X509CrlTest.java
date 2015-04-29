@@ -114,4 +114,10 @@ public class X509CrlTest {
         assertTrue(result.hasFailureForLocation(rootMftCrlValidationLocation));
         assertEquals(ValidationString.CRL_SIGNATURE_VALID, result.getFailures(rootMftCrlValidationLocation).get(0).getKey());
     }
+
+    @Test
+    public void shouldBePastValidityTime() {
+        X509Crl subject = createCrl();
+        assertFalse(subject.isPastValidityTime());
+    }
 }

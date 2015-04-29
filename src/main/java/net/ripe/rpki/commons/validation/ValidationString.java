@@ -80,6 +80,7 @@ public final class ValidationString {
     public static final String CRL_REQUIRED = "crl.required";
     public static final String CRL_NEXT_UPDATE_BEFORE_NOW = "crl.next.update.before.now";
     public static final String CRL_MANIFEST_VALID = "crl.manifest.valid";
+    public static final String CRL_AKI_MISMATCH = "crl.aki.mismatch";
 
     //certificate (parser)
     public static final String CERTIFICATE_PARSED = "cert.parsed";
@@ -179,7 +180,14 @@ public final class ValidationString {
     public static final String VALIDATOR_FETCHED_OBJECT_IS_MANIFEST = "validator.fetched.object.is.manifest";
     public static final String VALIDATOR_FETCHED_OBJECT_IS_CRL = "validator.fetched.object.is.crl";
     public static final String VALIDATOR_MANIFEST_DOES_NOT_CONTAIN_FILE = "validator.manifest.does.not.contain.file";
+    public static final String VALIDATOR_MANIFEST_CRL_URI_MISMATCH = "validator.manifest.crl.uri.mismatch";
+    public static final String VALIDATOR_MANIFEST_FILE_NOT_FOUND_BY_AKI = "validator.manifest.file.not.found.by.aki";
+    public static final String VALIDATOR_MANIFEST_HASH_MISMATCH = "validator.manifest.hash.mismatch";
+    public static final String VALIDATOR_MANIFEST_URI_MISMATCH = "validator.manifest.uri.mismatch";
     public static final String VALIDATOR_OBJECT_PROCESSING_EXCEPTION = "validator.object.processing.exception";
+    public static final String VALIDATOR_MANIFEST_LOCATION_MISMATCH = "validator.manifest.location.mismatch";
+    public static final String VALIDATOR_MANIFEST_IS_INVALID = "validator.manifest.is.invalid";
+    public static final String VALIDATOR_CA_SHOULD_HAVE_MANIFEST = "validator.ca.should.have.manifest";
 
     // Problems with repository
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
@@ -188,5 +196,8 @@ public final class ValidationString {
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_IN_CACHE = "validator.repository.object.not.in.cache";
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_FOUND = "validator.repository.object.not.found";
     public static final String VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD = "validator.repository.unsupported.ghostbusters.record";
+    public static final String VALIDATOR_REPOSITORY_EXPIRED_REVOKED_OBJECT = "validator.repository.expired.revoked.object";
 
+    // Problems fetching
+    public static final String VALIDATOR_REPO_EXECUTION = "validator.repo.execution";
 }

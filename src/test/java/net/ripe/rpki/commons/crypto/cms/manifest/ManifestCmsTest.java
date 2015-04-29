@@ -309,6 +309,29 @@ public class ManifestCmsTest {
         assertFalse(mft.matchesFiles(wrongFiles));
     }
 
+    @Test
+    public void shouldPastValidityTimeForCmsBeTheSameAsTheCertificate() {
+        ManifestCms subject = getRootManifestCms();
+        assertEquals(subject.getCertificate().isPastValidityTime(), subject.isPastValidityTime());
+    }
+
+    @Test
+    public void shouldBeRevoked() {
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate);
+        final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+
+        X509Crl crl = getRootCrlBuilder()
+                .addEntry(subject.getCertificate().getSerialNumber(), DateTime.now().minusMinutes(1))
+                .build(ROOT_KEY_PAIR.getPrivate());
+
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+
+        assertTrue(subject.isRevoked());
+    }
+
+
 
     private X509Crl getRootCrl() {
         return getRootCrlBuilder().build(ROOT_KEY_PAIR.getPrivate());

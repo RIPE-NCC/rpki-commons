@@ -31,7 +31,6 @@ package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
-import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.util.Specification;
 import net.ripe.rpki.commons.validation.ValidationLocation;
@@ -71,14 +70,14 @@ public class ManifestCms extends RpkiSignedObject {
 
     public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
 
-    private Map<String, byte[]> files;
+    private Map<String, byte[]> hashes;
 
     private ManifestCmsGeneralInfo manifestCmsGeneralInfo;
 
-    ManifestCms(RpkiSignedObjectInfo cmsObjectData, ManifestCmsGeneralInfo manifestCmsGeneralInfo, Map<String, byte[]> files) {
+    ManifestCms(RpkiSignedObjectInfo cmsObjectData, ManifestCmsGeneralInfo manifestCmsGeneralInfo, Map<String, byte[]> hashes) {
         super(cmsObjectData);
         this.manifestCmsGeneralInfo = manifestCmsGeneralInfo;
-        this.files = files;
+        this.hashes = hashes;
     }
 
     public int getVersion() {
@@ -102,21 +101,25 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     public int size() {
-        return files.size();
+        return hashes.size();
     }
 
     public boolean containsFile(String fileName) {
-        return files.containsKey(fileName);
+        return hashes.containsKey(fileName);
+    }
+
+    public Map<String, byte[]> getHashes() {
+        return hashes;
     }
 
     public Map<String, byte[]> getFiles() {
-        return files;
+        return getHashes();
     }
 
     public boolean matchesFiles(Map<String, byte[]> filesToMatch) {
 
-        if (files.keySet().equals(filesToMatch.keySet())) {
-            for (Entry<String, byte[]> entry : files.entrySet()) {
+        if (hashes.keySet().equals(filesToMatch.keySet())) {
+            for (Entry<String, byte[]> entry : hashes.entrySet()) {
                 String fileName = entry.getKey();
                 byte[] contentToMatch = filesToMatch.get(fileName);
                 if (!verifyFileContents(fileName, contentToMatch)) {
@@ -130,7 +133,7 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     public Set<String> getFileNames() {
-        return files.keySet();
+        return hashes.keySet();
     }
 
     @Override
@@ -143,19 +146,7 @@ public class ManifestCms extends RpkiSignedObject {
         return getCertificate().getParentCertificateUri();
     }
 
-    @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
-        ValidationLocation savedCurrentLocation = result.getCurrentLocation();
-        result.setLocation(new ValidationLocation(getCrlUri()));
-
-        X509Crl crl = crlLocator.getCrl(getCrlUri(), context, result);
-
-        result.setLocation(savedCurrentLocation);
-        result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
-        if (crl == null) {
-            return;
-        }
-
+    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
         result.setLocation(new ValidationLocation(location));
         checkManifestValidityTimes(options, result);
         X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
@@ -181,7 +172,7 @@ public class ManifestCms extends RpkiSignedObject {
      */
     @Deprecated
     public byte[] getHash(String fileName) {
-        return files.get(fileName);
+        return hashes.get(fileName);
     }
 
     public boolean verifyFileContents(String fileName, byte[] contents) {

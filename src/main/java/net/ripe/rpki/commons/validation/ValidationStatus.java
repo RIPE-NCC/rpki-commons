@@ -30,5 +30,5 @@
 package net.ripe.rpki.commons.validation;
 
 public enum ValidationStatus {
-    ERROR, WARNING, PASSED
+    ERROR, WARNING, PASSED, FETCH_ERROR
 }

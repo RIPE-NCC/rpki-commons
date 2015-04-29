@@ -38,19 +38,17 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationOptions;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationString;
+import net.ripe.rpki.commons.validation.*;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import org.apache.commons.lang.Validate;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
@@ -63,6 +61,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
     private final EnumSet<IpResourceType> inheritedResourceTypes;
     private final IpResourceSet resources;
+    private Boolean revoked;
 
 
     protected X509ResourceCertificate(X509Certificate certificate) {
@@ -147,6 +146,32 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         }
         X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateValidator(context, options, result, crl);
         validator.validate(location, this);
+
+        revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
+    }
+
+    private boolean hasErrorInRevocationCheck(List<ValidationCheck> failures) {
+        Iterator<ValidationCheck> iterator = failures.iterator();
+        while (iterator.hasNext()) {
+            ValidationCheck validationCheck = iterator.next();
+            if (ValidationString.CERT_NOT_REVOKED.equals(validationCheck.getKey()) && validationCheck.getStatus() == ValidationStatus.ERROR) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isPastValidityTime() {
+        return getValidityPeriod().isExpiredNow();
+    }
+
+    @Override
+    public boolean isRevoked() {
+        if (revoked == null) {
+            throw new RuntimeException("isRevoked() could only be called after validate()");
+        }
+        return revoked;
     }
 
     public IpResourceSet deriveResources(IpResourceSet parentResources) {

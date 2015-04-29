@@ -31,13 +31,24 @@ package net.ripe.rpki.commons.crypto.cms.roa;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
+import net.ripe.rpki.commons.crypto.crl.CrlLocator;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
+import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.bouncycastle.asn1.x509.X509Extension;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
@@ -53,9 +64,11 @@ import static org.junit.Assert.*;
 
 public class RoaCmsTest {
 
-    public static final X500Principal TEST_DN = new X500Principal("CN=Test");
+    public static final X500Principal TEST_DN = new X500Principal("CN=issuer");
     public static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
     public static final URI TEST_ROA_LOCATION = URI.create("rsync://certificate/repository/filename.roa");
+    private static final URI CRL_DP = URI.create("rsync://certificate/repository/filename.crl");
+    public static final BigInteger ROA_CERT_SERIAL = BigInteger.TEN;
 
     private List<RoaPrefix> ipv4Prefixes;
     private List<RoaPrefix> allPrefixes;
@@ -99,20 +112,18 @@ public class RoaCmsTest {
             resources.add(prefix.getPrefix());
         }
         X509ResourceCertificateBuilder builder = createCertificateBuilder(resources);
-        X509ResourceCertificate result = builder.build();
-        return result;
+        return builder.build();
     }
 
     private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(BigInteger.TEN);
+        builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         builder.withValidityPeriod(new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1)));
         builder.withResources(resources);
-        builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor[]{
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, TEST_ROA_LOCATION)
-        });
+        builder.withCrlDistributionPoints(CRL_DP);
+        builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, TEST_ROA_LOCATION));
         return builder;
     }
 
@@ -144,5 +155,42 @@ public class RoaCmsTest {
     public void shouldUseNotValidBeforeTimeForSigningTime() {
         RoaCms roaCms = createRoaCms(allPrefixes);
         assertEquals(roaCms.getCertificate().getValidityPeriod().getNotValidBefore(), roaCms.getSigningTime());
+    }
+
+    @Test
+    public void shouldPastValidityTimeForCmsBeTheSameAsTheCertificate() {
+        assertEquals(subject.getCertificate().isPastValidityTime(), subject.isPastValidityTime());
+    }
+
+    @Test
+    public void shouldBeRevoked() {
+        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(subject.getParentCertificateUri(), subject.getCertificate());
+        X509Crl crl = X509CrlTest.getCrlBuilder()
+                .withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic())
+                .addEntry(ROA_CERT_SERIAL, DateTime.now().minusDays(1))
+                .build(TEST_KEY_PAIR.getPrivate());
+
+        CrlLocator crlLocator = Mockito.mock(CrlLocator.class);
+        Mockito.when(crlLocator.getCrl(Mockito.any(URI.class), Mockito.any(CertificateRepositoryObjectValidationContext.class), Mockito.any(ValidationResult.class))).thenReturn(crl);
+
+        subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, new ValidationOptions(), ValidationResult.withLocation(TEST_ROA_LOCATION));
+
+        assertTrue("ROA must be revoked", subject.isRevoked());
+    }
+
+    @Test
+    public void shouldNotBeRevoked() {
+        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(subject.getParentCertificateUri(), subject.getCertificate());
+        X509Crl crl = X509CrlTest.getCrlBuilder()
+                .withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic())
+                .addEntry(ROA_CERT_SERIAL.add(BigInteger.ONE), DateTime.now().minusDays(1))
+                .build(TEST_KEY_PAIR.getPrivate());
+
+        CrlLocator crlLocator = Mockito.mock(CrlLocator.class);
+        Mockito.when(crlLocator.getCrl(Mockito.any(URI.class), Mockito.any(CertificateRepositoryObjectValidationContext.class), Mockito.any(ValidationResult.class))).thenReturn(crl);
+
+        subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, new ValidationOptions(), ValidationResult.withLocation(TEST_ROA_LOCATION));
+
+        assertFalse("ROA must not be revoked", subject.isRevoked());
     }
 }

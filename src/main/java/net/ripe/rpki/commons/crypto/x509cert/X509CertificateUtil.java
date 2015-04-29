@@ -256,6 +256,10 @@ public final class X509CertificateUtil {
         return findFirstSubjectInformationAccessByMethod(certificate, X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY);
     }
 
+    public static URI getRrdpNotifyUri(X509Certificate certificate) {
+        return findFirstByMethod(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY, "http", getSubjectInformationAccess(certificate));
+    }
+
     public static boolean isObjectIssuer(X509Certificate certificate) {
         return getManifestUri(certificate) != null;
     }
