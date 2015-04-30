@@ -188,6 +188,8 @@ public final class ValidationString {
     public static final String VALIDATOR_MANIFEST_LOCATION_MISMATCH = "validator.manifest.location.mismatch";
     public static final String VALIDATOR_MANIFEST_IS_INVALID = "validator.manifest.is.invalid";
     public static final String VALIDATOR_CA_SHOULD_HAVE_MANIFEST = "validator.ca.should.have.manifest";
+    public static final String VALIDATOR_ROOT_CERTIFICATE_INCLUDED_IN_MANIFEST = "validator.root.certificate.included.in.manifest";
+    public static final String VALIDATOR_CIRCULAR_REFERENCE = "validator.circular.reference";
 
     // Problems with repository
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
