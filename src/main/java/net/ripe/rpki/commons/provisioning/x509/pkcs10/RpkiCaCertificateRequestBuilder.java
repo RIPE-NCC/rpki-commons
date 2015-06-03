@@ -62,6 +62,8 @@ public class RpkiCaCertificateRequestBuilder {
 
     private URI manifestUri;
 
+    private URI notificationUri;
+
     private String signatureAlgorithm = "SHA256withRSA";
 
     private String signatureProvider = "SunRsaSign";
@@ -78,6 +80,11 @@ public class RpkiCaCertificateRequestBuilder {
 
     public RpkiCaCertificateRequestBuilder withManifestUri(URI manifestUri) {
         this.manifestUri = manifestUri;
+        return this;
+    }
+
+    public RpkiCaCertificateRequestBuilder withNotificationUri(URI notificationUri) {
+        this.notificationUri = notificationUri;
         return this;
     }
 
@@ -120,9 +127,17 @@ public class RpkiCaCertificateRequestBuilder {
         // http://www.bouncycastle.org/wiki/display/JA1/X.509+Public+Key+Certificate+and+Certification+Request+Generation
         List<Extension> extensions = new ArrayList<Extension>();
 
-        X509CertificateInformationAccessDescriptor[] descriptors = new X509CertificateInformationAccessDescriptor[]{
+        X509CertificateInformationAccessDescriptor[] descriptors;
+        if (notificationUri == null) {
+            descriptors = new X509CertificateInformationAccessDescriptor[]{
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri),
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri),};
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri)};
+        } else {
+            descriptors = new X509CertificateInformationAccessDescriptor[]{
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri),
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, manifestUri),
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY, notificationUri)};
+        }
         AccessDescription[] subjectInformationAccess = X509CertificateInformationAccessDescriptor.convertAccessDescriptors(descriptors);
         DERSequence derSequence = new DERSequence(subjectInformationAccess);
 

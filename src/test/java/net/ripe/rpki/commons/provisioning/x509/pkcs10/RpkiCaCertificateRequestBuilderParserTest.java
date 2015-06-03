@@ -81,6 +81,7 @@ public class RpkiCaCertificateRequestBuilderParserTest {
 
         Assert.assertEquals(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_REPO_URI, requestParser.getCaRepositoryUri());
         Assert.assertEquals(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_MFT_URI, requestParser.getManifestUri());
+        Assert.assertEquals(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_NOTIFICATION_URI, requestParser.getNotificationUri());
         Assert.assertEquals(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_KEYPAIR.getPublic(), requestParser.getPublicKey());
     }
 
@@ -88,6 +89,7 @@ public class RpkiCaCertificateRequestBuilderParserTest {
         RpkiCaCertificateRequestBuilder requestBuilder = new RpkiCaCertificateRequestBuilder();
         requestBuilder.withCaRepositoryUri(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_REPO_URI);
         requestBuilder.withManifestUri(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_MFT_URI);
+        requestBuilder.withNotificationUri(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_NOTIFICATION_URI);
         requestBuilder.withSubject(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_SUBJECT);
         PKCS10CertificationRequest pkcs10Request = requestBuilder.build(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_KEYPAIR);
         return pkcs10Request;

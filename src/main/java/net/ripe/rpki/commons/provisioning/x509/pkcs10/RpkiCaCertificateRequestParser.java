@@ -67,6 +67,8 @@ public class RpkiCaCertificateRequestParser {
 
     private URI manifestUri;
 
+    private URI notificationUri;
+
     private PublicKey publicKey;
 
     public RpkiCaCertificateRequestParser(PKCS10CertificationRequest pkcs10CertificationRequest) throws RpkiCaCertificateRequestParserException {
@@ -90,6 +92,10 @@ public class RpkiCaCertificateRequestParser {
 
     public URI getManifestUri() {
         return manifestUri;
+    }
+
+    public URI getNotificationUri() {
+        return notificationUri;
     }
 
     public PublicKey getPublicKey() {
@@ -127,7 +133,9 @@ public class RpkiCaCertificateRequestParser {
                     caRepositoryUri = accessDescriptor.getLocation();
                 } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST)) {
                     manifestUri = accessDescriptor.getLocation();
-                } else {
+                } else if (oid.equals(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY)) {
+                    notificationUri = accessDescriptor.getLocation();
+                }else {
                     throw new RpkiCaCertificateRequestParserException("Don't understand access descriptor using method: " + oid);
                 }
             }

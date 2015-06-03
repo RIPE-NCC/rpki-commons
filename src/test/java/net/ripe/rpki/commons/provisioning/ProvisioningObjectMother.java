@@ -71,6 +71,7 @@ public class ProvisioningObjectMother {
 
     public static URI RPKI_CA_CERT_REQUEST_CA_REPO_URI = URI.create("rsync://host/module/subdir/");
     public static URI RPKI_CA_CERT_REQUEST_CA_MFT_URI = URI.create("rsync://host/module/subdir/subject.mft");
+    public static URI RPKI_CA_CERT_REQUEST_CA_NOTIFICATION_URI = URI.create("http://host:7788/module/subdir/notification.xml");
 
     public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
     public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate();
