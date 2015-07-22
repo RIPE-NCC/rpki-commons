@@ -30,17 +30,20 @@
 package net.ripe.rpki.commons.rsync;
 
 import org.joda.time.DateTimeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 
 public class Rsync {
 
     public static final int DEFAULT_TIMEOUT_IN_SECONDS = 300;
 
     private static final String COMMAND = "rsync";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Rsync.class);
 
     private Command command;
 
@@ -156,11 +159,10 @@ public class Rsync {
             command = rsync;
             int exitStatus = rsync.getExitStatus();
             if (exitStatus != 0) {
-                // TODO Possibly change to some sort of proper logging
-                System.err.println("rsync command line: " + args);
-                System.err.println("rsync exit status: " + exitStatus);
-                System.err.println("rsync stderr: " + rsync.getErrors());
-                System.err.println("rsync stdout: " + rsync.getOutputs());
+                LOGGER.error("rsync command line: " + args);
+                LOGGER.error("rsync exit status: " + exitStatus);
+                LOGGER.error("rsync stderr: " + rsync.getErrors());
+                LOGGER.error("rsync stdout: " + rsync.getOutputs());
             }
 
             return exitStatus;
