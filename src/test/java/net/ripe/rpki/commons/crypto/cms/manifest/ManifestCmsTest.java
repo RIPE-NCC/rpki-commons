@@ -318,7 +318,7 @@ public class ManifestCmsTest {
 
     @Test
     public void shouldBeRevoked() {
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, Lists.newArrayList(rootCertificate.getSubject().getName()));
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate);
         final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         X509Crl crl = getRootCrlBuilder()

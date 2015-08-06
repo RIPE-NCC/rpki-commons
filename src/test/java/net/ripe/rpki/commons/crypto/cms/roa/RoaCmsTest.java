@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
@@ -162,7 +161,7 @@ public class RoaCmsTest {
     @Test
     public void shouldBeRevoked() {
         CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(
-            subject.getParentCertificateUri(), subject.getCertificate(), Lists.newArrayList(subject.getCertificate().getSubject().getName()));
+            subject.getParentCertificateUri(), subject.getCertificate());
         X509Crl crl = X509CrlTest.getCrlBuilder()
                 .withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic())
                 .addEntry(ROA_CERT_SERIAL, DateTime.now().minusDays(1))
@@ -179,7 +178,7 @@ public class RoaCmsTest {
     @Test
     public void shouldNotBeRevoked() {
         CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(
-            subject.getParentCertificateUri(), subject.getCertificate(), Lists.newArrayList(subject.getCertificate().getSubject().getName()));
+            subject.getParentCertificateUri(), subject.getCertificate());
         X509Crl crl = X509CrlTest.getCrlBuilder()
                 .withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic())
                 .addEntry(ROA_CERT_SERIAL.add(BigInteger.ONE), DateTime.now().minusDays(1))

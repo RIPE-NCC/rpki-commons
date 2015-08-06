@@ -48,7 +48,7 @@ import java.util.List;
  */
 public class CertificateRepositoryObjectValidationContext {
 
-    private List<String> subjectChain;
+    private final List<String> subjectChain;
 
     private final URI location;
 
@@ -58,8 +58,8 @@ public class CertificateRepositoryObjectValidationContext {
 
     private IpResourceSet overclaiming = new IpResourceSet();
 
-    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, List<String> subjectChain) {
-        this(location, certificate, certificate.getResources(), subjectChain);
+    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
+        this(location, certificate, certificate.getResources(), Lists.newArrayList(certificate.getSubject().getName()));
     }
 
     public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources, List<String> subjectChain) {
