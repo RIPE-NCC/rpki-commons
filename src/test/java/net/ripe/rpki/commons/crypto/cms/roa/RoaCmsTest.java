@@ -29,12 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
@@ -43,11 +42,9 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import javax.security.auth.x500.X500Principal;
@@ -164,7 +161,8 @@ public class RoaCmsTest {
 
     @Test
     public void shouldBeRevoked() {
-        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(subject.getParentCertificateUri(), subject.getCertificate());
+        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(
+            subject.getParentCertificateUri(), subject.getCertificate(), Lists.newArrayList(subject.getCertificate().getSubject().getName()));
         X509Crl crl = X509CrlTest.getCrlBuilder()
                 .withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic())
                 .addEntry(ROA_CERT_SERIAL, DateTime.now().minusDays(1))
@@ -180,7 +178,8 @@ public class RoaCmsTest {
 
     @Test
     public void shouldNotBeRevoked() {
-        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(subject.getParentCertificateUri(), subject.getCertificate());
+        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(
+            subject.getParentCertificateUri(), subject.getCertificate(), Lists.newArrayList(subject.getCertificate().getSubject().getName()));
         X509Crl crl = X509CrlTest.getCrlBuilder()
                 .withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic())
                 .addEntry(ROA_CERT_SERIAL.add(BigInteger.ONE), DateTime.now().minusDays(1))

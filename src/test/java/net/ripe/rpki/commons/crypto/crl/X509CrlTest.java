@@ -29,7 +29,9 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
+import com.google.common.collect.Lists;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -91,7 +93,8 @@ public class X509CrlTest {
         ValidationResult result = ValidationResult.withLocation(ROOT_MANIFEST_CRL_LOCATION);
         CrlLocator crlLocator = mock(CrlLocator.class);
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_MANIFEST_CRL_LOCATION, createSelfSignedCaResourceCertificate());
+        X509ResourceCertificate selfSignedCaResourceCertificate = createSelfSignedCaResourceCertificate();
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_MANIFEST_CRL_LOCATION, selfSignedCaResourceCertificate, Lists.newArrayList(selfSignedCaResourceCertificate.getSubject().getName()));
 
         subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 
@@ -104,7 +107,8 @@ public class X509CrlTest {
         ValidationResult result = ValidationResult.withLocation(ROOT_MANIFEST_CRL_LOCATION);
         CrlLocator crlLocator = mock(CrlLocator.class);
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_MANIFEST_CRL_LOCATION, createSelfSignedCaResourceCertificate());
+        X509ResourceCertificate selfSignedCaResourceCertificate = createSelfSignedCaResourceCertificate();
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_MANIFEST_CRL_LOCATION, selfSignedCaResourceCertificate, Lists.newArrayList(selfSignedCaResourceCertificate.getSubject().getName()));
 
         subject.validate(ROOT_MANIFEST_CRL_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
 

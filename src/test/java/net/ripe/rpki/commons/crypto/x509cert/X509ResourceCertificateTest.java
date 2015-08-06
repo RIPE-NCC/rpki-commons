@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -273,7 +274,7 @@ public class X509ResourceCertificateTest {
     public void shouldIgnoreCrlWhenValidatingRootCertificate() {
         ValidationResult result = ValidationResult.withLocation(TEST_TA_URI);
         X509ResourceCertificate selfSignedCert = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, selfSignedCert);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, selfSignedCert, Lists.newArrayList(selfSignedCert.getSubject().getName()));
 
         selfSignedCert.validate(TEST_TA_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
     }
@@ -287,7 +288,7 @@ public class X509ResourceCertificateTest {
                 .withSubjectDN(new X500Principal("CN=child"))
                 .withCrlDistributionPoints(TEST_TA_CRL)
                 .build();
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenAnswer(new Answer<X509Crl>() {
             @Override
@@ -316,7 +317,7 @@ public class X509ResourceCertificateTest {
                 .withCrlDistributionPoints(TEST_TA_CRL)
                 .build();
         X509Crl crl = X509CrlTest.createCrl();
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenReturn(crl);
 
@@ -365,7 +366,7 @@ public class X509ResourceCertificateTest {
         CrlLocator crlLocator = Mockito.mock(CrlLocator.class);
         Mockito.when(crlLocator.getCrl(Mockito.any(URI.class), Mockito.any(CertificateRepositoryObjectValidationContext.class), Mockito.any(ValidationResult.class))).thenReturn(crl);
 
-        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCert);
+        CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCert, Lists.newArrayList(rootCert.getSubject().getName()));
 
         subject.validate(TEST_CA_URI.toString(), validationContext, crlLocator, new ValidationOptions(), ValidationResult.withLocation(TEST_CA_URI));
 

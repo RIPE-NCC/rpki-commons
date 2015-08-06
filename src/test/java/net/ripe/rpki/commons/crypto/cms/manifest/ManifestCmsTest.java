@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
+import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -152,7 +153,7 @@ public class ManifestCmsTest {
         X509Crl crl = getRootCrl();
         IpResourceSet resources = rootCertificate.getResources();
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -167,7 +168,7 @@ public class ManifestCmsTest {
     public void shouldNotValidateWithInvalidCrl() {
         IpResourceSet resources = rootCertificate.getResources();
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
         final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
         result.setLocation(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION));
         final ValidationLocation rootMftCrlValidationLocation = new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION);
@@ -197,7 +198,7 @@ public class ManifestCmsTest {
 
         IpResourceSet resources = rootCertificate.getResources();
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
         options.setMaxStaleDays(Integer.MAX_VALUE);
@@ -226,7 +227,7 @@ public class ManifestCmsTest {
 
         IpResourceSet resources = rootCertificate.getResources();
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
         options.setMaxStaleDays(0);
@@ -257,7 +258,7 @@ public class ManifestCmsTest {
 
         IpResourceSet resources = rootCertificate.getResources();
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
         options.setMaxStaleDays(100);
@@ -317,7 +318,7 @@ public class ManifestCmsTest {
 
     @Test
     public void shouldBeRevoked() {
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, Lists.newArrayList(rootCertificate.getSubject().getName()));
         final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         X509Crl crl = getRootCrlBuilder()

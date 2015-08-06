@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.validation.objectvalidators;
 
-import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -38,6 +38,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * Represents the context used to validate an issued object. The context
@@ -47,6 +48,8 @@ import java.net.URI;
  */
 public class CertificateRepositoryObjectValidationContext {
 
+    private List<String> subjectChain;
+
     private final URI location;
 
     private final X509ResourceCertificate certificate;
@@ -55,14 +58,15 @@ public class CertificateRepositoryObjectValidationContext {
 
     private IpResourceSet overclaiming = new IpResourceSet();
 
-    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
-        this(location, certificate, certificate.getResources());
+    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, List<String> subjectChain) {
+        this(location, certificate, certificate.getResources(), subjectChain);
     }
 
-    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources) {
+    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources, List<String> subjectChain) {
         this.location = location;
         this.certificate = certificate;
         this.resources = resources;
+        this.subjectChain = subjectChain;
     }
 
     public URI getLocation() {
@@ -71,6 +75,10 @@ public class CertificateRepositoryObjectValidationContext {
 
     public X509ResourceCertificate getCertificate() {
         return certificate;
+    }
+
+    public List<String> getSubjectChain() {
+        return subjectChain;
     }
 
     public URI getManifestURI() {
@@ -95,7 +103,9 @@ public class CertificateRepositoryObjectValidationContext {
 
     public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
         IpResourceSet effectiveResources = getEffectiveResources(childCertificate.deriveResources(resources));
-        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, effectiveResources);
+        List<String> childSubjects = Lists.newArrayList(subjectChain);
+        childSubjects.add(childCertificate.getSubject().getName());
+        return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, effectiveResources, childSubjects);
     }
 
     public IpResourceSet getResources() {

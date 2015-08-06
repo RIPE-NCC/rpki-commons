@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.validation;
 
 import com.gargoylesoftware.base.testing.EqualsTester;
+import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -57,7 +58,7 @@ public class CertificateRepositoryObjectValidationContextTest {
     private X509ResourceCertificate certificateWithInheritedResources;
 
     public static CertificateRepositoryObjectValidationContext create() {
-        return new CertificateRepositoryObjectValidationContext(location, certificate);
+        return new CertificateRepositoryObjectValidationContext(location, certificate, Lists.newArrayList(certificate.getSubject().getName()));
     }
 
     @Before
@@ -98,11 +99,19 @@ public class CertificateRepositoryObjectValidationContextTest {
     }
 
     @Test
+    public void shouldUpdateSubjectChainForChildCertificate() {
+        CertificateRepositoryObjectValidationContext childContext = subject.createChildContext(childLocation, certificateWithInheritedResources);
+
+        assertEquals(subject.getSubjectChain().size() + 1, childContext.getSubjectChain().size());
+        assertEquals(certificateWithInheritedResources.getSubject().getName(), childContext.getSubjectChain().get(childContext.getSubjectChain().size() - 1));
+    }
+
+    @Test
     public void testEquals() {
-        CertificateRepositoryObjectValidationContext a = new CertificateRepositoryObjectValidationContext(location, certificate);
-        CertificateRepositoryObjectValidationContext b = new CertificateRepositoryObjectValidationContext(location, certificate);
-        CertificateRepositoryObjectValidationContext c = new CertificateRepositoryObjectValidationContext(URI.create("rsync://another/uri"), certificateWithInheritedResources);
-        CertificateRepositoryObjectValidationContext d = new CertificateRepositoryObjectValidationContext(location, certificate) {
+        CertificateRepositoryObjectValidationContext a = new CertificateRepositoryObjectValidationContext(location, certificate, Lists.newArrayList(certificate.getSubject().getName()));
+        CertificateRepositoryObjectValidationContext b = new CertificateRepositoryObjectValidationContext(location, certificate, Lists.newArrayList(certificate.getSubject().getName()));
+        CertificateRepositoryObjectValidationContext c = new CertificateRepositoryObjectValidationContext(URI.create("rsync://another/uri"), certificateWithInheritedResources, Lists.newArrayList(certificateWithInheritedResources.getSubject().getName()));
+        CertificateRepositoryObjectValidationContext d = new CertificateRepositoryObjectValidationContext(location, certificate, Lists.newArrayList(certificate.getSubject().getName())) {
         };
         new EqualsTester(a, b, c, d);
     }
