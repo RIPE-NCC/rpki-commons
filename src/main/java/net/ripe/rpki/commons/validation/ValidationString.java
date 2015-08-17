@@ -197,6 +197,8 @@ public final class ValidationString {
     public static final String VALIDATOR_REPOSITORY_UNKNOWN = "validator.repository.unknown";
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_IN_CACHE = "validator.repository.object.not.in.cache";
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_FOUND = "validator.repository.object.not.found";
+    public static final String VALIDATOR_REPOSITORY_NOT_AT_EXPECTED_LOCATION = "validator.repository.object.not.at.expected.location";
+    public static final String VALIDATOR_REPOSITORY_AT_EXPECTED_LOCATION_AND_ELSEWHERE = "validator.repository.object.at.expected.location.and.elsewhere";
     public static final String VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD = "validator.repository.unsupported.ghostbusters.record";
     public static final String VALIDATOR_REPOSITORY_EXPIRED_REVOKED_OBJECT = "validator.repository.expired.revoked.object";
     public static final String VALIDATOR_REPOSITORY_TA_CERT_NOT_UNIQUE = "validator.repository.trust.anchor.certificate.not.unique";
