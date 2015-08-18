@@ -95,6 +95,7 @@ public class RemoteCertificateFetcherTest {
                 Files.write(encoded, new File(getDestination()));
                 return 0;
             } catch (IOException e) {
+                e.printStackTrace();
                 return 1;
             }
         }
