@@ -241,7 +241,7 @@ public final class X509CertificateUtil {
             return null;
         }
         for (URI uri : crlDistributionPoints) {
-            if (uri.getScheme().equals("rsync")) {
+            if (uri != null && "rsync".equals(uri.getScheme())) {
                 return uri;
             }
         }
