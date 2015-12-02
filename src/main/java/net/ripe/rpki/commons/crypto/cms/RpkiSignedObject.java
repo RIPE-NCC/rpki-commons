@@ -153,9 +153,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     abstract protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl);
 
     private boolean hasErrorInRevocationCheck(List<ValidationCheck> failures) {
-        Iterator<ValidationCheck> iterator = failures.iterator();
-        while (iterator.hasNext()) {
-            ValidationCheck validationCheck = iterator.next();
+        for (ValidationCheck validationCheck : failures) {
             if (ValidationString.CERT_NOT_REVOKED.equals(validationCheck.getKey()) && validationCheck.getStatus() == ValidationStatus.ERROR) {
                 return true;
             }

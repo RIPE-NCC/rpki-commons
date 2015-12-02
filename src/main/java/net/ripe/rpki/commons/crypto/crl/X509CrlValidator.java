@@ -76,8 +76,6 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
                 result.rejectIfTrue(true, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
             }
         }
-
-
     }
 
     private void checkSignature(X509Crl crl) {
