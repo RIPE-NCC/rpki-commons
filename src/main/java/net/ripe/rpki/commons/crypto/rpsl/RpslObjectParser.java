@@ -8,6 +8,11 @@ public class RpslObjectParser {
 
     public void parse(ValidationResult result, String rpsl) {
         rpslObject = new RpslObject(rpsl);
+        String signatureString = rpslObject.getAttribute("signature");
+        if (signatureString != null) {
+            RpslSignature signature = RpslSignature.parse(signatureString);
+            signature.getSignedAttributes();
+        }
     }
 
     public RpslObject getRpslObject() {

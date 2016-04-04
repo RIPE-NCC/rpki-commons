@@ -46,4 +46,8 @@ public class RpslObject {
     public Set<String> getAttributes() {
         return attributeValues.keySet();
     }
+
+    public String getAttribute(String name) {
+        return attributeValues.get(name);
+    }
 }
