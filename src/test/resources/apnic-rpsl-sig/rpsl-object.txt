@@ -1,0 +1,13 @@
+% [whois.apnic.net]
+% Whois data copyright terms    http://www.apnic.net/db/dbcopyright.html
+
+% Information related to '202.134.59.0/24AS38810'
+
+route:          202.134.59.0/24
+descr:          CAIRNINDIA
+remarks:        Oil and gas company
+origin:         AS38810
+mnt-by:         MAINT-NEW
+changed:        hm-changed@apnic.net 20071107
+source:         TESTAPNIC
+rpki-signature: v=1; c=rsync://rpki-testbed.apnic.net/repository/A30015AEABE011E290E79B6AA8B6C50A/NoMuNJdN_LsKjdttcwvbErnVru8.cer; m=sha256withRSAEncryption; t=2016-03-31T06:48:35Z; a=route+origin; b=ZlAvT0CxZr3N+t3ZwL0IpOPI0MuNMZ/+Dx/mmBXsUmgFryt2anUiNWOnLrDTwnAPAvfBwQKilnE12WXMdb6/8AkOdElLPdvZntIMA6y+2iWE5lTtK369XrY6VuOrv5d27U5vVVM93uGVaMPl3Od5TFo+OLZN/dCSca96EYeLAMJCJSCfCpB7QIKRr0sjv0uTXjkFu+L8FIFaRm6MCjT8DTuCHsXv0D4UGbPpg165ejgmp94i+Iz+Oz5v/uJSVnwnBEGkUvCoV5dMhIkHH8j4jDvD38Sgs6a/fc5tnzP6dUyRAnTWulHgF8IC4tr2PurGRWOxwJCwRsU67bKSeA6ltA==
