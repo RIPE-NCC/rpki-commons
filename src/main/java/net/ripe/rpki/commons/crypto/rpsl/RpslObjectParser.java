@@ -11,7 +11,9 @@ public class RpslObjectParser {
         String signatureString = rpslObject.getAttribute("signature");
         if (signatureString != null) {
             RpslSignature signature = RpslSignature.parse(signatureString);
-            signature.getSignedAttributes();
+
+            String canonicalised = rpslObject.canonicaliseAttributes(signature.getSignedAttributes())
+                    + RpslSignature.stripSignatureValue(signatureString);
         }
     }
 

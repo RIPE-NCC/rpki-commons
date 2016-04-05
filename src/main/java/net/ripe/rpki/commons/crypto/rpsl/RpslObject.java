@@ -1,7 +1,12 @@
 package net.ripe.rpki.commons.crypto.rpsl;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -49,5 +54,26 @@ public class RpslObject {
 
     public String getAttribute(String name) {
         return attributeValues.get(name);
+    }
+
+    public String canonicaliseAttributes(Iterable<String> signedAttributes) {
+        return Joiner.on('\n').join(
+                Iterables.transform(signedAttributes, canonicaliseAttribute()))
+                + '\n';
+    }
+
+    private Function<String, String> canonicaliseAttribute() {
+        return new Function<String, String>() {
+            @Override
+            public String apply(String input) {
+                Preconditions.checkNotNull(input);
+
+                return input.toLowerCase() + ": " + canonicaliseValue(attributeValues.get(input));
+            }
+        };
+    }
+
+    private String canonicaliseValue(String input) {
+        return CharMatcher.WHITESPACE.trimAndCollapseFrom(input, ' ');
     }
 }

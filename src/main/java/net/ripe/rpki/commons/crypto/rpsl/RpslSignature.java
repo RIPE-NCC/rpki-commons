@@ -1,7 +1,7 @@
 package net.ripe.rpki.commons.crypto.rpsl;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
+import com.google.common.base.*;
+import com.google.common.collect.FluentIterable;
 
 import java.util.List;
 import java.util.Map;
@@ -56,5 +56,18 @@ public class RpslSignature {
 
     public List<String> getSignedAttributes() {
         return signedAttributes;
+    }
+
+    public static String stripSignatureValue(String input) {
+        String collapsed = CharMatcher.WHITESPACE.trimAndCollapseFrom(input, ' ');
+        FluentIterable<String> withoutSignature = FluentIterable
+                .from(Splitter.on("; ").split(collapsed))
+                .transform(new Function<String, String>() {
+                    @Override
+                    public String apply(String input) {
+                        return input.replaceFirst("^b=.*", "b=");
+                    }
+                });
+        return Joiner.on(' ').join(withoutSignature) + '\n';
     }
 }
