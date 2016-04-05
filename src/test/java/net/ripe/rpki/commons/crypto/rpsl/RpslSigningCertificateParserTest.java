@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class RpslSigningCertificateParserTest {
 
@@ -18,7 +17,7 @@ public class RpslSigningCertificateParserTest {
 
     @Test
     public void shouldParseApnicCertificate() throws IOException {
-        byte[] encoded = Files.toByteArray(new File(PATH_TO_OBJECTS + "/NoMuNJdN_LsKjdttcwvbErnVru8.cer"));
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_OBJECTS + "/test.cer"));
         String location = "apnic-ee-cert-for-rpsl-signature";
         ValidationResult result = ValidationResult.withLocation(location);
 
