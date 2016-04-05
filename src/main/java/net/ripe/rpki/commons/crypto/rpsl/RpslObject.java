@@ -5,9 +5,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Base64;
 
 import java.net.URI;
 import java.security.*;
@@ -81,14 +79,7 @@ public class RpslObject {
         String canonicalised = canonicaliseAttributes(signature.getSignedAttributes())
                 + "signature: " + signature.canonicalise();
 
-System.out.println(":"+canonicalised+":");
-        byte[] bytes = canonicalised.getBytes();
-        SHA256Digest digest = new SHA256Digest();
-        digest.update(bytes, 0, bytes.length);
-        byte[] result = new byte[digest.getDigestSize()];
-        digest.doFinal(result, 0);
-System.out.println(Base64.toBase64String(result));
-
+//TODO
         URI signingCertificate = signature.getCertificateUri();
 
         byte[] signatureValue = signature.getSignatureValue();
