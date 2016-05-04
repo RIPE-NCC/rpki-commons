@@ -41,8 +41,8 @@ import static org.junit.Assert.*;
 public class ChildIdentitySerializerTest {
 
     static final String exampleChildIdXml =
-            "<ns0:identity xmlns:ns0=\"http://www.hactrn.net/uris/rpki/myrpki/\" handle=\"Bob\" version=\"2\">\n" +
-                    "<ns0:bpki_ta>\n" +
+            "<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\" handle=\"Bob\" version=\"2\" tag=\"1234\">\n" +
+                    "<ns0:child_bpki_ta>\n" +
                     "MIIDIDCCAgigAwIBAgIBATANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDEx5Cb2Ig\n" +
                     "QlBLSSBSZXNvdXJjZSBUcnVzdCBBbmNob3IwHhcNMTEwNzAxMDQwNzIzWhcNMTIw\n" +
                     "NjMwMDQwNzIzWjApMScwJQYDVQQDEx5Cb2IgQlBLSSBSZXNvdXJjZSBUcnVzdCBB\n" +
@@ -60,8 +60,8 @@ public class ChildIdentitySerializerTest {
                     "MhyfonLLgFb5jz7A3BTE63vlTp359uDbFb1nRdyoT31s3FUBK8jF4B5pWzPiLdct\n" +
                     "bOMVjYUBs8aFC3fDXyGSr/RcjE4OOZQyTkYZn8zCPUJ4KqOPAUV9u9jx2FPvOcA3\n" +
                     "1BjcmhYHqott+cnK1ITOjLe9EKejRZv/7/BFsmpzm2Zbq1KA\n" +
-                    "</ns0:bpki_ta>\n" +
-                    "</ns0:identity>\n";
+                    "</ns0:child_bpki_ta>\n" +
+                    "</ns0:child_request>\n";
 
     @Test
     public void shouldDeserializeXml() {

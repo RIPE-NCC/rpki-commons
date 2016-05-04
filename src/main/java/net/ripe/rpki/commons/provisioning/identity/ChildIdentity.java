@@ -39,10 +39,10 @@ import java.util.UUID;
 @XStreamAlias(ChildIdentity.CHILD_IDENTITY_NODE_NAME)
 public class ChildIdentity extends EqualsSupport {
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 1;
 
-    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
-    public static final String CHILD_IDENTITY_NODE_NAME = "identity";
+    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
+    public static final String CHILD_IDENTITY_NODE_NAME = "child_request";
 
     @SuppressWarnings("unused")
     @XStreamAsAttribute
@@ -50,10 +50,10 @@ public class ChildIdentity extends EqualsSupport {
     private final int version = VERSION;
 
     @XStreamAsAttribute
-    @XStreamAlias("handle")
+    @XStreamAlias("child_handle")
     private String handle;
 
-    @XStreamAlias("bpki_ta")
+    @XStreamAlias("child_bpki_ta")
     private ProvisioningIdentityCertificate identityCertificate;
 
 

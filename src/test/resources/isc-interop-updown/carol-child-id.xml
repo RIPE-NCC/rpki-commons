@@ -1,5 +1,5 @@
-<ns0:identity xmlns:ns0="http://www.hactrn.net/uris/rpki/myrpki/" handle="Carol" version="2">
-<ns0:bpki_ta>
+<ns0:child_request xmlns:ns0="http://www.hactrn.net/uris/rpki/rpki-setup/" child_handle="Carol" version="1">
+<ns0:child_bpki_ta>
 MIIDJDCCAgygAwIBAgIBATANBgkqhkiG9w0BAQsFADArMSkwJwYDVQQDEyBDYXJv
 bCBCUEtJIFJlc291cmNlIFRydXN0IEFuY2hvcjAeFw0xMTA3MDEwNDA3MjRaFw0x
 MjA2MzAwNDA3MjRaMCsxKTAnBgNVBAMTIENhcm9sIEJQS0kgUmVzb3VyY2UgVHJ1
@@ -17,5 +17,5 @@ vmOIa4PXJT7YSrQ9son98akGZf6dEnDhX/S15z+WpCAyuUY8Zgpq6JRSsRrn2eOl
 zVmf9sE9tFCC8ozSwiGTcyILf1sORqMClhebRenE1GNWJ7Pabe7NkvoN5guMVO5h
 0lSfHnuxQGutxd2BvD6nOC5lqQMmuPIE47yAN7PNPbwlMl32nUDkUrESCYJ2luFS
 g3PASHSsHw2Tg/azHFrGcMMEbhIAHd1iOGOIlRjlJhkHLJZFTJOyZw==
-</ns0:bpki_ta>
-</ns0:identity>
+</ns0:child_bpki_ta>
+</ns0:child_request>

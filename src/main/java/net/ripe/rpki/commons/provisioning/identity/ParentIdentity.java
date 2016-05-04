@@ -39,11 +39,21 @@ import java.net.URI;
 @XStreamAlias(ParentIdentity.PARENT_IDENTITY_NODE_NAME)
 public class ParentIdentity extends EqualsSupport {
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 1;
 
-    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/myrpki/";
-    public static final String PARENT_IDENTITY_NODE_NAME = "parent";
+    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
+    public static final String PARENT_IDENTITY_NODE_NAME = "parent_response";
 
+    public ParentIdentity(URI upDownUrl, String parentHandle,
+                          String childHandle,
+                          ProvisioningIdentityCertificate parentIdCertificate)
+    {
+        this(upDownUrl, parentHandle, childHandle, parentIdCertificate, null);
+    }
+
+    /*
+    Parameter childCertificate in method signature is only for backwards compatibility.
+     */
     public ParentIdentity(URI upDownUrl, String parentHandle,
                           String childHandle,
                           ProvisioningIdentityCertificate parentIdCertificate,
@@ -52,7 +62,6 @@ public class ParentIdentity extends EqualsSupport {
         this.parentHandle = parentHandle;
         this.childHandle = childHandle;
         this.parentIdCertificate = parentIdCertificate;
-        this.childIdCertificate = childIdCertificate;
     }
 
 
@@ -73,11 +82,9 @@ public class ParentIdentity extends EqualsSupport {
     @XStreamAlias("service_uri")
     private URI upDownUrl;
 
-    @XStreamAlias("bpki_resource_ta")
+    @XStreamAlias("parent_bpki_ta")
     private ProvisioningIdentityCertificate parentIdCertificate;
 
-    @XStreamAlias("bpki_child_ta")
-    private ProvisioningIdentityCertificate childIdCertificate;
 
     public String getChildHandle() {
         return childHandle;
@@ -92,9 +99,6 @@ public class ParentIdentity extends EqualsSupport {
         return parentIdCertificate;
     }
 
-    public ProvisioningIdentityCertificate getChildIdCertificate() {
-        return childIdCertificate;
-    }
 
     public URI getUpDownUrl() {
         return upDownUrl;

@@ -1,5 +1,5 @@
-<ns0:parent xmlns:ns0="http://www.hactrn.net/uris/rpki/myrpki/" valid_until="2012-07-25T18:45:58Z" service_uri="http://localhost:4404/up-down/ripe-ncc-rpkid-test/60e445f5-97d1-4fcb-bc95-b8e6ef79319e" child_handle="60e445f5-97d1-4fcb-bc95-b8e6ef79319e" parent_handle="ripe-ncc-rpkid-test" version="2">
-<ns0:bpki_resource_ta>
+<ns0:parent_response xmlns:ns0="http://www.hactrn.net/uris/rpki/rpki-setup/" valid_until="2012-07-25T18:45:58Z" service_uri="http://localhost:4404/up-down/ripe-ncc-rpkid-test/60e445f5-97d1-4fcb-bc95-b8e6ef79319e" child_handle="60e445f5-97d1-4fcb-bc95-b8e6ef79319e" parent_handle="ripe-ncc-rpkid-test" version="1">
+<ns0:parent_bpki_ta>
 MIIDQDCCAiigAwIBAgIBATANBgkqhkiG9w0BAQsFADA5MTcwNQYDVQQDEy5yaXBl
 LW5jYy1ycGtpZC10ZXN0IEJQS0kgUmVzb3VyY2UgVHJ1c3QgQW5jaG9yMB4XDTEx
 MDcyNjE0MDQwMloXDTEyMDcyNTE0MDQwMlowOTE3MDUGA1UEAxMucmlwZS1uY2Mt
@@ -18,24 +18,8 @@ B/AbczPm3x/gWrMKbO1m/qBz7BvI7ASgU3dBvZNoHAEaAzoJ/vT+lP+3Chs/El8r
 tLwqMr74WedpQSzspPg3b21/v7IL2f8VulzyRNwnRCY9k6thGJcDi7yT9uH/6H/Z
 5mIAV77DWWGBkQtJ4SiTdBu0LpJ6ZPkUiguRYTNAllSqBMz76eyc1DFHix7GoHY0
 ShsnKgqdi16hS+2QV6xrvjWr1s4=
-</ns0:bpki_resource_ta>
-<ns0:bpki_child_ta>MIIDRDCCAiygAwIBAgIBATANBgkqhkiG9w0BAQsFADAzMTEwLwYDVQQDEyhiZDFhZGRhNTVkMDVj
-OTMxNDk3YTE5ODZiZDBiY2ZiNDljNDExNDFmMB4XDTExMDcyNjE4NDIwNFoXDTIxMDcyNjE4NDIw
-NFowMzExMC8GA1UEAxMoYmQxYWRkYTU1ZDA1YzkzMTQ5N2ExOTg2YmQwYmNmYjQ5YzQxMTQxZjCC
-ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAIK174Fjm4jxL5uUud3g3oouMDNtV+cGwDXd
-XQHRVnGF3diKAFqJJb59gp7YO77AYDf6KwT/PPRqZ5q1/EVc6wSrODzMX/YJg+btR6OpAd5k0MVY
-fJCD333BBl/yVJ0eoZyB4flsNgeM2jaEqhxsJgKGUfa6RT4c25nE6k88yFfxbfE8RymyAaojtTkJ
-Bcc8ESubjsGbi3bsO6tUau52yRuXgiJ8s8QYyMPd44DvuO0Vf3uY9IbgNx0dQGMGtisR83Jsyyl2
-+3SM747B2Ct9ESAmOob5xDr2AP+VVkR0XdscO3HrPDZwQKkJMr4Q6nOAECAmMiTBCZz69nDbT9Mm
-ygMCAwEAAaNjMGEwHQYDVR0OBBYEFL0a3aVdBckxSXoZhr0Lz7ScQRQfMB8GA1UdIwQYMBaAFL0a
-3aVdBckxSXoZhr0Lz7ScQRQfMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMA0GCSqG
-SIb3DQEBCwUAA4IBAQBBuI6eCMZNT6y1c362O47auRHNdYuLbytbpkE1wXpFggHfQRTd0oxILw55
-gHADpAB9lzzs1Pu/OtZ3bHggpVBcax+njRZOozcVfEwGMXrS28aZQLjeN13HP0DfCBj+PLW/EqJJ
-o/uMnE0Y0b6k84Q3Kxo82m1Hrca5frbVn3QmutsBoEZYfVTe/sp8Iynu69RujRhkfN7sq5aQV6Kr
-5D82Jbgbkq2nH+oKPSmPYzLRsbeP8TOn4wq/r2O3oXi8B726iqcu3YwixBT98fLzYzrR7A04mLNS
-YtKqZBFzarFzRK6PKNE5O6zpA1fV3IBsSQqOPz4EcuPyyVcAzbZvO6lx</ns0:bpki_child_ta>
-<ns0:repository type="referral">
-<ns0:authorization referrer="ripe-ncc-rpkid-test">
+</ns0:parent_bpki_ta>
+<ns0:referral referrer="ripe-ncc-rpkid-test" contact_uri="http://example.com/info">
 MIIKTwYJKoZIhvcNAQcCoIIKQDCCCjwCAQMxDTALBglghkgBZQMEAgEwggVHBgsqhkiG9w0BCRABH
 KCCBTYEggUyPG5zMDpyZWZlcnJhbCB4bWxuczpuczA9Imh0dHA6Ly93d3cuaGFjdHJuLm5ldC91cm
 lzL3Jwa2kvbXlycGtpLyIgYXV0aG9yaXplZF9zaWFfYmFzZT0icnN5bmM6Ly9sb2NhbGhvc3QvcnB
@@ -82,7 +66,5 @@ Z/zrx/wAUuyiw/1qwO2Uxeo4FAWxgc3oJSbywfSiIMTG4i5QK1rRRwJwWIMTqCi4D2O7JAPAm+loZ
 ufiHVxja5NGBCnl9JtR7HW8RxQKFhJvlH/WxSRIadfkGWAGXyOs67u9LNOWaDfzzXlZ+UCshaa9y3
 3b7fwWnYLj4YpHylgl3z6nVJDqc+0yHZtdQDirbMHQVvrTY9KKphd4oPTNqX0GXB3NSRhh9FVO7Sn
 ZgehM2m1PkgxNTlWoZeRfwDdkbpWVxu3WTChQibem3ePr3zuu5uHfXUGjSv
-</ns0:authorization>
-<ns0:contact_info>repo-man@rpki.example.org</ns0:contact_info>
-</ns0:repository>
-</ns0:parent>
+</ns0:referral>
+</ns0:parent_response>
