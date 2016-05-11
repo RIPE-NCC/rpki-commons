@@ -13,13 +13,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RpslSignature {
+public class RpkiRpslSignature {
     public static final String SIGNATURE_VERSION = "rpkiv1";
 
     private final LinkedHashMap<String, String> signatureValues;
     private List<String> signedAttributes;
 
-    private RpslSignature(LinkedHashMap<String, String> signatureValues) {
+    private RpkiRpslSignature(LinkedHashMap<String, String> signatureValues) {
         Preconditions.checkArgument(signatureValues.containsKey("v"),
                 "Missing mandatory version ('v') attribute in signature");
 //        Preconditions.checkArgument(SIGNATURE_VERSION.equals(signatureValues.get("v")),
@@ -48,7 +48,7 @@ public class RpslSignature {
         signedAttributes = Splitter.on("+").splitToList(value);
     }
 
-    public static RpslSignature parse(String input) {
+    public static RpkiRpslSignature parse(String input) {
         LinkedHashMap<String, String> attributes = Maps.newLinkedHashMap();
         for (String attribute : Splitter.on(';').trimResults().split(input)) {
             if (attribute.indexOf('=') != 1) throw new IllegalArgumentException("Wrong format in "+ attribute);
@@ -56,7 +56,7 @@ public class RpslSignature {
             String value = attribute.substring(2);
             if (attributes.put(key, value) != null) throw new IllegalArgumentException("Multiple attributes are not allowed");
         }
-        return new RpslSignature(attributes);
+        return new RpkiRpslSignature(attributes);
     }
 
     public String getValue(String name) {

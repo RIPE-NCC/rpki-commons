@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.crypto.rpsl;
 
 import com.google.common.io.Files;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -12,19 +13,39 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RpslObjectParserTest {
 
     private static final String PATH_TO_OBJECTS = "src/test/resources/apnic-rpsl-sig";
+    public static final String TEST_CER = "test.cer";
+    private RpslSigningCertificate signingCertificate;
+    private PublicKey publicKey;
+    private String testSignedObject;
+
+    @Before
+    private void loadTestCertificate() throws IOException {
+        testSignedObject = Files.toString(new File(PATH_TO_OBJECTS, "rpsl-object.txt"), Charset.forName("UTF-8"));
+
+        RpslSigningCertificateParser parser = new RpslSigningCertificateParser();
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_OBJECTS, TEST_CER));
+
+        ValidationResult result = ValidationResult.withLocation(TEST_CER);
+        parser.parse(result, encoded);
+        assertFalse(result.hasFailures());
+
+        signingCertificate = parser.getRpslSigningCertificate();
+        publicKey = signingCertificate.getPublicKey();
+    }
+
 
     @Test
     public void shouldParseApnicRpslObject() throws IOException {
 
-        String rpsl = Files.toString(new File(PATH_TO_OBJECTS + "/rpsl-object.txt"), Charset.forName("UTF-8"));
-
-        RpslObject rpslObject = new RpslObject(rpsl);
-        assertEquals(rpslObject.getRpsl(), rpsl);
+        RpslObject rpslObject = new RpslObject(testSignedObject);
+        assertEquals(rpslObject.getRpsl(), testSignedObject);
 
         Set<String> attributes = rpslObject.getAttributes();
         System.out.print(attributes);
@@ -32,27 +53,19 @@ public class RpslObjectParserTest {
         assertTrue(attributes.contains("remarks"));
     }
 
-
     @Test
     public void shouldValidateSignature() throws IOException, NoSuchProviderException, NoSuchAlgorithmException {
-        String rpsl = Files.toString(new File(PATH_TO_OBJECTS + "/rpsl-object.txt"), Charset.forName("UTF-8"));
-        RpslObject rpslObject = new RpslObject(rpsl);
-        boolean result = rpslObject.validateSignature(loadPublicKey());
+        RpslObject rpslObject = new RpslObject(testSignedObject);
+        boolean result = rpslObject.validateSignature(publicKey);
         assertTrue(result);
     }
 
-
-    private PublicKey loadPublicKey() throws IOException {
-        String location = "apnic-ee-cert-for-rpsl-signature";
-        ValidationResult result = ValidationResult.withLocation(location);
-
-        RpslSigningCertificateParser parser = new RpslSigningCertificateParser();
-        byte[] encoded = Files.toByteArray(new File(PATH_TO_OBJECTS + "/test.cer"));
-
-        parser.parse(result, encoded);
-        assertFalse(result.hasFailures());
-
-        return parser.getRpslSigningCertificate().getPublicKey();
+    @Test
+    public void shouldValidateResources() throws IOException, NoSuchProviderException, NoSuchAlgorithmException {
+        RpslObject rpslObject = new RpslObject(testSignedObject);
+        boolean result = rpslObject.validateSignature(publicKey);
+        assertTrue(result);
     }
+
 
 }
