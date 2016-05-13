@@ -30,6 +30,8 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
+import com.thoughtworks.xstream.XStreamException;
+
 /**
  * Convert ChildIdentity to/from ISC style XML
  */
@@ -41,7 +43,11 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
 
     @Override
     public ChildIdentity deserialize(String xml) {
-        return (ChildIdentity) xStream.fromXML(xml);
+        try {
+            return (ChildIdentity) xStream.fromXML(xml);
+        } catch (XStreamException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
