@@ -77,6 +77,7 @@ public final class CertificateRepositoryObjectPrinter {
         printWriter.println("Number: " + manifest.getNumber());
         printWriter.println("This update time: " + manifest.getThisUpdateTime());
         printWriter.println("Next update time: " + manifest.getNextUpdateTime());
+        printWriter.println("Authority Key Identifier: " + new String(Hex.encode(manifest.getCertificate().getAuthorityKeyIdentifier())));
         printWriter.println("Filenames and hashes:");
         for (Map.Entry<String, byte[]> fileEntry : manifest.getHashes().entrySet()) {
             printWriter.print("    ");
