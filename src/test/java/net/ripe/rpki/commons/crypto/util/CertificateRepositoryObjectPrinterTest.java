@@ -41,16 +41,18 @@ import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
+import org.bouncycastle.util.encoders.Hex;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class CertificateRepositoryObjectPrinterTest {
@@ -59,8 +61,10 @@ public class CertificateRepositoryObjectPrinterTest {
     public FixedDateRule fixedDateRule = new FixedDateRule(new DateTime(2008, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC));
 
     @Test
-    public void shouldPrintManifestCms() {
+    public void shouldPrintManifestCms() throws IOException {
         ManifestCms manifest = ManifestCmsTest.getRootManifestCms();
+        String aki = new String(Hex.encode(BouncyCastleUtil.createAuthorityKeyIdentifier(
+                ManifestCmsTest.ROOT_KEY_PAIR.getPublic()).getKeyIdentifier()));
         StringWriter output = new StringWriter();
         CertificateRepositoryObjectPrinter.print(new PrintWriter(output), manifest);
 
@@ -70,7 +74,7 @@ public class CertificateRepositoryObjectPrinterTest {
                              "Number: 68\n" +
                              "This update time: 2008-09-01T22:43:29.000Z\n" +
                              "Next update time: 2008-09-02T22:43:29.000Z\n" +
-                             "Authority Key Identifier: 28f43f27ec4164fc52dccf5c20e2ab8b429f8564\n" +
+                             "Authority Key Identifier: " + aki + "\n" +
                              "Filenames and hashes:\n"
                              + "    filename1 ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\n"
                              + "    filename2 cb8379ac2098aa165029e3938a51da0bcecfc008fd6795f401178647f96c5b34\n",
