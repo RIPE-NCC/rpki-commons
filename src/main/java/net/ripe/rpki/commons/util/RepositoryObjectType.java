@@ -1,20 +1,20 @@
 /**
  * The BSD License
- *
+ * <p>
  * Copyright (c) 2010-2012 RIPE NCC
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   - Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   - Neither the name of the RIPE NCC nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither the name of the RIPE NCC nor the names of its contributors may be
+ * used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,21 +36,19 @@ public enum RepositoryObjectType {
     public static RepositoryObjectType parse(String name) {
         if (name.endsWith(".mft")) {
             return Manifest;
-
-        } else if (name.endsWith(".roa")) {
-            return Roa;
-
-        } else if (name.endsWith(".cer")) {
-            return Certificate;
-
-        } else if (name.endsWith(".crl")) {
-            return Crl;
-
-        } else if (name.endsWith(".gbr")) {
-            return GhostbustersRecord;
-
-        } else {
-            return Unknown;
         }
+        if (name.endsWith(".crl")) {
+            return Crl;
+        }
+        if (name.endsWith(".cer")) {
+            return Certificate;
+        }
+        if (name.endsWith(".roa")) {
+            return Roa;
+        }
+        if (name.endsWith(".gbr")) {
+            return GhostbustersRecord;
+        }
+        return Unknown;
     }
 }
