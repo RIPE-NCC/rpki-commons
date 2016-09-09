@@ -30,11 +30,14 @@
 package net.ripe.rpki.commons.crypto;
 
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 
 import java.net.URI;
+
+import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPO_EXECUTION;
 
 public class UnknownCertificateRepositoryObject implements CertificateRepositoryObject {
 
@@ -47,6 +50,17 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
     }
 
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+        result.warn(VALIDATOR_REPO_EXECUTION, "This object type is not supported for " + location);
+    }
+
+    @Override
+    public void validate(String location,
+                         CertificateRepositoryObjectValidationContext context,
+                         X509Crl crl,
+                         URI crlUri,
+                         ValidationOptions options,
+                         ValidationResult result) {
+        result.warn(VALIDATOR_REPO_EXECUTION, "This object type is not supported for " + location);
     }
 
     @Override

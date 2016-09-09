@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.crypto;
 
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
@@ -49,6 +50,16 @@ public class GhostbustersRecord implements CertificateRepositoryObject {
     }
 
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+        result.warn(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
+    }
+
+    @Override
+    public void validate(String location,
+                         CertificateRepositoryObjectValidationContext context,
+                         X509Crl crl,
+                         URI crlUri,
+                         ValidationOptions options,
+                         ValidationResult result) {
         result.warn(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
     }
 

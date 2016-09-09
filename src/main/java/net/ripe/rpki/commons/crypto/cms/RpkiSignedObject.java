@@ -36,8 +36,6 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.*;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
@@ -46,7 +44,6 @@ import org.joda.time.DateTime;
 import javax.security.auth.x500.X500Principal;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class RpkiSignedObject implements CertificateRepositoryObject {
@@ -143,6 +140,16 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
         result.setLocation(savedCurrentLocation);
         result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
+        if (crl != null) {
+            validateWithCrl(location, context, options, result, crl);
+        }
+
+        revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
+    }
+
+    @Override
+    public void validate(String location, CertificateRepositoryObjectValidationContext context, X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result) {
+        result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, crlUri.toString());
         if (crl != null) {
             validateWithCrl(location, context, options, result, crl);
         }
