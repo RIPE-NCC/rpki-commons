@@ -36,6 +36,8 @@ import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryOb
 
 import java.net.URI;
 
+import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD;
+
 public class GhostbustersRecord implements CertificateRepositoryObject {
 
     private static final long serialVersionUID = 1L;
@@ -47,6 +49,7 @@ public class GhostbustersRecord implements CertificateRepositoryObject {
     }
 
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+        result.warn(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
     }
 
     @Override
