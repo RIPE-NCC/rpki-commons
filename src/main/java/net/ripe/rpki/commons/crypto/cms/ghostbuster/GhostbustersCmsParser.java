@@ -49,19 +49,7 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
     private String vCardPayload;
 
     @Override
-    public void parse(ValidationResult result, byte[] encoded) {
-        super.parse(result, encoded);
-        if (isSuccess()) {
-            validateGbr();
-        }
-    }
-
-    @Override
     public void decodeContent(ASN1Encodable encoded) {
-    }
-
-    private void validateGbr() {
-
     }
 
     @Override
@@ -96,5 +84,4 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
     public boolean isSuccess() {
         return !getValidationResult().hasFailureForCurrentLocation();
     }
-
 }

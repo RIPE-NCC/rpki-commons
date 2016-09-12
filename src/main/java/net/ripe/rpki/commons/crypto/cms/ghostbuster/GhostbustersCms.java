@@ -32,30 +32,31 @@ package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.joda.time.DateTime;
 
 import java.net.URI;
 
-import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD;
+import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPOSITORY_GHOSTBUSTERS_RECORD_EMPTY;
 
 public class GhostbustersCms extends RpkiSignedObject {
 
     public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.35");
     private String vCard;
 
-    protected GhostbustersCms(RpkiSignedObjectInfo cmsObjectData, String vCard) {
+    GhostbustersCms(RpkiSignedObjectInfo cmsObjectData, String vCard) {
         super(cmsObjectData);
         this.vCard = vCard;
     }
 
     @Override
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
-        result.warn(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
+        if (result.rejectIfNull(vCard, VALIDATOR_REPOSITORY_GHOSTBUSTERS_RECORD_EMPTY, getParentCertificateUri().toString())) {
+            return;
+        }
+        result.rejectIfTrue(vCard.isEmpty(), VALIDATOR_REPOSITORY_GHOSTBUSTERS_RECORD_EMPTY);
     }
 
     @Override
