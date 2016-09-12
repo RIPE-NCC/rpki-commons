@@ -104,29 +104,6 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
         validationResult.rejectIfFalse(getResourceCertificate().isResourceSetInherited(), MANIFEST_RESOURCE_INHERIT);
     }
 
-    void decodeManifest(ASN1Encodable encoded) {
-        ValidationResult validationResult = getValidationResult();
-        try {
-            ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
-            validationResult.rejectIfFalse(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE);
-            if (validationResult.hasFailureForCurrentLocation()) {
-                return;
-            }
-            version = ManifestCms.DEFAULT_VERSION;
-            number = expect(seq.getObjectAt(MANIFEST_NUMBER_INDEX), ASN1Integer.class).getValue();
-            thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), ASN1ObjectIdentifier.class).getId();
-            validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
-            files = new TreeMap<String, byte[]>();
-            decodeFileList(files, seq.getObjectAt(FILE_LIST_INDEX));
-        } catch (IllegalArgumentException e) {
-            validationResult.error(MANIFEST_CONTENT_STRUCTURE);
-        } catch (ParseException e) {
-            validationResult.error(MANIFEST_TIME_FORMAT);
-        }
-    }
-
     void decodeFileAndHash(Map<String, byte[]> result, ASN1Encodable encoded) {
         ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
         Validate.isTrue(seq.size() == 2, "der sequence does not contain file and hash");
@@ -151,7 +128,26 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 
     @Override
     public void decodeContent(ASN1Encodable encoded) {
-        decodeManifest(encoded);
+        ValidationResult validationResult = getValidationResult();
+        try {
+            ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
+            validationResult.rejectIfFalse(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE);
+            if (validationResult.hasFailureForCurrentLocation()) {
+                return;
+            }
+            version = ManifestCms.DEFAULT_VERSION;
+            number = expect(seq.getObjectAt(MANIFEST_NUMBER_INDEX), ASN1Integer.class).getValue();
+            thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
+            nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
+            fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), ASN1ObjectIdentifier.class).getId();
+            validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
+            files = new TreeMap<String, byte[]>();
+            decodeFileList(files, seq.getObjectAt(FILE_LIST_INDEX));
+        } catch (IllegalArgumentException e) {
+            validationResult.error(MANIFEST_CONTENT_STRUCTURE);
+        } catch (ParseException e) {
+            validationResult.error(MANIFEST_TIME_FORMAT);
+        }
     }
 
 }
