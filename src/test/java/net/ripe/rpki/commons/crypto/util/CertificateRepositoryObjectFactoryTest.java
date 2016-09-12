@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
-import net.ripe.rpki.commons.crypto.GhostbustersRecord;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsTest;
@@ -48,8 +47,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.*;
-import static net.ripe.rpki.commons.validation.ValidationStatus.*;
+import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.createCertificateRepositoryObject;
+import static net.ripe.rpki.commons.validation.ValidationStatus.ERROR;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.junit.Assert.*;
 
@@ -187,18 +186,14 @@ public class CertificateRepositoryObjectFactoryTest {
     }
 
     @Test
-    public void shouldParseUnsupportedGhostbustersRecord() {
+    public void shouldParsemalformedGhostbustersRecord() {
         byte[] encoded = {0, 1};
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("ghostbusters.gbr"));
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
-        assertTrue(object instanceof GhostbustersRecord);
-        assertEquals(encoded, object.getEncoded());
-        assertFalse(validationResult.hasFailures());
-        assertTrue(validationResult.hasWarnings());
+        assertNull(object);
         assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
-        assertEquals(WARNING, validationResult.getResultForCurrentLocation(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD).getStatus());
     }
 }
