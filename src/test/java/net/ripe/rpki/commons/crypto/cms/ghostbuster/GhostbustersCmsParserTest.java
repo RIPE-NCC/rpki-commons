@@ -29,41 +29,40 @@
  */
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
-import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
-import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.joda.time.DateTime;
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 
-import java.net.URI;
+import java.io.File;
 
-import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD;
+import static org.junit.Assert.assertEquals;
 
-public class GhostbustersCms extends RpkiSignedObject {
-
-    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.35");
-    private String vCard;
-
-    protected GhostbustersCms(RpkiSignedObjectInfo cmsObjectData, String vCard) {
-        super(cmsObjectData);
-        this.vCard = vCard;
+public class GhostbustersCmsParserTest {
+    @Test
+    public void testShouldParseGoodGbr() throws Exception {
+        String path = "src/test/resources/conformance/root/goodRealGbrNothingIsWrong.gbr";
+        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        GhostbustersCmsParser parser = new GhostbustersCmsParser();
+        parser.parse(ValidationResult.withLocation("test1.gbr"), bytes);
+        String vCard = parser.getGhostbustersCms().getvCard();
+        assertEquals("BEGIN:VCARD\r\n" +
+                "VERSION:3.0\r\n" +
+                "ADR:;;5147 Crystal Springs Drive NE;Bainbridge Island;Washington;98110;Uni\r\n" +
+                " ted States\r\n" +
+                "EMAIL:randy@psg.com\r\n" +
+                "FN:Randy Bush\r\n" +
+                "N:;;;;\r\n" +
+                "ORG:RGnet\\, LLC\r\n" +
+                "TEL:+1 206 356 8341\r\n" +
+                "END:VCARD\r\n", vCard);
     }
 
-    @Override
-    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
-        result.warn(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
-    }
-
-    @Override
-    public URI getParentCertificateUri() {
-        return getCertificate().getParentCertificateUri();
-    }
-
-    public String getvCard() {
-        return vCard;
+    @Test(expected = IllegalArgumentException.class)
+    public void testShouldParseBadGbr() throws Exception {
+        String path = "src/test/resources/conformance/root/badGBRNotVCard.gbr";
+        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        GhostbustersCmsParser parser = new GhostbustersCmsParser();
+        parser.parse(ValidationResult.withLocation("test2.gbr"), bytes);
+        parser.getGhostbustersCms().getvCard();
     }
 }

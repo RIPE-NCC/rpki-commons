@@ -29,16 +29,20 @@
  */
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
-import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.cms.CMSSignedDataParser;
+import org.bouncycastle.cms.CMSTypedStream;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
-import static net.ripe.rpki.commons.validation.ValidationString.ASN_AND_PREFIXES_IN_DER_SEQ;
-import static net.ripe.rpki.commons.validation.ValidationString.ROA_ATTESTATION_VERSION;
-import static net.ripe.rpki.commons.validation.ValidationString.ROA_CONTENT_STRUCTURE;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static net.ripe.rpki.commons.validation.ValidationString.DECODE_CONTENT;
 
 public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
@@ -52,25 +56,41 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
         }
     }
 
+    @Override
+    public void decodeContent(ASN1Encodable encoded) {
+    }
+
     private void validateGbr() {
 
     }
 
     @Override
-    public void decodeContent(ASN1Encodable der) {
-        ValidationResult validationResult = getValidationResult();
+    protected void parseContent(CMSSignedDataParser sp) {
+        final ValidationResult validationResult = getValidationResult();
+        final CMSTypedStream signedContent = sp.getSignedContent();
+        contentType = signedContent.getContentType();
+
         try {
-            ASN1Primitive asn1Primitive = der.toASN1Primitive();
-            DERApplicationSpecific str = expect(der, DERApplicationSpecific.class);
-            vCardPayload = str.toString();
-        } catch (IllegalArgumentException ex) {
-            validationResult.error(ROA_CONTENT_STRUCTURE);
+            final InputSupplier<InputStream> supplier = new InputSupplier<InputStream>() {
+                @Override
+                public InputStream getInput() throws IOException {
+                    return signedContent.getContentStream();
+                }
+            };
+            vCardPayload = CharStreams.toString(CharStreams.newReaderSupplier(supplier, Charsets.US_ASCII));
+        } catch (IOException e) {
+            validationResult.rejectIfFalse(false, DECODE_CONTENT);
+            return;
         }
+        validationResult.rejectIfFalse(true, DECODE_CONTENT);
     }
 
     public GhostbustersCms getGhostbustersCms() {
+        if (!isSuccess()) {
+            throw new IllegalArgumentException("Ghostbuster record validation failed: " + getValidationResult().getFailuresForCurrentLocation());
+        }
         RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
-        return new GhostbustersCms(cmsObjectData);
+        return new GhostbustersCms(cmsObjectData, vCardPayload);
     }
 
     public boolean isSuccess() {
