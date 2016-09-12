@@ -41,7 +41,11 @@ import org.joda.time.DateTime;
 
 import java.net.URI;
 
+import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD;
+
 public class GhostbustersCms extends RpkiSignedObject {
+
+    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.35");
 
     protected GhostbustersCms(RpkiSignedObjectInfo cmsObjectData) {
         super(cmsObjectData);
@@ -49,7 +53,7 @@ public class GhostbustersCms extends RpkiSignedObject {
 
     @Override
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
-        //We do not handle Ghostbusters
+        result.warn(VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
     }
 
     @Override

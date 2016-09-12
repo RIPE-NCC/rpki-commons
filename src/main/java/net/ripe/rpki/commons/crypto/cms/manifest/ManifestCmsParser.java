@@ -100,7 +100,6 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 
     private void validateManifest() {
         ValidationResult validationResult = getValidationResult();
-
         validationResult.rejectIfFalse(new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID).equals(getContentType()), MANIFEST_CONTENT_TYPE);
         validationResult.rejectIfFalse(getResourceCertificate().isResourceSetInherited(), MANIFEST_RESOURCE_INHERIT);
     }

@@ -31,18 +31,42 @@ package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.*;
+
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
+import static net.ripe.rpki.commons.validation.ValidationString.ASN_AND_PREFIXES_IN_DER_SEQ;
+import static net.ripe.rpki.commons.validation.ValidationString.ROA_ATTESTATION_VERSION;
+import static net.ripe.rpki.commons.validation.ValidationString.ROA_CONTENT_STRUCTURE;
 
 public class GhostbustersCmsParser extends RpkiSignedObjectParser {
+
+    private String vCardPayload;
 
     @Override
     public void parse(ValidationResult result, byte[] encoded) {
         super.parse(result, encoded);
+        if (isSuccess()) {
+            validateGbr();
+        }
+    }
+
+    private void validateGbr() {
+
     }
 
     @Override
-    public void decodeContent(ASN1Encodable encoded) { }
+    public void decodeContent(ASN1Encodable der) {
+        ValidationResult validationResult = getValidationResult();
+        try {
+            ASN1Primitive asn1Primitive = der.toASN1Primitive();
+            DERApplicationSpecific str = expect(der, DERApplicationSpecific.class);
+            vCardPayload = str.toString();
+        } catch (IllegalArgumentException ex) {
+            validationResult.error(ROA_CONTENT_STRUCTURE);
+        }
+    }
 
     public GhostbustersCms getGhostbustersCms() {
         RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
@@ -50,7 +74,7 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
     }
 
     public boolean isSuccess() {
-        return true;
+        return !getValidationResult().hasFailureForCurrentLocation();
     }
 
 }
