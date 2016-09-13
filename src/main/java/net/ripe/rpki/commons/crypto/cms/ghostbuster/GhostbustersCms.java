@@ -53,7 +53,7 @@ public class GhostbustersCms extends RpkiSignedObject {
 
     @Override
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
-        if (result.rejectIfNull(vCard, VALIDATOR_REPOSITORY_GHOSTBUSTERS_RECORD_EMPTY, getParentCertificateUri().toString())) {
+        if (!result.rejectIfNull(vCard, VALIDATOR_REPOSITORY_GHOSTBUSTERS_RECORD_EMPTY, getParentCertificateUri().toString())) {
             return;
         }
         result.rejectIfTrue(vCard.isEmpty(), VALIDATOR_REPOSITORY_GHOSTBUSTERS_RECORD_EMPTY);
