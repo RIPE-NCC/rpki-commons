@@ -139,8 +139,8 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
             result.setLocation(new ValidationLocation(getCrlUri()));
             crl = crlLocator.getCrl(getCrlUri(), context, result);
             result.setLocation(savedCurrentLocation);
-            result.rejectIfNull(crl, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
             if (crl == null) {
+                result.rejectIfFalse(false, ValidationString.OBJECTS_CRL_VALID, getCrlUri().toString());
                 return;
             }
         }
@@ -148,6 +148,24 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         validator.validate(location, this);
 
         revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
+    }
+
+    @Override
+    public void validate(String location,
+                         CertificateRepositoryObjectValidationContext context,
+                         X509Crl crl,
+                         URI crlUri,
+                         ValidationOptions options,
+                         ValidationResult result) {
+        if (!isRoot() && crl == null) {
+            result.rejectIfFalse(false, ValidationString.OBJECTS_CRL_VALID, crlUri.toString());
+            return;
+        }
+        X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateValidator(context, options, result, crl);
+        validator.validate(location, this);
+
+        revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
+
     }
 
     private boolean hasErrorInRevocationCheck(List<ValidationCheck> failures) {

@@ -27,48 +27,42 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto;
+package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import net.ripe.rpki.commons.crypto.crl.CrlLocator;
-import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 
-import java.net.URI;
+import java.io.File;
 
-public class GhostbustersRecord implements CertificateRepositoryObject {
+import static org.junit.Assert.assertEquals;
 
-    private static final long serialVersionUID = 1L;
-
-    private final byte[] encoded;
-
-    public GhostbustersRecord(byte[] encoded) {
-        this.encoded = encoded;
+public class GhostbustersCmsParserTest {
+    @Test
+    public void testShouldParseGoodGbr() throws Exception {
+        String path = "src/test/resources/conformance/root/goodRealGbrNothingIsWrong.gbr";
+        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        GhostbustersCmsParser parser = new GhostbustersCmsParser();
+        parser.parse(ValidationResult.withLocation("test1.gbr"), bytes);
+        String vCard = parser.getGhostbustersCms().getvCard();
+        assertEquals("BEGIN:VCARD\r\n" +
+                "VERSION:3.0\r\n" +
+                "ADR:;;5147 Crystal Springs Drive NE;Bainbridge Island;Washington;98110;Uni\r\n" +
+                " ted States\r\n" +
+                "EMAIL:randy@psg.com\r\n" +
+                "FN:Randy Bush\r\n" +
+                "N:;;;;\r\n" +
+                "ORG:RGnet\\, LLC\r\n" +
+                "TEL:+1 206 356 8341\r\n" +
+                "END:VCARD\r\n", vCard);
     }
 
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    @Test(expected = IllegalArgumentException.class)
+    public void testShouldParseBadGbr() throws Exception {
+        String path = "src/test/resources/conformance/root/badGBRNotVCard.gbr";
+        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        GhostbustersCmsParser parser = new GhostbustersCmsParser();
+        parser.parse(ValidationResult.withLocation("test2.gbr"), bytes);
+        parser.getGhostbustersCms().getvCard();
     }
-
-    @Override
-    public boolean isPastValidityTime() {
-        throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
-    }
-
-    @Override
-    public boolean isRevoked() {
-        return false;
-    }
-
-    public URI getCrlUri() {
-        throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
-    }
-
-    public URI getParentCertificateUri() {
-        throw new UnsupportedOperationException("Object type 'Ghostbusters Record' is currently unsupported.");
-    }
-
-    public byte[] getEncoded() {
-        return encoded;
-    }
-
 }

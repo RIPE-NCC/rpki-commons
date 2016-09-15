@@ -40,11 +40,7 @@ import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedDataParser;
-import org.bouncycastle.cms.SignerId;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
@@ -68,7 +64,7 @@ public abstract class RpkiSignedObjectParser {
 
     private X509ResourceCertificate certificate;
 
-    private ASN1ObjectIdentifier contentType;
+    protected ASN1ObjectIdentifier contentType;
 
     private DateTime signingTime;
 
@@ -131,12 +127,12 @@ public abstract class RpkiSignedObjectParser {
         }
     }
 
-    private void parseContent(CMSSignedDataParser sp) {
-        contentType = sp.getSignedContent().getContentType();
+    protected void parseContent(CMSSignedDataParser sp) {
+        final CMSTypedStream signedContent = sp.getSignedContent();
+        contentType = signedContent.getContentType();
 
-        InputStream signedContentStream = sp.getSignedContent().getContentStream();
+        InputStream signedContentStream = signedContent.getContentStream();
         ASN1InputStream asn1InputStream = new ASN1InputStream(signedContentStream);
-
         try {
             decodeContent(asn1InputStream.readObject());
         } catch (IOException e) {
@@ -249,7 +245,9 @@ public abstract class RpkiSignedObjectParser {
     	ASN1ObjectIdentifier attributeOID = signedAttribute.getAttrType();
     	
     	//Check if the attribute is any of the allowed ones.
-    	return binarySigningTimeOID.equals(attributeOID) || CMSAttributes.signingTime.equals(attributeOID) || CMSAttributes.contentType.equals(attributeOID)
+    	return binarySigningTimeOID.equals(attributeOID)
+                || CMSAttributes.signingTime.equals(attributeOID)
+                || CMSAttributes.contentType.equals(attributeOID)
     			|| CMSAttributes.messageDigest.equals(attributeOID);
     }
     

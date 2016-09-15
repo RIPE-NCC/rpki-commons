@@ -30,8 +30,9 @@
 package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
-import net.ripe.rpki.commons.crypto.GhostbustersRecord;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCms;
+import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
@@ -42,7 +43,6 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.util.RepositoryObjectType;
 import net.ripe.rpki.commons.validation.ValidationChecks;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationString;
 
 public final class CertificateRepositoryObjectFactory {
 
@@ -71,8 +71,8 @@ public final class CertificateRepositoryObjectFactory {
                 return parseX509ResourceCertificate(encoded, validationResult);
             case Crl:
                 return parseCrl(encoded, validationResult);
-            case GhostbustersRecord:
-                return parseGhostbustersRecord(encoded, validationResult);
+            case Gbr:
+                return parseGbr(encoded, validationResult);
             case Unknown:
                 return new UnknownCertificateRepositoryObject(encoded);
             default:
@@ -85,8 +85,8 @@ public final class CertificateRepositoryObjectFactory {
     }
 
     private static X509ResourceCertificate parseX509ResourceCertificate(byte[] encoded, ValidationResult validationResult) {
-        X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        final X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+        final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
         if (parser.isSuccess()) {
             validationResult.addAll(temp);
@@ -98,8 +98,8 @@ public final class CertificateRepositoryObjectFactory {
     }
 
     private static RoaCms parseRoa(byte[] encoded, ValidationResult validationResult) {
-        RoaCmsParser parser = new RoaCmsParser();
-        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        final RoaCmsParser parser = new RoaCmsParser();
+        final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
         validationResult.addAll(temp);
         if (parser.isSuccess()) {
@@ -110,8 +110,8 @@ public final class CertificateRepositoryObjectFactory {
     }
 
     private static ManifestCms parseManifest(byte[] encoded, ValidationResult validationResult) {
-        ManifestCmsParser parser = new ManifestCmsParser();
-        ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        final ManifestCmsParser parser = new ManifestCmsParser();
+        final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
         if (parser.isSuccess()) {
             validationResult.addAll(temp);
@@ -122,8 +122,16 @@ public final class CertificateRepositoryObjectFactory {
         }
     }
 
-    private static GhostbustersRecord parseGhostbustersRecord(byte[] encoded, ValidationResult validationResult) {
-        validationResult.warn(ValidationString.VALIDATOR_REPOSITORY_UNSUPPORTED_GHOSTBUSTERS_RECORD);
-        return new GhostbustersRecord(encoded);
+    private static GhostbustersCms parseGbr(byte[] encoded, ValidationResult validationResult) {
+        final GhostbustersCmsParser parser = new GhostbustersCmsParser();
+        final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        parser.parse(temp, encoded);
+        if (parser.isSuccess()) {
+            validationResult.addAll(temp);
+            return parser.getGhostbustersCms();
+        } else {
+            validationResult.addAll(temp);
+            return null;
+        }
     }
 }

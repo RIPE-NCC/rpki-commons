@@ -262,7 +262,7 @@ public final class ValidationResult implements Serializable {
     }
 
     public ValidationCheck getResult(ValidationLocation location, String checkKey) {
-        List<ValidationCheck> allChecks = getAllValidationChecksForLocation(location);
+        final List<ValidationCheck> allChecks = getAllValidationChecksForLocation(location);
         for (ValidationCheck check : allChecks) {
             if (check.getKey().equals(checkKey)) {
                 return check;
