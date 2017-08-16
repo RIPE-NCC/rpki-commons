@@ -40,7 +40,12 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class ValidityPeriodTest {
@@ -162,6 +167,27 @@ public class ValidityPeriodTest {
         assertFalse(validityPeriod.isExpiredAt(date(1920, 1, 1)));
         assertFalse(validityPeriod.isExpiredAt(date(2020, 1, 1)));
     }
+
+    @Test
+    public void truncatedMillisDates() {
+        long instant = 1502895557772L;
+
+        final ValidityPeriod validityPeriod = new ValidityPeriod(new Date(instant), new Date(instant));
+
+         assertEquals(validityPeriod.getNotValidBefore().getMillisOfSecond(), 0);
+         assertEquals(validityPeriod.getNotValidAfter().getMillisOfSecond(), 0);
+    }
+
+    @Test
+    public void truncatedMillisDateTimes() {
+        long instant = 1502895557772L;
+
+        final ValidityPeriod validityPeriod = new ValidityPeriod(new DateTime(instant), new DateTime(instant));
+
+         assertEquals(validityPeriod.getNotValidBefore().getMillisOfSecond(), 0);
+         assertEquals(validityPeriod.getNotValidAfter().getMillisOfSecond(), 0);
+    }
+
 
     private ReadableInstant date(int year, int month, int day) {
         return new LocalDate(year, month, day).toDateTimeAtStartOfDay(DateTimeZone.UTC);

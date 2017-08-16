@@ -55,14 +55,14 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
     }
 
     public ValidityPeriod(ReadableInstant notValidBefore, ReadableInstant notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : new DateTime(truncatedMillis(notValidBefore.getMillis()), DateTimeZone.UTC);
-        this.notValidAfter = (notValidAfter == null) ? null : new DateTime(truncatedMillis(notValidAfter.getMillis()), DateTimeZone.UTC);
+        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(new DateTime(notValidBefore, DateTimeZone.UTC));
+        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(new DateTime(notValidAfter, DateTimeZone.UTC));
         Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
     public ValidityPeriod(Date notValidBefore, Date notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : new DateTime(truncatedMillis(notValidBefore.getTime()), DateTimeZone.UTC);
-        this.notValidAfter = (notValidAfter == null) ? null : new DateTime(truncatedMillis(notValidAfter.getTime()), DateTimeZone.UTC);
+        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(new DateTime(notValidBefore, DateTimeZone.UTC));
+        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(new DateTime(notValidAfter, DateTimeZone.UTC));
         Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
@@ -70,13 +70,9 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
         return (notValidBefore == null || notValidAfter == null || notValidBefore.isEqual(notValidAfter) || notValidBefore.isBefore(notValidAfter));
     }
 
-    /**
-     * Match resolution of certificate validity period (seconds)
-     */
-    private long truncatedMillis(long millisec) {
-        // CHECKSTYLE:OFF  1000 is not a "magic number" in this case
-        return millisec / 1000 * 1000;
-        // CHECKSTYLE:ON
+    // Match resolution of certificate validity period (seconds)
+    private DateTime truncatedMillis(DateTime dateTime) {
+        return dateTime.withMillisOfSecond(0);
     }
 
     public DateTime getNotValidAfter() {
