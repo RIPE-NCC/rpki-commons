@@ -109,7 +109,7 @@ public final class ValidationResult implements Serializable {
     public boolean warnIfFalse(boolean condition, String key, String... param) {
         Validate.notNull(key, "key is required");
         if (condition) {
-            setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+            pass(key, param);
         } else {
             warn(key, param);
         }
@@ -147,9 +147,9 @@ public final class ValidationResult implements Serializable {
     public boolean rejectIfFalse(boolean condition, String key, String... param) {
         Validate.notNull(key, "key is required");
         if (condition) {
-            setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+            pass(key, param);
         } else {
-            setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
+            error(key, param);
         }
         return condition;
     }
