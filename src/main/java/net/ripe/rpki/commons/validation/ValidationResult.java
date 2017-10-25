@@ -185,11 +185,23 @@ public final class ValidationResult implements Serializable {
     }
 
     public boolean hasFailures() {
-        return !getFailuresForAllLocations().isEmpty();
+        for (Map<ValidationStatus, List<ValidationCheck>> checks: this.results.values()) {
+            List<ValidationCheck> errors = checks.get(ValidationStatus.ERROR);
+            if (errors != null && !errors.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean hasWarnings() {
-        return !getWarnings().isEmpty();
+        for (Map<ValidationStatus, List<ValidationCheck>> checks: this.results.values()) {
+            List<ValidationCheck> errors = checks.get(ValidationStatus.WARNING);
+            if (errors != null && !errors.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean hasNoFailuresOrWarnings() {

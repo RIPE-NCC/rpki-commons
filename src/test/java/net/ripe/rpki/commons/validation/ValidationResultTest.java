@@ -156,4 +156,26 @@ public class ValidationResultTest {
         assertEquals("existing", result.getFailures(FIRST_LOCATION).get(0).getKey());
         assertEquals("added", result.getFailures(FIRST_LOCATION).get(1).getKey());
     }
+
+    @Test
+    public void should_track_if_there_are_any_warnings() {
+        result = ValidationResult.withLocation(FIRST_LOCATION);
+        result.error("an.error");
+        result.setLocation(SECOND_LOCATION);
+        assertFalse("no warnings yet", result.hasWarnings());
+
+        result.warn("a.warning");
+        assertTrue("warning correctly found", result.hasWarnings());
+    }
+
+    @Test
+    public void should_track_if_there_are_any_errors() {
+        result = ValidationResult.withLocation(FIRST_LOCATION);
+        result.warn("a.warning");
+        result.setLocation(SECOND_LOCATION);
+        assertFalse("no failures yet", result.hasFailures());
+
+        result.error("an.error");
+        assertTrue("warning correctly found", result.hasFailures());
+    }
 }
