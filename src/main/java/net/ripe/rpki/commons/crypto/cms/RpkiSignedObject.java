@@ -57,6 +57,11 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     // implementations are doing. Until that time, we had better accept both when doing validation.
     public static final String SHA256WITHRSA_ENCRYPTION_OID = PKCSObjectIdentifiers.sha256WithRSAEncryption.getId();
 
+    public static final List<String> ALLOWED_SIGNATURE_ALGORITHM_OIDS = Arrays.asList(
+        PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
+        PKCSObjectIdentifiers.rsaEncryption.getId()
+    );
+
     /**
      * The digestAlgorithms set MUST include only SHA-256, the OID for which is
      * 2.16.840.1.101.3.4.2.1. [RFC4055] It MUST NOT contain any other

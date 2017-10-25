@@ -35,11 +35,7 @@ import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -66,6 +62,7 @@ import java.security.cert.CertStoreException;
 import java.security.cert.X509CRL;
 import java.util.Collection;
 
+import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.SHA256WITHRSA_ENCRYPTION_OID;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.rpki.commons.provisioning.ProvisioningObjectMother.*;
 import static org.bouncycastle.cms.CMSSignedGenerator.*;
@@ -298,7 +295,7 @@ public class ProvisioningCmsObjectBuilderTest {
 
         assertNotNull(signingTimeAttr);
         assertEquals(1, signingTimeAttr.getAttrValues().size());
-        DERUTCTime signingTime = (DERUTCTime) signingTimeAttr.getAttrValues().getObjectAt(0);
+        ASN1UTCTime signingTime = (ASN1UTCTime) signingTimeAttr.getAttrValues().getObjectAt(0);
         assertEquals(this.signingTime, signingTime.getDate().getTime());
     }
 
@@ -324,7 +321,7 @@ public class ProvisioningCmsObjectBuilderTest {
         Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
         SignerInformation signer = (SignerInformation) signers.iterator().next();
 
-        assertEquals(ENCRYPTION_RSA, signer.getEncryptionAlgOID());
+        assertEquals(SHA256WITHRSA_ENCRYPTION_OID, signer.getEncryptionAlgOID());
     }
 
     /**

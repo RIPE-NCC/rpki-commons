@@ -37,13 +37,7 @@ import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
@@ -151,7 +145,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     private void validateCrlDistributionPoints() {
-        byte[] extensionValue = certificate.getExtensionValue(X509Extension.cRLDistributionPoints.getId());
+        byte[] extensionValue = certificate.getExtensionValue(Extension.cRLDistributionPoints.getId());
 
         if (isRoot(certificate)) {
             // early ripe ncc ta certificates have crldp set so for now only warn here

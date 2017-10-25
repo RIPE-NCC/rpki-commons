@@ -276,7 +276,7 @@ public abstract class RpkiSignedObjectParser {
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
         validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
-        validationResult.rejectIfFalse(RSA_ENCRYPTION_OID.equals(signer.getEncryptionAlgOID()) || SHA256WITHRSA_ENCRYPTION_OID.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
+        validationResult.rejectIfFalse(ALLOWED_SIGNATURE_ALGORITHM_OIDS.contains(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
             return false;
         }

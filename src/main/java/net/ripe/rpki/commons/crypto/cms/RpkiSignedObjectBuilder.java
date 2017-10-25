@@ -65,6 +65,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Map;
 
 public abstract class RpkiSignedObjectBuilder {
 
@@ -108,7 +109,14 @@ public abstract class RpkiSignedObjectBuilder {
     private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey, String signatureProvider, X509Certificate signingCertificate) throws OperatorCreationException {
         ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
         DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
-        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes(signingCertificate.getNotBefore()))).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate));
+        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(
+            new DefaultSignedAttributeTableGenerator(createSignedAttributes(signingCertificate.getNotBefore())) {
+                @Override
+                public AttributeTable getAttributes(Map parameters) {
+                    return super.getAttributes(parameters).remove(CMSAttributes.cmsAlgorithmProtect);
+                }
+            }
+        ).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate));
         generator.addSignerInfoGenerator(gen);
     }
 
