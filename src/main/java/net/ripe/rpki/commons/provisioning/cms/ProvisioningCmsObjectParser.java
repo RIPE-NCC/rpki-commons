@@ -50,10 +50,9 @@ import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.CMSSignedGenerator;
@@ -259,7 +258,7 @@ public class ProvisioningCmsObjectParser {
 
     private boolean isEndEntityCertificate(X509Certificate certificate) {
         try {
-            byte[] basicConstraintsExtension = certificate.getExtensionValue(X509Extension.basicConstraints.getId());
+            byte[] basicConstraintsExtension = certificate.getExtensionValue(Extension.basicConstraints.getId());
             if (basicConstraintsExtension == null) {
                 /**
                  * If the basic constraints extension is not present [...] then the certified public key MUST NOT be used

@@ -39,7 +39,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
@@ -119,7 +118,7 @@ public class RpkiCaCertificateRequestParser {
     private void extractSiaUris() throws RpkiCaCertificateRequestParserException {
         try {
             Extensions extensions = getPkcs9Extensions();
-            Extension extension = extensions.getExtension(X509Extension.subjectInfoAccess);
+            Extension extension = extensions.getExtension(Extension.subjectInfoAccess);
 
             ASN1Sequence accessDescriptorSequence = (ASN1Sequence) ASN1Sequence.fromByteArray(extension.getExtnValue().getOctets());
 

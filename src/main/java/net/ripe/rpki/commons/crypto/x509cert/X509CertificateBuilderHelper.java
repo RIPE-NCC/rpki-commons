@@ -43,11 +43,11 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -311,41 +311,41 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void addSubjectKeyIdentifier(X509v3CertificateBuilder generator) throws InvalidKeyException, CertIOException, NoSuchAlgorithmException {
-        generator.addExtension(X509Extension.subjectKeyIdentifier, false, new JcaX509ExtensionUtils().createSubjectKeyIdentifier(publicKey));
+        generator.addExtension(Extension.subjectKeyIdentifier, false, new JcaX509ExtensionUtils().createSubjectKeyIdentifier(publicKey));
     }
 
     private void addAuthorityKeyIdentifier(X509v3CertificateBuilder generator) throws InvalidKeyException, CertIOException {
         generator.addExtension(
-                X509Extension.authorityKeyIdentifier,
+                Extension.authorityKeyIdentifier,
                 false,
                 BouncyCastleUtil.createAuthorityKeyIdentifier(signingKeyPair.getPublic()));
     }
 
     private void addCaBit(X509v3CertificateBuilder generator) throws CertIOException {
-        generator.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(ca));
+        generator.addExtension(Extension.basicConstraints, true, new BasicConstraints(ca));
     }
 
     private void addKeyUsage(X509v3CertificateBuilder generator) throws CertIOException {
-        generator.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
+        generator.addExtension(Extension.keyUsage, true, new KeyUsage(keyUsage));
     }
 
     private void addAIA(X509v3CertificateBuilder generator) throws CertIOException {
-        generator.addExtension(X509Extension.authorityInfoAccess, false,
+        generator.addExtension(Extension.authorityInfoAccess, false,
                 AuthorityInformationAccess.getInstance(new DERSequence(authorityInformationAccess)));
     }
 
     private void addSIA(X509v3CertificateBuilder generator) throws CertIOException {
-        generator.addExtension(X509Extension.subjectInfoAccess, false,
+        generator.addExtension(Extension.subjectInfoAccess, false,
                 AuthorityInformationAccess.getInstance(new DERSequence(subjectInformationAccess)));
     }
 
     private void addCrlDistributionPoints(X509v3CertificateBuilder generator) throws CertIOException {
         CRLDistPoint crldp = convertToCrlDistributionPoint(crlDistributionPoints);
-        generator.addExtension(X509Extension.cRLDistributionPoints, false, crldp);
+        generator.addExtension(Extension.cRLDistributionPoints, false, crldp);
     }
 
     private void addPolicies(X509v3CertificateBuilder generator) throws CertIOException {
-        generator.addExtension(X509Extension.certificatePolicies, true, new DERSequence(policies));
+        generator.addExtension(Extension.certificatePolicies, true, new DERSequence(policies));
     }
 
     private void addResourceExtensions(X509v3CertificateBuilder generator) throws CertIOException {

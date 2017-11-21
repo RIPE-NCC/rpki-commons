@@ -116,10 +116,10 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             return;
         }
 
-        result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(X509Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
+        result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
 
         try {
-            byte[] extensionValue = certificate.getExtensionValue(X509Extension.certificatePolicies.getId());
+            byte[] extensionValue = certificate.getExtensionValue(Extension.certificatePolicies.getId());
             if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
                 return;
             }
