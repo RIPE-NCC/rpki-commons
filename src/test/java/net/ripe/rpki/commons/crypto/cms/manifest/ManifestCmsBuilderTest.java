@@ -114,6 +114,6 @@ public class ManifestCmsBuilderTest {
     public void shouldEncodeManifest() {
         subject.addFile("foo1", FOO_CONTENT);
         subject.addFile("BaR", BAR_CONTENT);
-        assertEncoded(ENCODED_MANIFEST, subject.encodeManifest());
+        assertArrayEquals(ENCODED_MANIFEST, subject.encodeManifest());
     }
 }

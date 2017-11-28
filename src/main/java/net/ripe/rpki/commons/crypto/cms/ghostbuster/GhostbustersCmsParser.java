@@ -30,47 +30,85 @@
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
+import ezvcard.Ezvcard;
+import ezvcard.VCard;
+import ezvcard.VCardVersion;
+import ezvcard.property.Address;
+import ezvcard.property.Email;
+import ezvcard.property.FormattedName;
+import ezvcard.property.Organization;
+import ezvcard.property.Telephone;
+import ezvcard.property.VCardProperty;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.cms.CMSSignedDataParser;
-import org.bouncycastle.cms.CMSTypedStream;
+import net.ripe.rpki.commons.validation.ValidationString;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
 
-import static net.ripe.rpki.commons.validation.ValidationString.DECODE_CONTENT;
+import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_CONTENT_TYPE;
+import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD;
 
 public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
     private String vCardPayload;
 
     @Override
-    public void decodeContent(ASN1Encodable encoded) {
+    public void parse(ValidationResult result, byte[] encoded) {
+        super.parse(result, encoded);
+        validateGhostbusters();
     }
 
     @Override
-    protected void parseContent(CMSSignedDataParser sp) {
-        final ValidationResult validationResult = getValidationResult();
-        final CMSTypedStream signedContent = sp.getSignedContent();
-        contentType = signedContent.getContentType();
+    public void decodeRawContent(InputStream content) throws IOException {
+        vCardPayload = CharStreams.toString(new InputStreamReader(content, Charsets.UTF_8));
+    }
 
-        try {
-            final InputSupplier<InputStream> supplier = new InputSupplier<InputStream>() {
-                @Override
-                public InputStream getInput() throws IOException {
-                    return signedContent.getContentStream();
-                }
-            };
-            vCardPayload = CharStreams.toString(CharStreams.newReaderSupplier(supplier, Charsets.US_ASCII));
-        } catch (IOException e) {
-            validationResult.rejectIfFalse(false, DECODE_CONTENT);
+    protected void validateGhostbusters() {
+        ValidationResult validationResult = getValidationResult();
+
+        if (!validationResult.rejectIfFalse(getContentType() != null, GHOSTBUSTERS_RECORD_CONTENT_TYPE)) {
             return;
         }
-        validationResult.rejectIfFalse(true, DECODE_CONTENT);
+        if (!validationResult.rejectIfFalse(GhostbustersCms.CONTENT_TYPE.equals(getContentType()), GHOSTBUSTERS_RECORD_CONTENT_TYPE, getContentType().toString())) {
+            return;
+        }
+        if (!validationResult.rejectIfNull(vCardPayload, GHOSTBUSTERS_RECORD_SINGLE_VCARD)) {
+            return;
+        }
+
+        List<VCard> vCards = Ezvcard.parse(vCardPayload).all();
+        validationResult.rejectIfFalse(vCards.size() == 1, GHOSTBUSTERS_RECORD_SINGLE_VCARD, String.valueOf(vCards.size()));
+        if (validationResult.hasFailureForCurrentLocation()) {
+            return;
+        }
+
+        VCard vCard = vCards.get(0);
+
+        validationResult.rejectIfFalse(VCardVersion.V4_0 == vCard.getVersion(), ValidationString.GHOSTBUSTERS_RECORD_VCARD_VERSION, vCard.getVersion().getVersion());
+        validationResult.rejectIfFalse(vCard.getFormattedName() != null && !Strings.isNullOrEmpty(vCard.getFormattedName().getValue()), ValidationString.GHOSTBUSTERS_RECORD_FN_PRESENT);
+        validationResult.rejectIfTrue(
+            vCard.getAddresses().isEmpty() &&
+                vCard.getTelephoneNumbers().isEmpty() &&
+                vCard.getEmails().isEmpty(),
+            ValidationString.GHOSTBUSTERS_RECORD_ADR_TEL_OR_EMAIL_PRESENT
+        );
+
+        for (VCardProperty property: vCard) {
+            validationResult.rejectIfFalse(
+                property instanceof FormattedName ||
+                    property instanceof Address ||
+                    property instanceof Email ||
+                    property instanceof Telephone ||
+                    property instanceof Organization,
+                ValidationString.GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY
+            );
+        }
     }
 
     public GhostbustersCms getGhostbustersCms() {

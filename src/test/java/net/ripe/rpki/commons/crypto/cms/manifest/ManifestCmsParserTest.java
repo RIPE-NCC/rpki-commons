@@ -195,7 +195,7 @@ public class ManifestCmsParserTest {
 
     @Test
     public void shouldDecodeManifest() {
-        parser.decodeContent(decode(ENCODED_MANIFEST));
+        parser.decodeAsn1Content(decode(ENCODED_MANIFEST));
         ManifestCms manifest = parser.getManifestCms();
         assertEquals(0, manifest.getVersion());
         assertEquals(BigInteger.valueOf(68), manifest.getNumber());

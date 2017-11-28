@@ -188,7 +188,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
     }
 
     @Override
-    public void decodeContent(ASN1Encodable encoded) {
+    public void decodeAsn1Content(ASN1Encodable encoded) {
         parseRouteOriginAttestation(encoded);
     }
 

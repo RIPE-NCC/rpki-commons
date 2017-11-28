@@ -166,8 +166,8 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
      * Note: in DER encoding a field with a value equal to its default should
      * NOT be encoded. So the version field should not be present.
      */
-    ASN1Encodable encodeRouteOriginAttestation(Asn asn, List<RoaPrefix> prefixes) {
+    byte[] encodeRouteOriginAttestation(Asn asn, List<RoaPrefix> prefixes) {
         ASN1Encodable[] encodables = {new ASN1Integer(asn.getValue()), encodeRoaIpAddressFamilySequence(prefixes)};
-        return new DERSequence(encodables);
+        return Asn1Util.encode(new DERSequence(encodables));
     }
 }

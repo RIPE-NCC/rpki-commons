@@ -169,6 +169,14 @@ public final class ValidationString {
     public static final String MANIFEST_RESOURCE_INHERIT = "mf.resource.inherit";
     public static final String MANIFEST_PAST_NEXT_UPDATE_TIME = "mf.past.next.update";
 
+    //ghostbusters
+    public static final String GHOSTBUSTERS_RECORD_CONTENT_TYPE = "ghostbusters.record.content.type";
+    public static final String GHOSTBUSTERS_RECORD_SINGLE_VCARD = "ghostbusters.record.single.vcard";
+    public static final String GHOSTBUSTERS_RECORD_VCARD_VERSION = "ghostbusters.record.vcard.version";
+    public static final String GHOSTBUSTERS_RECORD_FN_PRESENT = "ghostbusters.record.fn.present";
+    public static final String GHOSTBUSTERS_RECORD_ADR_TEL_OR_EMAIL_PRESENT = "ghostbusters.record.adr.tel.or.email.present";
+    public static final String GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY = "ghostbusters.record.supported.property";
+
     //validator
     public static final String VALIDATOR_URI_SAFETY = "validator.uri.safety";
     public static final String VALIDATOR_URI_RSYNC_SCHEME = "validator.uri.rsync.scheme";
@@ -199,7 +207,6 @@ public final class ValidationString {
     public static final String VALIDATOR_REPOSITORY_OBJECT_NOT_FOUND = "validator.repository.object.not.found";
     public static final String VALIDATOR_REPOSITORY_NOT_AT_EXPECTED_LOCATION = "validator.repository.object.not.at.expected.location";
     public static final String VALIDATOR_REPOSITORY_AT_EXPECTED_LOCATION_AND_ELSEWHERE = "validator.repository.object.at.expected.location.and.elsewhere";
-    public static final String VALIDATOR_REPOSITORY_GHOSTBUSTERS_RECORD_EMPTY = "validator.repository.ghostbusters.record.empty";
     public static final String VALIDATOR_REPOSITORY_EXPIRED_REVOKED_OBJECT = "validator.repository.expired.revoked.object";
     public static final String VALIDATOR_REPOSITORY_TA_CERT_NOT_UNIQUE = "validator.repository.trust.anchor.certificate.not.unique";
     public static final String VALIDATOR_REPOSITORY_TA_CERT_URI_NOT_UNIQUE = "validator.repository.trust.anchor.certificate.uri.not.unique";
