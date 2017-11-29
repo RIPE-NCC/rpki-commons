@@ -29,8 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import ezvcard.Ezvcard;
-import ezvcard.VCard;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
@@ -50,12 +48,10 @@ public class GhostbustersCms extends RpkiSignedObject {
 
     public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.35");
     private String vCardContent;
-    private VCard vCard;
 
     GhostbustersCms(RpkiSignedObjectInfo cmsObjectData, String vCardContent) {
         super(cmsObjectData);
         this.vCardContent = vCardContent;
-        this.vCard = Ezvcard.parse(vCardContent).first();
     }
 
     @Override
@@ -67,10 +63,6 @@ public class GhostbustersCms extends RpkiSignedObject {
     @Override
     public URI getParentCertificateUri() {
         return getCertificate().getParentCertificateUri();
-    }
-
-    public VCard getVCard() {
-        return vCard;
     }
 
     public String getVCardContent() {

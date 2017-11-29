@@ -81,8 +81,6 @@ public class GhostbustersCmsParserTest {
             "ORG:RGnet\\, LLC\r\n" +
             "TEL:+1 206 356 8341\r\n" +
             "END:VCARD\r\n", vCard);
-
-        assertEquals("Randy Bush", ghostbustersCms.getVCard().getFormattedName());
     }
 
     @Test

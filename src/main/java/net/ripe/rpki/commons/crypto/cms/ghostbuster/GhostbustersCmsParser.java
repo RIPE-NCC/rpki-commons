@@ -29,18 +29,16 @@
  */
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
+import com.github.mangstadt.vinnie.VObjectProperty;
+import com.github.mangstadt.vinnie.io.Context;
+import com.github.mangstadt.vinnie.io.SyntaxRules;
+import com.github.mangstadt.vinnie.io.VObjectDataListener;
+import com.github.mangstadt.vinnie.io.VObjectReader;
+import com.github.mangstadt.vinnie.io.Warning;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
-import ezvcard.Ezvcard;
-import ezvcard.VCard;
-import ezvcard.VCardVersion;
-import ezvcard.property.Address;
-import ezvcard.property.Email;
-import ezvcard.property.FormattedName;
-import ezvcard.property.Organization;
-import ezvcard.property.Telephone;
-import ezvcard.property.VCardProperty;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -49,10 +47,11 @@ import net.ripe.rpki.commons.validation.ValidationString;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
-
-import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_CONTENT_TYPE;
-import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
@@ -72,42 +71,37 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
     protected void validateGhostbusters() {
         ValidationResult validationResult = getValidationResult();
 
-        if (!validationResult.rejectIfFalse(getContentType() != null, GHOSTBUSTERS_RECORD_CONTENT_TYPE)) {
+        if (!validationResult.rejectIfFalse(getContentType() != null, ValidationString.GHOSTBUSTERS_RECORD_CONTENT_TYPE)) {
             return;
         }
-        if (!validationResult.rejectIfFalse(GhostbustersCms.CONTENT_TYPE.equals(getContentType()), GHOSTBUSTERS_RECORD_CONTENT_TYPE, getContentType().toString())) {
+        if (!validationResult.rejectIfFalse(GhostbustersCms.CONTENT_TYPE.equals(getContentType()), ValidationString.GHOSTBUSTERS_RECORD_CONTENT_TYPE, getContentType().toString())) {
             return;
         }
-        if (!validationResult.rejectIfNull(vCardPayload, GHOSTBUSTERS_RECORD_SINGLE_VCARD)) {
-            return;
-        }
-
-        List<VCard> vCards = Ezvcard.parse(vCardPayload).all();
-        validationResult.rejectIfFalse(vCards.size() == 1, GHOSTBUSTERS_RECORD_SINGLE_VCARD, String.valueOf(vCards.size()));
-        if (validationResult.hasFailureForCurrentLocation()) {
+        if (!validationResult.rejectIfNull(vCardPayload, ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD)) {
             return;
         }
 
-        VCard vCard = vCards.get(0);
+        try (Reader reader = new StringReader(vCardPayload)) {
+            SyntaxRules syntaxRules = SyntaxRules.vcard();
+            VObjectReader vObjectReader = new VObjectReader(reader, syntaxRules);
+            VCardValidator validator = new VCardValidator(validationResult);
+            vObjectReader.parse(validator);
 
-        validationResult.rejectIfFalse(VCardVersion.V4_0 == vCard.getVersion(), ValidationString.GHOSTBUSTERS_RECORD_VCARD_VERSION, vCard.getVersion().getVersion());
-        validationResult.rejectIfFalse(vCard.getFormattedName() != null && !Strings.isNullOrEmpty(vCard.getFormattedName().getValue()), ValidationString.GHOSTBUSTERS_RECORD_FN_PRESENT);
-        validationResult.rejectIfTrue(
-            vCard.getAddresses().isEmpty() &&
-                vCard.getTelephoneNumbers().isEmpty() &&
-                vCard.getEmails().isEmpty(),
-            ValidationString.GHOSTBUSTERS_RECORD_ADR_TEL_OR_EMAIL_PRESENT
-        );
+            validationResult.rejectIfFalse(validator.vCardBegin == 1 && validator.vCardEnd == 1, ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD, String.valueOf(validator.vCardBegin));
+            if (validationResult.hasFailureForCurrentLocation()) {
+                return;
+            }
 
-        for (VCardProperty property: vCard) {
+            validationResult.rejectIfFalse(validator.properties.containsKey("FN") && !Strings.isNullOrEmpty(validator.properties.get("FN")), ValidationString.GHOSTBUSTERS_RECORD_FN_PRESENT);
+
             validationResult.rejectIfFalse(
-                property instanceof FormattedName ||
-                    property instanceof Address ||
-                    property instanceof Email ||
-                    property instanceof Telephone ||
-                    property instanceof Organization,
-                ValidationString.GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY
+                validator.properties.containsKey("ADR") ||
+                    validator.properties.containsKey("TEL") ||
+                    validator.properties.containsKey("EMAIL"),
+                ValidationString.GHOSTBUSTERS_RECORD_ADR_TEL_OR_EMAIL_PRESENT
             );
+        } catch (IOException e) {
+            validationResult.error(ValidationString.CMS_CONTENT_PARSING);
         }
     }
 
@@ -121,5 +115,45 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
     public boolean isSuccess() {
         return !getValidationResult().hasFailureForCurrentLocation();
+    }
+
+    private static class VCardValidator implements VObjectDataListener {
+        private static final Set<String> ALLOWED_PROPERTIES = Sets.newHashSet("FN", "ADR", "TEL", "EMAIL", "ORG");
+
+        private final ValidationResult validationResult;
+
+        public int vCardBegin = 0;
+        public int vCardEnd = 0;
+        public Map<String, String> properties = new HashMap<>();
+
+        private VCardValidator(ValidationResult validationResult) {
+            this.validationResult = validationResult;
+        }
+
+        @Override
+        public void onComponentBegin(String name, Context context) {
+            ++vCardBegin;
+        }
+
+        @Override
+        public void onComponentEnd(String name, Context context) {
+            ++vCardEnd;
+        }
+
+        @Override
+        public void onProperty(VObjectProperty property, Context context) {
+            validationResult.rejectIfFalse(ALLOWED_PROPERTIES.contains(property.getName()), ValidationString.GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY, property.getName());
+            properties.put(property.getName(), property.getValue());
+        }
+
+        @Override
+        public void onVersion(String value, Context context) {
+            validationResult.rejectIfFalse("4.0".equals(value), ValidationString.GHOSTBUSTERS_RECORD_VCARD_VERSION, value);
+        }
+
+        @Override
+        public void onWarning(Warning warning, VObjectProperty property, Exception thrown, Context context) {
+
+        }
     }
 }
