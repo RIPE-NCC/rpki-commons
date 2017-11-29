@@ -103,9 +103,16 @@ public final class ValidationString {
     public static final String POLICY_VALIDATION = "cert.policy.validation";
     public static final String RESOURCE_EXT_PRESENT = "cert.resource.ext.present";
     public static final String RESOURCE_EXT_NOT_PRESENT = "cert.resource.ext.not.present";
+    public static final String IP_RESOURCE_PRESENT = "cert.ip.resource.present";
+    public static final String AS_RESOURCE_PRESENT = "cert.as.resource.present";
     public static final String AS_OR_IP_RESOURCE_PRESENT = "cert.as.or.ip.resource.present";
     public static final String CERT_ISSUER_CORRECT = "cert.issuer.correct";
     public static final String CERT_SUBJECT_CORRECT = "cert.subject.correct";
+    public static final String CERT_NO_SUBJECT_PK_INFO = "cert.subj.pk.not.present";
+
+    // router certificate
+    public static final String CERT_SIA_IS_PRESENT = "cert.sia.present";
+    public static final String BGPSEC_EXT_PRESENT = "cert.bgpsec.ext.present";
 
     //cms object
     public static final String CMS_DATA_PARSING = "cms.signed.data.parsing";

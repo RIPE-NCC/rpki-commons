@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 
 import com.google.common.io.Closer;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
+import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -136,5 +137,25 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
                 || certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
     }
 
+    protected boolean isIpResourceExtensionPresent() {
+        if (certificate.getCriticalExtensionOIDs() == null) {
+            return false;
+        }
+        return certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
+    }
+
+    protected boolean isAsResourceExtensionPresent() {
+        if (certificate.getCriticalExtensionOIDs() == null) {
+            return false;
+        }
+        return certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
+    }
+
+    protected boolean isBgpSecExtensionPresent() {
+        if (certificate.getCriticalExtensionOIDs() == null) {
+            return false;
+        }
+        return certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+    }
 
 }

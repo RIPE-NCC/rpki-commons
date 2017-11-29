@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
@@ -47,15 +46,13 @@ import org.apache.commons.lang.Validate;
 import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.
  */
-public class X509ResourceCertificate extends AbstractX509CertificateWrapper implements CertificateRepositoryObject {
+public class X509ResourceCertificate extends AbstractX509CertificateWrapper implements X509CertificateObject {
 
     private static final long serialVersionUID = 2L;
 
@@ -166,17 +163,6 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
         revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
 
-    }
-
-    private boolean hasErrorInRevocationCheck(List<ValidationCheck> failures) {
-        Iterator<ValidationCheck> iterator = failures.iterator();
-        while (iterator.hasNext()) {
-            ValidationCheck validationCheck = iterator.next();
-            if (ValidationString.CERT_NOT_REVOKED.equals(validationCheck.getKey()) && validationCheck.getStatus() == ValidationStatus.ERROR) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

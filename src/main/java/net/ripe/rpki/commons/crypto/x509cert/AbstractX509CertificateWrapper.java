@@ -30,6 +30,9 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.validation.ValidationCheck;
+import net.ripe.rpki.commons.validation.ValidationStatus;
+import net.ripe.rpki.commons.validation.ValidationString;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -45,6 +48,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 public abstract class AbstractX509CertificateWrapper implements Serializable {
 
@@ -182,5 +186,19 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public void verify(PublicKey publicKey) throws InvalidKeyException, SignatureException {
         X509CertificateUtil.verify(certificate, publicKey);
+    }
+
+    protected boolean hasErrorInRevocationCheck(List<ValidationCheck> failures) {
+        for (ValidationCheck validationCheck : failures) {
+            if (ValidationString.CERT_NOT_REVOKED.equals(validationCheck.getKey()) && validationCheck.getStatus() == ValidationStatus.ERROR) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isRouterCertificate() {
+
+        return false;
     }
 }

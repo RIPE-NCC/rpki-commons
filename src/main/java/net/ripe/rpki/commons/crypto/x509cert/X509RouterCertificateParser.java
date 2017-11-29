@@ -27,30 +27,38 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto;
+package net.ripe.rpki.commons.crypto.x509cert;
 
-import net.ripe.rpki.commons.crypto.crl.CrlLocator;
-import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.validation.ValidationOptions;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.RepositoryObjectValidationContext;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
-import java.io.Serializable;
-import java.net.URI;
+import static net.ripe.rpki.commons.validation.ValidationString.AS_RESOURCE_PRESENT;
+import static net.ripe.rpki.commons.validation.ValidationString.BGPSEC_EXT_PRESENT;
+import static net.ripe.rpki.commons.validation.ValidationString.CERT_NO_SUBJECT_PK_INFO;
+import static net.ripe.rpki.commons.validation.ValidationString.CERT_SIA_IS_PRESENT;
+import static net.ripe.rpki.commons.validation.ValidationString.IP_RESOURCE_PRESENT;
 
-public interface CertificateRepositoryObject extends Serializable {
+public class X509RouterCertificateParser extends X509CertificateParser<X509RouterCertificate> {
 
-    URI getCrlUri();
+    @Override
+    public X509RouterCertificate getCertificate() {
+        if (!isSuccess()) {
+            throw new IllegalArgumentException("Router certificate validation failed");
+        }
+        return new X509RouterCertificate(getX509Certificate());
+    }
 
-    URI getParentCertificateUri();
 
-    void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result);
-    void validate(String location, CertificateRepositoryObjectValidationContext context, X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result);
+    @Override
+    protected void doTypeSpecificValidation() {
+        result.rejectIfFalse(isBgpSecExtensionPresent(), BGPSEC_EXT_PRESENT);
 
-    boolean isPastValidityTime();
+        final X509CertificateInformationAccessDescriptor[] sia = getCertificate().getSubjectInformationAccess();
+        result.rejectIfTrue(sia != null && sia.length > 0, CERT_SIA_IS_PRESENT);
 
-    boolean isRevoked();
+        result.rejectIfTrue(isIpResourceExtensionPresent(), IP_RESOURCE_PRESENT);
+        result.rejectIfFalse(isAsResourceExtensionPresent(), AS_RESOURCE_PRESENT);
 
-    byte[] getEncoded();
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(getX509Certificate().getPublicKey());
+        result.rejectIfTrue(subjectPublicKeyInfo == null, CERT_NO_SUBJECT_PK_INFO);
+    }
 }
