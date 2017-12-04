@@ -29,48 +29,48 @@
  */
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
-import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
-import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.validation.ValidationOptions;
+import com.google.common.base.Charsets;
+import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
-import java.net.URI;
+import java.security.PrivateKey;
 
 /**
- * A ghostbusters RPKI object as defined in <a href="https://tools.ietf.org/html/rfc6493">RFC6493</a>.
+ * Creates a RoaCms using the DER encoding specified in the ROA format standard.
+ *
+ * @see <a href="http://tools.ietf.org/html/draft-ietf-sidr-roa-format-03">ROA format</a>
  */
-public class GhostbustersCms extends RpkiSignedObject {
+public class GhostbustersCmsBuilder extends RpkiSignedObjectBuilder {
 
-    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.35");
-    private String vCardContent;
+    private X509ResourceCertificate certificate;
+    private String vCardPayload;
+    private String signatureProvider;
 
-    GhostbustersCms(RpkiSignedObjectInfo cmsObjectData, String vCardContent) {
-        super(cmsObjectData);
-        this.vCardContent = vCardContent;
+
+    public GhostbustersCmsBuilder withCertificate(X509ResourceCertificate certificate) {
+        this.certificate = certificate;
+        return this;
     }
 
-    @Override
-    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
-        X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
-        validator.validate(location, getCertificate());
+    public GhostbustersCmsBuilder withVCardPayload(String vCardPayload) {
+        this.vCardPayload = vCardPayload;
+        return this;
     }
 
-    @Override
-    public URI getParentCertificateUri() {
-        return getCertificate().getParentCertificateUri();
+    public GhostbustersCmsBuilder withSignatureProvider(String signatureProvider) {
+        this.signatureProvider = signatureProvider;
+        return this;
     }
 
-    public String getVCardContent() {
-        return vCardContent;
+    public GhostbustersCms build(PrivateKey privateKey) {
+        String location = "unknown.gbr";
+        GhostbustersCmsParser parser = new GhostbustersCmsParser();
+        parser.parse(ValidationResult.withLocation(location), getEncoded(privateKey));
+        return parser.getGhostbustersCms();
     }
 
-    @Deprecated
-    public String getvCard() {
-        return vCardContent;
+    public byte[] getEncoded(PrivateKey privateKey) {
+        return generateCms(certificate.getCertificate(), privateKey, signatureProvider, GhostbustersCms.CONTENT_TYPE, vCardPayload.getBytes(Charsets.UTF_8));
     }
 }

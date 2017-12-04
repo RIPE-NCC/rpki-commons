@@ -68,10 +68,10 @@ import java.util.Hashtable;
 
 public abstract class RpkiSignedObjectBuilder {
 
-    protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) {
+    protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, byte[] content) {
         byte[] result;
         try {
-            result = doGenerate(signingCertificate, privateKey, signatureProvider, contentTypeOid, encodableContent);
+            result = doGenerate(signingCertificate, privateKey, signatureProvider, contentTypeOid, content);
         } catch (NoSuchAlgorithmException e) {
             throw new RpkiSignedObjectBuilderException(e);
         } catch (NoSuchProviderException e) {
@@ -92,7 +92,7 @@ public abstract class RpkiSignedObjectBuilder {
         return result;
     }
 
-    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, ASN1Encodable encodableContent) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException, OperatorCreationException {
+    private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, byte[] content) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException, OperatorCreationException {
         byte[] subjectKeyIdentifier = X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate);
         Validate.notNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
 
@@ -100,7 +100,6 @@ public abstract class RpkiSignedObjectBuilder {
         addSignerInfo(generator, privateKey, signatureProvider, signingCertificate);
         generator.addCertificates(new JcaCertStore(Collections.singleton(signingCertificate)));
 
-        byte[] content = Asn1Util.encode(encodableContent);
         CMSSignedData data = generator.generate(new CMSProcessableByteArray(contentTypeOid, content), true);
         return data.getEncoded();
     }

@@ -127,7 +127,7 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
     }
 
     @Override
-    public void decodeContent(ASN1Encodable encoded) {
+    public void decodeAsn1Content(ASN1Encodable encoded) {
         ValidationResult validationResult = getValidationResult();
         try {
             ASN1Sequence seq = expect(encoded, ASN1Sequence.class);

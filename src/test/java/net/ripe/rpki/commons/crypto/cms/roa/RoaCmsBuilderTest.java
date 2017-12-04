@@ -92,7 +92,7 @@ public class RoaCmsBuilderTest {
 
     @Test
     public void shouldEncodeRouteOriginAttestation() {
-        assertEncoded(ENCODED_ROUTE_ORIGIN_ATTESTATION, subject.encodeRouteOriginAttestation(TEST_ASN, ipv4Prefixes));
+        assertArrayEquals(ENCODED_ROUTE_ORIGIN_ATTESTATION, subject.encodeRouteOriginAttestation(TEST_ASN, ipv4Prefixes));
     }
 
 }

@@ -104,7 +104,19 @@ public abstract class RpkiSignedObjectParser {
         return signingTime;
     }
 
-    public abstract void decodeContent(ASN1Encodable encoded);
+    public void decodeRawContent(InputStream content) throws IOException {
+        try (ASN1InputStream asn1InputStream = new ASN1InputStream(content)) {
+            decodeAsn1Content(asn1InputStream.readObject());
+
+            validationResult.rejectIfFalse(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
+            validationResult.pass(CMS_CONTENT_PARSING);
+        } catch (IOException e) {
+            validationResult.error(CMS_CONTENT_PARSING);
+        }
+    }
+
+    public void decodeAsn1Content(ASN1Encodable content) {
+    }
 
     private void parseCms() {
         CMSSignedDataParser sp;
@@ -131,23 +143,14 @@ public abstract class RpkiSignedObjectParser {
         final CMSTypedStream signedContent = sp.getSignedContent();
         contentType = signedContent.getContentType();
 
-        InputStream signedContentStream = signedContent.getContentStream();
-        ASN1InputStream asn1InputStream = new ASN1InputStream(signedContentStream);
-        try {
-            decodeContent(asn1InputStream.readObject());
+
+        try (InputStream signedContentStream = signedContent.getContentStream()) {
+            decodeRawContent(signedContentStream);
+            validationResult.pass(DECODE_CONTENT);
         } catch (IOException e) {
-            validationResult.rejectIfFalse(false, DECODE_CONTENT);
+            validationResult.error(DECODE_CONTENT);
             return;
         }
-        validationResult.rejectIfFalse(true, DECODE_CONTENT);
-
-        try {
-            validationResult.rejectIfFalse(asn1InputStream.readObject() == null, ONLY_ONE_SIGNED_OBJECT);
-            asn1InputStream.close();
-        } catch (IOException e) {
-            validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
-        }
-        validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
     }
 
     private void parseCmsCertificate(CMSSignedDataParser sp) {
