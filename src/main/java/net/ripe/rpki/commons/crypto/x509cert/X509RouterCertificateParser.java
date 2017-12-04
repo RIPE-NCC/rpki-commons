@@ -47,18 +47,17 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
         return new X509RouterCertificate(getX509Certificate());
     }
 
-
     @Override
     protected void doTypeSpecificValidation() {
         result.rejectIfFalse(isBgpSecExtensionPresent(), BGPSEC_EXT_PRESENT);
 
-        final X509CertificateInformationAccessDescriptor[] sia = getCertificate().getSubjectInformationAccess();
+        final X509CertificateInformationAccessDescriptor[] sia = X509CertificateUtil.getSubjectInformationAccess(certificate);
         result.rejectIfTrue(sia != null && sia.length > 0, CERT_SIA_IS_PRESENT);
 
         result.rejectIfTrue(isIpResourceExtensionPresent(), IP_RESOURCE_PRESENT);
         result.rejectIfFalse(isAsResourceExtensionPresent(), AS_RESOURCE_PRESENT);
 
-        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(getX509Certificate().getPublicKey());
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(certificate.getPublicKey().getEncoded());
         result.rejectIfTrue(subjectPublicKeyInfo == null, CERT_NO_SUBJECT_PK_INFO);
     }
 }
