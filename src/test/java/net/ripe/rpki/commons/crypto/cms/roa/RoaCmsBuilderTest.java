@@ -1,7 +1,7 @@
 /**
  * The BSD License
  *
- * Copyright (c) 2010-2012 RIPE NCC
+ * Copyright (c) 2010-2018 RIPE NCC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -92,7 +92,7 @@ public class RoaCmsBuilderTest {
 
     @Test
     public void shouldEncodeRouteOriginAttestation() {
-        assertEncoded(ENCODED_ROUTE_ORIGIN_ATTESTATION, subject.encodeRouteOriginAttestation(TEST_ASN, ipv4Prefixes));
+        assertArrayEquals(ENCODED_ROUTE_ORIGIN_ATTESTATION, subject.encodeRouteOriginAttestation(TEST_ASN, ipv4Prefixes));
     }
 
 }

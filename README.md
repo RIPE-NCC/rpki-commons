@@ -34,8 +34,7 @@ associated with an authority responsible for publishing in the repository.
   longer considered valid by the certificate issuer.
 
 - Ghostbusters Record (RFC 6493): A signed vCard (RFC 6350) that includes
-  contact information of an RPKI CA certificate maintainer. At the moment, only
-parsing and signature validation is implemented.
+  contact information of an RPKI CA certificate maintainer.
 
 This library supports the concept of path validation, the process that verifies
 the binding between the subject and the subject-public-key defined in the target
@@ -47,7 +46,9 @@ provisioning protocol.
 
 ## Changelog
 
-### 2016-09-15 version 1.3
+### 2017-11-28 version 1.3
+
+- Java 1.8 or higher required
 
 - Support parsing and validation of Ghostbusters records (RFC 6493).
 

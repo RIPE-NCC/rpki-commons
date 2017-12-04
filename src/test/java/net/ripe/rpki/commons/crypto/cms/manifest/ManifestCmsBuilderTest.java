@@ -1,7 +1,7 @@
 /**
  * The BSD License
  *
- * Copyright (c) 2010-2012 RIPE NCC
+ * Copyright (c) 2010-2018 RIPE NCC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -114,6 +114,6 @@ public class ManifestCmsBuilderTest {
     public void shouldEncodeManifest() {
         subject.addFile("foo1", FOO_CONTENT);
         subject.addFile("BaR", BAR_CONTENT);
-        assertEncoded(ENCODED_MANIFEST, subject.encodeManifest());
+        assertArrayEquals(ENCODED_MANIFEST, subject.encodeManifest());
     }
 }

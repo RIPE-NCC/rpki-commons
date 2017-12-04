@@ -1,7 +1,7 @@
 /**
  * The BSD License
  *
- * Copyright (c) 2010-2012 RIPE NCC
+ * Copyright (c) 2010-2018 RIPE NCC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -188,7 +188,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
     }
 
     @Override
-    public void decodeContent(ASN1Encodable encoded) {
+    public void decodeAsn1Content(ASN1Encodable encoded) {
         parseRouteOriginAttestation(encoded);
     }
 

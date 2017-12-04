@@ -1,7 +1,7 @@
 /**
  * The BSD License
  *
- * Copyright (c) 2010-2012 RIPE NCC
+ * Copyright (c) 2010-2018 RIPE NCC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -119,7 +120,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
      * Note: in DER encoding a field with a value equal to its default should
      * NOT be encoded. So the version field should not be present.
      */
-    ASN1Encodable encodeManifest() {
+    byte[] encodeManifest() {
         ASN1Encodable[] seq = {
                 new ASN1Integer(number),
                 new ASN1GeneralizedTime(thisUpdateTime.toDate()),
@@ -127,6 +128,6 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
                 new ASN1ObjectIdentifier(ManifestCms.FILE_HASH_ALGORITHM),
                 encodeFileList()
         };
-        return new DERSequence(seq);
+        return Asn1Util.encode(new DERSequence(seq));
     }
 }

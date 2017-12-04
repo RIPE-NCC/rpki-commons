@@ -27,42 +27,50 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.xml.converters;
+package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import com.thoughtworks.xstream.converters.Converter;
-import com.thoughtworks.xstream.converters.MarshallingContext;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
-import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
+import com.google.common.base.Charsets;
+import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.Validate;
 
-public class ManifestCmsConverter implements Converter {
+import java.security.PrivateKey;
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public boolean canConvert(Class type) {
-        return ManifestCms.class.equals(type);
+/**
+ * Creates a RoaCms using the DER encoding specified in the ROA format standard.
+ *
+ * @see <a href="http://tools.ietf.org/html/draft-ietf-sidr-roa-format-03">ROA format</a>
+ */
+public class GhostbustersCmsBuilder extends RpkiSignedObjectBuilder {
+
+    private X509ResourceCertificate certificate;
+    private String vCardPayload;
+    private String signatureProvider;
+
+
+    public GhostbustersCmsBuilder withCertificate(X509ResourceCertificate certificate) {
+        this.certificate = certificate;
+        return this;
     }
 
-    @Override
-    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        ManifestCms manifest = (ManifestCms) source;
-        writer.startNode("encoded");
-        context.convertAnother(manifest.getEncoded());
-        writer.endNode();
+    public GhostbustersCmsBuilder withVCardPayload(String vCardPayload) {
+        this.vCardPayload = vCardPayload;
+        return this;
     }
 
-    @Override
-    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        reader.moveDown();
-        Validate.isTrue("encoded".equals(reader.getNodeName()));
-        byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
-        reader.moveUp();
-        ManifestCmsParser parser = new ManifestCmsParser();
-        parser.parse(ValidationResult.withLocation("unknown.mft"), encoded);
-        return parser.getManifestCms();
+    public GhostbustersCmsBuilder withSignatureProvider(String signatureProvider) {
+        this.signatureProvider = signatureProvider;
+        return this;
+    }
+
+    public GhostbustersCms build(PrivateKey privateKey) {
+        String location = "unknown.gbr";
+        GhostbustersCmsParser parser = new GhostbustersCmsParser();
+        parser.parse(ValidationResult.withLocation(location), getEncoded(privateKey));
+        return parser.getGhostbustersCms();
+    }
+
+    public byte[] getEncoded(PrivateKey privateKey) {
+        return generateCms(certificate.getCertificate(), privateKey, signatureProvider, GhostbustersCms.CONTENT_TYPE, vCardPayload.getBytes(Charsets.UTF_8));
     }
 }
