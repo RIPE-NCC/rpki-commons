@@ -1,7 +1,7 @@
 /**
  * The BSD License
  *
- * Copyright (c) 2010-2012 RIPE NCC
+ * Copyright (c) 2010-2018 RIPE NCC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.validation.ValidationLocation;
@@ -37,6 +36,8 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
+import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509RouterCertificateValidator;
 
 import java.net.URI;
@@ -80,7 +81,15 @@ public class X509RouterCertificate extends AbstractX509CertificateWrapper implem
 
     @Override
     public void validate(String location, CertificateRepositoryObjectValidationContext context, X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result) {
+        if (!isRoot() && crl == null) {
+            result.rejectIfFalse(false, ValidationString.OBJECTS_CRL_VALID, crlUri.toString());
+            return;
+        }
 
+        X509RouterCertificateValidator validator = new X509RouterCertificateValidator(options, result, context.getRouterCertificate(), crl);
+        validator.validate(location, this);
+
+        revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
     }
 
     @Override

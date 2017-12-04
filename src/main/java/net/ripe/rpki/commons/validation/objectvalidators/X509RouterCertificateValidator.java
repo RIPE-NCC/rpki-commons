@@ -1,7 +1,7 @@
 /**
  * The BSD License
  *
- * Copyright (c) 2010-2012 RIPE NCC
+ * Copyright (c) 2010-2018 RIPE NCC
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,16 @@ public class X509RouterCertificateValidator extends X509CertificateParentChildVa
 
     public X509RouterCertificateValidator(ValidationOptions options, ValidationResult result, X509RouterCertificate parent, X509Crl crl) {
         super(options, result, parent, crl);
+    }
+
+    @Override
+    public void validate(String location, X509RouterCertificate certificate) {
+        super.validate(location, certificate);
+        verifyResources();
+    }
+
+    private void verifyResources() {
+
     }
 
 }
