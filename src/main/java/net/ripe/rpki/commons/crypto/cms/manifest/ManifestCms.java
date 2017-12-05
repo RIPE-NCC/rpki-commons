@@ -148,8 +148,23 @@ public class ManifestCms extends RpkiSignedObject {
 
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
         result.setLocation(new ValidationLocation(location));
+        checkManifestValidityTimes(options, result);
         X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
         validator.validate(location, getCertificate());
+    }
+
+
+    private void checkManifestValidityTimes(ValidationOptions options, ValidationResult result) {
+        DateTime now = new DateTime();
+        DateTime nextUpdateTime = getNextUpdateTime();
+
+        if (now.isAfter(nextUpdateTime)) {
+            if (nextUpdateTime.plusDays(options.getMaxStaleDays()).isAfter(now)) {
+                result.warnIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
+            } else {
+                result.rejectIfTrue(true, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
+            }
+        }
     }
 
     /**
