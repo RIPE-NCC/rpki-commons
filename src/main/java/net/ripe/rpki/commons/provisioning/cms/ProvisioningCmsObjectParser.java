@@ -52,7 +52,7 @@ import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.CMSSignedGenerator;
@@ -81,6 +81,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class ProvisioningCmsObjectParser {
@@ -257,7 +258,7 @@ public class ProvisioningCmsObjectParser {
 
     private boolean isEndEntityCertificate(X509Certificate certificate) {
         try {
-            byte[] basicConstraintsExtension = certificate.getExtensionValue(X509Extension.basicConstraints.getId());
+            byte[] basicConstraintsExtension = certificate.getExtensionValue(Extension.basicConstraints.getId());
             if (basicConstraintsExtension == null) {
                 /**
                  * If the basic constraints extension is not present [...] then the certified public key MUST NOT be used
@@ -426,11 +427,11 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.5
-     * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
+     * https://tools.ietf.org/html/rfc6492#section-3.1.1.6.5
+     * https://tools.ietf.org/html/rfc7935#section-2
      */
     private void verifyEncryptionAlgorithm(SignerInformation signer) {
-        validationResult.rejectIfFalse(CMSSignedGenerator.ENCRYPTION_RSA.equals(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
+        validationResult.rejectIfFalse(ALLOWED_SIGNATURE_ALGORITHM_OIDS.contains(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
     }
 
     /**

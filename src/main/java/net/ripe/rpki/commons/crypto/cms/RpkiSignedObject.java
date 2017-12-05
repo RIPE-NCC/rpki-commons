@@ -50,12 +50,21 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * CMS signed objects must indicate signing algorithm as "sha256WithRsa".
+     */
+    public static final String SHA256WITHRSA_ENCRYPTION_OID = PKCSObjectIdentifiers.sha256WithRSAEncryption.getId();
+
+    /**
+     * However, older versions of BouncyCastle did not support this OID and use "rsaEncryption" instead.
+     * We accept both when parsing and validating, but sign with "sha256WithRsa" now.
+     */
     public static final String RSA_ENCRYPTION_OID = CMSSignedDataGenerator.ENCRYPTION_RSA;
 
-    // The "sha256WithRsa" Object Id is defined in RFC6485 but no existing implementations, at least bouncy castle and
-    // openssl support this. There is a plan to issue an erratum for RFC6485 to just go with plain "rsa" as existing
-    // implementations are doing. Until that time, we had better accept both when doing validation.
-    public static final String SHA256WITHRSA_ENCRYPTION_OID = PKCSObjectIdentifiers.sha256WithRSAEncryption.getId();
+    public static final List<String> ALLOWED_SIGNATURE_ALGORITHM_OIDS = Arrays.asList(
+        SHA256WITHRSA_ENCRYPTION_OID,
+        RSA_ENCRYPTION_OID
+    );
 
     /**
      * The digestAlgorithms set MUST include only SHA-256, the OID for which is
