@@ -199,6 +199,10 @@ public final class ValidationString {
     public static final String VALIDATOR_ROOT_CERTIFICATE_INCLUDED_IN_MANIFEST = "validator.root.certificate.included.in.manifest";
     public static final String VALIDATOR_CIRCULAR_REFERENCE = "validator.circular.reference";
 
+    public static final String VALIDATOR_OLD_LOCAL_MANIFEST_REPOSITORY_FAILED = "validator.old.local.manifest.repository.failed";
+    public static final String VALIDATOR_NO_LOCAL_MANIFEST_NO_MANIFEST_IN_REPOSITORY = "validator.no.local.manifest.no.manifest.in.repository";
+    public static final String VALIDATOR_NO_MANIFEST_REPOSITORY_FAILED = "validator.no.manifest.repository.failed";
+
     // Problems with repository
     public static final String VALIDATOR_REPOSITORY_INCOMPLETE = "validator.repository.incomplete";
     public static final String VALIDATOR_REPOSITORY_INCONSISTENT = "validator.repository.inconsistent";
