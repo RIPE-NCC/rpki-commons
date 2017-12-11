@@ -42,8 +42,11 @@ import java.io.InputStream;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
@@ -74,16 +77,31 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         }
     }
 
-    private void validatePublicKey() {
-        PublicKey publicKey = certificate.getPublicKey();
-        result.rejectIfFalse(
-                "RSA".equals(publicKey.getAlgorithm()) && publicKey instanceof RSAPublicKey,
-                PUBLIC_KEY_CERT_ALGORITHM,
-                publicKey.getAlgorithm());
-        if (publicKey instanceof RSAPublicKey) {
+    protected void validatePublicKey() {
+        validateRsaPk();
+    }
+
+    void validateRsaPk() {
+        final PublicKey publicKey = certificate.getPublicKey();
+        final boolean rsaPk = isRsaPk(publicKey);
+        result.rejectIfFalse(rsaPk, PUBLIC_KEY_CERT_ALGORITHM, publicKey.getAlgorithm());
+        if (rsaPk && publicKey instanceof RSAPublicKey) {
             RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
             result.warnIfFalse(2048 == rsaPublicKey.getModulus().bitLength(), PUBLIC_KEY_CERT_SIZE, String.valueOf(rsaPublicKey.getModulus().bitLength()));
         }
+    }
+
+    boolean isRsaPk(PublicKey publicKey) {
+        return "RSA".equals(publicKey.getAlgorithm()) && publicKey instanceof RSAPublicKey;
+    }
+
+    boolean isEcPk(PublicKey publicKey) {
+        return "EC".equals(publicKey.getAlgorithm()) && publicKey instanceof ECPublicKey;
+    }
+
+    void validateEcPk() {
+        final PublicKey publicKey = certificate.getPublicKey();
+        result.rejectIfFalse(isEcPk(publicKey), PUBLIC_KEY_CERT_ALGORITHM, publicKey.getAlgorithm());
     }
 
     protected void doTypeSpecificValidation() {
@@ -152,10 +170,12 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     protected boolean isBgpSecExtensionPresent() {
-        if (certificate.getCriticalExtensionOIDs() == null) {
+        try {
+            final List<String> extendedKeyUsage = certificate.getExtendedKeyUsage();
+            return extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+        } catch (CertificateParsingException e) {
             return false;
         }
-        return certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
     }
 
 }

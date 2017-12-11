@@ -31,11 +31,17 @@ package net.ripe.rpki.commons.crypto.x509cert;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
+import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
+
 import static net.ripe.rpki.commons.validation.ValidationString.AS_RESOURCE_PRESENT;
 import static net.ripe.rpki.commons.validation.ValidationString.BGPSEC_EXT_PRESENT;
 import static net.ripe.rpki.commons.validation.ValidationString.CERT_NO_SUBJECT_PK_INFO;
 import static net.ripe.rpki.commons.validation.ValidationString.CERT_SIA_IS_PRESENT;
 import static net.ripe.rpki.commons.validation.ValidationString.IP_RESOURCE_PRESENT;
+import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_ALGORITHM;
+import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_SIZE;
 
 public class X509RouterCertificateParser extends X509CertificateParser<X509RouterCertificate> {
 
@@ -45,6 +51,18 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
             throw new IllegalArgumentException("Router certificate validation failed");
         }
         return new X509RouterCertificate(getX509Certificate());
+    }
+
+    @Override
+    protected void validatePublicKey() {
+        PublicKey publicKey = certificate.getPublicKey();
+        if (isRsaPk(publicKey)) {
+            super.validateRsaPk();
+        } else if (isEcPk(publicKey)) {
+            validateEcPk();
+        } else {
+            result.error(PUBLIC_KEY_CERT_ALGORITHM, publicKey.getAlgorithm());
+        }
     }
 
     @Override

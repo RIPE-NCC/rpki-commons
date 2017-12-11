@@ -29,17 +29,22 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
+import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -49,6 +54,7 @@ import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR
 import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -110,4 +116,19 @@ public class X509RouterCertificateParserTest {
         assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
         assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
     }
+
+
+    @Test
+    public void should_parse_the_real_router_certificate() throws IOException {
+        byte[] encoded = Files.toByteArray(new File("src/test/resources/router/RIR/R0/Alice/f9kHBufD_HEWjCM4VpFIwUIrv3Q.cer"));
+
+        subject.parse("certificate", encoded);
+        final ValidationResult validationResult = subject.getValidationResult();
+        assertFalse(validationResult.hasFailureForCurrentLocation());
+        final X509RouterCertificate certificate = subject.getCertificate();
+        assertNotNull(certificate);
+    }
+
+
+
 }
