@@ -54,7 +54,6 @@ import java.util.EnumSet;
 public class X509RouterCertificateBuilder {
 
     private X509CertificateBuilderHelper builderHelper;
-    private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
     private int[] asns;
 
     public X509RouterCertificateBuilder() {
@@ -149,14 +148,13 @@ public class X509RouterCertificateBuilder {
         return this;
     }
 
-    public X509ResourceCertificate build() {
+    public X509RouterCertificate build() {
         Validate.notNull(asns, "no AS resources");
         Validate.isTrue(asns.length > 0, "empty AS resources");
-        return new X509ResourceCertificate(builderHelper.generateCertificate());
+        return new X509RouterCertificate(builderHelper.generateCertificate());
     }
 
     public X509RouterCertificateBuilder withInheritedResourceTypes(EnumSet<IpResourceType> resourceTypes) {
-        this.inheritedResourceTypes = resourceTypes;
         builderHelper.withInheritedResourceTypes(resourceTypes);
         return this;
     }

@@ -85,7 +85,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         final PublicKey publicKey = certificate.getPublicKey();
         final boolean rsaPk = isRsaPk(publicKey);
         result.rejectIfFalse(rsaPk, PUBLIC_KEY_CERT_ALGORITHM, publicKey.getAlgorithm());
-        if (rsaPk && publicKey instanceof RSAPublicKey) {
+        if (rsaPk) {
             RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
             result.warnIfFalse(2048 == rsaPublicKey.getModulus().bitLength(), PUBLIC_KEY_CERT_SIZE, String.valueOf(rsaPublicKey.getModulus().bitLength()));
         }

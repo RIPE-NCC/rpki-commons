@@ -117,10 +117,9 @@ public class X509RouterCertificateParserTest {
         assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
     }
 
-
     @Test
     public void should_parse_the_real_router_certificate() throws IOException {
-        byte[] encoded = Files.toByteArray(new File("src/test/resources/router/RIR/R0/Alice/f9kHBufD_HEWjCM4VpFIwUIrv3Q.cer"));
+        byte[] encoded = Files.toByteArray(new File("src/test/resources/router/router_certificate.cer"));
 
         subject.parse("certificate", encoded);
         final ValidationResult validationResult = subject.getValidationResult();
@@ -128,7 +127,5 @@ public class X509RouterCertificateParserTest {
         final X509RouterCertificate certificate = subject.getCertificate();
         assertNotNull(certificate);
     }
-
-
 
 }

@@ -150,7 +150,7 @@ public class X509RouterCertificateBuilderTest {
     @Test
     public void shouldSetBasicConstraintsForCAs() {
         subject.withCa(true);
-        X509ResourceCertificate certificate = subject.build();
+        X509RouterCertificate certificate = subject.build();
 
         assertEquals(Integer.MAX_VALUE, certificate.getCertificate().getBasicConstraints());
     }
@@ -158,7 +158,7 @@ public class X509RouterCertificateBuilderTest {
     @Test
     public void shouldNotSetBasicConstraintsForNonCAs() {
         subject.withCa(false);
-        X509ResourceCertificate certificate = subject.build();
+        X509RouterCertificate certificate = subject.build();
 
         assertEquals(-1, certificate.getCertificate().getBasicConstraints());
     }
@@ -167,7 +167,7 @@ public class X509RouterCertificateBuilderTest {
     public void shouldHaveCrlDistributionPoints() {
         URI crlURI = URI.create("rsync://foo/bar.crl");
         subject.withCrlDistributionPoints(crlURI);
-        X509ResourceCertificate certificate = subject.build();
+        X509RouterCertificate certificate = subject.build();
 
         assertEquals(crlURI, certificate.getCrlDistributionPoints()[0]);
     }
