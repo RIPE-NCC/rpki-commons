@@ -151,6 +151,7 @@ public class X509RouterCertificateBuilder {
     public X509RouterCertificate build() {
         Validate.notNull(asns, "no AS resources");
         Validate.isTrue(asns.length > 0, "empty AS resources");
+        builderHelper.withRouter(true);
         return new X509RouterCertificate(builderHelper.generateCertificate());
     }
 

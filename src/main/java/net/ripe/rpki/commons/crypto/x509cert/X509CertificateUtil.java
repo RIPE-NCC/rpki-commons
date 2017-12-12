@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang.Validate;
@@ -62,6 +63,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509Extension;
 import java.util.ArrayList;
@@ -160,6 +162,15 @@ public final class X509CertificateUtil {
 
     public static boolean isEe(X509Certificate certificate) {
         return !isCa(certificate);
+    }
+
+    public static boolean isRouter(X509Certificate certificate) {
+        try {
+            final List<String> extendedKeyUsage = certificate.getExtendedKeyUsage();
+            return extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+        } catch (CertificateParsingException e) {
+            throw new X509CertificateOperationException(e);
+        }
     }
 
     public static X509CertificateInformationAccessDescriptor[] getAuthorityInformationAccess(X509Certificate certificate) {
@@ -299,4 +310,5 @@ public final class X509CertificateUtil {
             throw new IllegalArgumentException(e);
         }
     }
+
 }

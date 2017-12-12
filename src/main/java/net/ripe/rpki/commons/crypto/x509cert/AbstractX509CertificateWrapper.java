@@ -116,6 +116,10 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         return X509CertificateUtil.isRoot(certificate);
     }
 
+    public boolean isRouter() {
+        return X509CertificateUtil.isRouter(certificate);
+    }
+
     public URI getManifestUri() {
         return X509CertificateUtil.getManifestUri(certificate);
     }
@@ -194,11 +198,6 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
                 return true;
             }
         }
-        return false;
-    }
-
-    public boolean isRouterCertificate() {
-
         return false;
     }
 }
