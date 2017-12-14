@@ -135,6 +135,5 @@ public class X509ResourceCertificateParserTest {
         assertTrue(certificateWrapper instanceof X509RouterCertificate);
         X509RouterCertificate parsed = (X509RouterCertificate) certificateWrapper;
         assertEquals(parsed.getPublicKey(), certificate.getPublicKey());
-        assertEquals(parsed.get, certificate.getPublicKey());
     }
 }
