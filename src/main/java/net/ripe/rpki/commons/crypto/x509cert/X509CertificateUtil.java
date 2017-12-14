@@ -302,11 +302,7 @@ public final class X509CertificateUtil {
     public static void verify(X509Certificate certificate, PublicKey publicKey) throws InvalidKeyException, SignatureException {
         try {
             certificate.verify(publicKey, DEFAULT_SIGNATURE_PROVIDER);
-        } catch (CertificateException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchProviderException e) {
+        } catch (CertificateException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new IllegalArgumentException(e);
         }
     }

@@ -189,11 +189,7 @@ public abstract class RpkiSignedObjectParser {
     private Collection<? extends Certificate> extractCertificate(CMSSignedDataParser sp) {
         try {
             return BouncyCastleUtil.extractCertificates(sp);
-        } catch (CMSException e) {
-            return null;
-        } catch (StoreException e) {
-            return null;
-        } catch (CertificateException e) {
+        } catch (CMSException | StoreException | CertificateException e) {
             return null;
         }
     }
