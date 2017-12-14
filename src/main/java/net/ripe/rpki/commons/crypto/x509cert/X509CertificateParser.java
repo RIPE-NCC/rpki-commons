@@ -34,6 +34,7 @@ import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import java.io.ByteArrayInputStream;
@@ -56,8 +57,6 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
             PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
     };
 
-    private byte[] encoded;
-
     protected X509Certificate certificate;
 
     protected ValidationResult result;
@@ -68,13 +67,37 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     public void parse(ValidationResult validationResult, byte[] encoded) {
         this.result = validationResult;
-        this.encoded = encoded;
-        parse();
-        if (!result.hasFailureForCurrentLocation()) {
+        final X509Certificate certificate = parseEncoded(encoded, result);
+        validateX509Certificate(validationResult, certificate);
+    }
+
+    public void validateX509Certificate(ValidationResult validationResult, X509Certificate certificate) {
+        this.certificate = certificate;
+        this.result = validationResult;
+        if (!validationResult.hasFailureForCurrentLocation()) {
             validateSignatureAlgorithm();
             validatePublicKey();
             doTypeSpecificValidation();
         }
+    }
+
+    public static AbstractX509CertificateWrapper parseCertificate(ValidationResult result, byte[] encoded) {
+        final X509Certificate certificate = parseEncoded(encoded, result);
+        if (!result.hasFailureForCurrentLocation()) {
+            if (X509CertificateUtil.isRouter(certificate)) {
+                X509RouterCertificateParser parser = new X509RouterCertificateParser();
+                parser.validateX509Certificate(result, certificate);
+                return parser.getCertificate();
+            } else if (X509CertificateUtil.isCa(certificate) ||
+                    X509CertificateUtil.isEe(certificate) ||
+                    X509CertificateUtil.isRoot(certificate) ||
+                    X509CertificateUtil.isObjectIssuer(certificate)) {
+                final X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
+                parser.validateX509Certificate(result, certificate);
+                return parser.getCertificate();
+            }
+        }
+        return null;
     }
 
     protected void validatePublicKey() {
@@ -121,7 +144,8 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         return certificate;
     }
 
-    private void parse() {
+    private static X509Certificate parseEncoded(byte[] encoded, ValidationResult result) {
+        X509Certificate certificate;
         try {
             final Closer closer = Closer.create();
             try {
@@ -139,11 +163,12 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
             certificate = null;
         }
         result.rejectIfNull(certificate, CERTIFICATE_PARSED);
+        return certificate;
     }
 
 
     private void validateSignatureAlgorithm() {
-        result.rejectIfFalse(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM, certificate.getSigAlgOID());
+        result.rejectIfFalse(ArrayUtils.contains(ALLOWED_SIGNATURE_ALGORITHM_OIDS, this.certificate.getSigAlgOID()), CERTIFICATE_SIGNATURE_ALGORITHM, this.certificate.getSigAlgOID());
     }
 
     protected boolean isResourceExtensionPresent() {

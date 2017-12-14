@@ -32,8 +32,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
+import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.validation.ValidationString.AS_RESOURCE_PRESENT;
 import static net.ripe.rpki.commons.validation.ValidationString.BGPSEC_EXT_PRESENT;
@@ -41,7 +40,6 @@ import static net.ripe.rpki.commons.validation.ValidationString.CERT_NO_SUBJECT_
 import static net.ripe.rpki.commons.validation.ValidationString.CERT_SIA_IS_PRESENT;
 import static net.ripe.rpki.commons.validation.ValidationString.IP_RESOURCE_PRESENT;
 import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_ALGORITHM;
-import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_SIZE;
 
 public class X509RouterCertificateParser extends X509CertificateParser<X509RouterCertificate> {
 
@@ -55,7 +53,7 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
 
     @Override
     protected void validatePublicKey() {
-        PublicKey publicKey = certificate.getPublicKey();
+        PublicKey publicKey = this.certificate.getPublicKey();
         if (isRsaPk(publicKey)) {
             super.validateRsaPk();
         } else if (isEcPk(publicKey)) {
@@ -69,13 +67,13 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
     protected void doTypeSpecificValidation() {
         result.rejectIfFalse(isBgpSecExtensionPresent(), BGPSEC_EXT_PRESENT);
 
-        final X509CertificateInformationAccessDescriptor[] sia = X509CertificateUtil.getSubjectInformationAccess(certificate);
+        final X509CertificateInformationAccessDescriptor[] sia = X509CertificateUtil.getSubjectInformationAccess(this.certificate);
         result.rejectIfTrue(sia != null && sia.length > 0, CERT_SIA_IS_PRESENT);
 
         result.rejectIfTrue(isIpResourceExtensionPresent(), IP_RESOURCE_PRESENT);
         result.rejectIfFalse(isAsResourceExtensionPresent(), AS_RESOURCE_PRESENT);
 
-        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(certificate.getPublicKey().getEncoded());
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(this.certificate.getPublicKey().getEncoded());
         result.rejectIfTrue(subjectPublicKeyInfo == null, CERT_NO_SUBJECT_PK_INFO);
     }
 }
