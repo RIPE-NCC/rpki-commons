@@ -199,6 +199,14 @@ public final class ValidationString {
     public static final String VALIDATOR_ROOT_CERTIFICATE_INCLUDED_IN_MANIFEST = "validator.root.certificate.included.in.manifest";
     public static final String VALIDATOR_CIRCULAR_REFERENCE = "validator.circular.reference";
 
+    public static final String VALIDATOR_RPKI_REPOSITORY_PENDING = "validator.rpki.repository.pending";
+    public static final String VALIDATOR_TRUST_ANCHOR_CERTIFICATE_AVAILABLE = "validator.trust.anchor.certificate.available";
+    public static final String VALIDATOR_TRUST_ANCHOR_CERTIFICATE_RRDP_NOTIFY_URI_OR_REPOSITORY_URI_PRESENT = "validator.trust.anchor.certificate.rrdp.notify.uri.or.repository.uri.present";
+    public static final String VALIDATOR_MANIFEST_CONTAINS_ONE_CRL_ENTRY = "validator.manifest.contains.one.crl.entry";
+    public static final String VALIDATOR_CRL_FOUND = "validator.crl.found";
+    public static final String VALIDATOR_RPKI_OBJECT_HASH_MATCHES = "validator.rpki.object.hash.matches";
+    public static final String VALIDATOR_MANIFEST_ENTRY_HASH_MATCHES = "validator.manifest.entry.hash.matches";
+    public static final String VALIDATOR_MANIFEST_ENTRY_FOUND = "validator.manifest.entry.found";
     public static final String VALIDATOR_OLD_LOCAL_MANIFEST_REPOSITORY_FAILED = "validator.old.local.manifest.repository.failed";
     public static final String VALIDATOR_NO_LOCAL_MANIFEST_NO_MANIFEST_IN_REPOSITORY = "validator.no.local.manifest.no.manifest.in.repository";
     public static final String VALIDATOR_NO_MANIFEST_REPOSITORY_FAILED = "validator.no.manifest.repository.failed";
