@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.validation.ValidationString.AS_RESOURCE_PRESENT;
 import static net.ripe.rpki.commons.validation.ValidationString.BGPSEC_EXT_PRESENT;

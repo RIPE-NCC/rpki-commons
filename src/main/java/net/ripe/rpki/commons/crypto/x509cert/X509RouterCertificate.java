@@ -36,8 +36,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509RouterCertificateValidator;
 
 import java.net.URI;

@@ -31,7 +31,6 @@ package net.ripe.rpki.commons.validation.objectvalidators;
 
 import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
-import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509RouterCertificate;

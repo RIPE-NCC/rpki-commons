@@ -34,7 +34,6 @@ import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import java.io.ByteArrayInputStream;
@@ -49,7 +48,10 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
+import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM;
+import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_ALGORITHM;
+import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_SIZE;
 
 public abstract class X509CertificateParser<T extends AbstractX509CertificateWrapper> {
 
