@@ -237,15 +237,10 @@ public class ManifestCmsTest {
 
         subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
 
-        assertTrue(result.hasFailures());
-
-//        assertEquals(
-//                new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, NEXT_UPDATE_TIME.toString()),
-//                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
-//        );
+        assertFalse(result.hasFailures());
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }

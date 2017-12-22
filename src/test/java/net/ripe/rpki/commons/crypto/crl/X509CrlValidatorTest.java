@@ -55,7 +55,6 @@ import static org.junit.Assert.*;
 
 public class X509CrlValidatorTest {
 
-
     // Test data
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
     private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
@@ -115,16 +114,14 @@ public class X509CrlValidatorTest {
     }
 
     @Test
-    public void shouldRejectWhenNextUpdateTooLongAgo() {
+    public void shouldNotRejectWhenNextUpdateTooLongAgo() {
         DateTime nextUpdateTime = new DateTime(DateTimeZone.UTC).minusSeconds(1).withMillisOfSecond(0);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
         result = subject.getValidationResult();
-        assertTrue(result.hasFailures());
-        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+        assertFalse(result.hasFailures());
     }
-
 
     private X509ResourceCertificate getRootResourceCertificate() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();

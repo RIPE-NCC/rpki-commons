@@ -47,7 +47,7 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
@@ -79,7 +79,7 @@ public final class X509CertificateUtil {
 
     public static byte[] getSubjectKeyIdentifier(X509Extension certificate) {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.subjectKeyIdentifier.getId());
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.Extension.subjectKeyIdentifier.getId());
             if (extensionValue == null) {
                 return null;
             }
@@ -91,7 +91,7 @@ public final class X509CertificateUtil {
 
     public static byte[] getAuthorityKeyIdentifier(X509Extension certificate) {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.authorityKeyIdentifier.getId());
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.Extension.authorityKeyIdentifier.getId());
             if (extensionValue == null) {
                 return null;
             }
@@ -123,7 +123,7 @@ public final class X509CertificateUtil {
             throw new X509CertificateOperationException("Can't extract TBSCertificate from certificate", e);
         }
         ASN1Sequence tbsCertificateSequence = (ASN1Sequence) Asn1Util.decode(tbsCertificate);
-        TBSCertificateStructure tbsCertificateStructure = new TBSCertificateStructure(tbsCertificateSequence);
+        TBSCertificate tbsCertificateStructure = TBSCertificate.getInstance(tbsCertificateSequence);
         SubjectPublicKeyInfo subjectPublicKeyInfo = tbsCertificateStructure.getSubjectPublicKeyInfo();
 
         try {
@@ -144,7 +144,7 @@ public final class X509CertificateUtil {
 
     public static boolean isCa(X509Certificate certificate) {
         try {
-            byte[] basicConstraintsExtension = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.basicConstraints.getId());
+            byte[] basicConstraintsExtension = certificate.getExtensionValue(org.bouncycastle.asn1.x509.Extension.basicConstraints.getId());
             if (basicConstraintsExtension == null) {
                 /**
                  * The Basic Constraints extension field [...] MUST be present when
@@ -175,7 +175,7 @@ public final class X509CertificateUtil {
 
     public static X509CertificateInformationAccessDescriptor[] getAuthorityInformationAccess(X509Certificate certificate) {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.authorityInfoAccess.getId());
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.Extension.authorityInfoAccess.getId());
             if (extensionValue == null) {
                 return null;
             }
@@ -188,7 +188,7 @@ public final class X509CertificateUtil {
 
     public static X509CertificateInformationAccessDescriptor[] getSubjectInformationAccess(X509Certificate certificate) {
         try {
-            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.subjectInfoAccess.getId());
+            byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.Extension.subjectInfoAccess.getId());
             if (extensionValue == null) {
                 return null;
             }
@@ -222,7 +222,7 @@ public final class X509CertificateUtil {
     }
 
     public static URI[] getCrlDistributionPoints(X509Certificate certificate) {
-        byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.X509Extension.cRLDistributionPoints.getId());
+        byte[] extensionValue = certificate.getExtensionValue(org.bouncycastle.asn1.x509.Extension.cRLDistributionPoints.getId());
         if (extensionValue == null) {
             return null;
         }

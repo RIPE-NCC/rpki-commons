@@ -36,7 +36,7 @@ import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLNumber;
-import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.operator.ContentSigner;
@@ -144,8 +144,8 @@ public class X509CrlBuilder {
     private X509v2CRLBuilder createCrlGenerator() throws CertIOException {
         X509v2CRLBuilder generator = new X509v2CRLBuilder(X500Name.getInstance(issuerDN.getEncoded()), thisUpdateTime.toDate());
         generator.setNextUpdate(nextUpdateTime.toDate());
-        generator.addExtension(X509Extension.authorityKeyIdentifier, false, authorityKeyIdentifier);
-        generator.addExtension(X509Extension.cRLNumber, false, crlNumber);
+        generator.addExtension(Extension.authorityKeyIdentifier, false, authorityKeyIdentifier);
+        generator.addExtension(Extension.cRLNumber, false, crlNumber);
         for (X509Crl.Entry entry : entries.values()) {
             generator.addCRLEntry(entry.getSerialNumber(), entry.getRevocationDateTime().toDate(), 0);
         }
