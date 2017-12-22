@@ -81,7 +81,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         }
     }
 
-    public static AbstractX509CertificateWrapper parseCertificate(ValidationResult result, byte[] encoded) {
+    public static X509GenericCertificate parseCertificate(ValidationResult result, byte[] encoded) {
         final X509Certificate certificate = parseEncoded(encoded, result);
         if (!result.hasFailureForCurrentLocation()) {
             if (X509CertificateUtil.isRouter(certificate)) {

@@ -52,7 +52,7 @@ import java.util.SortedMap;
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.
  */
-public class X509ResourceCertificate extends AbstractX509CertificateWrapper implements X509CertificateObject {
+public class X509ResourceCertificate extends X509GenericCertificate implements X509CertificateObject {
 
     private static final long serialVersionUID = 2L;
 

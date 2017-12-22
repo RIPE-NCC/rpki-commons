@@ -43,7 +43,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509RouterCertificateVa
 import java.net.URI;
 import java.security.cert.X509Certificate;
 
-public class X509RouterCertificate extends AbstractX509CertificateWrapper implements X509CertificateObject {
+public class X509RouterCertificate extends X509GenericCertificate implements X509CertificateObject {
 
     private Boolean revoked;
 
