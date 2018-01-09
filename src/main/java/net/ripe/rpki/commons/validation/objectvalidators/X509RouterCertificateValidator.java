@@ -40,14 +40,4 @@ public class X509RouterCertificateValidator extends X509CertificateParentChildVa
         super(options, result, parent, crl);
     }
 
-    @Override
-    public void validate(String location, X509RouterCertificate certificate) {
-        super.validate(location, certificate);
-        verifyResources();
-    }
-
-    private void verifyResources() {
-
-    }
-
 }
