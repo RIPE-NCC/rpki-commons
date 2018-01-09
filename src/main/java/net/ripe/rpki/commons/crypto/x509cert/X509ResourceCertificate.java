@@ -176,7 +176,7 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
     @Override
     public boolean isRevoked() {
         if (revoked == null) {
-            throw new RuntimeException("isRevoked() could only be called after validate()");
+            throw new IllegalStateException("isRevoked() could only be called after validate()");
         }
         return revoked;
     }

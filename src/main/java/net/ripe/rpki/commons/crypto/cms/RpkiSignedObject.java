@@ -185,7 +185,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     @Override
     public boolean isRevoked() {
         if (revoked == null) {
-            throw new RuntimeException("isRevoked() could only be called after validate()");
+            throw new IllegalStateException("isRevoked() could only be called after validate()");
         }
         return revoked;
     }

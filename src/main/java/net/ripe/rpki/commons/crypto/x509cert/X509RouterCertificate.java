@@ -98,7 +98,7 @@ public class X509RouterCertificate extends X509GenericCertificate implements X50
     @Override
     public boolean isRevoked() {
         if (revoked == null) {
-            throw new RuntimeException("isRevoked() could only be called after validate()");
+            throw new IllegalStateException("isRevoked() could only be called after validate()");
         }
         return revoked;
     }
