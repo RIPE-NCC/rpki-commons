@@ -27,26 +27,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.provisioning.x509;
+package net.ripe.rpki.commons.validation.objectvalidators;
 
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateParser;
+import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.x509cert.X509RouterCertificate;
+import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.validation.ValidationResult;
 
-import java.security.cert.X509Certificate;
+public class X509RouterCertificateValidator extends X509CertificateParentChildValidator<X509RouterCertificate> implements CertificateRepositoryObjectValidator<X509RouterCertificate> {
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-
-public class ProvisioningCmsCertificateParser extends X509CertificateParser<ProvisioningCmsCertificate> {
-
-    @Override
-    public ProvisioningCmsCertificate getCertificate() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("Provisioning CMS Certificate validation failed");
-        }
-        return new ProvisioningCmsCertificate(getX509Certificate());
+    public X509RouterCertificateValidator(ValidationOptions options, ValidationResult result, X509RouterCertificate parent, X509Crl crl) {
+        super(options, result, parent, crl);
     }
 
-    @Override
-    protected void doTypeSpecificValidation() {
-        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
-    }
 }

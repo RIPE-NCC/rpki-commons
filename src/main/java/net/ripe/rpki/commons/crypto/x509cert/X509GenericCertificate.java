@@ -27,26 +27,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.provisioning.x509;
-
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateParser;
+package net.ripe.rpki.commons.crypto.x509cert;
 
 import java.security.cert.X509Certificate;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-
-public class ProvisioningCmsCertificateParser extends X509CertificateParser<ProvisioningCmsCertificate> {
-
-    @Override
-    public ProvisioningCmsCertificate getCertificate() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("Provisioning CMS Certificate validation failed");
-        }
-        return new ProvisioningCmsCertificate(getX509Certificate());
-    }
-
-    @Override
-    protected void doTypeSpecificValidation() {
-        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
+public abstract class X509GenericCertificate extends AbstractX509CertificateWrapper implements X509CertificateObject {
+    protected X509GenericCertificate(X509Certificate certificate) {
+        super(certificate);
     }
 }

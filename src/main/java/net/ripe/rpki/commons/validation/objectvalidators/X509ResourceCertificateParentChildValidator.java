@@ -54,14 +54,14 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
     }
 
     private void verifyResources() {
-        ValidationResult result = getValidationResult();
-        X509ResourceCertificate child = getChild();
-        IpResourceSet childResourceSet = child.deriveResources(resources);
+        final ValidationResult result = getValidationResult();
+        final X509ResourceCertificate child = getChild();
+        final IpResourceSet childResourceSet = child.deriveResources(resources);
 
         if (child.isRoot()) {
             result.rejectIfTrue(child.isResourceSetInherited(), ROOT_INHERITS_RESOURCES);
         } else {
-            IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
+            final IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
             overclaiming.removeAll(resources);
 
             result.rejectIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());

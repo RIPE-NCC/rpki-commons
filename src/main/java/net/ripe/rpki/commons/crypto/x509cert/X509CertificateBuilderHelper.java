@@ -33,6 +33,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
+import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -43,9 +44,11 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.cert.CertIOException;
@@ -63,7 +66,6 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -104,6 +106,8 @@ public final class X509CertificateBuilderHelper {
     private int keyUsage;
 
     private boolean ca;
+
+    private boolean router;
 
     private boolean addSubjectKeyIdentifier = true;
 
@@ -179,6 +183,13 @@ public final class X509CertificateBuilderHelper {
 
     public X509CertificateBuilderHelper withCa(boolean ca) {
         this.ca = ca;
+        this.router = !ca;
+        return this;
+    }
+
+    public X509CertificateBuilderHelper withRouter(boolean router) {
+        this.router = router;
+        this.ca = !router;
         return this;
     }
 
@@ -227,13 +238,7 @@ public final class X509CertificateBuilderHelper {
         try {
             ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(signatureProvider).build(signingKeyPair.getPrivate());
             return new JcaX509CertificateConverter().getCertificate(certificateGenerator.build(signer));
-        } catch (CertificateEncodingException e) {
-            throw new X509ResourceCertificateBuilderException(e);
-        } catch (IllegalStateException e) {
-            throw new X509ResourceCertificateBuilderException(e);
-        } catch (OperatorCreationException e) {
-            throw new X509ResourceCertificateBuilderException(e);
-        } catch (CertificateException e) {
+        } catch (IllegalStateException | OperatorCreationException | CertificateException e) {
             throw new X509ResourceCertificateBuilderException(e);
         }
     }
@@ -253,6 +258,9 @@ public final class X509CertificateBuilderHelper {
             }
             if (ca) {
                 addCaBit(generator);
+            }
+            if (router) {
+                addBgpExtension(generator);
             }
             if (keyUsage != 0) {
                 addKeyUsage(generator);
@@ -274,27 +282,25 @@ public final class X509CertificateBuilderHelper {
                 addResourceExtensions(generator);
             }
             return generator;
-        } catch (CertIOException e) {
-            throw new X509ResourceCertificateBuilderException(e);
-        } catch (InvalidKeyException e) {
-            throw new X509ResourceCertificateBuilderException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (CertIOException | InvalidKeyException | NoSuchAlgorithmException e) {
             throw new X509ResourceCertificateBuilderException(e);
         }
     }
 
+    private void addBgpExtension(X509v3CertificateBuilder generator) throws CertIOException {
+        generator.addExtension(Extension.extendedKeyUsage, true,
+                new ExtendedKeyUsage(KeyPurposeId.getInstance(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER)));
+    }
+
     private X509v3CertificateBuilder createX509V3CertificateGenerator() {
         validateCertificateFields();
-
-        PublicKey key = publicKey;
-        X509v3CertificateBuilder generator = new X509v3CertificateBuilder(
+        return new X509v3CertificateBuilder(
                 BouncyCastleUtil.principalToName(issuerDN),
                 serial,
                 new Date(validityPeriod.getNotValidBefore().getMillis()),
                 new Date(validityPeriod.getNotValidAfter().getMillis()),
                 BouncyCastleUtil.principalToName(subjectDN),
-                BouncyCastleUtil.createSubjectPublicKeyInfo(key));
-        return generator;
+                BouncyCastleUtil.createSubjectPublicKeyInfo(publicKey));
     }
 
     private void validateCertificateFields() {

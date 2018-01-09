@@ -27,26 +27,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.provisioning.x509;
+package net.ripe.rpki.commons.crypto.rfc8209;
 
-import net.ripe.rpki.commons.crypto.x509cert.X509CertificateParser;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
-import java.security.cert.X509Certificate;
+import static net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder.OID_PKIX;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+public class RouterExtensionEncoder {
 
-public class ProvisioningCmsCertificateParser extends X509CertificateParser<ProvisioningCmsCertificate> {
+    /**
+     * id-kp OBJECT IDENTIFIER ::= {
+     * iso(1) identified-organization(3) dod(6) internet(1)
+     * security(5) mechanisms(5) pkix(7) kp(3) }
+     * <p>
+     * id-kp-bgpsec-router OBJECT IDENTIFIER ::= { id-kp 30 }
+     */
+    public static final String OID_KP = OID_PKIX + ".3";
 
-    @Override
-    public ProvisioningCmsCertificate getCertificate() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("Provisioning CMS Certificate validation failed");
-        }
-        return new ProvisioningCmsCertificate(getX509Certificate());
-    }
+    public static final ASN1ObjectIdentifier OID_KP_BGPSEC_ROUTER = new ASN1ObjectIdentifier(OID_KP + ".30");
 
-    @Override
-    protected void doTypeSpecificValidation() {
-        result.rejectIfTrue(isResourceExtensionPresent(), RESOURCE_EXT_NOT_PRESENT);
-    }
 }

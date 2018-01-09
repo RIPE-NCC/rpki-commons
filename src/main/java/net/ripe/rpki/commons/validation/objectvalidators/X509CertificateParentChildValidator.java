@@ -93,9 +93,7 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
         boolean errorOccurred = false;
         try {
             child.verify(parent.getPublicKey()); // signed with issuer's public key
-        } catch (SignatureException e) {
-            errorOccurred = true;
-        } catch (InvalidKeyException e) {
+        } catch (SignatureException | InvalidKeyException e) {
             errorOccurred = true;
         }
 

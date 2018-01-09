@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.validation.ValidationCheck;
@@ -36,24 +37,30 @@ import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-import static org.junit.Assert.*;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class X509ResourceCertificateParserTest {
+public class X509RouterCertificateParserTest {
 
-    private X509ResourceCertificateParser subject = new X509ResourceCertificateParser();
+    private X509RouterCertificateParser subject = new X509RouterCertificateParser();
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
@@ -64,15 +71,13 @@ public class X509ResourceCertificateParserTest {
         subject.getCertificate();
     }
 
-    @Test
-    public void shouldParseResourceCertificateWhenResourceExtensionsArePresent() {
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotParseResourceCertificateWhenResourceExtensionsArePresent() {
         X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
         X509ResourceCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());
-        X509ResourceCertificate parsed = subject.getCertificate();
-
-        assertEquals(certificate, parsed);
+        subject.getCertificate();
     }
 
     @Test
@@ -113,27 +118,14 @@ public class X509ResourceCertificateParserTest {
     }
 
     @Test
-    public void should_parse_resource_certificate_when_its_unknown() {
-        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-        X509ResourceCertificate certificate = builder.build();
+    public void should_parse_the_real_router_certificate() throws IOException {
+        byte[] encoded = Files.toByteArray(new File("src/test/resources/router/router_certificate.cer"));
 
-        ValidationResult result = ValidationResult.withLocation("test");
-        final AbstractX509CertificateWrapper certificateWrapper = X509ResourceCertificateParser.parseCertificate(result, certificate.getEncoded());
-        assertTrue(certificateWrapper instanceof X509ResourceCertificate);
-        X509ResourceCertificate parsed = (X509ResourceCertificate) certificateWrapper;
-        assertEquals(parsed.getPublicKey(), certificate.getPublicKey());
-        assertEquals(parsed.getResources(), certificate.getResources());
+        subject.parse("certificate", encoded);
+        final ValidationResult validationResult = subject.getValidationResult();
+        assertFalse(validationResult.hasFailureForCurrentLocation());
+        final X509RouterCertificate certificate = subject.getCertificate();
+        assertNotNull(certificate);
     }
 
-    @Test
-    public void should_parse_router_certificate_when_its_unknown() {
-        X509RouterCertificateBuilder builder = X509RouterCertificateTest.createSelfSignedRouterCertificateBuilder().withAsns(new int[]{1, 2, 3});
-        X509RouterCertificate certificate = builder.build();
-
-        ValidationResult result = ValidationResult.withLocation("test");
-        final AbstractX509CertificateWrapper certificateWrapper = X509ResourceCertificateParser.parseCertificate(result, certificate.getEncoded());
-        assertTrue(certificateWrapper instanceof X509RouterCertificate);
-        X509RouterCertificate parsed = (X509RouterCertificate) certificateWrapper;
-        assertEquals(parsed.getPublicKey(), certificate.getPublicKey());
-    }
 }

@@ -31,7 +31,9 @@ package net.ripe.rpki.commons.validation.objectvalidators;
 
 import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509RouterCertificate;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -52,7 +54,7 @@ public class CertificateRepositoryObjectValidationContext {
 
     private final URI location;
 
-    private final X509ResourceCertificate certificate;
+    private final X509CertificateObject certificate;
 
     private final IpResourceSet resources;
 
@@ -74,6 +76,20 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public X509ResourceCertificate getCertificate() {
+        if (certificate instanceof X509ResourceCertificate) {
+            return (X509ResourceCertificate) certificate;
+        }
+        throw new IllegalStateException("The certificate in the context is not of the type " + X509ResourceCertificate.class);
+    }
+
+    public X509RouterCertificate getRouterCertificate() {
+        if (certificate instanceof X509RouterCertificate) {
+            return (X509RouterCertificate) certificate;
+        }
+        throw new IllegalStateException("The certificate in the context is not of the type " + X509RouterCertificate.class);
+    }
+
+    public X509CertificateObject getUntypedCertificate() {
         return certificate;
     }
 
@@ -82,19 +98,19 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public URI getManifestURI() {
-        return certificate.getManifestUri();
+        return getCertificate().getManifestUri();
     }
 
     public URI getRepositoryURI() {
-        return certificate.getRepositoryUri();
+        return getCertificate().getRepositoryUri();
     }
 
     public URI getRpkiNotifyURI() {
-        return certificate.getRrdpNotifyUri();
+        return getCertificate().getRrdpNotifyUri();
     }
 
     public byte[] getSubjectKeyIdentifier() {
-        return certificate.getSubjectKeyIdentifier();
+        return getCertificate().getSubjectKeyIdentifier();
     }
 
     public void addOverclaiming(IpResourceSet overclaiming) {
