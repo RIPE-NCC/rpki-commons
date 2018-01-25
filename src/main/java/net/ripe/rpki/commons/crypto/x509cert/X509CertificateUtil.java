@@ -29,7 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
+import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -67,6 +71,7 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509Extension;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
@@ -305,6 +310,18 @@ public final class X509CertificateUtil {
         } catch (CertificateException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public static List<String> getAsns(X509Certificate certificate) {
+        ResourceExtensionParser parser = new ResourceExtensionParser();
+        byte[] asnExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
+        if (asnExtension == null) {
+            return Collections.emptyList();
+        }
+        final IpResourceSet asResources = parser.parseAsIdentifiers(asnExtension);
+        final List<String> asns = new ArrayList<>();
+        asResources.forEach(a -> asns.add(a.toString()));
+        return asns;
     }
 
 }
