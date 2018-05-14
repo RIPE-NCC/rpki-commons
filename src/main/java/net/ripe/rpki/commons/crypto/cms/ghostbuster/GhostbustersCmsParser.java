@@ -87,12 +87,17 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
             VCardValidator validator = new VCardValidator(validationResult);
             vObjectReader.parse(validator);
 
-            validationResult.rejectIfFalse(validator.vCardBegin == 1 && validator.vCardEnd == 1, ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD, String.valueOf(validator.vCardBegin));
+            validationResult.rejectIfFalse(
+                    validator.vCardBegin == 1 && validator.vCardEnd == 1,
+                    ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD,
+                    String.valueOf(validator.vCardBegin));
             if (validationResult.hasFailureForCurrentLocation()) {
                 return;
             }
 
-            validationResult.rejectIfFalse(validator.properties.containsKey("FN") && !Strings.isNullOrEmpty(validator.properties.get("FN")), ValidationString.GHOSTBUSTERS_RECORD_FN_PRESENT);
+            validationResult.rejectIfFalse(
+                    validator.properties.containsKey("FN") && !Strings.isNullOrEmpty(validator.properties.get("FN")),
+                    ValidationString.GHOSTBUSTERS_RECORD_FN_PRESENT);
 
             validationResult.rejectIfFalse(
                 validator.properties.containsKey("ADR") ||
@@ -118,7 +123,7 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
     }
 
     private static class VCardValidator implements VObjectDataListener {
-        private static final Set<String> ALLOWED_PROPERTIES = Sets.newHashSet("FN", "ADR", "TEL", "EMAIL", "ORG");
+        private static final Set<String> ALLOWED_PROPERTIES = Sets.newHashSet("FN", "ADR", "TEL", "EMAIL", "ORG", "N");
 
         private final ValidationResult validationResult;
 
@@ -148,7 +153,7 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
         @Override
         public void onVersion(String value, Context context) {
-            validationResult.rejectIfFalse("4.0".equals(value), ValidationString.GHOSTBUSTERS_RECORD_VCARD_VERSION, value);
+            validationResult.rejectIfFalse("3.0".equals(value) || "4.0".equals(value), ValidationString.GHOSTBUSTERS_RECORD_VCARD_VERSION, value);
         }
 
         @Override

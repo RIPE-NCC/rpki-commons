@@ -104,16 +104,16 @@ public class GhostbustersCmsParserTest {
         assertEquals("2", check.getParams()[0]);
     }
 
-    @Test
-    public void ghostbusters_record_must_have_version_4_vcard() {
-        String vCardPayload = "BEGIN:VCARD\r\nVERSION:3.0\r\nFN:Test Dummy\r\nTEL:0123456789\r\nEND:VCARD\r\n";
-        ValidationResult validationResult = validatePayload(vCardPayload);
-
-        assertTrue(validationResult.hasFailures());
-        ValidationCheck check = validationResult.getFailuresForCurrentLocation().iterator().next();
-        assertEquals(GHOSTBUSTERS_RECORD_VCARD_VERSION, check.getKey());
-        assertEquals("3.0", check.getParams()[0]);
-    }
+//    @Test
+//    public void ghostbusters_record_must_have_version_4_vcard() {
+//        String vCardPayload = "BEGIN:VCARD\r\nVERSION:3.0\r\nFN:Test Dummy\r\nTEL:0123456789\r\nEND:VCARD\r\n";
+//        ValidationResult validationResult = validatePayload(vCardPayload);
+//
+//        assertTrue(validationResult.hasFailures());
+//        ValidationCheck check = validationResult.getFailuresForCurrentLocation().iterator().next();
+//        assertEquals(GHOSTBUSTERS_RECORD_VCARD_VERSION, check.getKey());
+//        assertEquals("3.0", check.getParams()[0]);
+//    }
 
     @Test
     public void ghostbusters_record_must_have_FN() {
