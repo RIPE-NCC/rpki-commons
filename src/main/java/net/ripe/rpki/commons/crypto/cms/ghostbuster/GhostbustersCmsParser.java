@@ -78,7 +78,7 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
         }
 
         if (!validationResult.rejectIfFalse(
-                vCardPayload.endsWith("END:VCARD") &&
+                StringUtils.trim(vCardPayload).endsWith("END:VCARD") &&
                         StringUtils.countMatches(vCardPayload, "END:VCARD") == 1,
                 ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD)) {
             return;
