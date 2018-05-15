@@ -90,7 +90,6 @@ public class GhostbustersCmsParserTest {
         assertTrue(validationResult.hasFailures());
         ValidationCheck check = validationResult.getFailuresForCurrentLocation().iterator().next();
         assertEquals(GHOSTBUSTERS_RECORD_SINGLE_VCARD, check.getKey());
-        assertEquals("0", check.getParams()[0]);
     }
 
     @Test
@@ -101,65 +100,6 @@ public class GhostbustersCmsParserTest {
         assertTrue(validationResult.hasFailures());
         ValidationCheck check = validationResult.getFailuresForCurrentLocation().iterator().next();
         assertEquals(GHOSTBUSTERS_RECORD_SINGLE_VCARD, check.getKey());
-        assertEquals("2", check.getParams()[0]);
-    }
-
-//    @Test
-//    public void ghostbusters_record_must_have_version_4_vcard() {
-//        String vCardPayload = "BEGIN:VCARD\r\nVERSION:3.0\r\nFN:Test Dummy\r\nTEL:0123456789\r\nEND:VCARD\r\n";
-//        ValidationResult validationResult = validatePayload(vCardPayload);
-//
-//        assertTrue(validationResult.hasFailures());
-//        ValidationCheck check = validationResult.getFailuresForCurrentLocation().iterator().next();
-//        assertEquals(GHOSTBUSTERS_RECORD_VCARD_VERSION, check.getKey());
-//        assertEquals("3.0", check.getParams()[0]);
-//    }
-
-    @Test
-    public void ghostbusters_record_must_have_FN() {
-        String vCardPayload = "BEGIN:VCARD\r\nVERSION:4.0\r\nTEL:0123456789\r\nEND:VCARD\r\n";
-        ValidationResult validationResult = validatePayload(vCardPayload);
-
-        assertTrue(validationResult.hasFailures());
-        ValidationCheck check = validationResult.getResult(validationResult.getCurrentLocation(), GHOSTBUSTERS_RECORD_FN_PRESENT);
-        assertNotNull(check);
-        assertFalse(check.isOk());
-    }
-
-    @Test
-    public void ghostbusters_record_must_have_at_least_one_of_ADR_TEL_EMAIL() {
-        String[] records = {"ADR:Address", "TEL:0123456789", "EMAIL:example@localhost"};
-        for (String record : records) {
-            String vCardPayload = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Test Dummy\r\n" + record + "\r\nEND:VCARD\r\n";
-            ValidationResult validationResult = validatePayload(vCardPayload);
-
-            assertFalse(validationResult.hasFailures());
-            ValidationCheck check = validationResult.getResult(validationResult.getCurrentLocation(), GHOSTBUSTERS_RECORD_ADR_TEL_OR_EMAIL_PRESENT);
-            assertNotNull(check);
-            assertTrue(check.isOk());
-        }
-    }
-
-    @Test
-    public void ghostbusters_record_may_have_ORG() {
-        String vCardPayload = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Test Dummy\r\nTEL:0123456789\r\nORG:Organisation\r\nEND:VCARD\r\n";
-        ValidationResult validationResult = validatePayload(vCardPayload);
-
-        assertFalse(validationResult.hasFailures());
-        ValidationCheck check = validationResult.getResult(validationResult.getCurrentLocation(), GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY);
-        assertNotNull(check);
-        assertTrue(check.isOk());
-    }
-
-    @Test
-    public void ghostbusters_record_must_not_have_other_properties() {
-        String vCardPayload = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Test Dummy\r\nTEL:0123456789\r\nTITLE:Unsupported\r\nEND:VCARD\r\n";
-        ValidationResult validationResult = validatePayload(vCardPayload);
-
-        assertTrue(validationResult.hasFailures());
-        ValidationCheck check = validationResult.getResult(validationResult.getCurrentLocation(), GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY);
-        assertNotNull(check);
-        assertFalse(check.isOk());
     }
 
     private ValidationResult validatePayload(String vCardPayload) {
