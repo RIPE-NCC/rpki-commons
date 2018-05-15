@@ -71,15 +71,15 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
         }
 
         if (!validationResult.rejectIfFalse(
-                vCardPayload.startsWith("BEGIN") &&
-                        StringUtils.countMatches(vCardPayload, "BEGIN") == 1,
+                vCardPayload.startsWith("BEGIN:VCARD") &&
+                        StringUtils.countMatches(vCardPayload, "BEGIN:VCARD") == 1,
                 ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD)) {
             return;
         }
 
         if (!validationResult.rejectIfFalse(
-                vCardPayload.endsWith("END") &&
-                        StringUtils.countMatches(vCardPayload, "END") == 1,
+                vCardPayload.endsWith("END:VCARD") &&
+                        StringUtils.countMatches(vCardPayload, "END:VCARD") == 1,
                 ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD)) {
             return;
         }
