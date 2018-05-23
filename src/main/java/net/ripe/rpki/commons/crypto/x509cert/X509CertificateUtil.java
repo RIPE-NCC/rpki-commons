@@ -112,6 +112,10 @@ public final class X509CertificateUtil {
         return parser.getCertificate();
     }
 
+    public static X509Certificate parseX509Certificate(byte[] encoded) {
+        return X509CertificateParser.parseX509Certificate(encoded);
+    }
+
     /**
      * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
      *

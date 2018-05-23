@@ -147,25 +147,26 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     private static X509Certificate parseEncoded(byte[] encoded, ValidationResult result) {
-        X509Certificate certificate;
+        final X509Certificate certificate = parseX509Certificate(encoded);
+        result.rejectIfNull(certificate, CERTIFICATE_PARSED);
+        return certificate;
+    }
+
+    public static X509Certificate parseX509Certificate(byte[] encoded) {
         try {
             final Closer closer = Closer.create();
             try {
                 final InputStream input = closer.register(new ByteArrayInputStream(encoded));
                 final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-                certificate = (X509Certificate) factory.generateCertificate(input);
+                return (X509Certificate) factory.generateCertificate(input);
             } catch (final CertificateException e) {
-                certificate = null;
+                return null;
             } catch (final Throwable t) {
                 throw closer.rethrow(t);
-            } finally {
-                closer.close();
             }
         } catch (final IOException e) {
-            certificate = null;
+            return null;
         }
-        result.rejectIfNull(certificate, CERTIFICATE_PARSED);
-        return certificate;
     }
 
 

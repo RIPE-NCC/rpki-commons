@@ -107,7 +107,7 @@ public final class X509CertificateBuilderHelper {
 
     private boolean ca;
 
-    private boolean router;
+    private boolean router = false;
 
     private boolean addSubjectKeyIdentifier = true;
 
@@ -183,13 +183,17 @@ public final class X509CertificateBuilderHelper {
 
     public X509CertificateBuilderHelper withCa(boolean ca) {
         this.ca = ca;
-        this.router = !ca;
+        if (ca) {
+            this.router = false;
+        }
         return this;
     }
 
     public X509CertificateBuilderHelper withRouter(boolean router) {
         this.router = router;
-        this.ca = !router;
+        if (router) {
+            this.ca = false;
+        }
         return this;
     }
 
