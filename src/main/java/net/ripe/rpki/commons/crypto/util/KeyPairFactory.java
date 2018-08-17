@@ -47,12 +47,12 @@ public class KeyPairFactory {
 
     public static final String ALGORITHM = "RSA";
 
-    public static final int RPKI_KEY_PAIR_SIZE = 2048;
+    static final int RPKI_KEY_PAIR_SIZE = 2048;
 
     /**
      * F4 Public Exponent
      */
-    public static final BigInteger PUBLIC_EXPONENT = RSAKeyGenParameterSpec.F4;
+    private static final BigInteger PUBLIC_EXPONENT = RSAKeyGenParameterSpec.F4;
 
     private final String provider;
 
@@ -65,11 +65,7 @@ public class KeyPairFactory {
             KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM, provider);
             generator.initialize(new RSAKeyGenParameterSpec(RPKI_KEY_PAIR_SIZE, PUBLIC_EXPONENT));
             return generator.generateKeyPair();
-        } catch (NoSuchProviderException e) {
-            throw new KeyPairFactoryException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new KeyPairFactoryException(e);
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
             throw new KeyPairFactoryException(e);
         }
     }
@@ -83,9 +79,7 @@ public class KeyPairFactory {
     public static PublicKey decodePublicKey(byte[] encoded) {
         try {
             return KeyFactory.getInstance(ALGORITHM).generatePublic(new X509EncodedKeySpec(encoded));
-        } catch (InvalidKeySpecException e) {
-            throw new KeyPairFactoryException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new KeyPairFactoryException(e);
         }
     }
@@ -100,9 +94,7 @@ public class KeyPairFactory {
     public static PrivateKey decodePrivateKey(byte[] encoded) {
         try {
             return KeyFactory.getInstance(ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(encoded));
-        } catch (InvalidKeySpecException e) {
-            throw new KeyPairFactoryException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new KeyPairFactoryException(e);
         }
     }
