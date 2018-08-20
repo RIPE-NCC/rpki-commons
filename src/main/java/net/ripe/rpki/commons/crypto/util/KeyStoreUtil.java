@@ -52,11 +52,12 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.function.Consumer;
 
 
 public final class KeyStoreUtil {
 
-    private static final char[] KEYSTORE_PASSPHRASE = "4AD8A8BD-A001-4400-8DAC-5F3B97F07DE5".toCharArray();
+    public static final char[] KEYSTORE_PASSPHRASE = "4AD8A8BD-A001-4400-8DAC-5F3B97F07DE5".toCharArray();
 
     static final String KEYSTORE_KEY_ALIAS = "mykey1";
 
@@ -66,14 +67,30 @@ public final class KeyStoreUtil {
     }
 
     public static KeyStore createKeyStoreForKeyPair(KeyPair keyPair, String keyStoreProvider, String signatureProvider, String keyStoreType) {
+        return createKeyStoreForKeyPair(keyPair, keyStoreProvider, signatureProvider, keyStoreType, KeyStoreUtil::defaultLoadKeyStore);
+    }
+
+    private static void defaultLoadKeyStore(KeyStore keyStore) {
+        try {
+            keyStore.load(null, KEYSTORE_PASSPHRASE);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new KeyStoreException(e);
+        }
+    }
+
+    public static KeyStore createKeyStoreForKeyPair(final KeyPair keyPair,
+                                                    final String keyStoreProvider,
+                                                    final String signatureProvider,
+                                                    final String keyStoreType,
+                                                    final Consumer<KeyStore> loadKs) {
         try {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType, keyStoreProvider);
-            keyStore.load(null, KEYSTORE_PASSPHRASE);
+            loadKs.accept(keyStore);
             keyStore.aliases();
             X509Certificate certificate = generateCertificate(keyPair, signatureProvider);
             keyStore.setKeyEntry(KEYSTORE_KEY_ALIAS, keyPair.getPrivate(), KEYSTORE_PASSPHRASE, new Certificate[]{certificate});
             return keyStore;
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (GeneralSecurityException e) {
             throw new KeyStoreException(e);
         }
     }
