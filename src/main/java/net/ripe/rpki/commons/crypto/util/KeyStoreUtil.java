@@ -74,7 +74,7 @@ public final class KeyStoreUtil {
             keyStore.setKeyEntry(KEYSTORE_KEY_ALIAS, keyPair.getPrivate(), KEYSTORE_PASSPHRASE, new Certificate[]{certificate});
             return keyStore;
         } catch (GeneralSecurityException | IOException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
+            throw new KeyStoreException(e);
         }
     }
 
@@ -90,14 +90,13 @@ public final class KeyStoreUtil {
             keyStoreOS.flush();
             return keyStoreOS.toByteArray();
         } catch (GeneralSecurityException | IOException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
+            throw new KeyStoreException(e);
         }
     }
 
     public static KeyStore clearKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
         KeyStore keyStore = loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType);
-        clearKeyStore(keyStore);
-        return keyStore;
+        return clearKeyStore(keyStore);
     }
 
     private static KeyStore clearKeyStore(KeyStore keyStore) {
@@ -108,7 +107,7 @@ public final class KeyStoreUtil {
             }
             return keyStore;
         } catch (GeneralSecurityException | IOException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
+            throw new KeyStoreException(e);
         }
     }
 
@@ -119,7 +118,7 @@ public final class KeyStoreUtil {
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);
             return new KeyPair(publicKey, privateKey);
         } catch (GeneralSecurityException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
+            throw new KeyStoreException(e);
         }
     }
 
@@ -129,7 +128,7 @@ public final class KeyStoreUtil {
             keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
             return keyStore;
         } catch (GeneralSecurityException | IOException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
+            throw new KeyStoreException(e);
         }
     }
 
