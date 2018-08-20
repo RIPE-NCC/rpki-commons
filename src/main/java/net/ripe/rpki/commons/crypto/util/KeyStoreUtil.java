@@ -73,9 +73,7 @@ public final class KeyStoreUtil {
             X509Certificate certificate = generateCertificate(keyPair, signatureProvider);
             keyStore.setKeyEntry(KEYSTORE_KEY_ALIAS, keyPair.getPrivate(), KEYSTORE_PASSPHRASE, new Certificate[]{certificate});
             return keyStore;
-        } catch (GeneralSecurityException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
         }
     }
@@ -91,9 +89,7 @@ public final class KeyStoreUtil {
             keyStore.store(keyStoreOS, KEYSTORE_PASSPHRASE);
             keyStoreOS.flush();
             return keyStoreOS.toByteArray();
-        } catch (GeneralSecurityException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
         }
     }
@@ -111,9 +107,7 @@ public final class KeyStoreUtil {
                 keyStore.store(ByteStreams.nullOutputStream(), KEYSTORE_PASSPHRASE);
             }
             return keyStore;
-        } catch (GeneralSecurityException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
         }
     }
@@ -134,9 +128,7 @@ public final class KeyStoreUtil {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType, keyStoreProvider);
             keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
             return keyStore;
-        } catch (GeneralSecurityException e) {
-            throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new net.ripe.rpki.commons.crypto.util.KeyStoreException(e);
         }
     }
@@ -152,9 +144,7 @@ public final class KeyStoreUtil {
         try {
             ContentSigner sigGen = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(keyPair.getPrivate());
             return new JcaX509CertificateConverter().getCertificate(builder.build(sigGen));
-        } catch (OperatorCreationException e) {
-            throw new RuntimeException(e);
-        } catch (CertificateException e) {
+        } catch (OperatorCreationException | CertificateException e) {
             throw new RuntimeException(e);
         }
     }
