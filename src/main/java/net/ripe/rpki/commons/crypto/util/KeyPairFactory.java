@@ -62,7 +62,7 @@ public class KeyPairFactory {
 
     public KeyPair generate() {
         try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM, provider);
+            final KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM, provider);
             generator.initialize(new RSAKeyGenParameterSpec(RPKI_KEY_PAIR_SIZE, PUBLIC_EXPONENT));
             return generator.generateKeyPair();
         } catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
