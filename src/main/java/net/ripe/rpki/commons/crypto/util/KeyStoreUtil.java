@@ -43,15 +43,19 @@ import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 
@@ -100,6 +104,14 @@ public final class KeyStoreUtil {
         return getKeyPairFromKeyStore(keyStore);
     }
 
+    public static KeyPair getKeyPairFromKeyStore(byte[] keyStoreData,
+                                                 String keyStoreProvider,
+                                                 String keyStoreType,
+                                                 final BiConsumer<KeyStore, InputStream> loadKs) {
+        KeyStore keyStore = loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, loadKs);
+        return getKeyPairFromKeyStore(keyStore);
+    }
+
     public static byte[] storeKeyStore(KeyStore keyStore) {
         ByteArrayOutputStream keyStoreOS = new ByteArrayOutputStream();
         try {
@@ -140,11 +152,24 @@ public final class KeyStoreUtil {
     }
 
     private static KeyStore loadKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
+        return loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, (keyStore, is) -> {
+            try {
+                keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
+            } catch (Exception e) {
+                throw new KeyStoreException(e);
+            }
+        });
+    }
+
+    private static KeyStore loadKeyStore(byte[] keyStoreData,
+                                         String keyStoreProvider,
+                                         String keyStoreType,
+                                         final BiConsumer<KeyStore, InputStream> loadKs) {
         try {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType, keyStoreProvider);
-            keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
+            loadKs.accept(keyStore, new ByteArrayInputStream(keyStoreData));
             return keyStore;
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (GeneralSecurityException e) {
             throw new KeyStoreException(e);
         }
     }
@@ -158,7 +183,9 @@ public final class KeyStoreUtil {
                 new X500Principal("CN=subject"),
                 keyPair.getPublic());
         try {
-            ContentSigner sigGen = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(keyPair.getPrivate());
+            ContentSigner sigGen = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM)
+                    .setProvider(signatureProvider)
+                    .build(keyPair.getPrivate());
             return new JcaX509CertificateConverter().getCertificate(builder.build(sigGen));
         } catch (OperatorCreationException | CertificateException e) {
             throw new RuntimeException(e);
