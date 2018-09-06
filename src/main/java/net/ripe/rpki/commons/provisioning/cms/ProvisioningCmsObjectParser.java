@@ -30,8 +30,7 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
+import com.google.common.io.ByteSource;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
@@ -75,8 +74,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -200,13 +199,13 @@ public class ProvisioningCmsObjectParser {
      */
     private void parseContent() {
         try {
-            final InputSupplier<InputStream> supplier = new InputSupplier<InputStream>() {
+            ByteSource byteSource = new ByteSource() {
                 @Override
-                public InputStream getInput() throws IOException {
+                public InputStream openStream() {
                     return sp.getSignedContent().getContentStream();
                 }
             };
-            final String payloadXml = CharStreams.toString(CharStreams.newReaderSupplier(supplier, Charsets.UTF_8));
+            final String payloadXml = byteSource.asCharSource(Charsets.UTF_8).read();
             payload = PayloadParser.parse(payloadXml, validationResult);
 
             validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);

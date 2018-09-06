@@ -171,7 +171,7 @@ public class ProvisioningCmsObjectBuilder {
     }
 
     private AttributeTable createSignedAttributes() {
-        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>(); // NOPMD
+        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>();
         // -
         // ReplaceHashtableWithMap
         Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));

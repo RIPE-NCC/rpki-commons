@@ -63,7 +63,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     protected ValidationResult result;
 
-    public void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
+    public void parse(String location, byte[] encoded) {
         parse(ValidationResult.withLocation(location), encoded);
     }
 

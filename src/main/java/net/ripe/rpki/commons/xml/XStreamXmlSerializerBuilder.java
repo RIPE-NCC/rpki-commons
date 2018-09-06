@@ -81,7 +81,7 @@ public class XStreamXmlSerializerBuilder<T> {
 
     protected XStreamXmlSerializerBuilder(Class<T> objectType, boolean strict) {
         this.objectType = objectType;
-        createDefaultXStream(strict);  // NOPMD
+        createDefaultXStream(strict);
     }
 
     private void createDefaultXStream(boolean strict) {

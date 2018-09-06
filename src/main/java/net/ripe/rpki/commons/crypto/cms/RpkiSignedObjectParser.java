@@ -70,7 +70,7 @@ public abstract class RpkiSignedObjectParser {
 
     private ValidationResult validationResult;
 
-    public final void parse(String location, byte[] encoded) { // NOPMD - ArrayIsStoredDirectly
+    public final void parse(String location, byte[] encoded) {
         parse(ValidationResult.withLocation(location), encoded);
     }
 

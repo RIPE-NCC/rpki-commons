@@ -54,7 +54,7 @@ public class CertificateElement {
     private X509ResourceCertificate certificate;
 
     // Setters
-    CertificateElement setIssuerCertificatePublicationLocation(List<URI> issuerCertificatePublicationLocation) {   // NOPMD no clone of array stored
+    CertificateElement setIssuerCertificatePublicationLocation(List<URI> issuerCertificatePublicationLocation) {
         this.issuerCertificatePublicationLocationUris = issuerCertificatePublicationLocation;
         return this;
     }

@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>20.0</version>
         </dependency>
 
         <!-- For XML we use Xstream -->
@@ -101,7 +101,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -142,7 +142,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>15.0</version>
+                <version>20.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
