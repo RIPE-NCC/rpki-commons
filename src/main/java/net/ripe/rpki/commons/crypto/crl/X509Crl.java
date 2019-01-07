@@ -125,9 +125,7 @@ public class X509Crl implements CertificateRepositoryObject {
                     final ByteArrayInputStream in = new ByteArrayInputStream(encoded);
                     final CertificateFactory factory = CertificateFactory.getInstance("X.509");
                     crl = (X509CRL) factory.generateCRL(in);
-                } catch (final CertificateException e) {
-                    throw closer.rethrow(new IllegalArgumentException(e));
-                } catch (final CRLException e) {
+                } catch (final CertificateException | CRLException e) {
                     throw closer.rethrow(new IllegalArgumentException(e));
                 } catch (final Throwable t) {
                     throw closer.rethrow(t);

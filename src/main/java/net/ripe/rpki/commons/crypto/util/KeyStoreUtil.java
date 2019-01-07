@@ -127,11 +127,11 @@ public final class KeyStoreUtil {
         return clearKeyStore(loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType));
     }
 
-    public static KeyStore clearKeyStore(byte[] keyStoreData,
-                                         String keyStoreProvider,
-                                         String keyStoreType,
-                                         final BiConsumer<KeyStore, InputStream> loadKs) {
-        return clearKeyStore(loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, loadKs));
+    public static void clearKeyStore(byte[] keyStoreData,
+                                     String keyStoreProvider,
+                                     String keyStoreType,
+                                     final BiConsumer<KeyStore, InputStream> loadKs) {
+        clearKeyStore(loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, loadKs));
     }
 
     private static KeyStore clearKeyStore(KeyStore keyStore) {

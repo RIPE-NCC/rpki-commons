@@ -73,21 +73,8 @@ public abstract class RpkiSignedObjectBuilder {
         byte[] result;
         try {
             result = doGenerate(signingCertificate, privateKey, signatureProvider, contentTypeOid, content);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RpkiSignedObjectBuilderException(e);
-        } catch (NoSuchProviderException e) {
-            throw new RpkiSignedObjectBuilderException(e);
-        } catch (CMSException e) {
-            throw new RpkiSignedObjectBuilderException(e);
-        } catch (IOException e) {
-            throw new RpkiSignedObjectBuilderException(e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new RpkiSignedObjectBuilderException(e);
-        } catch (CertStoreException e) {
-            throw new RpkiSignedObjectBuilderException(e);
-        } catch (CertificateEncodingException e) {
-            throw new RpkiSignedObjectBuilderException(e);
-        } catch (OperatorCreationException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | CMSException | IOException |
+                 InvalidAlgorithmParameterException | CertStoreException | CertificateEncodingException | OperatorCreationException e) {
             throw new RpkiSignedObjectBuilderException(e);
         }
         return result;
@@ -120,7 +107,7 @@ public abstract class RpkiSignedObjectBuilder {
     }
 
     private AttributeTable createSignedAttributes(Date signingTime) {
-        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>(); //NOPMD - ReplaceHashtableWithMap
+        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<>();
         Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(signingTime)));
         attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
         return new AttributeTable(attributes);
