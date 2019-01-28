@@ -120,8 +120,10 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
     protected void verifyValidity() {
         DateTime now = new DateTime();
 
-        result.rejectIfTrue(now.isBefore(child.getValidityPeriod().getNotValidBefore()), NOT_VALID_BEFORE, child.getValidityPeriod().getNotValidBefore().toString());
-        result.rejectIfTrue(now.isAfter(child.getValidityPeriod().getNotValidAfter()), NOT_VALID_AFTER, child.getValidityPeriod().getNotValidAfter().toString());
+        final DateTime notValidBefore = child.getValidityPeriod().getNotValidBefore();
+        final DateTime notValidAfter = child.getValidityPeriod().getNotValidAfter();
+        result.rejectIfTrue(now.isBefore(notValidBefore), NOT_VALID_BEFORE, notValidBefore.toString());
+        result.rejectIfTrue(now.isAfter(notValidAfter), NOT_VALID_AFTER, notValidAfter.toString());
     }
 
     private void verifyIssuer() {
