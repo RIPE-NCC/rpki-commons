@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
+import net.ripe.rpki.commons.crypto.cms.RPKISignedDataGenerator;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
@@ -50,7 +51,6 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
@@ -118,7 +118,7 @@ public class ProvisioningCmsObjectBuilder {
 
         ValidationResult validationResult = parser.getValidationResult();
         if (validationResult.hasFailures()) {
-            List<String> failureMessages = new ArrayList<String>();
+            List<String> failureMessages = new ArrayList<>();
             List<ValidationCheck> failures = validationResult.getFailures(new ValidationLocation("generated.cms"));
             for (ValidationCheck check : failures) {
                 failureMessages.add(check.getKey());
@@ -146,7 +146,7 @@ public class ProvisioningCmsObjectBuilder {
     }
 
     private byte[] doGenerate(PrivateKey privateKey) throws CMSException, IOException, CertificateEncodingException, CRLException, OperatorCreationException {
-        CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+        RPKISignedDataGenerator generator = new RPKISignedDataGenerator();
         addCertificateAndCrl(generator);
         addSignerInfo(generator, privateKey);
 
@@ -155,15 +155,15 @@ public class ProvisioningCmsObjectBuilder {
         return data.getEncoded();
     }
 
-    private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey) throws OperatorCreationException {
+    private void addSignerInfo(RPKISignedDataGenerator generator, PrivateKey privateKey) throws OperatorCreationException {
         ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
         DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
         SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate));
         generator.addSignerInfoGenerator(gen);
     }
 
-    private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws CertificateEncodingException, CMSException, CRLException {
-        List<X509Extension> certificates = new ArrayList<X509Extension>();
+    private void addCertificateAndCrl(RPKISignedDataGenerator generator) throws CertificateEncodingException, CMSException, CRLException {
+        List<X509Extension> certificates = new ArrayList<>();
         certificates.add(cmsCertificate);
 
         generator.addCertificates(new JcaCertStore(certificates));
@@ -171,7 +171,7 @@ public class ProvisioningCmsObjectBuilder {
     }
 
     private AttributeTable createSignedAttributes() {
-        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<ASN1ObjectIdentifier, Attribute>();
+        Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<>();
         // -
         // ReplaceHashtableWithMap
         Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));

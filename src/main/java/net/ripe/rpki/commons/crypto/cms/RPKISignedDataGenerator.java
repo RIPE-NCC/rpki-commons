@@ -37,7 +37,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
@@ -185,15 +184,14 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
 
         ContentInfo encInfo = new ContentInfo(contentTypeOID, octs);
 
-        SignedData  sd = new SignedData(
-                                 new DERSet(digestAlgs),
-                                 encInfo,
-                                 certificates,
-                                 certrevlist,
-                                 new DERSet(signerInfos));
+        RPKISignedData sd = new RPKISignedData(
+                new DERSet(digestAlgs),
+                encInfo,
+                certificates,
+                certrevlist,
+                new DERSet(signerInfos));
 
-        ContentInfo contentInfo = new ContentInfo(
-            CMSObjectIdentifiers.signedData, sd);
+        RPKIContentInfo contentInfo = new RPKIContentInfo(CMSObjectIdentifiers.signedData, sd);
 
         return new CMSSignedData(content, contentInfo);
     }
