@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.ripe.rpki</groupId>
     <artifactId>rpki-commons</artifactId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
     <name>RPKI Commmons</name>
@@ -29,7 +29,7 @@
         <url>https://github.com/RIPE-NCC/rpki-commons.git</url>
         <connection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</connection>
         <developerConnection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</developerConnection>
-      <tag>rpki-commons-1.4</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
