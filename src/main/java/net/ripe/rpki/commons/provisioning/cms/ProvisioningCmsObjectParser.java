@@ -67,6 +67,7 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.Certificate;
@@ -205,7 +206,7 @@ public class ProvisioningCmsObjectParser {
                     return sp.getSignedContent().getContentStream();
                 }
             };
-            final String payloadXml = byteSource.asCharSource(Charsets.UTF_8).read();
+            final String payloadXml = byteSource.asCharSource(StandardCharsets.UTF_8).read();
             payload = PayloadParser.parse(payloadXml, validationResult);
 
             validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);

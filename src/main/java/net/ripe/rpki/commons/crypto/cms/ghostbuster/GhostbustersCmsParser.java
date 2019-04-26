@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
@@ -40,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
@@ -53,7 +53,7 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
 
     @Override
     public void decodeRawContent(InputStream content) throws IOException {
-        vCardPayload = CharStreams.toString(new InputStreamReader(content, Charsets.UTF_8));
+        vCardPayload = CharStreams.toString(new InputStreamReader(content, StandardCharsets.UTF_8));
     }
 
     protected void validateGhostbusters() {
