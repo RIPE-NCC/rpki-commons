@@ -49,7 +49,7 @@ public final class ValidationResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new LinkedHashMap<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>>();
+    private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new LinkedHashMap<>();
 
     private ValidationLocation currentLocation;
 
@@ -300,15 +300,11 @@ public final class ValidationResult implements Serializable {
         for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> resultsByLocation : that.results.entrySet()) {
             Map<ValidationStatus, List<ValidationCheck>> map = results.get(resultsByLocation.getKey());
             if (map == null) {
-                map = new LinkedHashMap<ValidationStatus, List<ValidationCheck>>();
+                map = new LinkedHashMap<>();
                 this.results.put(resultsByLocation.getKey(), map);
             }
             for (Entry<ValidationStatus, List<ValidationCheck>> checks : resultsByLocation.getValue().entrySet()) {
-                List<ValidationCheck> list = map.get(checks.getKey());
-                if (list == null) {
-                    list = new ArrayList<ValidationCheck>();
-                    map.put(checks.getKey(), list);
-                }
+                List<ValidationCheck> list = map.computeIfAbsent(checks.getKey(), k -> new ArrayList<>());
                 list.addAll(checks.getValue());
             }
         }
