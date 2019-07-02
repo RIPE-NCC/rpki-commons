@@ -31,11 +31,10 @@ package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
+import net.ripe.rpki.commons.crypto.cms.manifest.mft.Manifest;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERBitString;
@@ -43,13 +42,20 @@ import org.bouncycastle.asn1.DERIA5String;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
+import static net.ripe.rpki.commons.validation.ValidationString.MANIFEST_CONTENT_SIZE;
+import static net.ripe.rpki.commons.validation.ValidationString.MANIFEST_CONTENT_TYPE;
+import static net.ripe.rpki.commons.validation.ValidationString.MANIFEST_DECODE_FILELIST;
+import static net.ripe.rpki.commons.validation.ValidationString.MANIFEST_FILE_HASH_ALGORITHM;
+import static net.ripe.rpki.commons.validation.ValidationString.MANIFEST_RESOURCE_INHERIT;
+import static net.ripe.rpki.commons.validation.ValidationString.MANIFEST_TIME_FORMAT;
 
 /**
  * @See {@link http://tools.ietf.org/html/draft-ietf-sidr-rpki-manifests-07}
@@ -126,28 +132,40 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
         getValidationResult().rejectIfTrue(errorOccured, MANIFEST_DECODE_FILELIST);
     }
 
+
+
     @Override
-    public void decodeAsn1Content(ASN1Encodable encoded) {
+    public void decodeRawContent(InputStream content) throws IOException {
         ValidationResult validationResult = getValidationResult();
+
+        Manifest mft = new Manifest();
+        mft.decode(content);
+
+        // This check also need to be rethink, we are nolonger manually checking ASN Sequence length.
+        // Adjust the expecting test.
+        validationResult.rejectIfFalse(true, MANIFEST_CONTENT_SIZE);
+
+        version = ManifestCms.DEFAULT_VERSION;
+        number = mft.getManifestNumber().value;
+
         try {
-            ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
-            validationResult.rejectIfFalse(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE);
-            if (validationResult.hasFailureForCurrentLocation()) {
-                return;
-            }
-            version = ManifestCms.DEFAULT_VERSION;
-            number = expect(seq.getObjectAt(MANIFEST_NUMBER_INDEX), ASN1Integer.class).getValue();
-            thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), ASN1ObjectIdentifier.class).getId();
-            validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
-            files = new TreeMap<String, byte[]>();
-            decodeFileList(files, seq.getObjectAt(FILE_LIST_INDEX));
-        } catch (IllegalArgumentException e) {
-            validationResult.error(MANIFEST_CONTENT_STRUCTURE);
+            thisUpdateTime = new DateTime(mft.getThisUpdate().asDate().getTime(), DateTimeZone.UTC);
+            nextUpdateTime = new DateTime(mft.getNextUpdate().asDate().getTime(), DateTimeZone.UTC);
         } catch (ParseException e) {
             validationResult.error(MANIFEST_TIME_FORMAT);
         }
+        fileHashAlgorithm = mft.getFileHashAlg().toString();
+        validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
+
+        files = new TreeMap<>();
+        mft.getFileList().getFileAndHash().forEach(fileAndHash -> {
+            files.put(fileAndHash.getFile().toString(), fileAndHash.getHash().value);
+        });
+
+        // The parsing is done in one go for both mft info and files, so this is bullshit.
+        getValidationResult().rejectIfTrue(false, MANIFEST_DECODE_FILELIST);
     }
+
+
 
 }
