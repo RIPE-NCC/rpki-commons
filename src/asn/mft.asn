@@ -1,0 +1,18 @@
+MFT DEFINITIONS ::= BEGIN
+
+    FileAndHash ::= SEQUENCE {
+       file            IA5String,
+       hash            BIT STRING
+    }
+
+    Manifest ::= SEQUENCE {
+           version     [0] INTEGER DEFAULT 0,
+           manifestNumber  INTEGER (0..MAX),
+           thisUpdate      GeneralizedTime,
+           nextUpdate      GeneralizedTime,
+           fileHashAlg     OBJECT IDENTIFIER,
+           fileList        SEQUENCE SIZE (0..MAX) OF FileAndHash
+    }
+END 
+
+
