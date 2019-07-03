@@ -117,8 +117,9 @@ public final class BouncyCastleUtil {
         return SubjectPublicKeyInfo.getInstance(key.getEncoded());
     }
 
+    static JcaX509CertificateConverter jcaX509CertificateConverter = new JcaX509CertificateConverter();
     public static X509Certificate holderToCertificate(X509CertificateHolder holder) throws CertificateException {
-        return new JcaX509CertificateConverter().getCertificate(holder);
+        return jcaX509CertificateConverter.getCertificate(holder);
     }
 
     public static List<? extends X509Certificate> extractCertificates(CMSSignedDataParser signedDataParser) throws StoreException, CMSException, CertificateException {
@@ -130,9 +131,10 @@ public final class BouncyCastleUtil {
         }
         return result;
     }
-
+    static JcaX509CRLConverter jcaX509CRLConverter = new JcaX509CRLConverter();
     public static X509CRL holderToCrl(X509CRLHolder holder) throws CRLException {
-        return new JcaX509CRLConverter().getCRL(holder);
+
+        return jcaX509CRLConverter.getCRL(holder);
     }
 
     public static List<? extends X509CRL> extractCrls(CMSSignedDataParser signedDataParser) throws StoreException, CMSException, CRLException {
