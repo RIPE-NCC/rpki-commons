@@ -152,8 +152,7 @@ public class ProvisioningCmsObjectBuilder {
         final DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
         final byte[] ski = X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate);
         final SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider)
-            .setSignedAttributeGenerator(
-                new DefaultSignedAttributeTableGenerator(createSignedAttributes()) {
+            .setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes()) {
                     @Override
                     public AttributeTable getAttributes(Map parameters) {
                         return super.getAttributes(parameters).remove(CMSAttributes.cmsAlgorithmProtect);

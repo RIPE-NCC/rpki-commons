@@ -350,4 +350,15 @@ public class ProvisioningCmsObjectBuilderTest {
 
         assertNull(signer.getUnsignedAttributes());
     }
+
+    /**
+     * https://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4
+     */
+    @Test
+    public void shouldCmsObjectHaveNoRedundantAttribute() throws Exception {
+        Collection<?> signers = signedDataParser.getSignerInfos().getSigners();
+        SignerInformation signer = (SignerInformation) signers.iterator().next();
+        AttributeTable attributeTable = signer.getSignedAttributes();
+        assertNull(attributeTable.get(CMSAttributes.cmsAlgorithmProtect));
+    }
 }
