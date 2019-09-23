@@ -37,7 +37,6 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
@@ -73,6 +72,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class ProvisioningCmsObjectBuilder {
@@ -118,29 +119,20 @@ public class ProvisioningCmsObjectBuilder {
 
         ValidationResult validationResult = parser.getValidationResult();
         if (validationResult.hasFailures()) {
-            List<String> failureMessages = new ArrayList<String>();
-            List<ValidationCheck> failures = validationResult.getFailures(new ValidationLocation("generated.cms"));
-            for (ValidationCheck check : failures) {
-                failureMessages.add(check.getKey());
-            }
-            Validate.isTrue(false, "Validation of generated CMS object failed with following errors: " + StringUtils.join(failureMessages, ","));
-        }
+            final String message = validationResult
+                .getFailures(new ValidationLocation("generated.cms")).stream()
+                .map(ValidationCheck::getKey)
+                .collect(Collectors.joining(","));
 
+            Validate.isTrue(false, "Validation of generated CMS object failed with following errors: " + message, ",");
+        }
         return parser.getProvisioningCmsObject();
     }
 
     private byte[] generateCms(PrivateKey privateKey) {
         try {
             return doGenerate(privateKey);
-        } catch (CMSException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (IOException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (OperatorCreationException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (CRLException e) {
-            throw new ProvisioningCmsObjectBuilderException(e);
-        } catch (CertificateEncodingException e) {
+        } catch (CMSException | IOException | OperatorCreationException | CRLException | CertificateEncodingException e) {
             throw new ProvisioningCmsObjectBuilderException(e);
         }
     }
@@ -156,9 +148,18 @@ public class ProvisioningCmsObjectBuilder {
     }
 
     private void addSignerInfo(CMSSignedDataGenerator generator, PrivateKey privateKey) throws OperatorCreationException {
-        ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
-        DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
-        SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes())).build(signer, X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate));
+        final ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
+        final DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
+        final byte[] ski = X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate);
+        final SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider)
+            .setSignedAttributeGenerator(
+                new DefaultSignedAttributeTableGenerator(createSignedAttributes()) {
+                    @Override
+                    public AttributeTable getAttributes(Map parameters) {
+                        return super.getAttributes(parameters).remove(CMSAttributes.cmsAlgorithmProtect);
+                    }
+                })
+            .build(signer, ski);
         generator.addSignerInfoGenerator(gen);
     }
 

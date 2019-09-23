@@ -29,12 +29,10 @@
  */
 package net.ripe.rpki.commons.crypto.cms;
 
-import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import org.apache.commons.lang.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -74,7 +72,7 @@ public abstract class RpkiSignedObjectBuilder {
         try {
             result = doGenerate(signingCertificate, privateKey, signatureProvider, contentTypeOid, content);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | CMSException | IOException |
-                 InvalidAlgorithmParameterException | CertStoreException | CertificateEncodingException | OperatorCreationException e) {
+            InvalidAlgorithmParameterException | CertStoreException | CertificateEncodingException | OperatorCreationException e) {
             throw new RpkiSignedObjectBuilderException(e);
         }
         return result;
