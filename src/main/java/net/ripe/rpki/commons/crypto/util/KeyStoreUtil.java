@@ -48,15 +48,15 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.Semaphore;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 
 public final class KeyStoreUtil {
@@ -147,24 +147,27 @@ public final class KeyStoreUtil {
     }
 
     private static KeyPair getKeyPairFromKeyStore(KeyStore keyStore) {
-        try {
-            Certificate certificate = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
-            PublicKey publicKey = certificate.getPublicKey();
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);
-            return new KeyPair(publicKey, privateKey);
-        } catch (GeneralSecurityException e) {
-            throw new KeyStoreException(e);
-        }
-    }
-
-    private static KeyStore loadKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
-        return loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, (keyStore, is) -> {
+        return withPermit(() -> {
             try {
-                keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
-            } catch (Exception e) {
+                Certificate certificate = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
+                PublicKey publicKey = certificate.getPublicKey();
+                PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);
+                return new KeyPair(publicKey, privateKey);
+            } catch (GeneralSecurityException e) {
                 throw new KeyStoreException(e);
             }
         });
+    }
+
+    private static KeyStore loadKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
+        return withPermit(() ->
+            loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, (keyStore, is) -> {
+                try {
+                    keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
+                } catch (Exception e) {
+                    throw new KeyStoreException(e);
+                }
+            }));
     }
 
     private static KeyStore loadKeyStore(byte[] keyStoreData,
@@ -195,6 +198,22 @@ public final class KeyStoreUtil {
             return new JcaX509CertificateConverter().getCertificate(builder.build(sigGen));
         } catch (OperatorCreationException | CertificateException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    // temporary measure to restrict the amount of simultaneous requests to the HSM
+    private static Semaphore semaphore = new Semaphore(5);
+
+    private static <T> T withPermit(Supplier<T> s) {
+        try {
+            semaphore.acquire();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            return s.get();
+        } finally {
+            semaphore.release();
         }
     }
 }
