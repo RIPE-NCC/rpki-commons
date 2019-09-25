@@ -62,31 +62,14 @@ import static net.ripe.rpki.commons.crypto.cms.CMSUtils.getSafeOutputStream;
  * CMSSignedData.
  *
  */
-
 public class RPKISignedDataGenerator extends CMSSignedDataGenerator
 {
-    /**
-     * base constructor
-     */
-    public RPKISignedDataGenerator()
-    {
+    public RPKISignedDataGenerator() {
     }
 
     /**
-     * Generate a CMS Signed Data object carrying a detached CMS signature.
-     *
-     * @param content the content to be signed.
-     */
-    public CMSSignedData generate(
-        CMSTypedData content)
-        throws CMSException
-    {
-        return generate(content, false);
-    }
-
-    /**
-     * Generate a CMS Signed Data object which can be carrying a detached CMS signature, or have encapsulated data, depending on the value
-     * of the encapsulated parameter.
+     * Generate a CMS Signed Data object which can be carrying a detached CMS signature, or have encapsulated data,
+     * depending on the value of the encapsulated parameter.
      *
      * @param content the content to be signed.
      * @param encapsulate true if the content should be encapsulated in the signature, false otherwise.
@@ -105,9 +88,8 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
         //
         // add the precalculated SignerInfo objects.
         //
-        for (Iterator it = _signers.iterator(); it.hasNext();)
-        {
-            SignerInformation signer = (SignerInformation)it.next();
+        for (Object o : _signers) {
+            SignerInformation signer = (SignerInformation) o;
             digestAlgs.add(fixAlgID(signer.getDigestAlgorithmID()));
 
             // TODO Verify the content type and calculated digest match the precalculated SignerInfo
@@ -152,9 +134,8 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
             }
         }
 
-        for (Iterator it = signerGens.iterator(); it.hasNext();)
-        {
-            SignerInfoGenerator sGen = (SignerInfoGenerator)it.next();
+        for (Object signerGen : signerGens) {
+            SignerInfoGenerator sGen = (SignerInfoGenerator) signerGen;
             SignerInfo inf = sGen.generate(contentTypeOID);
 
             digestAlgs.add(inf.getDigestAlgorithm());
@@ -162,22 +143,21 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
 
             byte[] calcDigest = sGen.getCalculatedDigest();
 
-            if (calcDigest != null)
-            {
+            if (calcDigest != null) {
                 digests.put(inf.getDigestAlgorithm().getAlgorithm().getId(), calcDigest);
             }
         }
 
         ASN1Set certificates = null;
 
-        if (certs.size() != 0)
+        if (!certs.isEmpty())
         {
             certificates = createDerSetFromList(certs);
         }
 
         ASN1Set certrevlist = null;
 
-        if (crls.size() != 0)
+        if (!crls.isEmpty())
         {
             certrevlist = createDerSetFromList(crls);
         }

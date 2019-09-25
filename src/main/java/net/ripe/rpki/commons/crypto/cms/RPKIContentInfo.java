@@ -75,46 +75,35 @@ public class RPKIContentInfo
      * @exception IllegalArgumentException if the object cannot be converted.
      */
     public static RPKIContentInfo getInstance(
-        Object  obj)
-    {
-        if (obj instanceof RPKIContentInfo)
-        {
-            return (RPKIContentInfo)obj;
+        Object obj) {
+        if (obj instanceof RPKIContentInfo) {
+            return (RPKIContentInfo) obj;
+        } else if (obj != null) {
+            return RPKIContentInfo.getInstance(ASN1Sequence.getInstance(obj));
         }
-        else if (obj != null)
-        {
-            return new RPKIContentInfo(ASN1Sequence.getInstance(obj));
-        }
-
         return null;
     }
 
     public static RPKIContentInfo getInstance(
         ASN1TaggedObject obj,
-        boolean explicit)
-    {
+        boolean explicit) {
         return getInstance(ASN1Sequence.getInstance(obj, explicit));
     }
 
     /**
      * @deprecated use getInstance()
      */
-    public RPKIContentInfo(
-        ASN1Sequence  seq)
-    {
+    public RPKIContentInfo(ASN1Sequence seq) {
         super(seq);
-        if (seq.size() < 1 || seq.size() > 2)
-        {
+        if (seq.size() < 1 || seq.size() > 2) {
             throw new IllegalArgumentException("Bad sequence size: " + seq.size());
         }
 
-        contentType = (ASN1ObjectIdentifier)seq.getObjectAt(0);
+        contentType = (ASN1ObjectIdentifier) seq.getObjectAt(0);
 
-        if (seq.size() > 1)
-        {
-            ASN1TaggedObject tagged = (ASN1TaggedObject)seq.getObjectAt(1);
-            if (!tagged.isExplicit() || tagged.getTagNo() != 0)
-            {
+        if (seq.size() > 1) {
+            ASN1TaggedObject tagged = (ASN1TaggedObject) seq.getObjectAt(1);
+            if (!tagged.isExplicit() || tagged.getTagNo() != 0) {
                 throw new IllegalArgumentException("Bad tag for 'content'");
             }
 
@@ -144,14 +133,12 @@ public class RPKIContentInfo
     /**
      * Produce an object suitable for an ASN1OutputStream.
      */
-    public ASN1Primitive toASN1Primitive()
-    {
-        ASN1EncodableVector  v = new ASN1EncodableVector();
+    public ASN1Primitive toASN1Primitive() {
+        ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(contentType);
 
-        if (content != null)
-        {
+        if (content != null) {
             v.add(new DERTaggedObject(0, content));
         }
 

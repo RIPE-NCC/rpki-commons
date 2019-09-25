@@ -131,7 +131,6 @@ public class RPKISignedData
                 if (obj instanceof ASN1TaggedObject)
                 {
                     ASN1TaggedObject tagged = ASN1TaggedObject.getInstance(obj);
-
                     if (tagged.getTagNo() == 1)
                     {
                         attrCertV1Found = true;
@@ -193,23 +192,17 @@ public class RPKISignedData
         return VERSION_1;
     }
 
-    private boolean checkForVersion3(ASN1Set signerInfs)
-    {
-        for (Enumeration e = signerInfs.getObjects(); e.hasMoreElements();)
-        {
+    private boolean checkForVersion3(ASN1Set signerInfs) {
+        for (Enumeration e = signerInfs.getObjects(); e.hasMoreElements(); ) {
             SignerInfo s = SignerInfo.getInstance(e.nextElement());
-
-            if (s.getVersion().getValue().intValue() == 3)
-            {
+            if (s.getVersion().getValue().intValue() == 3) {
                 return true;
             }
         }
-
         return false;
     }
 
-    private RPKISignedData(
-        ASN1Sequence seq)
+    private RPKISignedData(ASN1Sequence seq)
     {
         Enumeration     e = seq.getObjects();
 

@@ -47,42 +47,32 @@ import java.util.List;
 // From original CMSUtils of Bouncy Castle, needed for modified CMSSignedDataGenerator.
 public class CMSUtils {
 
-    static ASN1Set createDerSetFromList(List derObjects)
-    {
+    static ASN1Set createDerSetFromList(List derObjects) {
         ASN1EncodableVector v = new ASN1EncodableVector();
-
-        for (Iterator it = derObjects.iterator(); it.hasNext(); )
-        {
-            v.add((ASN1Encodable)it.next());
+        for (Object derObject : derObjects) {
+            v.add((ASN1Encodable) derObject);
         }
-
         return new DERSet(v);
     }
 
-    static AlgorithmIdentifier fixAlgID(AlgorithmIdentifier algId)
-    {
-        if (algId.getParameters() == null)
-        {
+    static AlgorithmIdentifier fixAlgID(AlgorithmIdentifier algId) {
+        if (algId.getParameters() == null) {
             return new AlgorithmIdentifier(algId.getAlgorithm(), DERNull.INSTANCE);
         }
-
         return algId;
     }
 
-    static OutputStream attachSignersToOutputStream(Collection signers, OutputStream s)
-    {
+    static OutputStream attachSignersToOutputStream(Collection signers, OutputStream s) {
         OutputStream result = s;
-        Iterator it = signers.iterator();
-        while (it.hasNext())
-        {
-            SignerInfoGenerator signerGen = (SignerInfoGenerator)it.next();
+        for (Object signer : signers) {
+            SignerInfoGenerator signerGen = (SignerInfoGenerator) signer;
             result = getSafeTeeOutputStream(result, signerGen.getCalculatingOutputStream());
         }
         return result;
     }
-    static OutputStream getSafeOutputStream(OutputStream s)
-    {
-        OutputStream nullStream = new OutputStream(){
+
+    static OutputStream getSafeOutputStream(OutputStream s) {
+        OutputStream nullStream = new OutputStream() {
 
             @Override
             public void write(int b) throws IOException {
@@ -93,9 +83,8 @@ public class CMSUtils {
     }
 
     static OutputStream getSafeTeeOutputStream(OutputStream s1,
-                                               OutputStream s2)
-    {
+                                               OutputStream s2) {
         return s1 == null ? getSafeOutputStream(s2)
-                : s2 == null ? getSafeOutputStream(s1) : new TeeOutputStream(s1, s2);
+            : s2 == null ? getSafeOutputStream(s1) : new TeeOutputStream(s1, s2);
     }
 }
