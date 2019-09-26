@@ -230,9 +230,7 @@ public abstract class RpkiSignedObjectParser {
     private SignerInformationStore getSignerStore(CMSSignedDataParser sp) {
         try {
             return sp.getSignerInfos();
-        } catch (CMSException e) {
-            return null; // Caller will validate that the SignerInformationStore is not null
-        } catch (RuntimeException e) {
+        } catch (CMSException | RuntimeException e) {
             return null; // Caller will validate that the SignerInformationStore is not null
         }
     }
@@ -249,27 +247,27 @@ public abstract class RpkiSignedObjectParser {
                 || CMSAttributes.contentType.equals(attributeOID)
     			|| CMSAttributes.messageDigest.equals(attributeOID);
     }
-    
+
     private boolean verifyOptionalSignedAttributes(SignerInformation signer) {
 
-    	//To loop over
-    	ASN1EncodableVector signedAttributes = signer.getSignedAttributes().toASN1EncodableVector();
-    	
+        //To loop over
+        ASN1EncodableVector signedAttributes = signer.getSignedAttributes().toASN1EncodableVector();
+
         boolean allAttributesCorrect = true;
-        for(int i = 0; i < signedAttributes.size(); i++){
-        	ASN1Encodable signedAttribute = signedAttributes.get(i);
-        	if(!isAllowedSignedAttribute((Attribute)signedAttribute)){
-        		allAttributesCorrect = false;
-        		break;
-        	}
+        for (int i = 0; i < signedAttributes.size(); i++) {
+            ASN1Encodable signedAttribute = signedAttributes.get(i);
+            if (!isAllowedSignedAttribute((Attribute) signedAttribute)) {
+                allAttributesCorrect = false;
+                break;
+            }
         }
-        
-        if(allAttributesCorrect){
-        	validationResult.pass(SIGNED_ATTRS_CORRECT);
+
+        if (allAttributesCorrect) {
+            validationResult.pass(SIGNED_ATTRS_CORRECT);
         } else {
-    		validationResult.warn(SIGNED_ATTRS_CORRECT);
+            validationResult.warn(SIGNED_ATTRS_CORRECT);
         }
-        
+
         return allAttributesCorrect;
     }
 
@@ -301,15 +299,15 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private boolean verifyAndStoreSigningTime(SignerInformation signer) {
-        Attribute signingTimeAttibute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
-        if (!validationResult.rejectIfNull(signingTimeAttibute, SIGNING_TIME_ATTR_PRESENT)) {
+        Attribute signingTimeAttribute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
+        if (!validationResult.rejectIfNull(signingTimeAttribute, SIGNING_TIME_ATTR_PRESENT)) {
             return false;
         }
-        if (!validationResult.rejectIfFalse(signingTimeAttibute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
+        if (!validationResult.rejectIfFalse(signingTimeAttribute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
             return false;
         }
 
-        Time signingTimeDate = Time.getInstance(signingTimeAttibute.getAttrValues().getObjectAt(0));
+        Time signingTimeDate = Time.getInstance(signingTimeAttribute.getAttrValues().getObjectAt(0));
         signingTime = new DateTime(signingTimeDate.getDate().getTime(), DateTimeZone.UTC);
         return true;
     }
@@ -324,9 +322,7 @@ public abstract class RpkiSignedObjectParser {
              * http://tools.ietf.org/html/rfc6488#section-2.1.6.4.3
              */
             validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey())), SIGNATURE_VERIFICATION);
-        } catch (OperatorCreationException e) {
-            errorMessage = String.valueOf(e.getMessage());
-        } catch (CMSException e) {
+        } catch (OperatorCreationException | CMSException e) {
             errorMessage = String.valueOf(e.getMessage());
         }
 

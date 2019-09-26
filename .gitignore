@@ -14,3 +14,4 @@ target/
 
 # Caches, etc.
 .pregenerated-test-key-pairs.keystore
+.vscode/settings.json

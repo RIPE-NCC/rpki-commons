@@ -71,7 +71,7 @@ public abstract class RpkiSignedObjectBuilder {
         try {
             result = doGenerate(signingCertificate, privateKey, signatureProvider, contentTypeOid, content);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | CMSException | IOException |
-                 InvalidAlgorithmParameterException | CertStoreException | CertificateEncodingException | OperatorCreationException e) {
+            InvalidAlgorithmParameterException | CertStoreException | CertificateEncodingException | OperatorCreationException e) {
             throw new RpkiSignedObjectBuilderException(e);
         }
         return result;

@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.interop;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.Files;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
@@ -54,9 +53,13 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class ProcessIscUpdownPdusTest {
@@ -92,14 +95,14 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldReadIscIssuerXml() throws IOException {
-        String parentXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), Charsets.UTF_8);
+        String parentXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), StandardCharsets.UTF_8);
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
         ParentIdentity parentId = serializer.deserialize(parentXml);
         assertNotNull(parentId);
     }
 
     public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException {
-        String childIdXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), Charsets.UTF_8);
+        String childIdXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), StandardCharsets.UTF_8);
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
         ChildIdentity childId = serializer.deserialize(childIdXml);
         ProvisioningIdentityCertificate childCert = childId.getIdentityCertificate();
@@ -125,8 +128,8 @@ public class ProcessIscUpdownPdusTest {
 
         assertEquals(2, failures.size());
 
-        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:08:03.000Z"));
-        failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:07:24.000Z"));
+        assertTrue(failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:08:03.000Z")));
+        assertTrue(failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:07:24.000Z")));
     }
 
     @Test
@@ -137,13 +140,13 @@ public class ProcessIscUpdownPdusTest {
             byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
             ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
             parser.parseCms("cms", encoded);
-            assertTrue("Error parsing file: " + fileName + " and giving up!", !parser.getValidationResult().hasFailures());
+            assertFalse(parser.getValidationResult().hasFailures());
         }
     }
 
     @Test
     public void shouldParseRpkidParentResponseXml() throws IOException {
-        String xml = Files.toString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), Charsets.UTF_8);
+        String xml = Files.toString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), StandardCharsets.UTF_8);
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
         ParentIdentity parentId = serializer.deserialize(xml);
@@ -159,7 +162,7 @@ public class ProcessIscUpdownPdusTest {
 
         for (String fileName : files) {
 
-            String base64Encoded = Files.toString(new File(PATH_TO_TEST_PDUS + "/" + fileName), Charsets.UTF_8);
+            String base64Encoded = Files.toString(new File(PATH_TO_TEST_PDUS + "/" + fileName), StandardCharsets.UTF_8);
 
             final byte[] encoded = decoder.decode(base64Encoded);
 
@@ -167,7 +170,7 @@ public class ProcessIscUpdownPdusTest {
             parser.parseCms("cms", encoded);
             ValidationResult validationResult = parser.getValidationResult();
 
-            assertTrue("Error parsing file: " + fileName + " and giving up!", !validationResult.hasFailures());
+            assertFalse(validationResult.hasFailures());
         }
     }
 }

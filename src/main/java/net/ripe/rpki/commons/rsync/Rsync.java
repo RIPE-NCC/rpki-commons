@@ -43,7 +43,7 @@ public class Rsync {
 
     private static final String COMMAND = "rsync";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Rsync.class);
+    private static final Logger log = LoggerFactory.getLogger(Rsync.class);
 
     private Command command;
 
@@ -159,10 +159,10 @@ public class Rsync {
             command = rsync;
             int exitStatus = rsync.getExitStatus();
             if (exitStatus != 0) {
-                LOGGER.error("rsync command line: " + args);
-                LOGGER.error("rsync exit status: " + exitStatus);
-                LOGGER.error("rsync stderr: " + rsync.getErrors());
-                LOGGER.error("rsync stdout: " + rsync.getOutputs());
+                log.error("rsync command line: " + args);
+                log.error("rsync exit status: " + exitStatus);
+                log.error("rsync stderr: " + rsync.getErrors());
+                log.error("rsync stdout: " + rsync.getOutputs());
             }
 
             return exitStatus;

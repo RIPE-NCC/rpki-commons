@@ -34,6 +34,7 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 
 /**
@@ -71,6 +72,6 @@ public class GhostbustersCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     public byte[] getEncoded(PrivateKey privateKey) {
-        return generateCms(certificate.getCertificate(), privateKey, signatureProvider, GhostbustersCms.CONTENT_TYPE, vCardPayload.getBytes(Charsets.UTF_8));
+        return generateCms(certificate.getCertificate(), privateKey, signatureProvider, GhostbustersCms.CONTENT_TYPE, vCardPayload.getBytes(StandardCharsets.UTF_8));
     }
 }

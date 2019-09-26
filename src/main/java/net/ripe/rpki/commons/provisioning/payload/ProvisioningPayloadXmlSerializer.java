@@ -39,6 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 class ProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> extends XStreamXmlSerializer<T> {
 
@@ -60,11 +61,11 @@ class ProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> ex
         final Closer closer = Closer.create();
         try {
             final ByteArrayOutputStream outputStream = closer.register(new ByteArrayOutputStream());
-            final Writer writer = closer.register(new OutputStreamWriter(outputStream, Charsets.UTF_8));
+            final Writer writer = closer.register(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writer.write(System.getProperty("line.separator"));
             super.serialize(payload, writer);
-            final String rawXml = new String(outputStream.toByteArray(), Charsets.UTF_8);
+            final String rawXml = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
             xml = rawXml.replace("<message", "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"");
         } catch (final Throwable t) {
             throw closer.rethrow(t);

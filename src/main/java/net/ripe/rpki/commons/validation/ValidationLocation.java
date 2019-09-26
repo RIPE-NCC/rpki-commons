@@ -39,7 +39,7 @@ import java.net.URI;
  * The validation location key that is used to associate validation checks with
  * a specific object or step. Typically the URI is used as the key.
  */
-public class ValidationLocation implements Serializable {
+public class ValidationLocation implements Serializable, Comparable<ValidationLocation> {
 
     private static final long serialVersionUID = 1L;
 
@@ -79,5 +79,10 @@ public class ValidationLocation implements Serializable {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    @Override
+    public int compareTo(ValidationLocation o) {
+        return this.name.compareTo(o.name);
     }
 }

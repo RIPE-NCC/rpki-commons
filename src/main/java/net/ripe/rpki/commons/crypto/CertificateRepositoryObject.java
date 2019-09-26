@@ -34,7 +34,6 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.RepositoryObjectValidationContext;
 
 import java.io.Serializable;
 import java.net.URI;

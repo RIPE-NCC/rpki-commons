@@ -63,11 +63,13 @@ public class X509ResourceCertificateParentChildLooseValidator extends X509Certif
         if (child.isRoot()) {
             result.rejectIfTrue(child.isResourceSetInherited(), ROOT_INHERITS_RESOURCES);
         } else {
-            IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
-            overclaiming.removeAll(resources);
+            if (!resources.contains(childResourceSet)) {
+                IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
+                overclaiming.removeAll(resources);
 
-            context.addOverclaiming(overclaiming);
-            result.warnIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
+                context.addOverclaiming(overclaiming);
+                result.warnIfFalse(overclaiming.isEmpty(), RESOURCE_RANGE, overclaiming.toString());
+            }
         }
     }
 
