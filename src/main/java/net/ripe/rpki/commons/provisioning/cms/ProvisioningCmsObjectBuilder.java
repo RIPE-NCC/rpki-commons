@@ -51,7 +51,6 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
-import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculatorProvider;
@@ -151,15 +150,15 @@ public class ProvisioningCmsObjectBuilder {
         final ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
         final DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
         final byte[] ski = X509CertificateUtil.getSubjectKeyIdentifier(cmsCertificate);
-        final SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider)
-            .setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes()) {
+        generator.addSignerInfoGenerator(
+            new JcaSignerInfoGeneratorBuilder(digestProvider)
+                .setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes()) {
                     @Override
                     public AttributeTable getAttributes(Map parameters) {
                         return super.getAttributes(parameters).remove(CMSAttributes.cmsAlgorithmProtect);
                     }
                 })
-            .build(signer, ski);
-        generator.addSignerInfoGenerator(gen);
+            .build(signer, ski));
     }
 
     private void addCertificateAndCrl(CMSSignedDataGenerator generator) throws CertificateEncodingException, CMSException, CRLException {
