@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.ByteSource;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
@@ -120,7 +119,7 @@ public class ProvisioningCmsObjectParser {
         return validationResult;
     }
 
-    public void parseCms(String location, byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
+    public void parseCms(String location, byte[] encoded) {
         this.location = location;
         this.encoded = encoded;
         validationResult.setLocation(new ValidationLocation(location));

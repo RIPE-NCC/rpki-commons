@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.provisioning.cms;
 
+import net.ripe.rpki.commons.crypto.cms.RPKISignedData;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
@@ -44,7 +45,6 @@ import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CRLHolder;
@@ -142,7 +142,7 @@ public class ProvisioningCmsObjectBuilderTest {
     public void shouldCmsObjectHaveCorrectDigestAlgorithm() throws Exception {
         ASN1InputStream in = new ASN1InputStream(new ByteArrayInputStream(cmsObject.getEncoded()));
         ContentInfo info = ContentInfo.getInstance(in.readObject());
-        SignedData signedData = SignedData.getInstance(info.getContent());
+        RPKISignedData signedData = RPKISignedData.getInstance(info.getContent());
         ASN1Set digestAlgorithms = signedData.getDigestAlgorithms();
         ASN1Encodable asn1Object = digestAlgorithms.getObjectAt(0);
         AlgorithmIdentifier algorithmId = AlgorithmIdentifier.getInstance(asn1Object.toASN1Primitive());
