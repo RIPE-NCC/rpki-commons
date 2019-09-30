@@ -54,6 +54,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -147,7 +148,7 @@ public final class KeyStoreUtil {
     }
 
     private static KeyPair getKeyPairFromKeyStore(KeyStore keyStore) {
-        return withPermit(() -> {
+        return bottleneck(() -> {
             try {
                 Certificate certificate = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
                 PublicKey publicKey = certificate.getPublicKey();
@@ -160,7 +161,7 @@ public final class KeyStoreUtil {
     }
 
     private static KeyStore loadKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
-        return withPermit(() ->
+        return bottleneck(() ->
             loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, (keyStore, is) -> {
                 try {
                     keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
@@ -202,18 +203,23 @@ public final class KeyStoreUtil {
     }
 
     // temporary measure to restrict the amount of simultaneous requests to the HSM
-    private static Semaphore semaphore = new Semaphore(5);
+    private static AtomicReference<Semaphore> semaphore = new AtomicReference<>(new Semaphore(5));
 
-    private static <T> T withPermit(Supplier<T> s) {
+    public static void setPermissions(int permissions) {
+        semaphore.set(new Semaphore(permissions));
+    }
+
+    private static <T> T bottleneck(Supplier<T> sup) {
+        final Semaphore s = semaphore.get();
         try {
-            semaphore.acquire();
+            s.acquire();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         try {
-            return s.get();
+            return sup.get();
         } finally {
-            semaphore.release();
+            s.release();
         }
     }
 }
