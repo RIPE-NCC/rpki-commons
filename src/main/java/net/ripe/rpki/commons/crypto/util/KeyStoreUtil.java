@@ -53,11 +53,8 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 
 public final class KeyStoreUtil {
@@ -148,27 +145,24 @@ public final class KeyStoreUtil {
     }
 
     private static KeyPair getKeyPairFromKeyStore(KeyStore keyStore) {
-        return bottleneck(() -> {
-            try {
-                Certificate certificate = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
-                PublicKey publicKey = certificate.getPublicKey();
-                PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);
-                return new KeyPair(publicKey, privateKey);
-            } catch (GeneralSecurityException e) {
-                throw new KeyStoreException(e);
-            }
-        });
+        try {
+            Certificate certificate = keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0];
+            PublicKey publicKey = certificate.getPublicKey();
+            PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_KEY_ALIAS, KEYSTORE_PASSPHRASE);
+            return new KeyPair(publicKey, privateKey);
+        } catch (GeneralSecurityException e) {
+            throw new KeyStoreException(e);
+        }
     }
 
     private static KeyStore loadKeyStore(byte[] keyStoreData, String keyStoreProvider, String keyStoreType) {
-        return bottleneck(() ->
-            loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, (keyStore, is) -> {
-                try {
-                    keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
-                } catch (Exception e) {
-                    throw new KeyStoreException(e);
-                }
-            }));
+        return loadKeyStore(keyStoreData, keyStoreProvider, keyStoreType, (keyStore, is) -> {
+            try {
+                keyStore.load(new ByteArrayInputStream(keyStoreData), KEYSTORE_PASSPHRASE);
+            } catch (Exception e) {
+                throw new KeyStoreException(e);
+            }
+        });
     }
 
     private static KeyStore loadKeyStore(byte[] keyStoreData,
@@ -199,27 +193,6 @@ public final class KeyStoreUtil {
             return new JcaX509CertificateConverter().getCertificate(builder.build(sigGen));
         } catch (OperatorCreationException | CertificateException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    // temporary measure to restrict the amount of simultaneous requests to the HSM
-    private static AtomicReference<Semaphore> semaphore = new AtomicReference<>(new Semaphore(5));
-
-    public static void setPermissions(int permissions) {
-        semaphore.set(new Semaphore(permissions));
-    }
-
-    private static <T> T bottleneck(Supplier<T> sup) {
-        final Semaphore s = semaphore.get();
-        try {
-            s.acquire();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            return sup.get();
-        } finally {
-            s.release();
         }
     }
 }
