@@ -55,7 +55,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
-import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.*;
+import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
+import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class RpkiSignedObjectParser {
@@ -321,7 +322,10 @@ public abstract class RpkiSignedObjectParser {
              * time. This happens occasionally and is no ground to reject according to standards:
              * http://tools.ietf.org/html/rfc6488#section-2.1.6.4.3
              */
-            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey())), SIGNATURE_VERIFICATION);
+            final SignerInformationVerifier verifier = new JcaSignerInfoVerifierBuilder(
+                BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey());
+
+            validationResult.rejectIfFalse(signer.verify(verifier), SIGNATURE_VERIFICATION);
         } catch (OperatorCreationException | CMSException e) {
             errorMessage = String.valueOf(e.getMessage());
         }
