@@ -57,6 +57,7 @@ import org.bouncycastle.cms.CMSSignedGenerator;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
@@ -439,10 +440,11 @@ public class ProvisioningCmsObjectParser {
     private void verifySignature(SignerInformation signer) {
         String errorMessage = null;
         try {
-            validationResult.rejectIfFalse(signer.verify(new JcaSignerInfoVerifierBuilder(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(cmsCertificate)), SIGNATURE_VERIFICATION);
-        } catch (CMSException e) {
-            errorMessage = String.valueOf(e.getMessage());
-        } catch (OperatorCreationException e) {
+            final SignerInformationVerifier verifier = new JcaSignerInfoVerifierBuilder(
+                BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(cmsCertificate.getPublicKey());
+
+            validationResult.rejectIfFalse(signer.verify(verifier), SIGNATURE_VERIFICATION);
+        } catch (CMSException | OperatorCreationException e) {
             errorMessage = String.valueOf(e.getMessage());
         }
 
