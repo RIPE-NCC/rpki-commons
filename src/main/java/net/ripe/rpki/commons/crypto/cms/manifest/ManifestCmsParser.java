@@ -59,13 +59,6 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 
     private int version = ManifestCms.DEFAULT_VERSION;
 
-    private static final int MANIFEST_CONTENT_SEQUENCE_LENGTH = 5;
-    private static final int MANIFEST_NUMBER_INDEX = 0;
-    private static final int THIS_UPDATE_TIME_INDEX = 1;
-    private static final int NEXT_UPDATE_TIME_INDEX = 2;
-    private static final int FILE_HASH_ALGORHYTHM_INDEX = 3;
-    private static final int FILE_LIST_INDEX = 4;
-
     private BigInteger number;
 
     private DateTime thisUpdateTime;
@@ -131,18 +124,27 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
         ValidationResult validationResult = getValidationResult();
         try {
             ASN1Sequence seq = expect(encoded, ASN1Sequence.class);
-            validationResult.rejectIfFalse(seq.size() == MANIFEST_CONTENT_SEQUENCE_LENGTH, MANIFEST_CONTENT_SIZE);
+            final int itemCount = seq.size();
+            int offset = 0;
+            if (itemCount == 6) {
+                BigInteger version = getRpkiObjectVersion(seq);
+                validationResult.rejectIfFalse(BigInteger.ZERO.equals(version), "mf.version", "manifest version must be 0, but is " + version);
+                offset++;
+            } else if (itemCount == 5) {
+                version = ManifestCms.DEFAULT_VERSION;
+            }
+
+            validationResult.rejectIfFalse(itemCount == 5 || itemCount == 6, "mf.content.size");
             if (validationResult.hasFailureForCurrentLocation()) {
                 return;
             }
-            version = ManifestCms.DEFAULT_VERSION;
-            number = expect(seq.getObjectAt(MANIFEST_NUMBER_INDEX), ASN1Integer.class).getValue();
-            thisUpdateTime = new DateTime(expect(seq.getObjectAt(THIS_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            nextUpdateTime = new DateTime(expect(seq.getObjectAt(NEXT_UPDATE_TIME_INDEX), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
-            fileHashAlgorithm = expect(seq.getObjectAt(FILE_HASH_ALGORHYTHM_INDEX), ASN1ObjectIdentifier.class).getId();
+            number = expect(seq.getObjectAt(offset++), ASN1Integer.class).getValue();
+            thisUpdateTime = new DateTime(expect(seq.getObjectAt(offset++), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
+            nextUpdateTime = new DateTime(expect(seq.getObjectAt(offset++), ASN1GeneralizedTime.class).getDate().getTime(), DateTimeZone.UTC);
+            fileHashAlgorithm = expect(seq.getObjectAt(offset++), ASN1ObjectIdentifier.class).getId();
             validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
-            files = new TreeMap<String, byte[]>();
-            decodeFileList(files, seq.getObjectAt(FILE_LIST_INDEX));
+            files = new TreeMap<>();
+            decodeFileList(files, seq.getObjectAt(offset));
         } catch (IllegalArgumentException e) {
             validationResult.error(MANIFEST_CONTENT_STRUCTURE);
         } catch (ParseException e) {
