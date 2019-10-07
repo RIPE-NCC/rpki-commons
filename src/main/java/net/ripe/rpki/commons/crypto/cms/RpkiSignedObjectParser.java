@@ -208,7 +208,9 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        verifyAndStoreSigningTime(signer);
+        if (!verifyAndStoreSigningTime(signer)) {
+            return;
+        }
 
         verifySignature(certificate, signer);
     }
@@ -298,12 +300,16 @@ public abstract class RpkiSignedObjectParser {
         return true;
     }
 
-    private void verifyAndStoreSigningTime(SignerInformation signer) {
+    private boolean verifyAndStoreSigningTime(SignerInformation signer) {
         Attribute signingTimeAttribute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
-        if (signingTimeAttribute != null && signingTimeAttribute.getAttrValues().size() > 0) {
+        if (signingTimeAttribute != null) {
+            if (!validationResult.rejectIfFalse(signingTimeAttribute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
+                return false;
+            }
             Time signingTimeDate = Time.getInstance(signingTimeAttribute.getAttrValues().getObjectAt(0));
             signingTime = new DateTime(signingTimeDate.getDate().getTime(), DateTimeZone.UTC);
         }
+        return true;
     }
 
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
