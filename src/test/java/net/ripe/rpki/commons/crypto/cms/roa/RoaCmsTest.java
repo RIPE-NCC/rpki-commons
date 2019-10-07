@@ -149,7 +149,6 @@ public class RoaCmsTest {
     }
 
     @Test
-    @Ignore
     public void shouldUseNotValidBeforeTimeForSigningTime() {
         RoaCms roaCms = createRoaCms(allPrefixes);
         assertEquals(roaCms.getCertificate().getValidityPeriod().getNotValidBefore(), roaCms.getSigningTime());
