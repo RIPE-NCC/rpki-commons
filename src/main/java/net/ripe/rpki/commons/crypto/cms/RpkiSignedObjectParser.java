@@ -49,6 +49,7 @@ import org.joda.time.DateTimeZone;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -301,15 +302,13 @@ public abstract class RpkiSignedObjectParser {
 
     private boolean verifyAndStoreSigningTime(SignerInformation signer) {
         Attribute signingTimeAttribute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
-        if (!validationResult.rejectIfNull(signingTimeAttribute, SIGNING_TIME_ATTR_PRESENT)) {
-            return false;
+        if (signingTimeAttribute != null) {
+            if (!validationResult.rejectIfFalse(signingTimeAttribute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
+                return false;
+            }
+            Time signingTimeDate = Time.getInstance(signingTimeAttribute.getAttrValues().getObjectAt(0));
+            signingTime = new DateTime(signingTimeDate.getDate().getTime(), DateTimeZone.UTC);
         }
-        if (!validationResult.rejectIfFalse(signingTimeAttribute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
-            return false;
-        }
-
-        Time signingTimeDate = Time.getInstance(signingTimeAttribute.getAttrValues().getObjectAt(0));
-        signingTime = new DateTime(signingTimeDate.getDate().getTime(), DateTimeZone.UTC);
         return true;
     }
 
@@ -333,6 +332,20 @@ public abstract class RpkiSignedObjectParser {
         if (errorMessage != null) {
             validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION, errorMessage);
         }
+    }
+
+    protected static BigInteger getRpkiObjectVersion(ASN1Sequence seq) {
+        ASN1Primitive asn1Version = seq.getObjectAt(0).toASN1Primitive();
+        BigInteger version = null;
+        if (asn1Version instanceof ASN1Integer) {
+            version = ((ASN1Integer) asn1Version).getValue();
+        } else if (asn1Version instanceof DERTaggedObject){
+            final ASN1Primitive o = ((DERTaggedObject) asn1Version).getObject();
+            if (o instanceof ASN1Integer) {
+                version = ((ASN1Integer) o).getValue();
+            }
+        }
+        return version;
     }
 
 }

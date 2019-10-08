@@ -40,6 +40,7 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBu
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;

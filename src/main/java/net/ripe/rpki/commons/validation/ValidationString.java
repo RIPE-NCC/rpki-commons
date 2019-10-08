@@ -168,7 +168,6 @@ public final class ValidationString {
 
     //manifest
     public static final String MANIFEST_CONTENT_TYPE = "mf.content.type";
-    public static final String MANIFEST_CONTENT_SIZE = "mf.content.size";
     public static final String MANIFEST_CONTENT_STRUCTURE = "mf.content.structure";
     public static final String MANIFEST_TIME_FORMAT = "mf.time.format";
     public static final String MANIFEST_FILE_HASH_ALGORITHM = "mf.file.hash.algorithm";

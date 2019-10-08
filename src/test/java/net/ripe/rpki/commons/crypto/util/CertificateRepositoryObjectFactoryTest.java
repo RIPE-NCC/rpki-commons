@@ -110,7 +110,7 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertTrue(object instanceof RoaCms);
         assertEquals(roaCms, object);
-        assertEquals(49, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(46, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertFalse(validationResult.hasFailures());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
         assertEquals(ValidationStatus.WARNING, validationResult.getResultForCurrentLocation(CRLDP_OMITTED).getStatus());
@@ -139,7 +139,7 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertTrue(object instanceof ManifestCms);
         assertEquals(manifestCms, object);
-        assertEquals(49, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(48, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }
