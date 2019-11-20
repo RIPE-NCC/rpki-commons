@@ -29,6 +29,8 @@
  */
 package net.ripe.rpki.commons.xml;
 
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.security.ForbiddenClassException;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -205,6 +207,105 @@ public class XStreamXmlSerializerBuilderTest {
         Assert.assertEquals("<test-alias.XStreamXmlSerializerBuilderTest_-SerializeMe/>", serializedData);
     }
 
+    @Test
+    public void shouldDeserializeOwnType() {
+        XStreamXmlSerializerBuilder<SerializeMe> builder = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT);
+        XStreamXmlSerializer<SerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new SerializeMe());
+        serializer.deserialize(serializedData);
+    }
+
+    @Test(expected = ForbiddenClassException.class)
+    public void shouldNotDeserializeUnknownType() {
+        XStreamXmlSerializerBuilder<SerializeMe> builder = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT);
+        XStreamXmlSerializer<SerializeMe> deserializer = builder.build();
+
+        XStreamXmlSerializer<OtherSerializeMe> otherSerializer = new XStreamXmlSerializerBuilder<OtherSerializeMe>(OtherSerializeMe.class, NOT_STRICT).build();
+
+        String serializedData = otherSerializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        // Should throw, input type is unknown:
+        deserializer.deserialize(serializedData);
+    }
+
+    @Test
+    public void shouldAllowExplicitlyAllowedType() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAllowedType(SerializeMe.class);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        serializer.deserialize(serializedData);
+    }
+
+
+    @Test
+    public void shouldAllowAliasedConcreteTypeInObjectField() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAliasType("serialize-me", SerializeMe.class);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        serializer.deserialize(serializedData);
+    }
+
+    @Test
+    public void shouldAllowConcreteTypeFromAliasedPackageInObjectField() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAliasPackage("rpki-commons-xml", "net.ripe.rpki.commons.xml");
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        serializer.deserialize(serializedData);
+    }
+
+    @Test(expected =  ForbiddenClassException.class)
+    public void shouldNotDeserializeUnknownTypeInObjectField() throws Throwable {
+        // Similar to above but without the alias
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        try {
+            // Should throw.
+            serializer.deserialize(serializedData);
+        } catch (ConversionException e) {
+            // Unwrap the cause from ConversionException
+            throw e.getCause();
+        }
+    }
+
+    @Test(expected = ConversionException.class)
+    public void shouldNotPopCalculatorApp() {
+        XStreamXmlSerializer<SerializeMe> builder = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT).build();
+        // Exploit example from https://www.baeldung.com/java-xstream-remote-code-execution
+        builder.deserialize(
+           "<sorted-set>\n" +
+                "    <string>foo</string>\n" +
+                "    <dynamic-proxy>\n" +
+                "        <interface>java.lang.Comparable</interface>\n" +
+                "        <handler class=\"java.beans.EventHandler\">\n" +
+                "            <target class=\"java.lang.ProcessBuilder\">\n" +
+                "                <command>\n" +
+                "                    <string>open</string>\n" +
+                "                    <string>/Applications/Calculator.app</string>\n" +
+                "                </command>\n" +
+                "            </target>\n" +
+                "            <action>start</action>\n" +
+                "        </handler>\n" +
+                "    </dynamic-proxy>\n" +
+                "</sorted-set>");
+    }
+
     private static class SerializeMe {
     }
+
+    private static class OtherSerializeMe {
+        Object canBeAnything;
+
+        public OtherSerializeMe(final Object canBeAnything) {
+            this.canBeAnything = canBeAnything;
+        }
+    }
+
 }

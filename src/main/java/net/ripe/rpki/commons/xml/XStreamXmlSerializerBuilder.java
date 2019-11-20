@@ -36,6 +36,7 @@ import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvide
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import com.thoughtworks.xstream.security.*;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -59,6 +60,7 @@ import net.ripe.rpki.commons.xml.converters.VersionedIdConverter;
 import net.ripe.rpki.commons.xml.converters.X500PrincipalConverter;
 import net.ripe.rpki.commons.xml.converters.X509ResourceCertificateConverter;
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -84,6 +86,16 @@ public class XStreamXmlSerializerBuilder<T> {
         createDefaultXStream(strict);
     }
 
+    /**
+     * Instantiate XStream and set-up the security framework to prevent injection and remote code execution.
+     *
+     * Types that are allowed are:
+     *   * A list of default types included in XStream.
+     *   * The type the serializer is built for.
+     *   * Types that have been aliased (i.e. the mapped name of the class is not it's qualified name).
+     *
+     * Note that the whitelist is <emph>only</emph> checked on deserialization.
+     */
     private void createDefaultXStream(boolean strict) {
         if(strict) {
             xStream = new XStream();
@@ -92,6 +104,15 @@ public class XStreamXmlSerializerBuilder<T> {
         }
 
         xStream.setMode(XStream.NO_REFERENCES);
+        // Setup the security framework for xStream (adds white-list of simple and default types)
+        XStream.setupDefaultSecurity(xStream);
+
+        // Allow type this serializer is instantiated for
+        xStream.allowTypes(new Class[]{ this.objectType });
+        // Not all registered types are part of this module.
+        // A wildcard could pull in classes that are not safe to deserialize -> allow types for which there
+        // exists an alias.
+        xStream.addPermission(new AliasedTypePermission(xStream));
 
         registerIpResourceRelated();
         registerDateTimeRelated();
@@ -114,6 +135,8 @@ public class XStreamXmlSerializerBuilder<T> {
     }
 
     private void registerDateTimeRelated() {
+        // Explictly allow Period without aliasing.
+        withAllowedType(Period.class);
         withAliasType("datetime", DateTime.class);
         withConverter(new DateTimeConverter());
         withConverter(new ReadablePeriodConverter());
@@ -165,8 +188,18 @@ public class XStreamXmlSerializerBuilder<T> {
         return this;
     }
 
+    /**
+     * Explicitly allow a type to be serialized without using an alias
+     * @param classType type to serialize.
+     */
+    public final XStreamXmlSerializerBuilder<T> withAllowedType(Class<?> classType) {
+        xStream.allowTypes(new Class[]{classType});
+        return this;
+    }
+
     public final XStreamXmlSerializerBuilder<T> withAliasField(String alias, Class<?> aliasOnField, String field) {
         xStream.useAttributeFor(alias, aliasOnField);
+        // transitive: aliasField allows serialization for field type.
         xStream.aliasField(alias, aliasOnField, field);
         return this;
     }
