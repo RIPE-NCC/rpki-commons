@@ -87,8 +87,7 @@ public final class KeyPairUtil {
     public static String base64UrlEncode(byte[] data) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            new FileSystemSafeBase64UrlEncoder().encode(data, 0, data.length,
-                    out);
+            new FileSystemSafeBase64UrlEncoder().encode(data, 0, data.length, out);
             out.flush();
             return out.toString();
         } catch (IOException e) {
