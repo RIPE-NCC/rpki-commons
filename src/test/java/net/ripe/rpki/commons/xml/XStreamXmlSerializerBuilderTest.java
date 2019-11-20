@@ -49,6 +49,7 @@ import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -214,6 +215,7 @@ public class XStreamXmlSerializerBuilderTest {
 
         String serializedData = serializer.serialize(new SerializeMe());
         serializer.deserialize(serializedData);
+        Assert.assertEquals("<net.ripe.rpki.commons.xml.XStreamXmlSerializerBuilderTest_-SerializeMe/>", serializedData);
     }
 
     @Test(expected = ForbiddenClassException.class)
@@ -234,10 +236,30 @@ public class XStreamXmlSerializerBuilderTest {
         builder.withAllowedType(SerializeMe.class);
         XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
 
-        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
-        serializer.deserialize(serializedData);
+        final OtherSerializeMe input = new OtherSerializeMe(new SerializeMe());
+
+        String serializedData = serializer.serialize(input);
+        final OtherSerializeMe output = serializer.deserialize(serializedData);
+
+        Assert.assertEquals(input.canBeAnything, output.canBeAnything);
     }
 
+    @Test
+    public void shouldAllowArrayOfExplicitlyAllowedType() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAllowedType(SerializeMe.class);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        final OtherSerializeMe input = new OtherSerializeMe(new SerializeMe[]{
+                new SerializeMe(),
+                new SerializeMe()
+        });
+
+        String serializedData = serializer.serialize(input);
+        final OtherSerializeMe output = serializer.deserialize(serializedData);
+
+        Assert.assertArrayEquals((Object[])input.canBeAnything, (Object[])output.canBeAnything);
+    }
 
     @Test
     public void shouldAllowAliasedConcreteTypeInObjectField() {
@@ -246,6 +268,7 @@ public class XStreamXmlSerializerBuilderTest {
         XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
 
         String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        Assert.assertTrue(serializedData.contains("serialize-me"));
         serializer.deserialize(serializedData);
     }
 
@@ -256,6 +279,7 @@ public class XStreamXmlSerializerBuilderTest {
         XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
 
         String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        Assert.assertTrue(serializedData.contains("rpki-commons-xml"));
         serializer.deserialize(serializedData);
     }
 
@@ -267,7 +291,7 @@ public class XStreamXmlSerializerBuilderTest {
 
         String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
         try {
-            // Should throw.
+            // Should throw, not an instance of an allowed or aliased type
             serializer.deserialize(serializedData);
         } catch (ConversionException e) {
             // Unwrap the cause from ConversionException
@@ -298,6 +322,12 @@ public class XStreamXmlSerializerBuilderTest {
     }
 
     private static class SerializeMe {
+        /** Needed for Assert.assertArrayEquals. */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            return !(o == null || getClass() != o.getClass());
+        }
     }
 
     private static class OtherSerializeMe {
@@ -307,5 +337,4 @@ public class XStreamXmlSerializerBuilderTest {
             this.canBeAnything = canBeAnything;
         }
     }
-
 }
