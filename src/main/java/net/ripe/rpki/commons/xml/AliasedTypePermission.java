@@ -51,6 +51,6 @@ public class AliasedTypePermission implements TypePermission {
      */
     @Override
     public boolean allows(Class type) {
-        return !xStream.getMapper().serializedClass(type).equals(type.getName());
+        return !type.getName().equals(xStream.getMapper().serializedClass(type));
     }
 }
