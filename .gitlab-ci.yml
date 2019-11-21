@@ -1,24 +1,34 @@
-image: maven:3.6.1-jdk-8-alpine
-# Inspired by https://gitlab.com/gitlab-examples/maven/simple-maven-dep
+image: maven:3.6-jdk-8-alpine
+# Inspired by https://gitlab.com/gitlab-examples/maven/simple-maven-dep and
+# https://gitlab.com/gitlab-org/gitlab-ci-yml/blob/master/Maven.gitlab-ci.yml
+# run manually with `gitlab-runner exec docker <task_name>`
 
 variables:
   BUILD_NUMBER: ${CI_COMMIT_REF_SLUG}-${CI_PIPELINE_ID}
-  # re-add --batch-mode to reduce output
-  MAVEN_CLI_OPTS: "--errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  # As of Maven 3.3.0 instead of this you may define these options in `.mvn/maven.config` so the same config is used
+
+  MAVEN_CLI_OPTS: "--errors --batch-mode --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
 
 cache:
   paths:
     - .m2/repository
 
+# before every job:
+before_script:
+  - apk update
+  - apk add rsync
+
+validate:
+  stage: build
+  script:
+    - 'mvn clean'
+    - 'mvn $MAVEN_CLI_OPTS test-compile -Dbuild.number=${BUILD_NUMBER}'
 
 verify:
   stage: test
-  before_script:
-    - apk update
-    - apk add rsync
   script:
-    - 'mvn $MAVEN_CLI_OPTS clean -Dbuild.number=${BUILD_NUMER}'
-    - 'mvn $MAVEN_CLI_OPTS verify -Dbuild.number=${BUILD_NUMER}'
+    - 'mvn $MAVEN_CLI_OPTS verify -Dbuild.number=${BUILD_NUMBER}'
   except:
     - master
   artifacts:
@@ -27,9 +37,6 @@ verify:
 
 deploy:
   stage: deploy
-  before_script:
-    - apk update
-    - apk add rsync
   script:
     - if [ ! -f ci_settings.xml ];
         then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/project/packages/maven_repository.html#creating-maven-packages-with-gitlab-cicd for instructions.";
@@ -40,5 +47,8 @@ deploy:
     # - 'mvn $MAVEN_CLI_OPTS release:prepare -B -DautoVersionSubmodules=true -DupdateDependencies=false'
     # - 'mvn $MAVEN_CLI_OPTS release:perform -B'
     - 'mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml'
+  artifacts:
+    paths:
+      - target/rpki-commons-*.jar
   only:
     - master

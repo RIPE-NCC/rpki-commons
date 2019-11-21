@@ -28,7 +28,7 @@
     <scm>
         <url>https://github.com/RIPE-NCC/rpki-commons.git</url>
         <connection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</connection>
-        <developerConnection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</developerConnection>
+        <developerConnection>${project.scm.developer.url}</developerConnection>
       <tag>HEAD</tag>
   </scm>
 
@@ -43,6 +43,9 @@
         <build.number>DEV</build.number>
         <build.timestamp>unknown</build.timestamp>
         <revision.number>unknown</revision.number>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.scm.developer.url>scm:git:ssh://git@gitlab.ripe.net:222/swe/rpki/rpki-commons.git</project.scm.developer.url>
 
         <net.ripe.ipresource.version>1.46</net.ripe.ipresource.version>
         <bouncycastle.version>1.58</bouncycastle.version>
@@ -298,6 +301,7 @@
                         <exclude>.idea/**</exclude>
                         <exclude>.gitignore</exclude>
                         <exclude>.gitlab-ci.yml</exclude>
+                        <exclude>.m2/**</exclude>
                         <exclude>.pregenerated-test-key-pairs.keystore</exclude>
                     </excludes>
                 </configuration>
