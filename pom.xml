@@ -217,6 +217,12 @@
                     <plugin>
                       <groupId>org.apache.maven.plugins</groupId>
                       <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <gpgArguments>
+                                <!-- for GPG2 -->
+                                <argument>--pinentry-mode=loopback</argument>
+                            </gpgArguments>
+                        </configuration>
                       <executions>
                         <execution>
                           <id>sign-artifacts</id>
@@ -369,6 +375,16 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <configuration>
+                        <gpgArguments>
+                            <!-- for GPG2 -->
+                            <argument>--pinentry-mode=loopback</argument>
+                        </gpgArguments>
+                    </configuration>
                 </plugin>
 
                 <plugin>

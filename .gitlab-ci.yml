@@ -1,6 +1,10 @@
 image: maven:3.6-jdk-8-alpine
 # Inspired by https://gitlab.com/gitlab-examples/maven/simple-maven-dep and
 # https://gitlab.com/gitlab-org/gitlab-ci-yml/blob/master/Maven.gitlab-ci.yml
+# 
+# Signing procedure inspired by https://gitlab.com/gitlab-org/gitlab-runner/merge_requests/922/diffs
+# and related code.
+#
 # run manually with `gitlab-runner exec docker <task_name>`
 
 variables:
@@ -14,10 +18,11 @@ cache:
   paths:
     - .m2/repository
 
-# before every job:
+# before every job
 before_script:
-  - apk update
-  - apk add rsync
+  - unset GPG_KEY
+  - unset GPG_PASSPHRASE
+  - apk update && apk add rsync
 
 validate:
   stage: build
@@ -25,7 +30,7 @@ validate:
     - 'mvn clean'
     - 'mvn $MAVEN_CLI_OPTS test-compile -Dbuild.number=${BUILD_NUMBER}'
 
-verify:
+test:verify:
   stage: test
   script:
     - 'mvn $MAVEN_CLI_OPTS verify -Dbuild.number=${BUILD_NUMBER}'
@@ -35,8 +40,32 @@ verify:
     paths:
       - target/rpki-commons-${BUILD_NUMBER}.jar
 
+.gpg_setup: &gpg_setup
+  before_script:
+    - apk update && apk add git gnupg rsync
+    - |
+      # checking GPG signing support
+      if [ -n "$GPG_KEY" ]; then
+        echo "$GPG_KEY" | gpg --batch --no-tty --allow-secret-key-import --import -
+        unset GPG_KEY
+        export GPG_KEYID=$(gpg --with-colon --list-secret-keys | head -n1 | cut -d : -f 5)
+      else
+        echo -e "\033[0;31m****** GPG signing disabled ******\033[0m"
+      fi
+
+
+test:deploy:
+  stage: test
+  <<: *gpg_setup
+  script:
+    - if [ ! -f ci_settings.xml ];
+        then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/project/packages/maven_repository.html#creating-maven-packages-with-gitlab-cicd for instructions.";
+      fi
+    - 'mvn $MAVEN_CLI_OPTS package gpg:sign deploy -s ci_settings.xml'
+
 deploy:
   stage: deploy
+  <<: *gpg_setup
   script:
     - if [ ! -f ci_settings.xml ];
         then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/project/packages/maven_repository.html#creating-maven-packages-with-gitlab-cicd for instructions.";
@@ -44,8 +73,8 @@ deploy:
     # The mvn release commands are from bamboo setup.
     # `release:prepare` and `release:perform` tries to do a git commit -> disabled for now
     - 'mvn $MAVEN_CLI_OPTS release:clean'
-    # - 'mvn $MAVEN_CLI_OPTS release:prepare -B -DautoVersionSubmodules=true -DupdateDependencies=false'
-    # - 'mvn $MAVEN_CLI_OPTS release:perform -B'
+    - 'mvn $MAVEN_CLI_OPTS release:prepare -B -DautoVersionSubmodules=true -DupdateDependencies=false'
+    - 'mvn $MAVEN_CLI_OPTS release:perform -B'
     - 'mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml'
   artifacts:
     paths:
