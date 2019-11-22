@@ -17,6 +17,11 @@
             <username>${env.SONATYPE_NEXUS_SNAPSHOTS_USERNAME}</username>
             <password>${env.SONATYPE_NEXUS_SNAPSHOTS_PASSWORD}</password>
         </server>
+        <server>
+            <id>sonatype-nexus-staging</id>
+            <username>${env.SONATYPE_NEXUS_STAGING_USERNAME}</username>
+            <password>${env.SONATYPE_NEXUS_STAGING_PASSWORD}</password>
+        </server>
     </servers>
 
     <activeProfiles>

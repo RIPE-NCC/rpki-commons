@@ -76,7 +76,7 @@ release:deploy:
     # Update version in pom.xml to match the tag
     - mvn versions:set -DnewVersion=$CI_COMMIT_TAG
     # Use the release profile from pom.xml to deploy
-    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P release
+    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release
   artifacts:
     paths:
       - target/rpki-commons-*.jar
