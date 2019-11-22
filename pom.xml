@@ -41,9 +41,6 @@
 
     <properties>
         <build.number>DEV</build.number>
-        <build.timestamp>unknown</build.timestamp>
-        <revision.number>unknown</revision.number>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.developer.url>scm:git:ssh://git@gitlab.ripe.net:222/swe/rpki/rpki-commons.git</project.scm.developer.url>
 
@@ -309,6 +306,7 @@
                         <exclude>.gitlab-ci.yml</exclude>
                         <exclude>.m2/**</exclude>
                         <exclude>.pregenerated-test-key-pairs.keystore</exclude>
+                        <exclude>builds/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
