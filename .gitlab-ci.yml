@@ -73,10 +73,10 @@ release:deploy:
     - if [ ! -f ci_settings.xml ];
         then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/project/packages/maven_repository.html#creating-maven-packages-with-gitlab-cicd for instructions.";
       fi
-    # The mvn release commands are from bamboo setup.
-    # `release:prepare` and `release:perform` tries to do a git commit -> disabled for now
+    # Update version in pom.xml to match the tag
     - mvn versions:set -DnewVersion=$CI_COMMIT_TAG
-    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml
+    # Use the release profile from pom.xml to deploy
+    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P release
   artifacts:
     paths:
       - target/rpki-commons-*.jar
