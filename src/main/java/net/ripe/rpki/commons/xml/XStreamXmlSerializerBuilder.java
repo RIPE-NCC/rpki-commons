@@ -190,10 +190,19 @@ public class XStreamXmlSerializerBuilder<T> {
 
     /**
      * Explicitly allow a type to be serialized without using an alias
-     * @param classType type to serialize.
+     * @param classType type to allow.
      */
     public final XStreamXmlSerializerBuilder<T> withAllowedType(Class<?> classType) {
         xStream.allowTypes(new Class[]{classType});
+        return this;
+    }
+
+    /**
+     * Explicitly allow a type and it's descendant types to be serialized without using an alias
+     * @param classType parent type to allow.
+     */
+    public final XStreamXmlSerializerBuilder<T> withAllowedTypeHierarchy(Class<?> classType) {
+        xStream.allowTypeHierarchy(classType);
         return this;
     }
 
