@@ -46,6 +46,10 @@ provisioning protocol.
 
 ## Changelog
 
+### 2019-11-25 version 1.6
+
+- GitLab continuous integration.
+
 ### 2017-11-28 version 1.3
 
 - Java 1.8 or higher required
@@ -56,3 +60,9 @@ provisioning protocol.
 
 - Handle the new XML format for out-of-band identity exchange as described in
   https://tools.ietf.org/html/draft-ietf-sidr-rpki-oob-setup-04.
+
+## Continuous Integration
+
+When a pull request is merged to master GitLab CI builds a snapshot release
+and publishes it on maven central. Pushing tag `rpki-commons-<version>` creates
+a release with version `<version>` and publishes it.
