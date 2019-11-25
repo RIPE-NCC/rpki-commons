@@ -262,6 +262,30 @@ public class XStreamXmlSerializerBuilderTest {
     }
 
     @Test
+    public void shouldSerializeHierarchy() {
+        XStreamXmlSerializer<SerializeMeInterface> serializer = new XStreamXmlSerializerBuilder<>(SerializeMeInterface.class, NOT_STRICT).build();
+
+        String serializedData = serializer.serialize(new SerializeMe());
+        final SerializeMeInterface output = serializer.deserialize(serializedData);
+
+        Assert.assertEquals(new SerializeMe(), output);
+    }
+
+    @Test
+    public void shouldSerializeAllowedHierarchy() {
+        XStreamXmlSerializerBuilder<WithSerializeMeInterfaceField> builder = new XStreamXmlSerializerBuilder<>(WithSerializeMeInterfaceField.class, NOT_STRICT);
+        builder.withAllowedTypeHierarchy(SerializeMeInterface.class);
+        XStreamXmlSerializer<WithSerializeMeInterfaceField> serializer = builder.build();
+
+        WithSerializeMeInterfaceField input = new WithSerializeMeInterfaceField(new SerializeMe());
+
+        String serializedData = serializer.serialize(input);
+        final WithSerializeMeInterfaceField output = serializer.deserialize(serializedData);
+
+        Assert.assertEquals(input, output);
+    }
+
+    @Test
     public void shouldAllowAliasedConcreteTypeInObjectField() {
         XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
         builder.withAliasType("serialize-me", SerializeMe.class);
@@ -321,7 +345,10 @@ public class XStreamXmlSerializerBuilderTest {
                 "</sorted-set>");
     }
 
-    private static class SerializeMe {
+    private interface SerializeMeInterface {
+    }
+
+    private static class SerializeMe implements SerializeMeInterface {
         /** Needed for Assert.assertArrayEquals. */
         @Override
         public boolean equals(Object o) {
@@ -330,11 +357,25 @@ public class XStreamXmlSerializerBuilderTest {
         }
     }
 
-    private static class OtherSerializeMe {
+    private static class OtherSerializeMe implements SerializeMeInterface {
         Object canBeAnything;
 
         public OtherSerializeMe(final Object canBeAnything) {
             this.canBeAnything = canBeAnything;
+        }
+    }
+
+    private static class WithSerializeMeInterfaceField {
+        SerializeMeInterface inner;
+
+        public WithSerializeMeInterfaceField(final SerializeMeInterface inner) { this.inner = inner; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            WithSerializeMeInterfaceField that = (WithSerializeMeInterfaceField) o;
+            return Objects.equals(inner, that.inner);
         }
     }
 }

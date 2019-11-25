@@ -107,8 +107,9 @@ public class XStreamXmlSerializerBuilder<T> {
         // Setup the security framework for xStream (adds white-list of simple and default types)
         XStream.setupDefaultSecurity(xStream);
 
-        // Allow type this serializer is instantiated for
+        // Allow type this serializer is instantiated for as well as its descendant types
         xStream.allowTypes(new Class[]{ this.objectType });
+        xStream.allowTypeHierarchy(this.objectType);
         // Not all registered types are part of this module.
         // A wildcard could pull in classes that are not safe to deserialize -> allow types for which there
         // exists an alias.
