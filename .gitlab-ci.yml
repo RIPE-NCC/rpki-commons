@@ -1,0 +1,85 @@
+image: maven:3.6-jdk-8-alpine
+# Inspired by https://gitlab.com/gitlab-examples/maven/simple-maven-dep and
+# https://gitlab.com/gitlab-org/gitlab-ci-yml/blob/master/Maven.gitlab-ci.yml
+# 
+# Signing procedure inspired by https://gitlab.com/gitlab-org/gitlab-runner/merge_requests/922/diffs
+# and related code.
+#
+# run manually with `gitlab-runner exec docker <task_name>`
+
+variables:
+  BUILD_NUMBER: ${CI_COMMIT_REF_SLUG}-${CI_PIPELINE_ID}
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  # As of Maven 3.3.0 instead of this you may define these options in `.mvn/maven.config` so the same config is used
+
+  MAVEN_CLI_OPTS: "--errors --batch-mode --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+
+cache:
+  key: ${CI_JOB_NAME}
+  paths:
+    - .m2/repository
+
+# before every job
+before_script:
+  - unset GPG_KEY
+  - unset GPG_PASSPHRASE
+  - apk update && apk add rsync
+
+validate:
+  stage: build
+  script:
+    - mvn clean
+    - mvn $MAVEN_CLI_OPTS test-compile -Dbuild.number=${BUILD_NUMBER}
+
+test:verify:
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS verify -Dbuild.number=${BUILD_NUMBER}
+  except:
+    - master
+  artifacts:
+    paths:
+      - target/rpki-commons-${BUILD_NUMBER}.jar
+
+.gpg_setup: &gpg_setup
+  before_script:
+    - apk update && apk add git gnupg rsync
+    - |
+      # checking GPG signing support
+      if [ -n "$GPG_KEY" ]; then
+        echo "$GPG_KEY" | gpg --batch --no-tty --allow-secret-key-import --import -
+        unset GPG_KEY
+        export GPG_KEYID=$(gpg --with-colon --list-secret-keys | head -n1 | cut -d : -f 5)
+      else
+        echo -e "\033[0;31m****** GPG signing disabled ******\033[0m"
+      fi
+
+
+snapshot:deploy:
+  stage: deploy
+  <<: *gpg_setup
+  script:
+    - if [ ! -f ci_settings.xml ];
+        then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/project/packages/maven_repository.html#creating-maven-packages-with-gitlab-cicd for instructions.";
+      fi
+    - mvn $MAVEN_CLI_OPTS package gpg:sign deploy -s ci_settings.xml
+  only:
+    - master
+
+release:deploy:
+  stage: deploy
+  <<: *gpg_setup
+  script:
+    - if [ ! -f ci_settings.xml ];
+        then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/project/packages/maven_repository.html#creating-maven-packages-with-gitlab-cicd for instructions.";
+      fi
+    - if [[ "$CI_COMMIT_TAG" =~ ^rpki-commons-.* ]]; then echo "Correct tag"; else exit 1; fi
+    # Update version in pom.xml to match the tag
+    - mvn versions:set -DnewVersion=$(echo $CI_COMMIT_TAG | sed -e 's/rpki-commons-//')
+    # Use the release profile from pom.xml to deploy
+    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release
+  artifacts:
+    paths:
+      - target/rpki-commons-*.jar
+  only:
+    - tags

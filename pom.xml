@@ -28,18 +28,22 @@
     <scm>
         <url>https://github.com/RIPE-NCC/rpki-commons.git</url>
         <connection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</connection>
-        <developerConnection>scm:git:git@github.com:RIPE-NCC/rpki-commons.git</developerConnection>
+        <developerConnection>${project.scm.developer.url}</developerConnection>
       <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
       <snapshotRepository>
-        <id>ossrh</id>
+        <id>sonatype-nexus-snapshots</id>
         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
       </snapshotRepository>
     </distributionManagement>
 
     <properties>
+        <build.number>DEV</build.number>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.scm.developer.url>scm:git:ssh://git@gitlab.ripe.net:222/swe/rpki/rpki-commons.git</project.scm.developer.url>
+
         <net.ripe.ipresource.version>1.46</net.ripe.ipresource.version>
         <bouncycastle.version>1.58</bouncycastle.version>
         <joda-time.version>2.3</joda-time.version>
@@ -176,6 +180,7 @@
         <profile>
             <id>release</id>
             <build>
+                <finalName>${project.artifactId}-${project.version}</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -209,6 +214,12 @@
                     <plugin>
                       <groupId>org.apache.maven.plugins</groupId>
                       <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <gpgArguments>
+                                <!-- for GPG2 -->
+                                <argument>--pinentry-mode=loopback</argument>
+                            </gpgArguments>
+                        </configuration>
                       <executions>
                         <execution>
                           <id>sign-artifacts</id>
@@ -263,6 +274,8 @@
     </reporting>
 
     <build>
+        <finalName>${project.artifactId}-${build.number}</finalName>
+
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
@@ -284,12 +297,16 @@
                     <strictCheck>true</strictCheck>
                     <header>LICENSE.txt</header>
                     <excludes>
+                        <exclude>ci_settings.xml</exclude>
                         <exclude>README.md</exclude>
                         <exclude>**/*.txt</exclude>
                         <exclude>src/test/resources/**</exclude>
                         <exclude>.idea/**</exclude>
                         <exclude>.gitignore</exclude>
+                        <exclude>.gitlab-ci.yml</exclude>
+                        <exclude>.m2/**</exclude>
                         <exclude>.pregenerated-test-key-pairs.keystore</exclude>
+                        <exclude>builds/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -307,21 +324,10 @@
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
+                    <serverId>sonatype-nexus-staging</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
-            </plugin>
-
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-release-plugin</artifactId>
-              <configuration>
-                <autoVersionSubmodules>true</autoVersionSubmodules>
-                <useReleaseProfile>false</useReleaseProfile>
-                <releaseProfiles>release</releaseProfiles>
-                <goals>deploy</goals>
-              </configuration>
             </plugin>
         </plugins>
 
@@ -356,6 +362,16 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <configuration>
+                        <gpgArguments>
+                            <!-- for GPG2 -->
+                            <argument>--pinentry-mode=loopback</argument>
+                        </gpgArguments>
+                    </configuration>
                 </plugin>
 
                 <plugin>
