@@ -61,7 +61,6 @@ public class ParentIdentitySerializerTest {
                     "6Ynrt3fS0MpprBPxJF3KWveHLhaUxLYefSsnsV6o3nfZYwyDlo9m7t3IQCg+Yg7k\n" +
                     "FO2iB8/TDRIdP6bpBvpVrQ13FvWqC6CglZ0fbFRNklotIVxcP1cuNw==\n" +
                     "</ns0:parent_bpki_ta>\n" +
-                    "<ns0:offer/>\n" +
                     "</ns0:parent_response>";
 
     public static final ParentIdentity PARENT_IDENTITY = new ParentIdentitySerializer().deserialize(exampleXml);
