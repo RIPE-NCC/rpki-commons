@@ -46,6 +46,12 @@ provisioning protocol.
 
 ## Changelog
 
+### 2019-11-27 version 1.7
+
+ - Update to recent XStream version.
+
+ - Use class whitelisting for XStream deserialization.
+
 ### 2019-11-25 version 1.6
 
 - GitLab continuous integration.

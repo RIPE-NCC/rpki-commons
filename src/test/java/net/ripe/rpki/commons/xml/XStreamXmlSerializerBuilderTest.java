@@ -29,6 +29,8 @@
  */
 package net.ripe.rpki.commons.xml;
 
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.security.ForbiddenClassException;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -47,6 +49,7 @@ import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -205,6 +208,174 @@ public class XStreamXmlSerializerBuilderTest {
         Assert.assertEquals("<test-alias.XStreamXmlSerializerBuilderTest_-SerializeMe/>", serializedData);
     }
 
-    private static class SerializeMe {
+    @Test
+    public void shouldDeserializeOwnType() {
+        XStreamXmlSerializerBuilder<SerializeMe> builder = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT);
+        XStreamXmlSerializer<SerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new SerializeMe());
+        serializer.deserialize(serializedData);
+        Assert.assertEquals("<net.ripe.rpki.commons.xml.XStreamXmlSerializerBuilderTest_-SerializeMe/>", serializedData);
+    }
+
+    @Test(expected = ForbiddenClassException.class)
+    public void shouldNotDeserializeUnknownType() {
+        XStreamXmlSerializerBuilder<SerializeMe> builder = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT);
+        XStreamXmlSerializer<SerializeMe> deserializer = builder.build();
+
+        XStreamXmlSerializer<OtherSerializeMe> otherSerializer = new XStreamXmlSerializerBuilder<OtherSerializeMe>(OtherSerializeMe.class, NOT_STRICT).build();
+
+        String serializedData = otherSerializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        // Should throw, input type is unknown:
+        deserializer.deserialize(serializedData);
+    }
+
+    @Test
+    public void shouldAllowExplicitlyAllowedType() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAllowedType(SerializeMe.class);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        final OtherSerializeMe input = new OtherSerializeMe(new SerializeMe());
+
+        String serializedData = serializer.serialize(input);
+        final OtherSerializeMe output = serializer.deserialize(serializedData);
+
+        Assert.assertEquals(input.canBeAnything, output.canBeAnything);
+    }
+
+    @Test
+    public void shouldAllowArrayOfExplicitlyAllowedType() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAllowedType(SerializeMe.class);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        final OtherSerializeMe input = new OtherSerializeMe(new SerializeMe[]{
+                new SerializeMe(),
+                new SerializeMe()
+        });
+
+        String serializedData = serializer.serialize(input);
+        final OtherSerializeMe output = serializer.deserialize(serializedData);
+
+        Assert.assertArrayEquals((Object[])input.canBeAnything, (Object[])output.canBeAnything);
+    }
+
+    @Test
+    public void shouldSerializeHierarchy() {
+        XStreamXmlSerializer<SerializeMeInterface> serializer = new XStreamXmlSerializerBuilder<>(SerializeMeInterface.class, NOT_STRICT).build();
+
+        String serializedData = serializer.serialize(new SerializeMe());
+        final SerializeMeInterface output = serializer.deserialize(serializedData);
+
+        Assert.assertEquals(new SerializeMe(), output);
+    }
+
+    @Test
+    public void shouldSerializeAllowedHierarchy() {
+        XStreamXmlSerializerBuilder<WithSerializeMeInterfaceField> builder = new XStreamXmlSerializerBuilder<>(WithSerializeMeInterfaceField.class, NOT_STRICT);
+        builder.withAllowedTypeHierarchy(SerializeMeInterface.class);
+        XStreamXmlSerializer<WithSerializeMeInterfaceField> serializer = builder.build();
+
+        WithSerializeMeInterfaceField input = new WithSerializeMeInterfaceField(new SerializeMe());
+
+        String serializedData = serializer.serialize(input);
+        final WithSerializeMeInterfaceField output = serializer.deserialize(serializedData);
+
+        Assert.assertEquals(input, output);
+    }
+
+    @Test
+    public void shouldAllowAliasedConcreteTypeInObjectField() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAliasType("serialize-me", SerializeMe.class);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        Assert.assertTrue(serializedData.contains("serialize-me"));
+        serializer.deserialize(serializedData);
+    }
+
+    @Test
+    public void shouldAllowConcreteTypeFromAliasedPackageInObjectField() {
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        builder.withAliasPackage("rpki-commons-xml", "net.ripe.rpki.commons.xml");
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        Assert.assertTrue(serializedData.contains("rpki-commons-xml"));
+        serializer.deserialize(serializedData);
+    }
+
+    @Test(expected =  ForbiddenClassException.class)
+    public void shouldNotDeserializeUnknownTypeInObjectField() throws Throwable {
+        // Similar to above but without the alias
+        XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
+        XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
+
+        String serializedData = serializer.serialize(new OtherSerializeMe(new SerializeMe()));
+        try {
+            // Should throw, not an instance of an allowed or aliased type
+            serializer.deserialize(serializedData);
+        } catch (ConversionException e) {
+            // Unwrap the cause from ConversionException
+            throw e.getCause();
+        }
+    }
+
+    @Test(expected = ConversionException.class)
+    public void shouldNotPopCalculatorApp() {
+        XStreamXmlSerializer<SerializeMe> builder = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT).build();
+        // Exploit example from https://www.baeldung.com/java-xstream-remote-code-execution
+        builder.deserialize(
+           "<sorted-set>\n" +
+                "    <string>foo</string>\n" +
+                "    <dynamic-proxy>\n" +
+                "        <interface>java.lang.Comparable</interface>\n" +
+                "        <handler class=\"java.beans.EventHandler\">\n" +
+                "            <target class=\"java.lang.ProcessBuilder\">\n" +
+                "                <command>\n" +
+                "                    <string>open</string>\n" +
+                "                    <string>/Applications/Calculator.app</string>\n" +
+                "                </command>\n" +
+                "            </target>\n" +
+                "            <action>start</action>\n" +
+                "        </handler>\n" +
+                "    </dynamic-proxy>\n" +
+                "</sorted-set>");
+    }
+
+    private interface SerializeMeInterface {
+    }
+
+    private static class SerializeMe implements SerializeMeInterface {
+        /** Needed for Assert.assertArrayEquals. */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            return !(o == null || getClass() != o.getClass());
+        }
+    }
+
+    private static class OtherSerializeMe implements SerializeMeInterface {
+        Object canBeAnything;
+
+        public OtherSerializeMe(final Object canBeAnything) {
+            this.canBeAnything = canBeAnything;
+        }
+    }
+
+    private static class WithSerializeMeInterfaceField {
+        SerializeMeInterface inner;
+
+        public WithSerializeMeInterfaceField(final SerializeMeInterface inner) { this.inner = inner; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            WithSerializeMeInterfaceField that = (WithSerializeMeInterfaceField) o;
+            return Objects.equals(inner, that.inner);
+        }
     }
 }
