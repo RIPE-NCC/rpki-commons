@@ -19,7 +19,11 @@ cache:
   paths:
     - .m2/repository
 
-# before every job
+# before every job - unless overridden in a stage.
+#
+# Protected environment variables are only available on protected
+# branches and tags. Master is protected by default.
+#
 before_script:
   - unset GPG_KEY
   - unset GPG_PASSPHRASE
@@ -35,8 +39,6 @@ test:verify:
   stage: test
   script:
     - mvn $MAVEN_CLI_OPTS verify -Dbuild.number=${BUILD_NUMBER}
-  except:
-    - master
   artifacts:
     paths:
       - target/rpki-commons-${BUILD_NUMBER}.jar
@@ -78,8 +80,5 @@ release:deploy:
     - mvn versions:set -DnewVersion=$(echo $CI_COMMIT_TAG | sed -e 's/rpki-commons-//')
     # Use the release profile from pom.xml to deploy
     - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release
-  artifacts:
-    paths:
-      - target/rpki-commons-*.jar
   only:
     - tags
