@@ -35,7 +35,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Rsync {
 
@@ -58,6 +60,8 @@ public class Rsync {
     private long startedAt;
 
     private long finishedAt;
+
+    private String proxy;
 
     public Rsync() {
     }
@@ -122,6 +126,10 @@ public class Rsync {
         this.destination = destination;
     }
 
+    public void setProxy(String proxy) {
+        this.proxy = proxy;
+    }
+
     public String[] getErrorLines() {
         return command == null ? null : command.getErrorLines();
     }
@@ -152,7 +160,15 @@ public class Rsync {
             args.add(destination);
         }
 
-        Command rsync = new Command(args);
+        final Command rsync;
+        if (proxy != null) {
+            Map<String, String> environment = new HashMap<>();
+            environment.put("RSYNC_PROXY", proxy);
+            rsync = new Command(args, environment);
+        } else {
+            rsync = new Command(args);
+        }
+
         startedAt = DateTimeUtils.currentTimeMillis();
         try {
             rsync.execute();
