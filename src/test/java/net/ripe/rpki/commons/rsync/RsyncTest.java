@@ -32,6 +32,7 @@ package net.ripe.rpki.commons.rsync;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.*;
 
@@ -89,7 +90,7 @@ public class RsyncTest {
     @Test
     public void shouldResetProperly() {
         Rsync rsync = new Rsync();
-        rsync.addOptions(Arrays.asList(new String[]{"--version"}));
+        rsync.addOptions(Collections.singletonList("--version"));
 
         assertFalse(rsync.isCompleted());
         assertNull(rsync.getException());

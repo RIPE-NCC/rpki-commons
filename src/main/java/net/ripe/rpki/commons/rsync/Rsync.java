@@ -35,11 +35,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Rsync {
 
-    public static final int DEFAULT_TIMEOUT_IN_SECONDS = 300;
+    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 300;
+
+    private static final String RSYNC_PROXY = "RSYNC_PROXY";
 
     private static final String COMMAND = "rsync";
 
@@ -58,6 +62,8 @@ public class Rsync {
     private long startedAt;
 
     private long finishedAt;
+
+    private String proxy;
 
     public Rsync() {
     }
@@ -122,6 +128,10 @@ public class Rsync {
         this.destination = destination;
     }
 
+    public void setProxy(String proxy) {
+        this.proxy = proxy;
+    }
+
     public String[] getErrorLines() {
         return command == null ? null : command.getErrorLines();
     }
@@ -152,7 +162,18 @@ public class Rsync {
             args.add(destination);
         }
 
-        Command rsync = new Command(args);
+        final Command rsync;
+        if (proxy != null) {
+            Map<String, String> environment = System.getenv();
+            if (System.getenv(RSYNC_PROXY) == null) {
+                environment = new HashMap<>(environment);
+                environment.put(RSYNC_PROXY, proxy);
+            }
+            rsync = new Command(args, environment);
+        } else {
+            rsync = new Command(args);
+        }
+
         startedAt = DateTimeUtils.currentTimeMillis();
         try {
             rsync.execute();
