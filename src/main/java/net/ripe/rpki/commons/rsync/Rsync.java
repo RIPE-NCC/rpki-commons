@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -163,8 +164,9 @@ public class Rsync {
 
         final Command rsync;
         if (proxy != null) {
-            final Map<String, String> environment = System.getenv();
+            Map<String, String> environment = System.getenv();
             if (System.getenv(RSYNC_PROXY) == null) {
+                environment = new HashMap<>(environment);
                 environment.put(RSYNC_PROXY, proxy);
             }
             rsync = new Command(args, environment);
