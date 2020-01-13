@@ -30,7 +30,7 @@
 package net.ripe.rpki.commons.xml.converters;
 
 import com.thoughtworks.xstream.converters.SingleValueConverter;
-import org.joda.time.DateTime;
+import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -54,6 +54,6 @@ public class JavaUtilTimestampConverter implements SingleValueConverter {
 
     @Override
     public String toString(Object datetime) {
-        return FORMATTER.print(new DateTime(datetime));
+        return FORMATTER.print(UTC.dateTime(datetime));
     }
 }

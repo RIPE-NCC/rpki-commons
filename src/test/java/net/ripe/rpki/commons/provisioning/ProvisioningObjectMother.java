@@ -46,6 +46,7 @@ import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassList
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
 import net.ripe.rpki.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBuilderParserTest;
+import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
 
@@ -97,7 +98,7 @@ public class ProvisioningObjectMother {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(new X500Principal("CN=nl.bluelight"));
         builder.withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic());
-        DateTime now = new DateTime();
+        DateTime now = UTC.dateTime();
         builder.withThisUpdateTime(now);
         builder.withNextUpdateTime(now.plusHours(24));
         builder.withNumber(BigInteger.TEN);
@@ -137,9 +138,7 @@ public class ProvisioningObjectMother {
 
     private static ResourceClassListQueryPayload createResourceListQueryPayload() {
         ResourceClassListQueryPayloadBuilder payloadBuilder = new ResourceClassListQueryPayloadBuilder();
-        ResourceClassListQueryPayload payloadXml = payloadBuilder.build();
-        return payloadXml;
+        return payloadBuilder.build();
     }
-
 
 }

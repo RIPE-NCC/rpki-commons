@@ -41,6 +41,7 @@ import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
+import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.util.encoders.Hex;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -112,8 +113,9 @@ public class CertificateRepositoryObjectPrinterTest {
     @Test
     public void shouldPrintCRL() {
         X509CrlBuilder builder = X509CrlTest.getCrlBuilder();
-        builder.addEntry(BigInteger.TEN, new DateTime().minusDays(1));
-        builder.addEntry(BigInteger.valueOf(42), new DateTime().minusDays(3));
+        final DateTime now = UTC.dateTime();
+        builder.addEntry(BigInteger.TEN, now.minusDays(1));
+        builder.addEntry(BigInteger.valueOf(42), now.minusDays(3));
         X509Crl crl = builder.build(KeyPairFactoryTest.TEST_KEY_PAIR.getPrivate());
 
         StringWriter output = new StringWriter();

@@ -33,6 +33,7 @@ import com.google.common.io.Closer;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.util.EqualsSupport;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
@@ -42,7 +43,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
@@ -171,11 +171,11 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     public DateTime getThisUpdateTime() {
-        return new DateTime(getCrl().getThisUpdate(), DateTimeZone.UTC);
+        return UTC.dateTime(getCrl().getThisUpdate());
     }
 
     public DateTime getNextUpdateTime() {
-        return new DateTime(getCrl().getNextUpdate(), DateTimeZone.UTC);
+        return UTC.dateTime(getCrl().getNextUpdate());
     }
 
     public X500Principal getIssuer() {
@@ -300,7 +300,7 @@ public class X509Crl implements CertificateRepositoryObject {
 
         public Entry(X509CRLEntry entry) {
             this.serialNumber = entry.getSerialNumber();
-            this.revocationDateTime = new DateTime(entry.getRevocationDate(), DateTimeZone.UTC);
+            this.revocationDateTime = UTC.dateTime(entry.getRevocationDate());
         }
 
         public BigInteger getSerialNumber() {

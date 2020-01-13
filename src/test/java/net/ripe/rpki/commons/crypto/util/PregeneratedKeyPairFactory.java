@@ -34,6 +34,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
@@ -134,7 +135,8 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withSignatureProvider("SunRsaSign");
         builder.withSerial(BigInteger.ONE);
-        builder.withValidityPeriod(new ValidityPeriod(new DateTime().minusYears(2), new DateTime().minusYears(1)));
+        final DateTime now = UTC.dateTime();
+        builder.withValidityPeriod(new ValidityPeriod(now.minusYears(2), now.minusYears(1)));
         builder.withCa(false);
         builder.withIssuerDN(new X500Principal("CN=issuer"));
         builder.withSubjectDN(new X500Principal("CN=subject"));

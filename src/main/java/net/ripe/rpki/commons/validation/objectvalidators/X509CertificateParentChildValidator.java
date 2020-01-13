@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.validation.objectvalidators;
 
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -118,8 +119,7 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
     }
 
     protected void verifyValidity() {
-        DateTime now = new DateTime();
-
+        final DateTime now = UTC.dateTime();
         final DateTime notValidBefore = child.getValidityPeriod().getNotValidBefore();
         final DateTime notValidAfter = child.getValidityPeriod().getNotValidAfter();
         result.rejectIfTrue(now.isBefore(notValidBefore), NOT_VALID_BEFORE, notValidBefore.toString());

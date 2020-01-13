@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -57,7 +58,8 @@ public class ValidityPeriodTest {
     @Test
     public void testWrongValidityPeriod() {
         try {
-            new ValidityPeriod(new DateTime(), new DateTime().minus(Period.millis(1)));
+            final DateTime now = UTC.dateTime();
+            new ValidityPeriod(now, now.minus(Period.millis(1)));
             fail("IllegalArgumentException expected");
         } catch (IllegalArgumentException expected) {
         }
@@ -65,7 +67,7 @@ public class ValidityPeriodTest {
 
     @Test
     public void singleInstantShouldBeOK() {
-        DateTime now = new DateTime();
+        DateTime now = UTC.dateTime();
         new ValidityPeriod(now, now);
     }
 
@@ -182,7 +184,7 @@ public class ValidityPeriodTest {
     public void truncatedMillisDateTimes() {
         long instant = 1502895557772L;
 
-        final ValidityPeriod validityPeriod = new ValidityPeriod(new DateTime(instant), new DateTime(instant));
+        final ValidityPeriod validityPeriod = new ValidityPeriod(UTC.dateTime(instant), UTC.dateTime(instant));
 
          assertEquals(validityPeriod.getNotValidBefore().getMillisOfSecond(), 0);
          assertEquals(validityPeriod.getNotValidAfter().getMillisOfSecond(), 0);

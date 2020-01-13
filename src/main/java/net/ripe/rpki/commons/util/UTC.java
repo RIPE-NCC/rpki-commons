@@ -27,43 +27,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto.x509cert;
+package net.ripe.rpki.commons.util;
 
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
 
-import javax.security.auth.x500.X500Principal;
-import java.math.BigInteger;
+import java.time.Instant;
 
-import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
-
-
-public class X509CertificateBuilderHelperTest {
-
-    private X509CertificateBuilderHelper subject;
-
-    @Before
-    public void setUp() {
-        subject = new X509CertificateBuilderHelper();
-
-        subject.withSubjectDN(new X500Principal("CN=zz.subject")).withIssuerDN(new X500Principal("CN=zz.issuer"));
-        subject.withSerial(BigInteger.ONE);
-        subject.withPublicKey(TEST_KEY_PAIR.getPublic());
-        subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
-        subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+public class UTC {
+    public static DateTime dateTime() {
+        return new DateTime(DateTimeZone.UTC);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailOnIncorrectAlgorithm() {
-        subject.withSignatureAlgorithm("foo");
-        subject.generateCertificate();
+    public static DateTime dateTime(Object o) {
+        return new DateTime(o, DateTimeZone.UTC);
     }
 
+    public static Instant instant() {
+        return Instant.now();
+    }
 }

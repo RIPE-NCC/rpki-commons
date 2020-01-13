@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.crypto.crl;
 
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
+import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -162,7 +163,7 @@ public class X509CrlBuilderTest {
 
     @Test
     public void shouldNotBeSatisfiedByCrlWithFewerEntries() {
-        subject.addEntry(BigInteger.valueOf(42), new DateTime());
+        subject.addEntry(BigInteger.valueOf(42), UTC.dateTime());
         assertFalse(subject.isSatisfiedByEntries(nonEmptyCrl));
     }
 }

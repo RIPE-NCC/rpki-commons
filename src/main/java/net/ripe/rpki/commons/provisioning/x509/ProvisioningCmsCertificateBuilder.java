@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.provisioning.x509;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
+import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 
@@ -90,6 +91,7 @@ public class ProvisioningCmsCertificateBuilder {
         builderHelper.withKeyUsage(KeyUsage.digitalSignature);
         builderHelper.withAuthorityKeyIdentifier(true);
         builderHelper.withSubjectKeyIdentifier(true);
-        builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusDays(DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW)));
+        final DateTime now = UTC.dateTime();
+        builderHelper.withValidityPeriod(new ValidityPeriod(now, now.plusDays(DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW)));
     }
 }

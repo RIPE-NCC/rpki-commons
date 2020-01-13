@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.RpkiSignedObjectEeCertificateBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
+import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +75,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         subject.withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic());
 
 
-        DateTime now = new DateTime();
+        DateTime now = UTC.dateTime();
         ValidityPeriod vp = new ValidityPeriod(now, now.plusSeconds(5));
 
         subject.withValidityPeriod(vp);
@@ -186,7 +187,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         subject.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         subject.withIssuerDN(resourceCertificate.getSubject());
 
-        DateTime now = new DateTime();
+        DateTime now = UTC.dateTime();
         subject.withValidityPeriod(new ValidityPeriod(now, now.plusSeconds(5)));
 
         URI publicationUri = URI.create("rsync://somewhere/certificate.cer");

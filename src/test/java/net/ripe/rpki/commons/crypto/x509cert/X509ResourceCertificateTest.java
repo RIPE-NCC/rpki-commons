@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -83,7 +84,13 @@ public class X509ResourceCertificateTest {
     private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private CrlLocator crlLocator;
 
-    private static final ValidityPeriod TEST_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(100));
+    private static final ValidityPeriod TEST_VALIDITY_PERIOD;
+
+    static {
+        final DateTime now = UTC.dateTime();
+        TEST_VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1), now.plusYears(100));
+    }
+
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
 
     private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
@@ -350,7 +357,7 @@ public class X509ResourceCertificateTest {
                 .withResources(TEST_RESOURCE_SET)
                 .withCrlDistributionPoints(TEST_TA_CRL)
                 .build();
-        BigInteger serialNumber = BigInteger.valueOf(new Random(new DateTime().getMillis()).nextLong());
+        BigInteger serialNumber = BigInteger.valueOf(new Random(UTC.dateTime().getMillis()).nextLong());
 
         X509ResourceCertificate subject = createBasicBuilder()
                 .withResources(TEST_RESOURCE_SET)
