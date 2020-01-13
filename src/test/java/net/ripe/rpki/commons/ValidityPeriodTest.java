@@ -123,10 +123,10 @@ public class ValidityPeriodTest {
 
     @Test
     public void shouldSupportIntersection() {
-        DateTime t1 = new DateTime(2008, 1, 1, 0, 0, 0, 0);
-        DateTime t2 = new DateTime(2008, 2, 1, 0, 0, 0, 0);
-        DateTime t3 = new DateTime(2008, 11, 1, 0, 0, 0, 0);
-        DateTime t4 = new DateTime(2008, 12, 1, 0, 0, 0, 0);
+        DateTime t1 = new DateTime(2008, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+        DateTime t2 = new DateTime(2008, 2, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+        DateTime t3 = new DateTime(2008, 11, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+        DateTime t4 = new DateTime(2008, 12, 1, 0, 0, 0, 0, DateTimeZone.UTC);
 
         assertEquals(null, new ValidityPeriod(t1, t2).intersectedWith(new ValidityPeriod(t3, t4)));
         assertEquals(new ValidityPeriod(), new ValidityPeriod().intersectedWith(new ValidityPeriod()));

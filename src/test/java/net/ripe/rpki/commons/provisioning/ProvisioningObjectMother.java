@@ -49,6 +49,7 @@ import net.ripe.rpki.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBu
 import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
@@ -88,7 +89,7 @@ public class ProvisioningObjectMother {
         builder.withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = new DateTime(2011, 3, 1, 0, 0, 0, 0);
+        DateTime now = new DateTime(2011, 3, 1, 0, 0, 0, 0, DateTimeZone.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now, now.plusYears(5)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         return builder.build();

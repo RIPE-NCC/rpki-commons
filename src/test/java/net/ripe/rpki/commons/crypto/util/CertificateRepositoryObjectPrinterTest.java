@@ -85,8 +85,9 @@ public class CertificateRepositoryObjectPrinterTest {
     @Test
     public void shouldPrintResourceCertificate() {
         X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-        builder.withValidityPeriod(new ValidityPeriod(new DateTime(2008, 1, 4, 0, 0, 0, 0, DateTimeZone.UTC), new DateTime(2009, 1, 4, 0, 0, 0, 0,
-                DateTimeZone.UTC)));
+        builder.withValidityPeriod(new ValidityPeriod(
+            new DateTime(2008, 1, 4, 0, 0, 0, 0, DateTimeZone.UTC),
+            new DateTime(2009, 1, 4, 0, 0, 0, 0, DateTimeZone.UTC)));
         X509ResourceCertificate certificate = builder.build();
 
         StringWriter output = new StringWriter();
