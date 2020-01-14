@@ -46,6 +46,10 @@ provisioning protocol.
 
 ## Changelog
 
+### 2019-11-27 version 1.7.3
+
+ - Fix: make sure all the time operations are doen using UTC.
+
 ### 2019-11-27 version 1.7
 
  - Update to recent XStream version.
