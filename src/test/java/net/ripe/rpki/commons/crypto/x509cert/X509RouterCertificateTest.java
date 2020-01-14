@@ -31,8 +31,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationOptions;
+import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -61,7 +60,13 @@ public class X509RouterCertificateTest {
 
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
 
-    private static final ValidityPeriod TEST_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(100));
+    private static final ValidityPeriod TEST_VALIDITY_PERIOD;
+
+    static {
+        final DateTime now = UTC.dateTime();
+        TEST_VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1), now.plusYears(100));
+    }
+
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
 
     public static X509RouterCertificateBuilder createBasicBuilder() {

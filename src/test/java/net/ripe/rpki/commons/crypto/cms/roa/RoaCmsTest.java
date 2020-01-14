@@ -38,12 +38,12 @@ import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -117,7 +117,8 @@ public class RoaCmsTest {
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        builder.withValidityPeriod(new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1)));
+        final DateTime now = UTC.dateTime();
+        builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
         builder.withResources(resources);
         builder.withCrlDistributionPoints(CRL_DP);
         builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, TEST_ROA_LOCATION));

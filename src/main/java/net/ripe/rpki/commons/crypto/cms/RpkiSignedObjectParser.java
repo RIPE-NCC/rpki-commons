@@ -33,6 +33,7 @@ import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
 import org.bouncycastle.asn1.*;
@@ -45,7 +46,6 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -307,7 +307,7 @@ public abstract class RpkiSignedObjectParser {
                 return false;
             }
             Time signingTimeDate = Time.getInstance(signingTimeAttribute.getAttrValues().getObjectAt(0));
-            signingTime = new DateTime(signingTimeDate.getDate().getTime(), DateTimeZone.UTC);
+            signingTime = UTC.dateTime(signingTimeDate.getDate().getTime());
         }
         return true;
     }

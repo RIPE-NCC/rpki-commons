@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
+import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -117,14 +118,12 @@ public class ProvisioningCmsObject {
                     Object obj = en.nextElement();
                     if (obj instanceof DERUTCTime) {
                         DERUTCTime derTime = (DERUTCTime) obj;
-                        return new DateTime(derTime.getDate());
+                        return UTC.dateTime(derTime.getDate());
                     }
                 }
             }
             throw new IllegalArgumentException("Malformed encoded cms content");
-        } catch (CMSException e) {
-            throw new IllegalArgumentException("Malformed encoded cms content", e);
-        } catch (ParseException e) {
+        } catch (CMSException | ParseException e) {
             throw new IllegalArgumentException("Malformed encoded cms content", e);
         }
     }

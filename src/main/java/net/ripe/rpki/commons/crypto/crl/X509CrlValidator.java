@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.crypto.crl;
 
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -66,7 +67,7 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
     }
 
     private void checkNextUpdate(X509Crl crl) {
-        DateTime now = new DateTime();
+        DateTime now = UTC.dateTime();
         DateTime nextUpdateTime = crl.getNextUpdateTime();
         result.warnIfTrue(now.isAfter(nextUpdateTime), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
     }

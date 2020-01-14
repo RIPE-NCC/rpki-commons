@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.crypto.util;
 
 import com.google.common.io.ByteStreams;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
+import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
@@ -179,11 +180,12 @@ public final class KeyStoreUtil {
     }
 
     public static X509Certificate generateCertificate(KeyPair keyPair, String signatureProvider) {
+        DateTime now = UTC.dateTime();
         X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
                 new X500Principal("CN=issuer"),
                 BigInteger.ONE,
-                new DateTime().minusYears(2).toDate(),
-                new DateTime().minusYears(1).toDate(),
+                now.minusYears(2).toDate(),
+                now.minusYears(1).toDate(),
                 new X500Principal("CN=subject"),
                 keyPair.getPublic());
         try {

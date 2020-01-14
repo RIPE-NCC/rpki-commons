@@ -38,11 +38,11 @@ import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceCertificateLocator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,7 +62,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
     private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
-    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1));
+    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(UTC.dateTime().minusMinutes(1), UTC.dateTime().plusYears(1));
 
     private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=First Child, C=NL");
     private static final BigInteger FIRST_CHILD_SERIAL_NUMBER = ROOT_SERIAL_NUMBER.add(BigInteger.valueOf(1));
@@ -70,7 +70,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final BigInteger SECOND_CHILD_SERIAL_NUMBER = FIRST_CHILD_SERIAL_NUMBER.add(BigInteger.valueOf(1));
     private static final IpResourceSet CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/17, ffce::/16, AS21212");
     private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
-    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(new DateTime().minusMonths(2), new DateTime().minusMonths(1));
+    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(UTC.dateTime().minusMonths(2), UTC.dateTime().minusMonths(1));
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
     private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -294,7 +294,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
         builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(new DateTime().plusMonths(1));
+        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -306,7 +306,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         builder.withIssuerDN(FIRST_CHILD_CERTIFICATE_NAME);
         builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(new DateTime().plusMonths(1));
+        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(FIRST_CHILD_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

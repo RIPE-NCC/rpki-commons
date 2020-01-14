@@ -30,9 +30,9 @@
 package net.ripe.rpki.commons.crypto;
 
 import net.ripe.rpki.commons.util.EqualsSupport;
+import net.ripe.rpki.commons.util.UTC;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
@@ -55,14 +55,14 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
     }
 
     public ValidityPeriod(ReadableInstant notValidBefore, ReadableInstant notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(new DateTime(notValidBefore, DateTimeZone.UTC));
-        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(new DateTime(notValidAfter, DateTimeZone.UTC));
+        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(UTC.dateTime(notValidBefore));
+        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(UTC.dateTime(notValidAfter));
         Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
     public ValidityPeriod(Date notValidBefore, Date notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(new DateTime(notValidBefore, DateTimeZone.UTC));
-        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(new DateTime(notValidAfter, DateTimeZone.UTC));
+        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(UTC.dateTime(notValidBefore));
+        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(UTC.dateTime(notValidAfter));
         Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 

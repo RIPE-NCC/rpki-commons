@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -89,7 +90,7 @@ public class X509ResourceCertificateParserTest {
         builder.withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = new DateTime(DateTimeZone.UTC);
+        DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withSignatureAlgorithm("MD5withRSA");

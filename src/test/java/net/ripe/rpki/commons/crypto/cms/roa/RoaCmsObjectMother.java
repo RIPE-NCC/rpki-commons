@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
@@ -57,7 +58,8 @@ public class RoaCmsObjectMother {
     public static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
 
     public static RoaCms getRoaCms() {
-        ValidityPeriod validityPeriod = new ValidityPeriod(new DateTime(), new DateTime().plusYears(1));
+        final DateTime now = UTC.dateTime();
+        ValidityPeriod validityPeriod = new ValidityPeriod(now, now.plusYears(1));
         return getRoaCms(validityPeriod);
     }
 

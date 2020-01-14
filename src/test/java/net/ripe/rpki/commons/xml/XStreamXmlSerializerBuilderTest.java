@@ -40,6 +40,7 @@ import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.util.VersionedId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -126,7 +127,7 @@ public class XStreamXmlSerializerBuilderTest {
     public void shouldConvertDateTimeFromReadablePeriod() {
         XStreamXmlSerializerBuilder<Period> builder = new XStreamXmlSerializerBuilder<Period>(Period.class, NOT_STRICT);
         XStreamXmlSerializer<Period> serializer = builder.build();
-        DateTime now = new DateTime();
+        DateTime now = UTC.dateTime();
         Period period = new Period(now, now.plusHours(1));
 
         String serializedData = serializer.serialize(period);

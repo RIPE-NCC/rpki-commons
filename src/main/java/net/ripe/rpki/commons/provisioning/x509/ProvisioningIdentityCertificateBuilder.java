@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.provisioning.x509;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
+import net.ripe.rpki.commons.util.UTC;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
@@ -90,7 +91,8 @@ public class ProvisioningIdentityCertificateBuilder {
 
     private void setUpImplicitRequirementsForBuilderHelper() {
         builderHelper.withSerial(BigInteger.ONE); // Self-signed! So this is the first!
-        builderHelper.withValidityPeriod(new ValidityPeriod(new DateTime(), new DateTime().plusYears(DEFAULT_VALIDITY_TIME_YEARS_FROM_NOW)));
+        final DateTime now = UTC.dateTime();
+        builderHelper.withValidityPeriod(new ValidityPeriod(now, now.plusYears(DEFAULT_VALIDITY_TIME_YEARS_FROM_NOW)));
         builderHelper.withCa(true);
         builderHelper.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
     }

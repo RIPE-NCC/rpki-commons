@@ -33,6 +33,7 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.util.Specification;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -155,7 +156,7 @@ public class ManifestCms extends RpkiSignedObject {
 
 
     private void checkManifestValidityTimes(ValidationOptions options, ValidationResult result) {
-        DateTime now = new DateTime();
+        DateTime now = UTC.dateTime();
         DateTime nextUpdateTime = getNextUpdateTime();
         result.warnIfTrue(now.isAfter(nextUpdateTime), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
     }

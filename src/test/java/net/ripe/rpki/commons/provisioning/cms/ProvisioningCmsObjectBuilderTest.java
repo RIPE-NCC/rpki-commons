@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
+import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -54,7 +55,6 @@ import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,7 +91,7 @@ public class ProvisioningCmsObjectBuilderTest {
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         subject.withPayloadContent(payload);
 
-        signingTime = new DateTime().getMillis() / 1000 * 1000; // truncate milliseconds
+        signingTime = UTC.dateTime().getMillis() / 1000 * 1000; // truncate milliseconds
         DateTimeUtils.setCurrentMillisFixed(signingTime);
         cmsObject = subject.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate());
         DateTimeUtils.setCurrentMillisSystem();

@@ -35,6 +35,7 @@ import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
+import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
@@ -129,7 +130,8 @@ public class GhostbustersCmsParserTest {
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        builder.withValidityPeriod(new ValidityPeriod(new DateTime().minusMinutes(1), new DateTime().plusYears(1)));
+        final DateTime now = UTC.dateTime();
+        builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(CRL_DP);
         builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, TEST_ROA_LOCATION));
