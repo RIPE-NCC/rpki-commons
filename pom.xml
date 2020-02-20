@@ -42,7 +42,7 @@
     <properties>
         <build.number>DEV</build.number>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.scm.developer.url>scm:git:ssh://git@gitlab.ripe.net:222/swe/rpki/rpki-commons.git</project.scm.developer.url>
+        <project.scm.developer.url>scm:git:ssh://git@gitlab.ripe.net:7999/rpki/rpki-commons.git</project.scm.developer.url>
 
         <net.ripe.ipresource.version>1.46</net.ripe.ipresource.version>
         <bouncycastle.version>1.58</bouncycastle.version>
