@@ -46,6 +46,10 @@ provisioning protocol.
 
 ## Changelog
 
+### 2019-04 version 1.9-SNAPSHOT
+
+ - Fix: Reject CRLs with nextUpdate in the past.
+
 ### 2020-04-24 version 1.9.0
 
  - Revert Bouncy Castle version.
