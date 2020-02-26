@@ -106,7 +106,6 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
-
         options.setMaxStaleDays(1);
 
         DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
@@ -119,9 +118,37 @@ public class X509CrlValidatorTest {
     }
 
     @Test
-    public void shouldNotRejectWhenNextUpdateTooLongAgo() {
+    public void shouldErrorWhenNextUpdatePassedOutsideMaxStaleDays() {
+        options.setMaxStaleDays(1);
+
+        DateTime nextUpdateTime = UTC.dateTime().minusDays(2);
+        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertFalse(result.hasFailures());
+
+        ValidationCheck res = result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW);
+        assertEquals(ValidationStatus.WARNING, res.getStatus());
+        assertEquals(CRL_NEXT_UPDATE_BEFORE_NOW, res.getKey());
+    }
+
+    @Test
+    public void shouldNotRejectWhenNextUpdateInStalePeriod() {
         DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        options.setMaxStaleDays(1);
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertFalse(result.hasFailures());
+    }
+
+    @Test
+    public void shoulRejectWhenNextUpdateTooLongAgo() {
+        DateTime nextUpdateTime = UTC.dateTime().minusDays(1).minusSeconds(1).withMillisOfSecond(0);
+        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        options.setMaxStaleDays(1);
         subject.validate("location", crl);
 
         result = subject.getValidationResult();

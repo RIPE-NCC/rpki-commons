@@ -48,7 +48,8 @@ provisioning protocol.
 
 ### 2019-04 version 1.9-SNAPSHOT
 
- - Fix: Reject CRLs with nextUpdate in the past.
+ - Fix: Warn for CRLs with nextUpdate in grace period, reject CRLs with
+   nextUpdate outside grace period.
 
 ### 2020-04-24 version 1.9.0
 

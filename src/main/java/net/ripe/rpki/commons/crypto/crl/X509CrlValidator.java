@@ -69,7 +69,14 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
     private void checkNextUpdate(X509Crl crl) {
         DateTime now = UTC.dateTime();
         DateTime nextUpdateTime = crl.getNextUpdateTime();
-        result.rejectIfTrue(now.isAfter(nextUpdateTime), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+
+        boolean postGracePeriod = now.minusDays(options.getMaxStaleDays()).isAfter(nextUpdateTime);
+
+        if (postGracePeriod) {
+            result.warn(ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, String.format("%s + %d day grace period", nextUpdateTime.toString(), options.getMaxStaleDays()));
+        } else {
+            result.warnIfTrue(now.isAfter(nextUpdateTime), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+        }
     }
 
     private void checkSignature(X509Crl crl) {
