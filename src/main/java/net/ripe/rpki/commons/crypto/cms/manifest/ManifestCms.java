@@ -158,7 +158,14 @@ public class ManifestCms extends RpkiSignedObject {
     private void checkManifestValidityTimes(ValidationOptions options, ValidationResult result) {
         DateTime now = UTC.dateTime();
         DateTime nextUpdateTime = getNextUpdateTime();
-        result.warnIfTrue(now.isAfter(nextUpdateTime), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME);
+
+        boolean postGracePeriod = now.isAfter(nextUpdateTime.plusDays(options.getManifestMaxStaleDays()));
+
+        if (postGracePeriod) {
+            result.rejectIfTrue(postGracePeriod, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+        } else {
+            result.warnIfTrue(nextUpdateTime.isBefore(now), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+        }
     }
 
     /**

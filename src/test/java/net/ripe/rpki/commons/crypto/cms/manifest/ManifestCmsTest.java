@@ -202,7 +202,7 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
-        options.setMaxStaleDays(Integer.MAX_VALUE);
+        options.setManifestMaxStaleDays(Integer.MAX_VALUE);
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -214,7 +214,7 @@ public class ManifestCmsTest {
 
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
@@ -231,21 +231,24 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
-        options.setMaxStaleDays(0);
+        options.setManifestMaxStaleDays(0);
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
 
         subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
 
-        assertFalse(result.hasFailures());
+        assertTrue(result.hasFailures());
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
 
+    /**
+     * EE certificate is expired. Manifest is in grace period.
+     */
     @Test
     public void shouldRejectWhenCertificateIsExpired() {
         X509Crl crl = getRootCrl();
@@ -257,7 +260,7 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
-        options.setMaxStaleDays(100);
+        options.setManifestMaxStaleDays(100);
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -267,7 +270,7 @@ public class ManifestCmsTest {
         assertTrue(result.hasFailures());
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
 
@@ -353,8 +356,8 @@ public class ManifestCmsTest {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(X509ResourceCertificateTest.TEST_SELF_SIGNED_CERTIFICATE_NAME);
         final DateTime now = UTC.dateTime();
-        builder.withThisUpdateTime(now);
-        builder.withNextUpdateTime(now.plusHours(8));
+        builder.withThisUpdateTime(NEXT_UPDATE_TIME.minusHours(24));
+        builder.withNextUpdateTime(NEXT_UPDATE_TIME.plusHours(24));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

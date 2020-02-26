@@ -34,17 +34,26 @@ package net.ripe.rpki.commons.validation;
  * User controlled options to use when validating objects.
  */
 public class ValidationOptions {
+    private int manifestMaxStaleDays = 0;
 
-    private int maxStaleDays = 0;
+    private int crlMaxStaleDays = 0;
 
     private boolean looseValidationEnabled = false;
 
-    public void setMaxStaleDays(int maxStaleDays) {
-        this.maxStaleDays = maxStaleDays;
+    public void setManifestMaxStaleDays(int maxStaleDays) {
+        this.manifestMaxStaleDays = maxStaleDays;
     }
 
-    public int getMaxStaleDays() {
-        return maxStaleDays;
+    public int getManifestMaxStaleDays() {
+        return manifestMaxStaleDays;
+    }
+
+    public void setCrlMaxStaleDays(int maxStaleDays) {
+        this.crlMaxStaleDays = maxStaleDays;
+    }
+
+    public int getCrlMaxStaleDays() {
+        return this.crlMaxStaleDays;
     }
 
     public boolean isLooseValidationEnabled() {
