@@ -79,6 +79,7 @@ public final class ValidationString {
     public static final String CRL_SIGNATURE_VALID = "cert.crl.signature";
     public static final String CRL_REQUIRED = "crl.required";
     public static final String CRL_NEXT_UPDATE_BEFORE_NOW = "crl.next.update.before.now";
+    public static final String CRL_THIS_UPDATE_AFTER_NOW = "crl.this.update.after.now";
     public static final String CRL_MANIFEST_VALID = "crl.manifest.valid";
     public static final String CRL_AKI_MISMATCH = "crl.aki.mismatch";
 
@@ -173,6 +174,7 @@ public final class ValidationString {
     public static final String MANIFEST_FILE_HASH_ALGORITHM = "mf.file.hash.algorithm";
     public static final String MANIFEST_DECODE_FILELIST = "mf.decode.filelist";
     public static final String MANIFEST_RESOURCE_INHERIT = "mf.resource.inherit";
+    public static final String MANIFEST_BEFORE_THIS_UPDATE_TIME = "mf.before.this.update";
     public static final String MANIFEST_PAST_NEXT_UPDATE_TIME = "mf.past.next.update";
 
     //ghostbusters

@@ -50,6 +50,11 @@ provisioning protocol.
 
  - Fix: Warn for CRLs with nextUpdate in grace period, reject CRLs with
    nextUpdate outside grace period.
+ - Fix: Warn for manifests with nextUpdate in grace period, reject manifests
+   with nextUpdate outside grace period.
+ - Fix: Reject CRLs with thisUpdate in future.
+ - Fix: Reject manifests with thisUpdate in future.
+ - Allow grace period for manifests and CRLs to be changed.
 
 ### 2020-04-24 version 1.9.0
 

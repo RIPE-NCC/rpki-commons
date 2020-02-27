@@ -280,6 +280,34 @@ public class ManifestCmsTest {
         );
     }
 
+    /**
+     * This update in future. EE certificate in validity window (notBefore is 5 minutes before THIS_UPDATE_TIME).
+     */
+    @Test
+    public void shouldRejectWhenThisUpdateInFuture() {
+        X509Crl crl = getRootCrl();
+
+        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.minusSeconds(1).getMillis());
+
+        IpResourceSet resources = rootCertificate.getResources();
+
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
+
+        ValidationOptions options = new ValidationOptions();
+        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+
+        assertTrue(result.hasFailures());
+
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, THIS_UPDATE_TIME.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME)
+        );
+    }
+
     @Test
     public void shouldMatchFiles() {
         ManifestCms mft = getRootManifestCms();

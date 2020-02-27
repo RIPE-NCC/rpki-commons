@@ -63,7 +63,7 @@ public class X509CrlValidatorTest {
 
     static {
         final DateTime now = UTC.dateTime();
-        VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1), now.plusYears(1));
+        VALIDITY_PERIOD = new ValidityPeriod(now.minusDays(2), now.plusDays(2));
     }
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -105,6 +105,19 @@ public class X509CrlValidatorTest {
     }
 
     @Test
+    public void shouldRejectWhenThisUpdateInFuture() {
+        DateTime now = UTC.dateTime().withMillisOfSecond(0);
+        DateTime thisUpdateTime = now.plusDays(2);
+        DateTime nextUpdateTime = now.plusDays(4);
+        X509Crl crl = getRootCRL().withThisUpdateTime(thisUpdateTime).withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_THIS_UPDATE_AFTER_NOW, thisUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_THIS_UPDATE_AFTER_NOW));
+    }
+
+    @Test
     public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
         options.setCrlMaxStaleDays(1);
 
@@ -121,7 +134,7 @@ public class X509CrlValidatorTest {
     public void shouldRejectWhenNextUpdateOutsideMaxStaleDays() {
         options.setCrlMaxStaleDays(1);
 
-        DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillis(0); // Truncate millis
+        DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillisOfSecond(0); // Truncate millis
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
