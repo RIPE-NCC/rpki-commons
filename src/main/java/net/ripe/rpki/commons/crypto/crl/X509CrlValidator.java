@@ -73,9 +73,9 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
 
         result.rejectIfTrue(thisUpdateTime.isAfter(now), ValidationString.CRL_THIS_UPDATE_AFTER_NOW, thisUpdateTime.toString());
 
-        boolean postGracePeriod = now.isAfter(nextUpdateTime.plusDays(options.getCrlMaxStaleDays()));
+        boolean postGracePeriod = now.isAfter(nextUpdateTime.plus(options.getCrlMaxStalePeriod()));
         if (postGracePeriod) {
-            result.rejectIfTrue(postGracePeriod, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+            result.error(ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
         } else {
             result.warnIfTrue(now.isAfter(nextUpdateTime), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
         }

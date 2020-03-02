@@ -30,30 +30,31 @@
 package net.ripe.rpki.commons.validation;
 
 
+import org.joda.time.Duration;
+
 /**
  * User controlled options to use when validating objects.
  */
 public class ValidationOptions {
-    private int manifestMaxStaleDays = 0;
-
-    private int crlMaxStaleDays = 0;
+    private Duration crlMaxStalePeriod = Duration.ZERO;
+    private Duration manifestMaxStalePeriod = Duration.ZERO;
 
     private boolean looseValidationEnabled = false;
 
-    public void setManifestMaxStaleDays(int maxStaleDays) {
-        this.manifestMaxStaleDays = maxStaleDays;
+    public Duration getCrlMaxStalePeriod() {
+        return this.crlMaxStalePeriod;
     }
 
-    public int getManifestMaxStaleDays() {
-        return manifestMaxStaleDays;
+    public Duration getManifestMaxStalePeriod() {
+        return manifestMaxStalePeriod;
     }
 
-    public void setCrlMaxStaleDays(int maxStaleDays) {
-        this.crlMaxStaleDays = maxStaleDays;
+    public void setCrlMaxStalePeriod(Duration maxStalePeriod) {
+        this.crlMaxStalePeriod = maxStalePeriod;
     }
 
-    public int getCrlMaxStaleDays() {
-        return this.crlMaxStaleDays;
+    public void setManifestMaxStalePeriod(Duration maxStalePeriod) {
+        this.manifestMaxStalePeriod = maxStalePeriod;
     }
 
     public boolean isLooseValidationEnabled() {

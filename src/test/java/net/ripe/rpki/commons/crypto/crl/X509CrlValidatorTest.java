@@ -42,6 +42,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -119,7 +120,7 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
-        options.setCrlMaxStaleDays(1);
+        options.setCrlMaxStalePeriod(Duration.standardDays(1));
 
         DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
@@ -132,7 +133,7 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenNextUpdateOutsideMaxStaleDays() {
-        options.setCrlMaxStaleDays(1);
+        options.setCrlMaxStalePeriod(Duration.standardDays(1));
 
         DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillisOfSecond(0); // Truncate millis
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());

@@ -33,7 +33,6 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.util.Specification;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -161,9 +160,9 @@ public class ManifestCms extends RpkiSignedObject {
 
         result.rejectIfTrue(thisUpdateTime.isAfterNow(), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, thisUpdateTime.toString());
 
-        boolean postGracePeriod = nextUpdateTime.plusDays(options.getManifestMaxStaleDays()).isBeforeNow();
+        boolean postGracePeriod = nextUpdateTime.plus(options.getManifestMaxStalePeriod()).isBeforeNow();
         if (postGracePeriod) {
-            result.rejectIfTrue(postGracePeriod, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+            result.error(ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
         } else {
             result.warnIfTrue(nextUpdateTime.isBeforeNow(), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
         }
