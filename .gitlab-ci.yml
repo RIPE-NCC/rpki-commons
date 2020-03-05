@@ -39,9 +39,13 @@ test:verify:
   stage: test
   script:
     - mvn $MAVEN_CLI_OPTS verify -Dbuild.number=${BUILD_NUMBER}
+    - cat target/site/jacoco/index.html
   artifacts:
     paths:
       - target/rpki-commons-${BUILD_NUMBER}.jar
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
 
 .gpg_setup: &gpg_setup
   before_script:

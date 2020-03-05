@@ -44,7 +44,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.developer.url>scm:git:ssh://git@gitlab.ripe.net:7999/rpki/rpki-commons.git</project.scm.developer.url>
 
-        <owasp.version>5.3.0</owasp.version>
         <jacoco.version>0.8.5</jacoco.version>
 
         <net.ripe.ipresource.version>1.46</net.ripe.ipresource.version>
@@ -287,19 +286,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>${owasp.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
