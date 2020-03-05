@@ -46,6 +46,10 @@ provisioning protocol.
 
 ## Changelog
 
+### 2020-03-05 version 1.8.0
+
+ - Update to recent Guava, Bouncy Castle, Joda Time version.
+
 ### 2019-11-27 version 1.7.3
 
  - Fix: make sure all the time operations are doen using UTC.
