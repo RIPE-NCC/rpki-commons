@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import com.gargoylesoftware.base.testing.EqualsTester;
+import com.google.common.testing.EqualsTester;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -107,11 +107,19 @@ public class CertificateRepositoryObjectValidationContextTest {
 
     @Test
     public void testEquals() {
+        // Two equal objects
         CertificateRepositoryObjectValidationContext a = new CertificateRepositoryObjectValidationContext(location, certificate);
         CertificateRepositoryObjectValidationContext b = new CertificateRepositoryObjectValidationContext(location, certificate);
+        // A different one
         CertificateRepositoryObjectValidationContext c = new CertificateRepositoryObjectValidationContext(URI.create("rsync://another/uri"), certificateWithInheritedResources);
+        // And one of a different type.
         CertificateRepositoryObjectValidationContext d = new CertificateRepositoryObjectValidationContext(location, certificate) {
         };
-        new EqualsTester(a, b, c, d);
+
+        new EqualsTester()
+                .addEqualityGroup(a, b)
+                .addEqualityGroup(c)
+                .addEqualityGroup(d)
+                .testEquals();
     }
 }

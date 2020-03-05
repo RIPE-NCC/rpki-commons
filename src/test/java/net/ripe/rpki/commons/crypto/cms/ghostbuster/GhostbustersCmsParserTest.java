@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
+import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
@@ -38,7 +39,6 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class GhostbustersCmsParserTest {
     @Test
     public void testShouldParseGoodGbr() throws Exception {
         String path = "src/test/resources/conformance/root/goodRealGbrNothingIsWrong.gbr";
-        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        byte[] bytes = Files.toByteArray(new File(path));
         GhostbustersCmsParser parser = new GhostbustersCmsParser();
         parser.parse(ValidationResult.withLocation("test1.gbr"), bytes);
 
@@ -119,7 +119,7 @@ public class GhostbustersCmsParserTest {
     @Test(expected = IllegalArgumentException.class)
     public void testShouldParseBadGbr() throws Exception {
         String path = "src/test/resources/conformance/root/badGBRNotVCard.gbr";
-        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        byte[] bytes = Files.toByteArray(new File(path));
         GhostbustersCmsParser parser = new GhostbustersCmsParser();
         parser.parse(ValidationResult.withLocation("test2.gbr"), bytes);
         parser.getGhostbustersCms().getVCardContent();

@@ -29,8 +29,9 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharSource;
 import net.ripe.ipresource.IpResourceSet;
-import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -87,9 +88,9 @@ public class X509CertificateUtilTest {
 
     @Test
     @Ignore
-    public void shouldParseRrdpRepositoryUrl() throws java.security.cert.CertificateException {
+    public void shouldParseRrdpRepositoryUrl() throws java.security.cert.CertificateException, IOException {
         final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        X509Certificate certificate = (X509Certificate) factory.generateCertificate(IOUtils.toInputStream(CERT_WITH_RRDP_URL));
+        X509Certificate certificate = (X509Certificate) factory.generateCertificate(CharSource.wrap(CERT_WITH_RRDP_URL).asByteSource(Charsets.UTF_8).openStream());
 
         URI rrdpNotifyUri = X509CertificateUtil.getRrdpNotifyUri(certificate);
 

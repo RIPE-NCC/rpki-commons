@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.provisioning.serialization;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-import org.apache.commons.lang.StringUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -64,6 +63,6 @@ public class CertificateUrlListConverter extends AbstractSingleValueConverter {
         for (URI uri : (List<URI>) obj) {
             encodedUrls.add(uri.toString().replace(",", "%2C"));
         }
-        return StringUtils.join(encodedUrls, ",");
+        return String.join(",", encodedUrls);
     }
 }

@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.common;
 
+import com.google.common.base.Strings;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -40,7 +41,6 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
 import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 public class CertificateElementConverter implements Converter {
@@ -96,7 +96,7 @@ public class CertificateElementConverter implements Converter {
 
     public static IpResourceSet decodeResources(HierarchicalStreamReader reader, String attribute) {
         String resources = reader.getAttribute(attribute);
-        if (StringUtils.isBlank(resources)) {
+        if (Strings.isNullOrEmpty(resources)) {
             return null;
         } else {
             return IpResourceSetProvisioningConverter.INSTANCE.fromString(resources);

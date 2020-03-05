@@ -79,6 +79,5 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
 
         Validate.notNull(caRepositoryUri, "CA Repository URI is required");
         Validate.notNull(manifestUri, "Manifest URI is required");
-
     }
 }
