@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.validation;
 
+
 import org.apache.commons.lang.Validate;
 
 import java.io.Serializable;

@@ -35,7 +35,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1</a>
  */
 public class CertificateRevocationRequestElement {
-
     private String className;
     private String subjectPublicKey;
 

@@ -29,8 +29,8 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
+import com.google.common.base.Strings;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-import org.apache.commons.lang.StringUtils;
 
 import java.net.URI;
 
@@ -45,7 +45,7 @@ public class URIConverter extends AbstractSingleValueConverter {
 
     @Override
     public Object fromString(String str) {
-        if (StringUtils.isEmpty(str)) {
+        if (Strings.isNullOrEmpty(str)) {
             return null;
         } else {
             return URI.create(str);
