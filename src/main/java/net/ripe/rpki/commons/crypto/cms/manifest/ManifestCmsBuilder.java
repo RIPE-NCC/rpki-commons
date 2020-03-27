@@ -103,6 +103,10 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
         files.put(fileName, digestValue);
     }
 
+    public void addFileHash(String fileName, byte[] hash) {
+        files.put(fileName, hash);
+    }
+
     ASN1Encodable encodeFileAndHash(String fileName, byte[] hash) {
         ASN1Encodable[] seq = {new DERIA5String(fileName, true), new DERBitString(hash)};
         return new DERSequence(seq);
