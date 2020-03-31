@@ -19,6 +19,10 @@ cache:
   paths:
     - .m2/repository
 
+include:
+  - project: 'swe/gitlab-ci'
+    file: '/templates/whitesource-scanning.yml'
+
 # before every job - unless overridden in a stage.
 #
 # Protected environment variables are only available on protected
@@ -59,6 +63,8 @@ test:verify:
 
 snapshot:deploy:
   stage: deploy
+  environment:
+    name: snapshot
   <<: *gpg_setup
   script:
     - if [ ! -f ci_settings.xml ];
@@ -70,6 +76,8 @@ snapshot:deploy:
 
 release:deploy:
   stage: deploy
+  environment:
+    name: release
   <<: *gpg_setup
   script:
     - if [ ! -f ci_settings.xml ];
