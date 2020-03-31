@@ -46,7 +46,7 @@ provisioning protocol.
 
 ## Changelog
 
-### 2020-03-05 version 1.8.0
+### 2020-03-31 version 1.8.0
 
  - Update to recent Guava, Bouncy Castle, Joda Time version.
 
