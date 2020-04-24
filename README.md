@@ -46,6 +46,10 @@ provisioning protocol.
 
 ## Changelog
 
+### 2020-04-24 version 1.9.0
+
+ - Revert Bouncy Castle version.
+
 ### 2020-03-31 version 1.8.0
 
  - Update to recent Guava, Bouncy Castle, Joda Time version.
