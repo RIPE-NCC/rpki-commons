@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.ripe.rpki</groupId>
     <artifactId>rpki-commons</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
     <name>RPKI Commmons</name>
@@ -45,7 +45,7 @@
         <project.scm.developer.url>scm:git:ssh://git@gitlab.ripe.net:7999/rpki/rpki-commons.git</project.scm.developer.url>
 
         <net.ripe.ipresource.version>1.46</net.ripe.ipresource.version>
-        <bouncycastle.version>1.64</bouncycastle.version>
+        <bouncycastle.version>1.58</bouncycastle.version>
         <guava.version>28.2-jre</guava.version>
         <joda-time.version>2.10.5</joda-time.version>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
