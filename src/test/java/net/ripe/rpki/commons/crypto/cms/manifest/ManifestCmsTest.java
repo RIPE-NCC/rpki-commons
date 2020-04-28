@@ -220,6 +220,31 @@ public class ManifestCmsTest {
         );
     }
 
+    @Test
+    public void shouldRejectWhenManifestIsTooStaleDueToNegativeGracePeriod() {
+        X509Crl crl = getRootCrl();
+
+        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.minusDays(1).getMillis());
+
+        IpResourceSet resources = rootCertificate.getResources();
+
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
+
+        ValidationOptions options = new ValidationOptions();
+        options.setManifestMaxStalePeriod(Duration.standardDays(-2));
+        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+
+        assertTrue(result.hasFailures());
+
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
+        );
+    }
 
     @Test
     public void shouldRejectWhenManifestIsTooStale() {

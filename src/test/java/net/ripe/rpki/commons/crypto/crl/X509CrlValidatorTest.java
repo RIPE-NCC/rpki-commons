@@ -145,6 +145,19 @@ public class X509CrlValidatorTest {
     }
 
     @Test
+    public void shouldRejectWhenNextUpdateOutsideNegativeMaxStaleDays() {
+        options.setCrlMaxStalePeriod(Duration.standardDays(-8));
+
+        DateTime nextUpdateTime = UTC.dateTime().withMillisOfSecond(0); // Truncate millis
+        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+    }
+
+    @Test
     public void shouldNotRejectWhenBetweenThisUpdateAndNextUpdate() {
         DateTime thisUpdateTime = UTC.dateTime().minusDays(1);
         DateTime nextUpdateTime = thisUpdateTime.plusDays(2);
