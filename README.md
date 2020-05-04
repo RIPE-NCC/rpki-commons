@@ -46,15 +46,20 @@ provisioning protocol.
 
 ## Changelog
 
-### 2019-04 version 1.9-SNAPSHOT
+### 2019-05 version 1.10-SNAPSHOT
 
- - Fix: Warn for CRLs with nextUpdate in grace period, reject CRLs with
+**Breaking change**:
+This release changes the handling of not-yet valid or expired objects. When you
+want to accept expired objects, you can set an grace period through
+`ValidationOptions.setCrlMaxStalePeriod` or `ValidationOptions.setManifestMaxStalePeriod`.
+
+ - Add a configurable grace period for manifests and CRLs to be changed.
+ - Change: Warn for CRLs with nextUpdate in grace period, reject CRLs with
    nextUpdate outside grace period.
- - Fix: Warn for manifests with nextUpdate in grace period, reject manifests
+ - Change: Warn for manifests with nextUpdate in grace period, reject manifests
    with nextUpdate outside grace period.
  - Fix: Reject CRLs with thisUpdate in future.
  - Fix: Reject manifests with thisUpdate in future.
- - Allow grace period for manifests and CRLs to be changed.
 
 ### 2020-04-24 version 1.9.0
 
