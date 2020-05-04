@@ -39,7 +39,7 @@ public class ValidationOptions {
     private Duration crlMaxStalePeriod = Duration.ZERO;
     /**
      * Grace period for the NEXT_UPDATE_TIME of Manifest. When a manifest is in the grace period, the manifest causes
-     * a warning on validation instead of an failure.
+     * a warning on validation instead of a failure.
      *
      * This grace period is not applied to the EE certificate.
      */
