@@ -63,13 +63,22 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
     public void validate(String location, X509Crl crl) {
         result.setLocation(new ValidationLocation(location));
         checkSignature(crl);
-        checkNextUpdate(crl);
+        checkValidityTimes(crl);
     }
 
-    private void checkNextUpdate(X509Crl crl) {
+    private void checkValidityTimes(X509Crl crl) {
         DateTime now = UTC.dateTime();
         DateTime nextUpdateTime = crl.getNextUpdateTime();
-        result.warnIfTrue(now.isAfter(nextUpdateTime), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+        DateTime thisUpdateTime = crl.getThisUpdateTime();
+
+        result.rejectIfTrue(thisUpdateTime.isAfter(now), ValidationString.CRL_THIS_UPDATE_AFTER_NOW, thisUpdateTime.toString());
+
+        boolean postGracePeriod = now.isAfter(nextUpdateTime.plus(options.getCrlMaxStalePeriod()));
+        if (postGracePeriod) {
+            result.error(ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+        } else {
+            result.warnIfTrue(now.isAfter(nextUpdateTime), ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString());
+        }
     }
 
     private void checkSignature(X509Crl crl) {

@@ -42,6 +42,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,7 +64,7 @@ public class X509CrlValidatorTest {
 
     static {
         final DateTime now = UTC.dateTime();
-        VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1), now.plusYears(1));
+        VALIDITY_PERIOD = new ValidityPeriod(now.minusDays(2), now.plusDays(2));
     }
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -105,9 +106,21 @@ public class X509CrlValidatorTest {
     }
 
     @Test
-    public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
+    public void shouldRejectWhenThisUpdateInFuture() {
+        DateTime now = UTC.dateTime().withMillisOfSecond(0);
+        DateTime thisUpdateTime = now.plusDays(2);
+        DateTime nextUpdateTime = now.plusDays(4);
+        X509Crl crl = getRootCRL().withThisUpdateTime(thisUpdateTime).withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
 
-        options.setMaxStaleDays(1);
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_THIS_UPDATE_AFTER_NOW, thisUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_THIS_UPDATE_AFTER_NOW));
+    }
+
+    @Test
+    public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
+        options.setCrlMaxStalePeriod(Duration.standardDays(1));
 
         DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
@@ -119,9 +132,36 @@ public class X509CrlValidatorTest {
     }
 
     @Test
-    public void shouldNotRejectWhenNextUpdateTooLongAgo() {
-        DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
+    public void shouldRejectWhenNextUpdateOutsideMaxStaleDays() {
+        options.setCrlMaxStalePeriod(Duration.standardDays(1));
+
+        DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillisOfSecond(0); // Truncate millis
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+    }
+
+    @Test
+    public void shouldRejectWhenNextUpdateOutsideNegativeMaxStaleDays() {
+        options.setCrlMaxStalePeriod(Duration.standardDays(-8));
+
+        DateTime nextUpdateTime = UTC.dateTime().withMillisOfSecond(0); // Truncate millis
+        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        subject.validate("location", crl);
+
+        result = subject.getValidationResult();
+        assertTrue(result.hasFailures());
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+    }
+
+    @Test
+    public void shouldNotRejectWhenBetweenThisUpdateAndNextUpdate() {
+        DateTime thisUpdateTime = UTC.dateTime().minusDays(1);
+        DateTime nextUpdateTime = thisUpdateTime.plusDays(2);
+        X509Crl crl = getRootCRL().withThisUpdateTime(thisUpdateTime).withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
         result = subject.getValidationResult();

@@ -46,6 +46,21 @@ provisioning protocol.
 
 ## Changelog
 
+### 2019-05 version 1.10-SNAPSHOT
+
+**Breaking change**:
+This release changes the handling of not-yet valid or expired objects. When you
+want to accept expired objects, you can set an grace period through
+`ValidationOptions.setCrlMaxStalePeriod` or `ValidationOptions.setManifestMaxStalePeriod`.
+
+ - Add a configurable grace period for manifests and CRLs to be changed.
+ - Change: Warn for CRLs with nextUpdate in grace period, reject CRLs with
+   nextUpdate outside grace period.
+ - Change: Warn for manifests with nextUpdate in grace period, reject manifests
+   with nextUpdate outside grace period.
+ - Fix: Reject CRLs with thisUpdate in future.
+ - Fix: Reject manifests with thisUpdate in future.
+
 ### 2020-04-24 version 1.9.0
 
  - Revert Bouncy Castle version.

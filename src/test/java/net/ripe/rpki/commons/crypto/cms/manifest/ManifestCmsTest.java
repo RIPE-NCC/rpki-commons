@@ -54,6 +54,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -202,7 +203,7 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
-        options.setMaxStaleDays(Integer.MAX_VALUE);
+        options.setManifestMaxStalePeriod(Duration.standardDays(100 * 365));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -214,11 +215,36 @@ public class ManifestCmsTest {
 
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
 
+    @Test
+    public void shouldRejectWhenManifestIsTooStaleDueToNegativeGracePeriod() {
+        X509Crl crl = getRootCrl();
+
+        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.minusDays(1).getMillis());
+
+        IpResourceSet resources = rootCertificate.getResources();
+
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
+
+        ValidationOptions options = new ValidationOptions();
+        options.setManifestMaxStalePeriod(Duration.standardDays(-2));
+        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+
+        assertTrue(result.hasFailures());
+
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
+        );
+    }
 
     @Test
     public void shouldRejectWhenManifestIsTooStale() {
@@ -231,21 +257,24 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
-        options.setMaxStaleDays(0);
+        options.setManifestMaxStalePeriod(Duration.ZERO);
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
 
         subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
 
-        assertFalse(result.hasFailures());
+        assertTrue(result.hasFailures());
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
 
+    /**
+     * EE certificate is expired. Manifest is in grace period.
+     */
     @Test
     public void shouldRejectWhenCertificateIsExpired() {
         X509Crl crl = getRootCrl();
@@ -257,7 +286,7 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
-        options.setMaxStaleDays(100);
+        options.setManifestMaxStalePeriod(Duration.standardDays(100));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -267,13 +296,41 @@ public class ManifestCmsTest {
         assertTrue(result.hasFailures());
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME),
+                new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, MFT_EE_NOT_AFTER.toString()),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
+        );
+    }
+
+    /**
+     * This update in future. EE certificate in validity window (notBefore is 5 minutes before THIS_UPDATE_TIME).
+     */
+    @Test
+    public void shouldRejectWhenThisUpdateInFuture() {
+        X509Crl crl = getRootCrl();
+
+        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.minusSeconds(1).getMillis());
+
+        IpResourceSet resources = rootCertificate.getResources();
+
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
+
+        ValidationOptions options = new ValidationOptions();
+        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+
+        assertTrue(result.hasFailures());
+
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, THIS_UPDATE_TIME.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME)
         );
     }
 
@@ -353,8 +410,8 @@ public class ManifestCmsTest {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(X509ResourceCertificateTest.TEST_SELF_SIGNED_CERTIFICATE_NAME);
         final DateTime now = UTC.dateTime();
-        builder.withThisUpdateTime(now);
-        builder.withNextUpdateTime(now.plusHours(8));
+        builder.withThisUpdateTime(NEXT_UPDATE_TIME.minusHours(24));
+        builder.withNextUpdateTime(NEXT_UPDATE_TIME.plusHours(24));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

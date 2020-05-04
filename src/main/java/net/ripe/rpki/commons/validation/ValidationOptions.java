@@ -30,21 +30,37 @@
 package net.ripe.rpki.commons.validation;
 
 
+import org.joda.time.Duration;
+
 /**
  * User controlled options to use when validating objects.
  */
 public class ValidationOptions {
-
-    private int maxStaleDays = 0;
+    private Duration crlMaxStalePeriod = Duration.ZERO;
+    /**
+     * Grace period for the NEXT_UPDATE_TIME of Manifest. When a manifest is in the grace period, the manifest causes
+     * a warning on validation instead of a failure.
+     *
+     * This grace period is not applied to the EE certificate.
+     */
+    private Duration manifestMaxStalePeriod = Duration.ZERO;
 
     private boolean looseValidationEnabled = false;
 
-    public void setMaxStaleDays(int maxStaleDays) {
-        this.maxStaleDays = maxStaleDays;
+    public Duration getCrlMaxStalePeriod() {
+        return this.crlMaxStalePeriod;
     }
 
-    public int getMaxStaleDays() {
-        return maxStaleDays;
+    public Duration getManifestMaxStalePeriod() {
+        return manifestMaxStalePeriod;
+    }
+
+    public void setCrlMaxStalePeriod(Duration maxStalePeriod) {
+        this.crlMaxStalePeriod = maxStalePeriod;
+    }
+
+    public void setManifestMaxStalePeriod(Duration maxStalePeriod) {
+        this.manifestMaxStalePeriod = maxStalePeriod;
     }
 
     public boolean isLooseValidationEnabled() {
