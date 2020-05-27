@@ -36,14 +36,14 @@ import org.joda.time.Duration;
  * User controlled options to use when validating objects.
  */
 public class ValidationOptions {
-    private Duration crlMaxStalePeriod = Duration.ZERO;
+    private Duration crlMaxStalePeriod = Duration.standardHours(12);
     /**
      * Grace period for the NEXT_UPDATE_TIME of Manifest. When a manifest is in the grace period, the manifest causes
      * a warning on validation instead of a failure.
      *
      * This grace period is not applied to the EE certificate.
      */
-    private Duration manifestMaxStalePeriod = Duration.ZERO;
+    private Duration manifestMaxStalePeriod = Duration.standardHours(12);
 
     private boolean looseValidationEnabled = false;
 
