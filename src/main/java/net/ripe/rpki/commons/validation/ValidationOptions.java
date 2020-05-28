@@ -36,16 +36,36 @@ import org.joda.time.Duration;
  * User controlled options to use when validating objects.
  */
 public class ValidationOptions {
-    private Duration crlMaxStalePeriod = Duration.standardHours(12);
+
     /**
-     * Grace period for the NEXT_UPDATE_TIME of Manifest. When a manifest is in the grace period, the manifest causes
-     * a warning on validation instead of a failure.
+     * Flag to switch whether we would reject stale manifest and CRL under certain max stale period.
+     * Turning this on will activate the {@link ValidationOptions#crlMaxStalePeriod} and {@link ValidationOptions#manifestMaxStalePeriod} checks.
+     *
+     */
+    private boolean strictManifestCRLValidityChecks = false;
+
+    /**
+     * When {@link ValidationOptions#strictManifestCRLValidityChecks} is enabled, this is the grace period for the
+     * NEXT_UPDATE_TIME of CRL. When a crl is in the grace period, the crl causes a warning on
+     * validation instead of a failure.
+     */
+    private Duration crlMaxStalePeriod = Duration.ZERO;
+
+    /**
+     *  When {@link ValidationOptions#strictManifestCRLValidityChecks} is enabled, this is the grace period for the
+     *  NEXT_UPDATE_TIME of Manifest. When a manifest is in the grace period, the manifest causes
+     *  a warning on validation instead of a failure.
      *
      * This grace period is not applied to the EE certificate.
      */
-    private Duration manifestMaxStalePeriod = Duration.standardHours(12);
+    private Duration manifestMaxStalePeriod = Duration.ZERO;
 
-    private boolean looseValidationEnabled = false;
+    /**
+     * Setting this will allow resources over claim on X509ResourceCertificateParentChildLooseValidator.
+     * Instead of rejected, it will only produce warnin on overclaim of child resources.
+     */
+    private boolean allowOverclaimParentChild = false;
+
 
     public Duration getCrlMaxStalePeriod() {
         return this.crlMaxStalePeriod;
@@ -63,11 +83,19 @@ public class ValidationOptions {
         this.manifestMaxStalePeriod = maxStalePeriod;
     }
 
-    public boolean isLooseValidationEnabled() {
-        return looseValidationEnabled;
+    public boolean isAllowOverclaimParentChild() {
+        return allowOverclaimParentChild;
     }
 
-    public void setLooseValidationEnabled(boolean looseValidationEnabled) {
-        this.looseValidationEnabled = looseValidationEnabled;
+    public void setAllowOverclaimParentChild(boolean allowOverclaimParentChild) {
+        this.allowOverclaimParentChild = allowOverclaimParentChild;
+    }
+
+    public boolean isStrictManifestCRLValidityChecks() {
+        return strictManifestCRLValidityChecks;
+    }
+
+    public void setStrictManifestCRLValidityChecks(boolean strictManifestCRLValidityChecks) {
+        this.strictManifestCRLValidityChecks = strictManifestCRLValidityChecks;
     }
 }

@@ -133,6 +133,7 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenNextUpdateOutsideMaxStaleDays() {
+        options.setStrictManifestCRLValidityChecks(true);
         options.setCrlMaxStalePeriod(Duration.standardDays(1));
 
         DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillisOfSecond(0); // Truncate millis
@@ -146,6 +147,7 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenNextUpdateOutsideNegativeMaxStaleDays() {
+        options.setStrictManifestCRLValidityChecks(true);
         options.setCrlMaxStalePeriod(Duration.standardDays(-8));
 
         DateTime nextUpdateTime = UTC.dateTime().withMillisOfSecond(0); // Truncate millis

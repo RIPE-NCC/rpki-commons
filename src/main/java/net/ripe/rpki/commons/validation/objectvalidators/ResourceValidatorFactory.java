@@ -48,7 +48,7 @@ public class ResourceValidatorFactory {
             CertificateRepositoryObjectValidationContext context,
             ValidationOptions options, ValidationResult result, X509Crl crl) {
 
-        if (options.isLooseValidationEnabled())
+        if (options.isAllowOverclaimParentChild())
             return new X509ResourceCertificateParentChildLooseValidator(options, result, crl, context);
 
         return new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
