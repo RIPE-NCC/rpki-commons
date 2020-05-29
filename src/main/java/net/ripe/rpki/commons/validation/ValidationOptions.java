@@ -66,6 +66,27 @@ public class ValidationOptions {
      */
     private boolean allowOverclaimParentChild = false;
 
+    public ValidationOptions() { }
+
+    private ValidationOptions(Boolean strictManifestCRLValidityChecks, Duration crlMaxStalePeriod,
+                              Duration manifestMaxStalePeriod){
+        this.strictManifestCRLValidityChecks = strictManifestCRLValidityChecks;
+        this.crlMaxStalePeriod = crlMaxStalePeriod;
+        this.manifestMaxStalePeriod = manifestMaxStalePeriod;
+    }
+
+    /**
+     * RIPE regularly refresh Crl/Manifest in our RPKI core every 16 hours, with validity for 8 hours.
+     * This one will invalidates a crl/manifest with still 7 hours remaining, indicating something wrong with refresh.
+     * @return
+     */
+    public static ValidationOptions paranoidOptions() {
+        return new ValidationOptions(true, Duration.standardHours(-7), Duration.standardHours(-7));
+    }
+
+    public static ValidationOptions defaultRipeNccValidator() {
+        return new ValidationOptions();
+    }
 
     public Duration getCrlMaxStalePeriod() {
         return this.crlMaxStalePeriod;
