@@ -80,7 +80,7 @@ public class ValidationOptions {
      * This one will invalidates a crl/manifest with still 7 hours remaining, indicating something wrong with refresh.
      * @return
      */
-    public static ValidationOptions paranoidOptions() {
+    public static ValidationOptions strictValidations() {
         return new ValidationOptions(true, Duration.standardHours(-7), Duration.standardHours(-7));
     }
 
