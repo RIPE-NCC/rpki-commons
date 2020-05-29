@@ -289,6 +289,7 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = new ValidationOptions();
+        options.setStrictManifestCRLValidityChecks(true);
         options.setManifestMaxStalePeriod(Duration.standardDays(100));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 

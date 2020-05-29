@@ -120,6 +120,7 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
+        options.setStrictManifestCRLValidityChecks(true);
         options.setCrlMaxStalePeriod(Duration.standardDays(1));
 
         DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);

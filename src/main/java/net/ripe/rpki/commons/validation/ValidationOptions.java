@@ -76,10 +76,15 @@ public class ValidationOptions {
     }
 
     public void setCrlMaxStalePeriod(Duration maxStalePeriod) {
+        if(!strictManifestCRLValidityChecks)
+            throw new IllegalArgumentException("You need to set strictManifestCrlValidity check to use this option.");
         this.crlMaxStalePeriod = maxStalePeriod;
     }
 
     public void setManifestMaxStalePeriod(Duration maxStalePeriod) {
+        if(!strictManifestCRLValidityChecks)
+            throw new IllegalArgumentException("You need to set strictManifestCrlValidity check to use this option.");
+
         this.manifestMaxStalePeriod = maxStalePeriod;
     }
 
