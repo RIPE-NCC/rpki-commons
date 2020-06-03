@@ -120,7 +120,7 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
-        options.setCrlMaxStalePeriod(Duration.standardDays(1));
+        options = ValidationOptions.withStaleConfigurations(Duration.standardDays(1), Duration.ZERO);
 
         DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
@@ -133,8 +133,8 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenNextUpdateOutsideMaxStaleDays() {
-        options.setCrlMaxStalePeriod(Duration.standardDays(1));
-
+        options = ValidationOptions.withStaleConfigurations(Duration.standardDays(1), Duration.ZERO);
+        subject = new X509CrlValidator(options, result, parent);
         DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillisOfSecond(0); // Truncate millis
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
@@ -146,8 +146,8 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenNextUpdateOutsideNegativeMaxStaleDays() {
-        options.setCrlMaxStalePeriod(Duration.standardDays(-8));
-
+        options = ValidationOptions.withStaleConfigurations(Duration.standardDays(-8), Duration.ZERO);
+        subject = new X509CrlValidator(options, result, parent);
         DateTime nextUpdateTime = UTC.dateTime().withMillisOfSecond(0); // Truncate millis
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);

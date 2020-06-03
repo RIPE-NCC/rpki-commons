@@ -36,16 +36,62 @@ import org.joda.time.Duration;
  * User controlled options to use when validating objects.
  */
 public class ValidationOptions {
-    private Duration crlMaxStalePeriod = Duration.ZERO;
+
     /**
-     * Grace period for the NEXT_UPDATE_TIME of Manifest. When a manifest is in the grace period, the manifest causes
-     * a warning on validation instead of a failure.
+     * Flag to switch whether we would reject stale manifest and CRL under certain max stale period.
+     * Turning this on will activate the {@link ValidationOptions#crlMaxStalePeriod} and {@link ValidationOptions#manifestMaxStalePeriod} checks.
+     *
+     */
+    private boolean strictManifestCRLValidityChecks = false;
+
+    /**
+     * When {@link ValidationOptions#strictManifestCRLValidityChecks} is enabled, this is the grace period for the
+     * NEXT_UPDATE_TIME of CRL. When a crl is in the grace period, the crl causes a warning on
+     * validation instead of a failure.
+     */
+    private Duration crlMaxStalePeriod = Duration.ZERO;
+
+    /**
+     *  When {@link ValidationOptions#strictManifestCRLValidityChecks} is enabled, this is the grace period for the
+     *  NEXT_UPDATE_TIME of Manifest. When a manifest is in the grace period, the manifest causes
+     *  a warning on validation instead of a failure.
      *
      * This grace period is not applied to the EE certificate.
      */
     private Duration manifestMaxStalePeriod = Duration.ZERO;
 
-    private boolean looseValidationEnabled = false;
+    /**
+     * Setting this will allow resources over claim on X509ResourceCertificateParentChildLooseValidator.
+     * Instead of rejected, it will only produce warnin on overclaim of child resources.
+     */
+    private boolean allowOverclaimParentChild = false;
+
+    public ValidationOptions() { }
+
+    private ValidationOptions(Boolean strictManifestCRLValidityChecks, Duration crlMaxStalePeriod,
+                              Duration manifestMaxStalePeriod){
+        this.strictManifestCRLValidityChecks = strictManifestCRLValidityChecks;
+        this.crlMaxStalePeriod = crlMaxStalePeriod;
+        this.manifestMaxStalePeriod = manifestMaxStalePeriod;
+    }
+
+    /**
+     * RIPE regularly refresh Crl/Manifest in our RPKI core every 16 hours,with validity for 24 hours.
+     * Leaving 8 for troubleshooting if needed. This one will invalidates a crl/manifest with still 7 hours
+     * remaining, indicating something wrong with refresh.
+     * @return
+     */
+    public static ValidationOptions strictValidations() {
+        return new ValidationOptions(true, Duration.standardHours(-7), Duration.standardHours(-7));
+    }
+
+    public static ValidationOptions defaultRipeNccValidator() {
+        return new ValidationOptions();
+    }
+
+    public static ValidationOptions withStaleConfigurations(Duration maxCrlStalePeriod, Duration maxMftStalePeriod) {
+        return new ValidationOptions(true, maxCrlStalePeriod, maxMftStalePeriod);
+    }
 
     public Duration getCrlMaxStalePeriod() {
         return this.crlMaxStalePeriod;
@@ -55,19 +101,19 @@ public class ValidationOptions {
         return manifestMaxStalePeriod;
     }
 
-    public void setCrlMaxStalePeriod(Duration maxStalePeriod) {
-        this.crlMaxStalePeriod = maxStalePeriod;
+    public boolean isAllowOverclaimParentChild() {
+        return allowOverclaimParentChild;
     }
 
-    public void setManifestMaxStalePeriod(Duration maxStalePeriod) {
-        this.manifestMaxStalePeriod = maxStalePeriod;
+    public void setAllowOverclaimParentChild(boolean allowOverclaimParentChild) {
+        this.allowOverclaimParentChild = allowOverclaimParentChild;
     }
 
-    public boolean isLooseValidationEnabled() {
-        return looseValidationEnabled;
+    public boolean isStrictManifestCRLValidityChecks() {
+        return strictManifestCRLValidityChecks;
     }
 
-    public void setLooseValidationEnabled(boolean looseValidationEnabled) {
-        this.looseValidationEnabled = looseValidationEnabled;
+    public void setStrictManifestCRLValidityChecks(boolean strictManifestCRLValidityChecks) {
+        this.strictManifestCRLValidityChecks = strictManifestCRLValidityChecks;
     }
 }

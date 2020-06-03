@@ -202,8 +202,7 @@ public class ManifestCmsTest {
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = new ValidationOptions();
-        options.setManifestMaxStalePeriod(Duration.standardDays(100 * 365));
+        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.standardDays(100 * 365));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -230,8 +229,7 @@ public class ManifestCmsTest {
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = new ValidationOptions();
-        options.setManifestMaxStalePeriod(Duration.standardDays(-2));
+        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.standardDays(-2));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -256,8 +254,7 @@ public class ManifestCmsTest {
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = new ValidationOptions();
-        options.setManifestMaxStalePeriod(Duration.ZERO);
+        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO,Duration.ZERO);
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -285,8 +282,7 @@ public class ManifestCmsTest {
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = new ValidationOptions();
-        options.setManifestMaxStalePeriod(Duration.standardDays(100));
+        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.standardDays(100));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -319,7 +315,7 @@ public class ManifestCmsTest {
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = new ValidationOptions();
+        ValidationOptions options = ValidationOptions.defaultRipeNccValidator();
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);

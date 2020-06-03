@@ -126,9 +126,8 @@ public class ProcessIscUpdownPdusTest {
 
         List<ValidationCheck> failures = result.getFailuresForAllLocations();
 
-        assertEquals(3, failures.size());
+        assertEquals(2, failures.size());
 
-        assertTrue(failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_NEXT_UPDATE_BEFORE_NOW, "2012-06-30T04:07:24.000Z")));
         assertTrue(failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:08:03.000Z")));
         assertTrue(failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:07:24.000Z")));
     }

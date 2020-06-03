@@ -160,12 +160,17 @@ public class ManifestCms extends RpkiSignedObject {
 
         result.rejectIfTrue(thisUpdateTime.isAfterNow(), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, thisUpdateTime.toString());
 
-        boolean postGracePeriod = nextUpdateTime.plus(options.getManifestMaxStalePeriod()).isBeforeNow();
-        if (postGracePeriod) {
-            result.error(ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+        if(options.isStrictManifestCRLValidityChecks()){
+            boolean postGracePeriod = nextUpdateTime.plus(options.getManifestMaxStalePeriod()).isBeforeNow();
+            if (postGracePeriod) {
+                result.error(ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+            } else {
+                result.warnIfTrue(nextUpdateTime.isBeforeNow(), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+            }
         } else {
             result.warnIfTrue(nextUpdateTime.isBeforeNow(), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
         }
+
     }
 
     /**
