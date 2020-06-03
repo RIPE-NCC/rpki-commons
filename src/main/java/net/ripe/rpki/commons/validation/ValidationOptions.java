@@ -76,8 +76,9 @@ public class ValidationOptions {
     }
 
     /**
-     * RIPE regularly refresh Crl/Manifest in our RPKI core every 16 hours, with validity for 8 hours.
-     * This one will invalidates a crl/manifest with still 7 hours remaining, indicating something wrong with refresh.
+     * RIPE regularly refresh Crl/Manifest in our RPKI core every 16 hours,with validity for 24 hours.
+     * Leaving 8 for troubleshooting if needed. This one will invalidates a crl/manifest with still 7 hours
+     * remaining, indicating something wrong with refresh.
      * @return
      */
     public static ValidationOptions strictValidations() {
