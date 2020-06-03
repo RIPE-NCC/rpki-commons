@@ -88,25 +88,16 @@ public class ValidationOptions {
         return new ValidationOptions();
     }
 
+    public static ValidationOptions withStaleConfigurations(Duration maxCrlStalePeriod, Duration maxMftStalePeriod) {
+        return new ValidationOptions(true, maxCrlStalePeriod, maxMftStalePeriod);
+    }
+
     public Duration getCrlMaxStalePeriod() {
         return this.crlMaxStalePeriod;
     }
 
     public Duration getManifestMaxStalePeriod() {
         return manifestMaxStalePeriod;
-    }
-
-    public void setCrlMaxStalePeriod(Duration maxStalePeriod) {
-        if(!strictManifestCRLValidityChecks)
-            throw new IllegalArgumentException("You need to set strictManifestCrlValidity check to use this option.");
-        this.crlMaxStalePeriod = maxStalePeriod;
-    }
-
-    public void setManifestMaxStalePeriod(Duration maxStalePeriod) {
-        if(!strictManifestCRLValidityChecks)
-            throw new IllegalArgumentException("You need to set strictManifestCrlValidity check to use this option.");
-
-        this.manifestMaxStalePeriod = maxStalePeriod;
     }
 
     public boolean isAllowOverclaimParentChild() {
