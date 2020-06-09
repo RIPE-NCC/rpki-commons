@@ -46,7 +46,7 @@ provisioning protocol.
 
 ## Changelog
 
-### 2019-05 version 1.10
+### 2020-06 version 1.10
 
 This release provide configurable options for handling of not-yet valid or expired objects. 
 
@@ -68,6 +68,7 @@ Grace perioud behaviour are as follows:
 Fixes:
  - Reject CRLs with thisUpdate in future.
  - Reject manifests with thisUpdate in future.
+
 
 ### 2020-04-24 version 1.9.0
 
