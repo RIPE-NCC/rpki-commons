@@ -47,6 +47,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
+import java.util.Set;
 
 import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
 import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM;
@@ -175,12 +176,13 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     protected boolean isResourceExtensionPresent() {
-        if (certificate.getCriticalExtensionOIDs() == null) {
+        Set<String> criticalExtensionOIDs = certificate.getCriticalExtensionOIDs();
+        if (criticalExtensionOIDs == null) {
             return false;
         }
 
-        return certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId())
-                || certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
+        return criticalExtensionOIDs.contains(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId())
+                || criticalExtensionOIDs.contains(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
     }
 
     protected boolean isIpResourceExtensionPresent() {
