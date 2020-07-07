@@ -182,7 +182,10 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
     }
 
     public IpResourceSet deriveResources(IpResourceSet parentResources) {
-        IpResourceSet result = new IpResourceSet(getResources());
+        IpResourceSet result = new IpResourceSet(resources);
+        if (inheritedResourceTypes.isEmpty()) {
+            return result;
+        }
         for (IpResource ipResource : parentResources) {
             if (inheritedResourceTypes.contains(ipResource.getType())) {
                 result.add(ipResource);
@@ -191,4 +194,7 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
         return result;
     }
 
+    public boolean containsResources(IpResourceSet that) {
+        return resources.contains(that);
+    }
 }

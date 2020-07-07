@@ -92,7 +92,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
             roaPrefixes.add(prefix.getPrefix());
         }
         try {
-            validationResult.rejectIfFalse(getResourceCertificate().getResources().contains(roaPrefixes), ROA_RESOURCES);
+            validationResult.rejectIfFalse(getResourceCertificate().containsResources(roaPrefixes), ROA_RESOURCES);
         } catch (Exception e) {
             validationResult.rejectIfFalse(false, ROA_RESOURCES);
         }

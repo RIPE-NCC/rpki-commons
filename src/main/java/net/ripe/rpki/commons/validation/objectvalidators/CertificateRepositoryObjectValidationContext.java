@@ -118,20 +118,24 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-        IpResourceSet effectiveResources = getEffectiveResources(childCertificate.deriveResources(resources));
+        IpResourceSet effectiveResources = childCertificate.deriveResources(resources);
+        removeOverclaimingResources(effectiveResources);
         List<String> childSubjects = Lists.newArrayList(subjectChain);
         childSubjects.add(childCertificate.getSubject().getName());
         return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, effectiveResources, childSubjects);
     }
 
     public IpResourceSet getResources() {
-        return getEffectiveResources(resources);
+        IpResourceSet result = new IpResourceSet(resources);
+        removeOverclaimingResources(result);
+        return result;
     }
 
-    private IpResourceSet getEffectiveResources(IpResourceSet r) {
-        IpResourceSet effectiveResources = new IpResourceSet(r);
-        effectiveResources.removeAll(overclaiming);
-        return effectiveResources;
+    private void removeOverclaimingResources(IpResourceSet resources) {
+        if (overclaiming.isEmpty() || resources.isEmpty()) {
+            return;
+        }
+        resources.removeAll(overclaiming);
     }
 
     @Override
