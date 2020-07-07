@@ -60,10 +60,12 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     private final X509Certificate certificate;
 
+    private final boolean ca;
 
     protected AbstractX509CertificateWrapper(X509Certificate certificate) {
         Validate.notNull(certificate);
         this.certificate = certificate;
+        this.ca = X509CertificateUtil.isCa(certificate);
     }
 
     public X509Certificate getCertificate() {
@@ -105,11 +107,11 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
     }
 
     public boolean isEe() {
-        return X509CertificateUtil.isEe(certificate);
+        return !isCa();
     }
 
     public boolean isCa() {
-        return X509CertificateUtil.isCa(certificate);
+        return ca;
     }
 
     public boolean isRoot() {

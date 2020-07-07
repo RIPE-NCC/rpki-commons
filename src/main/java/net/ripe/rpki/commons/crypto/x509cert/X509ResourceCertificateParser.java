@@ -44,12 +44,10 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import java.io.IOException;
 import java.net.URI;
-import java.security.cert.CertificateEncodingException;
 import java.util.regex.Pattern;
 
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
@@ -80,13 +78,10 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     private void validateIssuerAndSubjectDN() {
-        try {
-            JcaX509CertificateHolder cert = new JcaX509CertificateHolder(certificate);
-            getValidationResult().warnIfFalse(isValidName(cert.getIssuer()), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
-            getValidationResult().warnIfFalse(isValidName(cert.getSubject()), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
-        } catch (CertificateEncodingException e) {
-            throw new AbstractX509CertificateWrapperException(e);
-        }
+        X500Name issuer = X500Name.getInstance(certificate.getIssuerX500Principal().getEncoded());
+        getValidationResult().warnIfFalse(isValidName(issuer), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
+        X500Name subject = X500Name.getInstance(certificate.getSubjectX500Principal().getEncoded());
+        getValidationResult().warnIfFalse(isValidName(subject), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
     }
 
     private boolean isValidName(X500Name principal) {
@@ -189,7 +184,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             if (!result.rejectIfFalse(dp.getDistributionPoint().getType() == DistributionPointName.FULL_NAME, CRLDP_TYPE_FULL_NAME)) {
                 return;
             }
-            
+
             GeneralNames names = (GeneralNames) dp.getDistributionPoint().getName();
             for (GeneralName name : names.getNames()) {
                 if (!result.rejectIfFalse(name.getTagNo() == GeneralName.uniformResourceIdentifier, CRLDP_NAME_IS_A_URI)) {

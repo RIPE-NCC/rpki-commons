@@ -109,10 +109,18 @@ public final class Asn1Util {
      *                                  class.
      */
     public static <T extends ASN1Encodable> T expect(ASN1Encodable value, Class<? extends T> expectedClass) {
-        Validate.notNull(value, expectedClass.getSimpleName() + " expected, got null");
-        Validate.isTrue(expectedClass.isInstance(value), expectedClass.getSimpleName() + " expected, got " + value.getClass().getSimpleName()
-                + " with value: " + value);
-        return expectedClass.cast(value);
+        if (value != null) {
+            try {
+                return expectedClass.cast(value);
+            } catch (ClassCastException e) {
+                throw new IllegalArgumentException(
+                        expectedClass.getSimpleName() + " expected, got " + value.getClass().getSimpleName() +
+                                " with value: " + value
+                );
+            }
+        } else {
+            throw new IllegalArgumentException(expectedClass.getSimpleName() + " expected, got null");
+        }
     }
 
     /**
