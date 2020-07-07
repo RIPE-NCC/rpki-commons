@@ -53,6 +53,8 @@ public final class ValidationResult implements Serializable {
 
     private ValidationLocation currentLocation;
 
+    private Map<ValidationStatus, List<ValidationCheck>> currentResults;
+
     private Map<ValidationLocation, List<ValidationMetric>> metrics = new TreeMap<>();
 
     private ValidationResult(ValidationLocation location) {
@@ -73,19 +75,19 @@ public final class ValidationResult implements Serializable {
 
     public ValidationResult setLocation(ValidationLocation location) {
         currentLocation = location;
+        currentResults = results.get(location);
 
-        if (!results.containsKey(currentLocation)) {
-            Map<ValidationStatus, List<ValidationCheck>> locationResults = new TreeMap<>();
-            locationResults.put(ValidationStatus.ERROR, new ArrayList<>());
-            locationResults.put(ValidationStatus.WARNING, new ArrayList<>());
-            locationResults.put(ValidationStatus.PASSED, new ArrayList<>());
-            results.put(currentLocation, locationResults);
+        if (currentResults == null) {
+            currentResults = new TreeMap<>();
+            currentResults.put(ValidationStatus.ERROR, new ArrayList<>());
+            currentResults.put(ValidationStatus.WARNING, new ArrayList<>());
+            currentResults.put(ValidationStatus.PASSED, new ArrayList<>());
+            results.put(currentLocation, currentResults);
         }
         return this;
     }
 
     private ValidationResult setValidationCheckForCurrentLocation(ValidationStatus status, String key, String... param) {
-        Map<ValidationStatus, List<ValidationCheck>> currentResults = results.get(currentLocation);
         List<ValidationCheck> checksForStatus = currentResults.get(status);
         checksForStatus.add(new ValidationCheck(status, key, param));
         return this;
@@ -245,8 +247,9 @@ public final class ValidationResult implements Serializable {
     }
 
     private List<ValidationCheck> getChecks(ValidationLocation location, ValidationStatus status) {
-        if (results.containsKey(location)) {
-            return results.get(location).get(status);
+        Map<ValidationStatus, List<ValidationCheck>> checks = results.get(location);
+        if (checks != null) {
+            return checks.get(status);
         } else {
             return new ArrayList<ValidationCheck>();
         }
@@ -259,8 +262,8 @@ public final class ValidationResult implements Serializable {
 
     public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
         ArrayList<ValidationCheck> allChecks = new ArrayList<ValidationCheck>();
-        if (results.containsKey(location)) {
-            Map<ValidationStatus, List<ValidationCheck>> locationChecksMap = results.get(location);
+        Map<ValidationStatus, List<ValidationCheck>> locationChecksMap = results.get(location);
+        if (locationChecksMap != null) {
             allChecks.addAll(locationChecksMap.get(ValidationStatus.ERROR));
             allChecks.addAll(locationChecksMap.get(ValidationStatus.WARNING));
             allChecks.addAll(locationChecksMap.get(ValidationStatus.PASSED));
