@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import com.google.common.io.Closer;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -154,18 +153,10 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     public static X509Certificate parseX509Certificate(byte[] encoded) {
-        try {
-            final Closer closer = Closer.create();
-            try {
-                final InputStream input = closer.register(new ByteArrayInputStream(encoded));
-                final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-                return (X509Certificate) factory.generateCertificate(input);
-            } catch (final CertificateException e) {
-                return null;
-            } catch (final Throwable t) {
-                throw closer.rethrow(t);
-            }
-        } catch (final IOException e) {
+        try (InputStream input = new ByteArrayInputStream(encoded)) {
+            final CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            return (X509Certificate) factory.generateCertificate(input);
+        } catch (final CertificateException | IOException e) {
             return null;
         }
     }
