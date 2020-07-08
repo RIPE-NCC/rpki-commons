@@ -30,11 +30,13 @@
 package net.ripe.rpki.commons.crypto.util;
 
 import org.junit.Test;
-import sun.security.x509.X509CertImpl;
 
+import java.io.ByteArrayInputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import static net.ripe.rpki.commons.crypto.util.KeyStoreUtil.*;
@@ -59,7 +61,8 @@ public class KeyStoreUtilTest {
         keyStore = createKeyStoreForKeyPair(TEST_KEY_PAIR, KeyStoreUtilTest.DEFAULT_KEYSTORE_PROVIDER, DEFAULT_SIGNATURE_PROVIDER, KeyStoreUtilTest.DEFAULT_KEYSTORE_TYPE);
         keyStoreData = storeKeyStore(keyStore);
 
-        X509CertImpl certificate = new X509CertImpl(keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0].getEncoded());
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        X509Certificate certificate = (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(keyStore.getCertificateChain(KEYSTORE_KEY_ALIAS)[0].getEncoded()));
         assertTrue(certificate.getNotAfter().before(new Date()));
     }
 
