@@ -289,11 +289,11 @@ public final class ValidationResult implements Serializable {
 
     public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
         ArrayList<ValidationCheck> allChecks = new ArrayList<>();
-        ResultsPerLocation locationChecksMap = results.get(location);
-        if (locationChecksMap != null) {
-            allChecks.addAll(locationChecksMap.error);
-            allChecks.addAll(locationChecksMap.warning);
-            allChecks.addAll(locationChecksMap.passed);
+        ResultsPerLocation resultsPerLocation = results.get(location);
+        if (resultsPerLocation != null) {
+            allChecks.addAll(resultsPerLocation.error);
+            allChecks.addAll(resultsPerLocation.warning);
+            allChecks.addAll(resultsPerLocation.passed);
         }
 
         return allChecks;
