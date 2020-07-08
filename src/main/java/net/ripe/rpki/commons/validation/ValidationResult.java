@@ -49,6 +49,8 @@ public final class ValidationResult implements Serializable {
 
     private static final long serialVersionUID = 2L;
 
+    private static final String[] EMPTY_PARAM = {};
+
     private Map<ValidationLocation, ResultsPerLocation> results = new TreeMap<>();
 
     private ValidationLocation currentLocation;
@@ -79,9 +81,17 @@ public final class ValidationResult implements Serializable {
         return this;
     }
 
+    public ValidationResult pass(String key) {
+        return pass(key, EMPTY_PARAM);
+    }
+
     public ValidationResult pass(String key, String... param) {
         currentResults.passed.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
         return this;
+    }
+
+    public ValidationResult warn(String key) {
+        return warn(key, EMPTY_PARAM);
     }
 
     public ValidationResult warn(String key, String... param) {
@@ -89,9 +99,17 @@ public final class ValidationResult implements Serializable {
         return this;
     }
 
+    public ValidationResult error(String key) {
+        return error(key, EMPTY_PARAM);
+    }
+
     public ValidationResult error(String key, String... param) {
         currentResults.error.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
         return this;
+    }
+
+    public boolean warnIfFalse(boolean condition, String key) {
+        return warnIfFalse(condition, key, EMPTY_PARAM);
     }
 
     public boolean warnIfFalse(boolean condition, String key, String... param) {
@@ -104,16 +122,32 @@ public final class ValidationResult implements Serializable {
         return condition;
     }
 
+    public boolean warnIfTrue(boolean condition, String key) {
+        return warnIfTrue(condition, key, EMPTY_PARAM);
+    }
+
     public boolean warnIfTrue(boolean condition, String key, String... param) {
         return warnIfFalse(!condition, key, param);
+    }
+
+    public boolean warnIfNull(Object object, String key) {
+        return warnIfNull(object, key, EMPTY_PARAM);
     }
 
     public boolean warnIfNull(Object object, String key, String... param) {
         return warnIfTrue(object == null, key, param);
     }
 
+    public boolean warnIfNotNull(Object object, String key) {
+        return warnIfNotNull(object, key, EMPTY_PARAM);
+    }
+
     public boolean warnIfNotNull(Object object, String key, String... param) {
         return warnIfTrue(object != null, key, param);
+    }
+
+    public ValidationResult rejectForLocation(ValidationLocation location, String key) {
+        return rejectForLocation(location, key, EMPTY_PARAM);
     }
 
     public ValidationResult rejectForLocation(ValidationLocation location, String key, String... param) {
@@ -122,10 +156,18 @@ public final class ValidationResult implements Serializable {
         return this;
     }
 
+    public ValidationResult warnForLocation(ValidationLocation location, String key) {
+        return warnForLocation(location, key, EMPTY_PARAM);
+    }
+
     public ValidationResult warnForLocation(ValidationLocation location, String key, String... param) {
         ResultsPerLocation resultsPerLocation = results.computeIfAbsent(location, (x) -> new ResultsPerLocation());
         resultsPerLocation.warning.add(new ValidationCheck(ValidationStatus.WARNING, key, param));
         return this;
+    }
+
+    public boolean rejectIfFalse(boolean condition, String key) {
+        return rejectIfFalse(condition, key, EMPTY_PARAM);
     }
 
     public boolean rejectIfFalse(boolean condition, String key, String... param) {
@@ -138,12 +180,24 @@ public final class ValidationResult implements Serializable {
         return condition;
     }
 
+    public boolean rejectIfTrue(boolean condition, String key) {
+        return rejectIfTrue(condition, key, EMPTY_PARAM);
+    }
+
     public boolean rejectIfTrue(boolean condition, String key, String... param) {
         return rejectIfFalse(!condition, key, param);
     }
 
+    public boolean rejectIfNull(Object object, String key) {
+        return rejectIfNull(object, key, EMPTY_PARAM);
+    }
+
     public boolean rejectIfNull(Object object, String key, String... param) {
         return rejectIfTrue(object == null, key, param);
+    }
+
+    public boolean rejectIfNotNull(Object object, String key) {
+        return rejectIfNotNull(object, key, EMPTY_PARAM);
     }
 
     public boolean rejectIfNotNull(Object object, String key, String... param) {
