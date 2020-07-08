@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
-import com.google.common.io.Closer;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.util.EqualsSupport;
@@ -117,29 +116,19 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     private static X509CRL makeX509CRLFromEncoded(byte[] encoded) {
-        final X509CRL crl;
-        if (null != encoded) {
-            try {
-                final Closer closer = Closer.create();
-                try {
-                    final ByteArrayInputStream in = new ByteArrayInputStream(encoded);
-                    final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-                    crl = (X509CRL) factory.generateCRL(in);
-                } catch (final CertificateException | CRLException e) {
-                    throw closer.rethrow(new IllegalArgumentException(e));
-                } catch (final Throwable t) {
-                    throw closer.rethrow(t);
-                } finally {
-                    closer.close();
-                }
-            } catch (final IOException e) {
-                throw new RuntimeException("Error managing CRL I/O stream", e);
-            }
-        } else {
-            crl = null;
+        if (encoded == null) {
+            return null;
         }
-        return crl;
-
+        try {
+            try (final ByteArrayInputStream in = new ByteArrayInputStream(encoded)) {
+                final CertificateFactory factory = CertificateFactory.getInstance("X.509");
+                return (X509CRL) factory.generateCRL(in);
+            } catch (final CertificateException | CRLException e) {
+                throw new IllegalArgumentException(e);
+            }
+        } catch (final IOException e) {
+            throw new RuntimeException("Error managing CRL I/O stream", e);
+        }
     }
 
     @Override

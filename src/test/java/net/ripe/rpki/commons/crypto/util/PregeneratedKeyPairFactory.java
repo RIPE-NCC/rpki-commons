@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.util;
 
-import com.google.common.io.Closer;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -46,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -72,22 +72,13 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     private void initKeyStore() {
         try {
-            final Closer closer = Closer.create();
-            try {
-                InputStream input;
-                try {
-                    input = closer.register(new FileInputStream(keyStoreFile));
-                } catch (FileNotFoundException e) {
-                    input = null;
-                }
-                pregeneratedKeys = KeyStore.getInstance("JKS", "SUN");
+            pregeneratedKeys = KeyStore.getInstance("JKS", "SUN");
+            try (InputStream input = new FileInputStream(keyStoreFile)) {
                 pregeneratedKeys.load(input, PASSPHRASE);
-            } catch (final Throwable t) {
-                throw closer.rethrow(t);
-            } finally {
-                closer.close();
+            } catch (FileNotFoundException e) {
+                pregeneratedKeys.load(null, PASSPHRASE);
             }
-        } catch (final IOException e) {
+        } catch (final IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
@@ -112,14 +103,8 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
             if (key == null) {
                 result = super.generate();
                 pregeneratedKeys.setKeyEntry(alias, result.getPrivate(), PASSPHRASE, new Certificate[]{createCertificate(result).getCertificate()});
-                final Closer closer = Closer.create();
-                try {
-                    final OutputStream output = new FileOutputStream(keyStoreFile);
+                try (final OutputStream output = new FileOutputStream(keyStoreFile)) {
                     pregeneratedKeys.store(output, PASSPHRASE);
-                } catch (final Throwable t) {
-                    throw closer.rethrow(t);
-                } finally {
-                    closer.close();
                 }
             } else {
                 Certificate certificate = pregeneratedKeys.getCertificateChain(alias)[0];
