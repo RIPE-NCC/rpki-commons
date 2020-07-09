@@ -48,6 +48,7 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
@@ -114,11 +115,12 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     private void validateCertificatePolicy() {
-        if (!result.rejectIfNull(certificate.getCriticalExtensionOIDs(), CRITICAL_EXT_PRESENT)) {
+        Set<String> criticalExtensionOIDs = certificate.getCriticalExtensionOIDs();
+        if (!result.rejectIfNull(criticalExtensionOIDs, CRITICAL_EXT_PRESENT)) {
             return;
         }
 
-        result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
+        result.rejectIfFalse(criticalExtensionOIDs.contains(Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
 
         try {
             byte[] extensionValue = certificate.getExtensionValue(Extension.certificatePolicies.getId());

@@ -29,8 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.payload;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Closer;
 import com.thoughtworks.xstream.XStream;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderException;
 import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
@@ -58,19 +56,13 @@ class ProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> ex
 
     private String serializeUTF8Encoded(T payload) throws IOException {
         final String xml;
-        final Closer closer = Closer.create();
-        try {
-            final ByteArrayOutputStream outputStream = closer.register(new ByteArrayOutputStream());
-            final Writer writer = closer.register(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+        try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             final Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writer.write(System.getProperty("line.separator"));
             super.serialize(payload, writer);
             final String rawXml = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
             xml = rawXml.replace("<message", "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"");
-        } catch (final Throwable t) {
-            throw closer.rethrow(t);
-        } finally {
-            closer.close();
         }
         return xml;
     }

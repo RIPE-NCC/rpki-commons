@@ -47,11 +47,15 @@ import java.util.TreeMap;
 
 public final class ValidationResult implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    private Map<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> results = new TreeMap<>();
+    private static final String[] EMPTY_PARAM = {};
+
+    private Map<ValidationLocation, ResultsPerLocation> results = new TreeMap<>();
 
     private ValidationLocation currentLocation;
+
+    private ResultsPerLocation currentResults;
 
     private Map<ValidationLocation, List<ValidationMetric>> metrics = new TreeMap<>();
 
@@ -73,37 +77,39 @@ public final class ValidationResult implements Serializable {
 
     public ValidationResult setLocation(ValidationLocation location) {
         currentLocation = location;
-
-        if (!results.containsKey(currentLocation)) {
-            Map<ValidationStatus, List<ValidationCheck>> locationResults = new TreeMap<>();
-            locationResults.put(ValidationStatus.ERROR, new ArrayList<>());
-            locationResults.put(ValidationStatus.WARNING, new ArrayList<>());
-            locationResults.put(ValidationStatus.PASSED, new ArrayList<>());
-            results.put(currentLocation, locationResults);
-        }
+        currentResults = results.computeIfAbsent(location, (x) -> new ResultsPerLocation());
         return this;
     }
 
-    private ValidationResult setValidationCheckForCurrentLocation(ValidationStatus status, String key, String... param) {
-        Map<ValidationStatus, List<ValidationCheck>> currentResults = results.get(currentLocation);
-        List<ValidationCheck> checksForStatus = currentResults.get(status);
-        checksForStatus.add(new ValidationCheck(status, key, param));
-        return this;
+    public ValidationResult pass(String key) {
+        return pass(key, EMPTY_PARAM);
     }
 
     public ValidationResult pass(String key, String... param) {
-        setValidationCheckForCurrentLocation(ValidationStatus.PASSED, key, param);
+        currentResults.passed.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
         return this;
+    }
+
+    public ValidationResult warn(String key) {
+        return warn(key, EMPTY_PARAM);
     }
 
     public ValidationResult warn(String key, String... param) {
-        setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
+        currentResults.warning.add(new ValidationCheck(ValidationStatus.WARNING, key, param));
         return this;
     }
 
+    public ValidationResult error(String key) {
+        return error(key, EMPTY_PARAM);
+    }
+
     public ValidationResult error(String key, String... param) {
-        setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
+        currentResults.error.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
         return this;
+    }
+
+    public boolean warnIfFalse(boolean condition, String key) {
+        return warnIfFalse(condition, key, EMPTY_PARAM);
     }
 
     public boolean warnIfFalse(boolean condition, String key, String... param) {
@@ -116,32 +122,52 @@ public final class ValidationResult implements Serializable {
         return condition;
     }
 
+    public boolean warnIfTrue(boolean condition, String key) {
+        return warnIfTrue(condition, key, EMPTY_PARAM);
+    }
+
     public boolean warnIfTrue(boolean condition, String key, String... param) {
         return warnIfFalse(!condition, key, param);
+    }
+
+    public boolean warnIfNull(Object object, String key) {
+        return warnIfNull(object, key, EMPTY_PARAM);
     }
 
     public boolean warnIfNull(Object object, String key, String... param) {
         return warnIfTrue(object == null, key, param);
     }
 
+    public boolean warnIfNotNull(Object object, String key) {
+        return warnIfNotNull(object, key, EMPTY_PARAM);
+    }
+
     public boolean warnIfNotNull(Object object, String key, String... param) {
         return warnIfTrue(object != null, key, param);
     }
 
+    public ValidationResult rejectForLocation(ValidationLocation location, String key) {
+        return rejectForLocation(location, key, EMPTY_PARAM);
+    }
+
     public ValidationResult rejectForLocation(ValidationLocation location, String key, String... param) {
-        ValidationLocation locationBefore = currentLocation;
-        setLocation(location);
-        setValidationCheckForCurrentLocation(ValidationStatus.ERROR, key, param);
-        setLocation(locationBefore);
+        ResultsPerLocation resultsPerLocation = results.computeIfAbsent(location, (x) -> new ResultsPerLocation());
+        resultsPerLocation.error.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
         return this;
     }
 
+    public ValidationResult warnForLocation(ValidationLocation location, String key) {
+        return warnForLocation(location, key, EMPTY_PARAM);
+    }
+
     public ValidationResult warnForLocation(ValidationLocation location, String key, String... param) {
-        ValidationLocation locationBefore = currentLocation;
-        setLocation(location);
-        setValidationCheckForCurrentLocation(ValidationStatus.WARNING, key, param);
-        setLocation(locationBefore);
+        ResultsPerLocation resultsPerLocation = results.computeIfAbsent(location, (x) -> new ResultsPerLocation());
+        resultsPerLocation.warning.add(new ValidationCheck(ValidationStatus.WARNING, key, param));
         return this;
+    }
+
+    public boolean rejectIfFalse(boolean condition, String key) {
+        return rejectIfFalse(condition, key, EMPTY_PARAM);
     }
 
     public boolean rejectIfFalse(boolean condition, String key, String... param) {
@@ -154,12 +180,24 @@ public final class ValidationResult implements Serializable {
         return condition;
     }
 
+    public boolean rejectIfTrue(boolean condition, String key) {
+        return rejectIfTrue(condition, key, EMPTY_PARAM);
+    }
+
     public boolean rejectIfTrue(boolean condition, String key, String... param) {
         return rejectIfFalse(!condition, key, param);
     }
 
+    public boolean rejectIfNull(Object object, String key) {
+        return rejectIfNull(object, key, EMPTY_PARAM);
+    }
+
     public boolean rejectIfNull(Object object, String key, String... param) {
         return rejectIfTrue(object == null, key, param);
+    }
+
+    public boolean rejectIfNotNull(Object object, String key) {
+        return rejectIfNotNull(object, key, EMPTY_PARAM);
     }
 
     public boolean rejectIfNotNull(Object object, String key, String... param) {
@@ -185,9 +223,8 @@ public final class ValidationResult implements Serializable {
     }
 
     public boolean hasFailures() {
-        for (Map<ValidationStatus, List<ValidationCheck>> checks: this.results.values()) {
-            List<ValidationCheck> errors = checks.get(ValidationStatus.ERROR);
-            if (errors != null && !errors.isEmpty()) {
+        for (ResultsPerLocation checks: this.results.values()) {
+            if (!checks.error.isEmpty()) {
                 return true;
             }
         }
@@ -195,9 +232,8 @@ public final class ValidationResult implements Serializable {
     }
 
     public boolean hasWarnings() {
-        for (Map<ValidationStatus, List<ValidationCheck>> checks: this.results.values()) {
-            List<ValidationCheck> errors = checks.get(ValidationStatus.WARNING);
-            if (errors != null && !errors.isEmpty()) {
+        for (ResultsPerLocation checks: this.results.values()) {
+            if (!checks.warning.isEmpty()) {
                 return true;
             }
         }
@@ -214,18 +250,20 @@ public final class ValidationResult implements Serializable {
 
     public List<ValidationCheck> getFailuresForAllLocations() {
         List<ValidationCheck> failures = new ArrayList<ValidationCheck>();
-        for (ValidationLocation location : getValidatedLocations()) {
-            failures.addAll(getChecks(location, ValidationStatus.ERROR));
+        for (ResultsPerLocation checks : results.values()) {
+            failures.addAll(checks.error);
         }
         return failures;
     }
 
     public List<ValidationCheck> getFailures(ValidationLocation location) {
-        return getChecks(location, ValidationStatus.ERROR);
+        ResultsPerLocation checks = results.get(location);
+        return checks == null ? Collections.emptyList() : checks.error;
     }
 
     public List<ValidationCheck> getWarnings(ValidationLocation location) {
-        return getChecks(location, ValidationStatus.WARNING);
+        ResultsPerLocation checks = results.get(location);
+        return checks == null ? Collections.emptyList() : checks.warning;
     }
 
     public boolean hasFailureForCurrentLocation() {
@@ -233,37 +271,29 @@ public final class ValidationResult implements Serializable {
     }
 
     public boolean hasFailureForLocation(ValidationLocation location) {
-        return !getFailures(location).isEmpty();
+        ResultsPerLocation checks = results.get(location);
+        return checks != null && !checks.error.isEmpty();
     }
 
     public List<ValidationCheck> getWarnings() {
         List<ValidationCheck> warnings = new ArrayList<ValidationCheck>();
-        for (ValidationLocation location : getValidatedLocations()) {
-            warnings.addAll(getChecks(location, ValidationStatus.WARNING));
+        for (ResultsPerLocation checks : results.values()) {
+            warnings.addAll(checks.warning);
         }
         return warnings;
     }
-
-    private List<ValidationCheck> getChecks(ValidationLocation location, ValidationStatus status) {
-        if (results.containsKey(location)) {
-            return results.get(location).get(status);
-        } else {
-            return new ArrayList<ValidationCheck>();
-        }
-    }
-
 
     public List<ValidationCheck> getAllValidationChecksForCurrentLocation() {
         return getAllValidationChecksForLocation(currentLocation);
     }
 
     public List<ValidationCheck> getAllValidationChecksForLocation(ValidationLocation location) {
-        ArrayList<ValidationCheck> allChecks = new ArrayList<ValidationCheck>();
-        if (results.containsKey(location)) {
-            Map<ValidationStatus, List<ValidationCheck>> locationChecksMap = results.get(location);
-            allChecks.addAll(locationChecksMap.get(ValidationStatus.ERROR));
-            allChecks.addAll(locationChecksMap.get(ValidationStatus.WARNING));
-            allChecks.addAll(locationChecksMap.get(ValidationStatus.PASSED));
+        ArrayList<ValidationCheck> allChecks = new ArrayList<>();
+        ResultsPerLocation resultsPerLocation = results.get(location);
+        if (resultsPerLocation != null) {
+            allChecks.addAll(resultsPerLocation.error);
+            allChecks.addAll(resultsPerLocation.warning);
+            allChecks.addAll(resultsPerLocation.passed);
         }
 
         return allChecks;
@@ -297,17 +327,24 @@ public final class ValidationResult implements Serializable {
     }
 
     public ValidationResult addAll(ValidationResult that) {
-        for (Entry<ValidationLocation, Map<ValidationStatus, List<ValidationCheck>>> resultsByLocation : that.results.entrySet()) {
-            Map<ValidationStatus, List<ValidationCheck>> map = results.get(resultsByLocation.getKey());
-            if (map == null) {
-                map = new TreeMap<>();
-                this.results.put(resultsByLocation.getKey(), map);
-            }
-            for (Entry<ValidationStatus, List<ValidationCheck>> checks : resultsByLocation.getValue().entrySet()) {
-                List<ValidationCheck> list = map.computeIfAbsent(checks.getKey(), k -> new ArrayList<>());
-                list.addAll(checks.getValue());
-            }
+        for (Entry<ValidationLocation, ResultsPerLocation> resultsByLocation : that.results.entrySet()) {
+            ResultsPerLocation map = results.computeIfAbsent(resultsByLocation.getKey(), (x) -> new ResultsPerLocation());
+            map.error.addAll(resultsByLocation.getValue().error);
+            map.warning.addAll(resultsByLocation.getValue().warning);
+            map.passed.addAll(resultsByLocation.getValue().passed);
         }
         return this;
+    }
+
+    private static final class ResultsPerLocation implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        final List<ValidationCheck> error = new ArrayList<>();
+
+        final List<ValidationCheck> warning = new ArrayList<>();
+
+        // Average of 12-13 passed checks per location (min = 1, max = 18) as of 2020-07-08 on RIPE NCC trust anchor,
+        // we use a slightly higher initial capacity to avoid re-sizing.
+        final List<ValidationCheck> passed = new ArrayList<>(20);
     }
 }
