@@ -46,9 +46,17 @@ provisioning protocol.
 
 ## Changelog
 
+### 2020-07 version 1.11.0
+
+This release improves performance of the validation process.
+
+WARNING: The internal implementation of some classes have changed,
+breaking Java serialization compatibility with previous versions of
+this library.
+
 ### 2020-06 version 1.10
 
-This release provide configurable options for handling of not-yet valid or expired objects. 
+This release provide configurable options for handling of not-yet valid or expired objects.
 
 When you want to accept expired/stale objects, you can set an grace period through
 `ValidationOptions.withStaleConfiguration(maxCrlStalePeriod, maxMftStalePeriod)`
