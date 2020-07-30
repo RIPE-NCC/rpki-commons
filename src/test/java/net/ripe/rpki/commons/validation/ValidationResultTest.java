@@ -178,4 +178,50 @@ public class ValidationResultTest {
         result.error("an.error");
         assertTrue("warning correctly found", result.hasFailures());
     }
+
+    @Test
+    public void should_not_store_passing_checks_when_requested() {
+        result = ValidationResult.withLocation(FIRST_LOCATION).withoutStoringPassingChecks();
+        result.pass("passed1");
+        result.pass("passed2", "with", "params");
+        result.rejectIfFalse(true, "passed3");
+        result.warnIfNotNull(null, "passed4");
+        assertEquals(0, result.getAllValidationChecksForCurrentLocation().size());
+    }
+
+    @Test
+    public void should_still_store_warnings_when_not_storing_passing_checks() {
+        result = ValidationResult.withLocation(FIRST_LOCATION).withoutStoringPassingChecks();
+        result.warn("warning");
+        assertEquals(1, result.getAllValidationChecksForCurrentLocation().size());
+    }
+
+    @Test
+    public void should_still_store_errors_when_not_storing_passing_checks() {
+        result = ValidationResult.withLocation(FIRST_LOCATION).withoutStoringPassingChecks();
+        result.error("error");
+        assertEquals(1, result.getAllValidationChecksForCurrentLocation().size());
+    }
+
+    @Test
+    public void should_not_add_passed_checks_from_other_validation_result_when_not_storing_passing_checks() {
+        result = ValidationResult.withLocation(FIRST_LOCATION).withoutStoringPassingChecks();
+        ValidationResult that = ValidationResult.withLocation(SECOND_LOCATION);
+        that.pass("passed");
+        that.warn("warning");
+        that.error("error");
+        result.addAll(that);
+        assertEquals(2, result.getAllValidationChecksForLocation(SECOND_LOCATION).size());
+    }
+
+    @Test
+    public void should_remove_passed_checks_when_invoking_withoutPassingChecks() {
+        result = ValidationResult.withLocation(FIRST_LOCATION);
+        assertTrue(result.isStoringPassingChecks());
+        result.pass("passed");
+        assertEquals(1, result.getAllValidationChecksForCurrentLocation().size());
+        result.withoutStoringPassingChecks();
+        assertFalse(result.isStoringPassingChecks());
+        assertEquals(0, result.getAllValidationChecksForCurrentLocation().size());
+    }
 }
