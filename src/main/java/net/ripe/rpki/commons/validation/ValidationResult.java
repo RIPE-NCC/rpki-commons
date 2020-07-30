@@ -55,9 +55,9 @@ public final class ValidationResult implements Serializable {
 
     private ValidationLocation currentLocation;
 
-    private ResultsPerLocation currentResults;
-
     private Map<ValidationLocation, List<ValidationMetric>> metrics = new TreeMap<>();
+
+    private boolean storingPassingChecks = true;
 
     private ValidationResult(ValidationLocation location) {
         setLocation(location);
@@ -75,10 +75,27 @@ public final class ValidationResult implements Serializable {
         return new ValidationResult(location);
     }
 
+    public ValidationResult withoutStoringPassingChecks() {
+        if (this.storingPassingChecks) {
+            this.storingPassingChecks = false;
+            for (ResultsPerLocation entry : this.results.values()) {
+                entry.passed.clear();
+            }
+        }
+        return this;
+    }
+
+    public boolean isStoringPassingChecks() {
+        return storingPassingChecks;
+    }
+
     public ValidationResult setLocation(ValidationLocation location) {
         currentLocation = location;
-        currentResults = results.computeIfAbsent(location, (x) -> new ResultsPerLocation());
         return this;
+    }
+
+    private ResultsPerLocation getCurrentResults() {
+        return results.computeIfAbsent(currentLocation, (x) -> new ResultsPerLocation());
     }
 
     public ValidationResult pass(String key) {
@@ -86,7 +103,9 @@ public final class ValidationResult implements Serializable {
     }
 
     public ValidationResult pass(String key, String... param) {
-        currentResults.passed.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
+        if (storingPassingChecks) {
+            getCurrentResults().passed.add(new ValidationCheck(ValidationStatus.PASSED, key, param));
+        }
         return this;
     }
 
@@ -95,7 +114,7 @@ public final class ValidationResult implements Serializable {
     }
 
     public ValidationResult warn(String key, String... param) {
-        currentResults.warning.add(new ValidationCheck(ValidationStatus.WARNING, key, param));
+        getCurrentResults().warning.add(new ValidationCheck(ValidationStatus.WARNING, key, param));
         return this;
     }
 
@@ -104,7 +123,7 @@ public final class ValidationResult implements Serializable {
     }
 
     public ValidationResult error(String key, String... param) {
-        currentResults.error.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
+        getCurrentResults().error.add(new ValidationCheck(ValidationStatus.ERROR, key, param));
         return this;
     }
 
@@ -328,10 +347,17 @@ public final class ValidationResult implements Serializable {
 
     public ValidationResult addAll(ValidationResult that) {
         for (Entry<ValidationLocation, ResultsPerLocation> resultsByLocation : that.results.entrySet()) {
-            ResultsPerLocation map = results.computeIfAbsent(resultsByLocation.getKey(), (x) -> new ResultsPerLocation());
-            map.error.addAll(resultsByLocation.getValue().error);
-            map.warning.addAll(resultsByLocation.getValue().warning);
-            map.passed.addAll(resultsByLocation.getValue().passed);
+            ResultsPerLocation thatResults = resultsByLocation.getValue();
+            if (thatResults.error.isEmpty() && thatResults.warning.isEmpty() && (thatResults.passed.isEmpty() || !this.storingPassingChecks)) {
+                continue;
+            }
+
+            ResultsPerLocation thisResults = results.computeIfAbsent(resultsByLocation.getKey(), (x) -> new ResultsPerLocation());
+            thisResults.error.addAll(thatResults.error);
+            thisResults.warning.addAll(thatResults.warning);
+            if (this.storingPassingChecks) {
+                thisResults.passed.addAll(thatResults.passed);
+            }
         }
         return this;
     }
