@@ -46,6 +46,11 @@ provisioning protocol.
 
 ## Changelog
 
+### 2020-07 version 1.12.0
+
+Provide option to avoid storing passed checks in validation result to
+reduce memory usage.
+
 ### 2020-07 version 1.11.0
 
 This release improves performance of the validation process.
