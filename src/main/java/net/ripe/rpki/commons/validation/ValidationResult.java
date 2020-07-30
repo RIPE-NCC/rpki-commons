@@ -76,9 +76,11 @@ public final class ValidationResult implements Serializable {
     }
 
     public ValidationResult withoutStoringPassingChecks() {
-        this.storingPassingChecks = false;
-        for (ResultsPerLocation entry : this.results.values()) {
-            entry.passed.clear();
+        if (this.storingPassingChecks) {
+            this.storingPassingChecks = false;
+            for (ResultsPerLocation entry : this.results.values()) {
+                entry.passed.clear();
+            }
         }
         return this;
     }
