@@ -80,7 +80,7 @@ public class X509CrlValidatorTest {
     @Before
     public void setUp() {
         parent = getRootResourceCertificate();
-        options = new ValidationOptions();
+        options = ValidationOptions.backCompatibleRipeNccValidator();
         result = ValidationResult.withLocation("location");
         subject = new X509CrlValidator(options, result, parent);
     }

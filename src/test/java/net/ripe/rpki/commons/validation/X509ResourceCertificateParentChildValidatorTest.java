@@ -88,7 +88,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
         child = createChildCertificateBuilder().build();
         rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
         result = ValidationResult.withLocation("n/a");
-        options = new ValidationOptions();
+        options = ValidationOptions.strictValidation();
     }
 
     private void validate(X509ResourceCertificateParentChildValidator validator, X509ResourceCertificate certificate) {

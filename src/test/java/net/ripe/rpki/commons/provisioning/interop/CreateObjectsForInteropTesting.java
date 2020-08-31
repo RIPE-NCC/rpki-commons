@@ -83,7 +83,7 @@ public class CreateObjectsForInteropTesting {
     }
 
     public void validateCmsObject(ProvisioningCmsObject resourceClassListQueryCms) {
-        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), resourceClassListQueryCms, ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(ValidationOptions.strictValidation(), resourceClassListQueryCms, ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
         ValidationResult result = ValidationResult.withLocation("n/a");
         validator.validate(result);
         assertTrue(!result.hasFailures());

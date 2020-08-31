@@ -93,7 +93,7 @@ public class X509ResourceCertificateTest {
 
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
 
-    private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
+    private static final ValidationOptions VALIDATION_OPTIONS = ValidationOptions.strictValidation();
 
     public static X509ResourceCertificateBuilder createSelfSignedCaCertificateBuilder() {
         X509ResourceCertificateBuilder builder = createBasicBuilder();
@@ -374,7 +374,7 @@ public class X509ResourceCertificateTest {
 
         CertificateRepositoryObjectValidationContext validationContext = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCert);
 
-        subject.validate(TEST_CA_URI.toString(), validationContext, crlLocator, new ValidationOptions(), ValidationResult.withLocation(TEST_CA_URI));
+        subject.validate(TEST_CA_URI.toString(), validationContext, crlLocator, ValidationOptions.strictValidation(), ValidationResult.withLocation(TEST_CA_URI));
 
         assertTrue("Certificate must be revoked", subject.isRevoked());
 

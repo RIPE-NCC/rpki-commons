@@ -55,7 +55,7 @@ public class X509CrlTest {
 
     private static final URI ROOT_MANIFEST_CRL_LOCATION = URI.create("rsync://foo.host/bar/bar%20space.crl");
 
-    private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
+    private static final ValidationOptions VALIDATION_OPTIONS = ValidationOptions.strictValidation();
 
 
     public static X509Crl createCrl() {

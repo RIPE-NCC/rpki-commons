@@ -172,7 +172,7 @@ public class RoaCmsTest {
         CrlLocator crlLocator = Mockito.mock(CrlLocator.class);
         Mockito.when(crlLocator.getCrl(Mockito.any(URI.class), Mockito.any(CertificateRepositoryObjectValidationContext.class), Mockito.any(ValidationResult.class))).thenReturn(crl);
 
-        subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, new ValidationOptions(), ValidationResult.withLocation(TEST_ROA_LOCATION));
+        subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, ValidationOptions.strictValidation(), ValidationResult.withLocation(TEST_ROA_LOCATION));
 
         assertTrue("ROA must be revoked", subject.isRevoked());
     }
@@ -189,7 +189,7 @@ public class RoaCmsTest {
         CrlLocator crlLocator = Mockito.mock(CrlLocator.class);
         Mockito.when(crlLocator.getCrl(Mockito.any(URI.class), Mockito.any(CertificateRepositoryObjectValidationContext.class), Mockito.any(ValidationResult.class))).thenReturn(crl);
 
-        subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, new ValidationOptions(), ValidationResult.withLocation(TEST_ROA_LOCATION));
+        subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, ValidationOptions.strictValidation(), ValidationResult.withLocation(TEST_ROA_LOCATION));
 
         assertFalse("ROA must not be revoked", subject.isRevoked());
     }

@@ -111,7 +111,7 @@ public class ManifestCmsTest {
     private ManifestCms subject;
     private X509ResourceCertificate rootCertificate;
 
-    private static final ValidationOptions VALIDATION_OPTIONS = new ValidationOptions();
+    private static final ValidationOptions VALIDATION_OPTIONS = ValidationOptions.strictValidation();
 
     public static ManifestCms getRootManifestCms() {
         ManifestCmsBuilder builder = getRootManifestBuilder();
@@ -315,7 +315,7 @@ public class ManifestCmsTest {
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = ValidationOptions.defaultRipeNccValidator();
+        ValidationOptions options = ValidationOptions.backCompatibleRipeNccValidator();
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
