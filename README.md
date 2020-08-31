@@ -46,7 +46,7 @@ provisioning protocol.
 
 ## Changelog
 
-### 2020-07 version 1.12.2
+### 2020-07 version 1.12.1
 
 Fix inconsistencies in ValidationOptions behaviour.
 
