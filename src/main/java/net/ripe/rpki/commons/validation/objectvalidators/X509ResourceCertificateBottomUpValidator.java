@@ -52,7 +52,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     private X509ResourceCertificate certificate;
     private Collection<X509ResourceCertificate> trustAnchors;
     private ResourceCertificateLocator locator;
-    private List<CertificateWithLocation> certificates = new LinkedList<CertificateWithLocation>();
+    private List<CertificateWithLocation> certificates = new LinkedList<>();
     private ValidationOptions options;
     private ValidationResult result;
     private ValidationLocation location;
@@ -63,7 +63,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     }
 
     public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
-        this(new ValidationOptions(), ValidationResult.withLocation("unknown.cer"), locator, trustAnchors);
+        this(ValidationOptions.strictValidation(), ValidationResult.withLocation("unknown.cer"), locator, trustAnchors);
     }
 
     public X509ResourceCertificateBottomUpValidator(ValidationOptions options, ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {

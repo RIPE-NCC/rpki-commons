@@ -120,7 +120,8 @@ public class ProcessIscUpdownPdusTest {
 
         ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
 
-        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(new ValidationOptions(), provisioningCmsObject, childCert);
+        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(
+            ValidationOptions.backCompatibleRipeNccValidator(), provisioningCmsObject, childCert);
         ValidationResult result = ValidationResult.withLocation("unknown.der");
         validator.validate(result);
 

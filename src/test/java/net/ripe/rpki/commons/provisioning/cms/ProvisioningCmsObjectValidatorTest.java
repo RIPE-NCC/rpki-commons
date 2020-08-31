@@ -48,7 +48,7 @@ public class ProvisioningCmsObjectValidatorTest {
 
     private ProvisioningCmsObjectValidator subject;
 
-    private ValidationOptions options = new ValidationOptions();
+    private ValidationOptions options = ValidationOptions.strictValidation();
 
 
     @Before

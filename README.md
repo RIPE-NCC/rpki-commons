@@ -46,6 +46,10 @@ provisioning protocol.
 
 ## Changelog
 
+### 2020-07 version 1.12.2
+
+Fix inconsistencies in ValidationOptions behaviour.
+
 ### 2020-07 version 1.12.0
 
 Provide option to avoid storing passed checks in validation result to
