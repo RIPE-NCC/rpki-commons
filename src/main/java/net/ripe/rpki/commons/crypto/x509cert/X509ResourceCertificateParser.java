@@ -44,10 +44,11 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -105,7 +106,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             return false;
         }
         ASN1Encodable firstCnValue = firstCn.getValue();
-        return firstCnValue != null && isPrintableString(firstCnValue);
+        return isPrintableString(firstCnValue);
     }
 
     //http://tools.ietf.org/html/rfc6487#section-4.4
@@ -127,7 +128,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
                 return;
             }
-            ASN1Sequence policies = ASN1Sequence.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            ASN1Sequence policies = ASN1Sequence.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
             if (!result.rejectIfFalse(policies.size() == 1, SINGLE_CERT_POLICY)) {
                 return;
             }
@@ -163,7 +164,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
         CRLDistPoint crlDistPoint;
         try {
-            crlDistPoint = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            crlDistPoint = CRLDistPoint.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
             result.pass(CRLDP_EXTENSION_PARSED);
         } catch (IOException e) {
             result.error(CRLDP_EXTENSION_PARSED);
@@ -194,8 +195,8 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 }
                 DERIA5String uri = (DERIA5String) name.getName();
                 try {
-                    URI.create(uri.getString());
-                } catch (IllegalArgumentException e) {
+                    new URI(uri.getString());
+                } catch (URISyntaxException e) {
                     result.error(CRLDP_URI_SYNTAX);
                     return;
                 }
