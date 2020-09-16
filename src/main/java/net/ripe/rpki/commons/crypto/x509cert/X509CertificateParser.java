@@ -92,16 +92,8 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         X509CertificateParser<? extends X509GenericCertificate> parser;
         if (X509CertificateUtil.isRouter(certificate)) {
             parser = new X509RouterCertificateParser();
-        } else if (
-                X509CertificateUtil.isCa(certificate) ||
-                X509CertificateUtil.isEe(certificate) ||
-                X509CertificateUtil.isRoot(certificate) ||
-                X509CertificateUtil.isObjectIssuer(certificate)
-        ) {
+        } else  {
             parser = new X509ResourceCertificateParser();
-        } else {
-            result.error("cert.type.unknown");
-            return null;
         }
 
         parser.validateX509Certificate(result, certificate);

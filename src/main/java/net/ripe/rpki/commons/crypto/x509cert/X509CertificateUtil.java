@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
