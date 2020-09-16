@@ -125,5 +125,6 @@ Fixes:
 When a pull request is merged to master GitLab CI builds a snapshot release
 and publishes it on maven central.
 
-Running `mvn prepare:release` locally creates a release version and
-tags it. This version automatically is published by GitLab CI.
+Running `mvn release:prepare` locally creates a release version and
+tags it. This version automatically is published by GitLab CI. The new
+snapshot version will also be set and committed.
