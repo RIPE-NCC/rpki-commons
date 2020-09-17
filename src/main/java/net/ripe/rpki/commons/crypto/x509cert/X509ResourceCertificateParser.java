@@ -53,11 +53,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.findFirstRsyncCrlDistributionPoint;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.isRoot;
@@ -264,6 +266,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     private void validateSiaForEeCertificate(List<AccessDescription> accessDescriptors) {
+        Set<String> otherAccessMethods = new TreeSet<>();
         boolean hasSignedObjectUri = false;
         for (AccessDescription descriptor : accessDescriptors) {
             if (ID_AD_SIGNED_OBJECT.equals(descriptor.getAccessMethod())) {
@@ -271,10 +274,16 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 if (location != null && "rsync".equals(location.getScheme())) {
                     hasSignedObjectUri = true;
                 }
+            } else if (ID_AD_RPKI_NOTIFY.equals(descriptor.getAccessMethod())) {
+                // Not allowed by the spec, but (some?) AFRINIC manifest objects have this access method defined
+                result.warn(CERT_SIA_EE_CERTIFICATE_OTHER_ACCESS_METHODS, descriptor.getAccessMethod().getId());
+            } else {
+                otherAccessMethods.add(descriptor.getAccessMethod().getId());
             }
         }
 
         result.rejectIfFalse(hasSignedObjectUri, CERT_SIA_SIGNED_OBJECT_URI_PRESENT);
+        result.rejectIfFalse(otherAccessMethods.isEmpty(), CERT_SIA_EE_CERTIFICATE_OTHER_ACCESS_METHODS, String.join(", ", otherAccessMethods));
     }
 
     private URI toUri(AccessDescription descriptor, String key) {
