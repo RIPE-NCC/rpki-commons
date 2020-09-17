@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.util.UTC;
@@ -54,6 +55,8 @@ import java.security.cert.CRLException;
 import java.util.EnumSet;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
 import static org.junit.Assert.*;
 
 
@@ -167,6 +170,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
         validator.validate("child", child);
+        System.out.println(validator.getValidationResult());
         assertTrue(validator.getValidationResult().hasFailures());
         assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
         assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
@@ -247,6 +251,10 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withSubjectKeyIdentifier(true);
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
+        builder.withSubjectInformationAccess(
+            new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, URI.create("rsync://example.com/root")),
+            new X509CertificateInformationAccessDescriptor(ID_AD_RPKI_MANIFEST, URI.create("rsync://example.com/root/manifest.mft"))
+        );
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
         return builder.build();
     }
@@ -267,6 +275,10 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(VALIDITY_PERIOD);
         builder.withCrlDistributionPoints(URI.create("rsync://localhost/ta.crl"));
+        builder.withSubjectInformationAccess(
+                new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, URI.create("rsync://example.com/repository")),
+                new X509CertificateInformationAccessDescriptor(ID_AD_RPKI_MANIFEST, URI.create("rsync://example.com/repository/manifest.mft"))
+        );
         return builder;
     }
 

@@ -372,5 +372,14 @@ public final class ValidationResult implements Serializable {
         // Average of 12-13 passed checks per location (min = 1, max = 18) as of 2020-07-08 on RIPE NCC trust anchor,
         // we use a slightly higher initial capacity to avoid re-sizing.
         final List<ValidationCheck> passed = new ArrayList<>(20);
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                    .append("error", error)
+                    .append("warning", warning)
+                    .append("passed", passed)
+                    .toString();
+        }
     }
 }
