@@ -58,6 +58,7 @@ import java.util.regex.Pattern;
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.findFirstRsyncCrlDistributionPoint;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.isRoot;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -214,48 +215,66 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
         result.rejectIfFalse(nonCriticalExtensionOIDs.contains(Extension.subjectInfoAccess.getId()), CERT_SIA_NON_CRITICAL_EXTENSION);
 
-        if (X509CertificateUtil.isCa(certificate)) {
-            byte[] extensionValue = certificate.getExtensionValue(Extension.subjectInfoAccess.getId());
-            if (!result.rejectIfNull(extensionValue, CERT_SIA_IS_PRESENT)) {
-                return;
-            }
-
-            List<AccessDescription> accessDescriptors = new ArrayList<>();
-            try {
-                ASN1Sequence sia = ASN1Sequence.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
-                for (ASN1Encodable encodable : sia) {
-                    accessDescriptors.add(AccessDescription.getInstance(encodable));
-                }
-                result.pass(CERT_SIA_PARSED);
-            } catch (IllegalArgumentException | IOException e) {
-                result.error(CERT_SIA_PARSED);
-                return;
-            }
-
-            boolean hasCaRepositorySia = false;
-            boolean hasRsyncRepositoryUri = false;
-            boolean hasManifestUri = false;
-            for (AccessDescription descriptor : accessDescriptors) {
-                if (ID_AD_CA_REPOSITORY.equals(descriptor.getAccessMethod())) {
-                    hasCaRepositorySia = true;
-                    URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
-                    if (location != null && "rsync".equals(location.getScheme())) {
-                        hasRsyncRepositoryUri = true;
-                    }
-                } else if (ID_AD_RPKI_MANIFEST.equals(descriptor.getAccessMethod())) {
-                    URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
-                    if (location != null && "rsync".equals(location.getScheme())) {
-                        hasManifestUri = true;
-                    }
-                }
-            }
-
-            result.rejectIfFalse(hasCaRepositorySia, CERT_SIA_CA_REPOSITORY_URI_PRESENT);
-            result.rejectIfFalse(hasRsyncRepositoryUri, CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT);
-            result.rejectIfFalse(hasManifestUri, CERT_SIA_MANIFEST_URI_PRESENT);
-        } else {
-
+        byte[] extensionValue = certificate.getExtensionValue(Extension.subjectInfoAccess.getId());
+        if (!result.rejectIfNull(extensionValue, CERT_SIA_IS_PRESENT)) {
+            return;
         }
+
+        List<AccessDescription> accessDescriptors = new ArrayList<>();
+        try {
+            ASN1Sequence sia = ASN1Sequence.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
+            for (ASN1Encodable encodable : sia) {
+                accessDescriptors.add(AccessDescription.getInstance(encodable));
+            }
+            result.pass(CERT_SIA_PARSED);
+        } catch (IllegalArgumentException | IOException e) {
+            result.error(CERT_SIA_PARSED);
+            return;
+        }
+
+        if (X509CertificateUtil.isCa(certificate)) {
+            validateSiaForCaCertificate(accessDescriptors);
+        } else {
+            validateSiaForEeCertificate(accessDescriptors);
+        }
+    }
+
+    private void validateSiaForCaCertificate(List<AccessDescription> accessDescriptors) {
+        boolean hasCaRepositorySia = false;
+        boolean hasRsyncRepositoryUri = false;
+        boolean hasManifestUri = false;
+        for (AccessDescription descriptor : accessDescriptors) {
+            if (ID_AD_CA_REPOSITORY.equals(descriptor.getAccessMethod())) {
+                hasCaRepositorySia = true;
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                if (location != null && "rsync".equals(location.getScheme())) {
+                    hasRsyncRepositoryUri = true;
+                }
+            } else if (ID_AD_RPKI_MANIFEST.equals(descriptor.getAccessMethod())) {
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                if (location != null && "rsync".equals(location.getScheme())) {
+                    hasManifestUri = true;
+                }
+            }
+        }
+
+        result.rejectIfFalse(hasCaRepositorySia, CERT_SIA_CA_REPOSITORY_URI_PRESENT);
+        result.rejectIfFalse(hasRsyncRepositoryUri, CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT);
+        result.rejectIfFalse(hasManifestUri, CERT_SIA_MANIFEST_URI_PRESENT);
+    }
+
+    private void validateSiaForEeCertificate(List<AccessDescription> accessDescriptors) {
+        boolean hasSignedObjectUri = false;
+        for (AccessDescription descriptor : accessDescriptors) {
+            if (ID_AD_SIGNED_OBJECT.equals(descriptor.getAccessMethod())) {
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                if (location != null && "rsync".equals(location.getScheme())) {
+                    hasSignedObjectUri = true;
+                }
+            }
+        }
+
+        result.rejectIfFalse(hasSignedObjectUri, CERT_SIA_SIGNED_OBJECT_URI_PRESENT);
     }
 
     private URI toUri(AccessDescription descriptor, String key) {
