@@ -222,7 +222,7 @@ public final class X509CertificateUtil {
             return null;
         }
         for (X509CertificateInformationAccessDescriptor ad : accessDescriptor) {
-            if ((method.equals(ad.getMethod())) && (ad.getLocation().getScheme().equals(scheme))) {
+            if ((method.equals(ad.getMethod())) && (ad.getLocation().getScheme().equalsIgnoreCase(scheme))) {
                 return ad.getLocation();
             }
         }
@@ -260,7 +260,7 @@ public final class X509CertificateUtil {
             return null;
         }
         for (URI uri : crlDistributionPoints) {
-            if (uri != null && "rsync".equals(uri.getScheme())) {
+            if (uri != null && "rsync".equalsIgnoreCase(uri.getScheme())) {
                 return uri;
             }
         }

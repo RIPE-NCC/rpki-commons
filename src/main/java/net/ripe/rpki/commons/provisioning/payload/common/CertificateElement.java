@@ -91,7 +91,7 @@ public class CertificateElement {
 
     public URI getRsyncAIAPointer() {
         for (URI uri : issuerCertificatePublicationLocationUris) {
-            if (uri.toString().startsWith("rsync")) {
+            if ("rsync".equalsIgnoreCase(uri.getScheme())) {
                 return uri;
             }
         }

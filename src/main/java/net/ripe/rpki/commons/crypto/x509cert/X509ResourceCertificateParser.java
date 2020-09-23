@@ -250,12 +250,12 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             if (ID_AD_CA_REPOSITORY.equals(descriptor.getAccessMethod())) {
                 hasCaRepositorySia = true;
                 URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
-                if (location != null && "rsync".equals(location.getScheme())) {
+                if (location != null && "rsync".equalsIgnoreCase(location.getScheme())) {
                     hasRsyncRepositoryUri = true;
                 }
             } else if (ID_AD_RPKI_MANIFEST.equals(descriptor.getAccessMethod())) {
                 URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
-                if (location != null && "rsync".equals(location.getScheme())) {
+                if (location != null && "rsync".equalsIgnoreCase(location.getScheme())) {
                     hasManifestUri = true;
                 }
             }
@@ -273,7 +273,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         for (AccessDescription descriptor : accessDescriptors) {
             if (ID_AD_SIGNED_OBJECT.equals(descriptor.getAccessMethod())) {
                 URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
-                if (location != null && "rsync".equals(location.getScheme())) {
+                if (location != null && "rsync".equalsIgnoreCase(location.getScheme())) {
                     hasSignedObjectUri = true;
                 }
             } else if (ID_AD_RPKI_NOTIFY.equals(descriptor.getAccessMethod())) {
