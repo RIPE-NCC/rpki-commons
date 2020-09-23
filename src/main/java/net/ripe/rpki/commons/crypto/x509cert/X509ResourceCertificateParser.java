@@ -241,6 +241,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         }
     }
 
+    // https://tools.ietf.org/html/rfc6487#section-4.8.8.1
     private void validateSiaForCaCertificate(List<AccessDescription> accessDescriptors) {
         boolean hasCaRepositorySia = false;
         boolean hasRsyncRepositoryUri = false;
