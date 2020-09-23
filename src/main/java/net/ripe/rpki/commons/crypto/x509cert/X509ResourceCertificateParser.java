@@ -266,6 +266,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         result.rejectIfFalse(hasManifestUri, CERT_SIA_MANIFEST_URI_PRESENT);
     }
 
+    // https://tools.ietf.org/html/rfc6487#section-4.8.8.2
     private void validateSiaForEeCertificate(List<AccessDescription> accessDescriptors) {
         Set<String> otherAccessMethods = new TreeSet<>();
         boolean hasSignedObjectUri = false;
