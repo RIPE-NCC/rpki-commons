@@ -121,6 +121,7 @@ public final class ValidationString {
     public static final String CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT = "cert.sia.ca.repository.rsync.uri.present";
     public static final String CERT_SIA_MANIFEST_URI_PRESENT = "cert.sia.manifest.uri.present";
     public static final String CERT_SIA_SIGNED_OBJECT_URI_PRESENT = "cert.sia.signed.object.uri.present";
+    public static final String CERT_SIA_RRDP_NOTIFY_URI_HTTPS = "cert.sia.rrdp.notify.uri.https";
     public static final String CERT_SIA_EE_CERTIFICATE_OTHER_ACCESS_METHODS = "cert.sia.ee.certificate.other.access.methods";
 
     // router certificate

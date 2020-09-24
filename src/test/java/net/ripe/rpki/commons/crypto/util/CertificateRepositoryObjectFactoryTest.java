@@ -80,9 +80,10 @@ public class CertificateRepositoryObjectFactoryTest {
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(cert.getEncoded(), validationResult);
 
+        assertFalse("no validation failures " + validationResult.getFailuresForCurrentLocation(), validationResult.hasFailureForCurrentLocation());
         assertTrue(object instanceof X509ResourceCertificate);
         assertEquals(cert, object);
-        assertEquals(25, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(27, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
         assertTrue(validationResult.getResultForCurrentLocation(CERTIFICATE_PARSED).isOk());

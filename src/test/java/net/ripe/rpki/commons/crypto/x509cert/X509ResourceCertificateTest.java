@@ -77,7 +77,7 @@ public class X509ResourceCertificateTest {
     public static final URI TEST_TA_CRL = URI.create("Rsync://host.foo/bar/ta.crl");
     private static final URI MFT_URI = URI.create("Rsync://host.foo/bar/ta.mft");
     private static final URI PUB_DIR_URI = URI.create("RSYNC://host.foo/bar/");
-    private static final URI PUB_NOTIFY_URI = URI.create("HTTP://host.foo/notify.xml");
+    private static final URI PUB_NOTIFY_URI = URI.create("HTTPS://host.foo/notify.xml");
 
 
     private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_CRL);

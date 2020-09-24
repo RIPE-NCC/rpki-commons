@@ -209,6 +209,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     // See https://tools.ietf.org/html/rfc6487#section-4.8.8
+    // https://tools.ietf.org/html/rfc8182#section-3.2
     private void validateSubjectInformationAccess() {
         Set<String> nonCriticalExtensionOIDs = certificate.getNonCriticalExtensionOIDs();
         if (!result.rejectIfNull(nonCriticalExtensionOIDs, NON_CRITICAL_EXT_PRESENT)) {
@@ -242,6 +243,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     }
 
     // https://tools.ietf.org/html/rfc6487#section-4.8.8.1
+    // https://tools.ietf.org/html/rfc8182#section-3.2
     private void validateSiaForCaCertificate(List<AccessDescription> accessDescriptors) {
         boolean hasCaRepositorySia = false;
         boolean hasRsyncRepositoryUri = false;
@@ -258,6 +260,13 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 if (location != null && "rsync".equalsIgnoreCase(location.getScheme())) {
                     hasManifestUri = true;
                 }
+            } else if (ID_AD_RPKI_NOTIFY.equals(descriptor.getAccessMethod())) {
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                result.rejectIfFalse(
+                        location != null && "https".equalsIgnoreCase(location.getScheme()),
+                        CERT_SIA_RRDP_NOTIFY_URI_HTTPS,
+                        location.toASCIIString()
+                );
             }
         }
 
@@ -277,8 +286,16 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                     hasSignedObjectUri = true;
                 }
             } else if (ID_AD_RPKI_NOTIFY.equals(descriptor.getAccessMethod())) {
-                // Not allowed by the spec, but (some?) AFRINIC manifest objects have this access method defined
-                result.warn(CERT_SIA_EE_CERTIFICATE_OTHER_ACCESS_METHODS, descriptor.getAccessMethod().getId());
+                // RFC 8181 section 3.2 (https://tools.ietf.org/html/rfc8182#section-3.2) says all resource certificates
+                // issued by an RRDP using CA must include this access methods. This is in direct contradiction to
+                // RFC 6487 section 4.8.8.2. The intention was to only require this for CA certificates, not EE
+                // certificates. Since the wording is unclear we'll accept this for now. In the future we might warn.
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                result.rejectIfFalse(
+                        location != null && "https".equalsIgnoreCase(location.getScheme()),
+                        CERT_SIA_RRDP_NOTIFY_URI_HTTPS,
+                        location.toASCIIString()
+                );
             } else {
                 otherAccessMethods.add(descriptor.getAccessMethod().getId());
             }
