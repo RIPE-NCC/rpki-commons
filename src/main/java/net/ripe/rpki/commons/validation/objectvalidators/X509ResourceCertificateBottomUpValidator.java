@@ -130,16 +130,17 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
                 return;
             }
 
+            ValidationLocation parentLocation = new ValidationLocation(parent.getName());
+            result.setLocation(parentLocation);
+
             X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-            parser.parse(ValidationResult.withLocation(parent.getName()), parent.getContent());
+            parser.parse(result, parent.getContent());
             if (result.hasFailures()) {
                 return;
             }
 
             cert = parser.getCertificate();
-            ValidationLocation parentLocation = new ValidationLocation(parent.getName());
             certificates.add(0, new CertificateWithLocation(cert, parentLocation));
-            result.setLocation(parentLocation);
             if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.valueOf(MAX_CHAIN_LENGTH).toString())) {
                 return;
             }

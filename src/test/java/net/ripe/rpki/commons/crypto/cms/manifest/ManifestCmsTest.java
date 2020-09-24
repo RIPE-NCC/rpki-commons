@@ -72,6 +72,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -441,6 +442,9 @@ public class ManifestCmsTest {
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(new ValidityPeriod(MFT_EE_NOT_BEFORE, MFT_EE_NOT_AFTER));
         builder.withCrlDistributionPoints(ROOT_MANIFEST_CRL_LOCATION);
+        builder.withSubjectInformationAccess(
+                new X509CertificateInformationAccessDescriptor(ID_AD_SIGNED_OBJECT, ROOT_SIA_MANIFEST_RSYNC_LOCATION)
+        );
         return builder;
     }
 

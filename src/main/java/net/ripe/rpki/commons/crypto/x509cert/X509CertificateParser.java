@@ -85,21 +85,20 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     public static X509GenericCertificate parseCertificate(ValidationResult result, byte[] encoded) {
         final X509Certificate certificate = parseEncoded(encoded, result);
-        if (!result.hasFailureForCurrentLocation()) {
-            if (X509CertificateUtil.isRouter(certificate)) {
-                X509RouterCertificateParser parser = new X509RouterCertificateParser();
-                parser.validateX509Certificate(result, certificate);
-                return parser.getCertificate();
-            } else if (X509CertificateUtil.isCa(certificate) ||
-                    X509CertificateUtil.isEe(certificate) ||
-                    X509CertificateUtil.isRoot(certificate) ||
-                    X509CertificateUtil.isObjectIssuer(certificate)) {
-                final X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-                parser.validateX509Certificate(result, certificate);
-                return parser.getCertificate();
-            }
+        if (result.hasFailureForCurrentLocation()) {
+            return null;
         }
-        return null;
+
+        X509CertificateParser<? extends X509GenericCertificate> parser;
+        if (X509CertificateUtil.isRouter(certificate)) {
+            parser = new X509RouterCertificateParser();
+        } else  {
+            parser = new X509ResourceCertificateParser();
+        }
+
+        parser.validateX509Certificate(result, certificate);
+
+        return result.hasFailureForCurrentLocation() ? null : parser.getCertificate();
     }
 
     protected void validatePublicKey() {

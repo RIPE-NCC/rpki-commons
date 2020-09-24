@@ -31,6 +31,8 @@ package net.ripe.rpki.commons.validation;
 
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -57,6 +59,11 @@ public class ValidationLocation implements Serializable, Comparable<ValidationLo
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append("name", name).toString();
     }
 
     @Override

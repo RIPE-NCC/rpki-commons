@@ -33,6 +33,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import org.bouncycastle.asn1.BERTags;
@@ -45,6 +46,7 @@ import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.util.EnumSet;
 import java.util.Map;
@@ -52,6 +54,7 @@ import java.util.TreeMap;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
 import static org.junit.Assert.*;
 
 
@@ -132,6 +135,9 @@ public class ManifestCmsParserTest {
         builder.withResources(new IpResourceSet());
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
+        builder.withSubjectInformationAccess(
+                new X509CertificateInformationAccessDescriptor(ID_AD_SIGNED_OBJECT, URI.create("rsync://example.com/repository/manifest.mft"))
+        );
         return builder.build();
     }
 

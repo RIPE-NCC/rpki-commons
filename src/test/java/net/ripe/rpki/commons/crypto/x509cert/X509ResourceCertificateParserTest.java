@@ -43,10 +43,13 @@ import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
@@ -100,6 +103,24 @@ public class X509ResourceCertificateParserTest {
 
         assertTrue(subject.getValidationResult().hasFailures());
         assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
+    }
+
+
+    @Test
+    public void should_require_rsync_repository_uri() {
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withSubjectInformationAccess(
+                new X509CertificateInformationAccessDescriptor(ID_AD_RPKI_MANIFEST, URI.create("rsync://example.com/repository/manifest.mft")),
+                new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, URI.create("https://example.com/repository/notify.xml"))
+        );
+        X509ResourceCertificate certificate = builder.build();
+
+        ValidationResult result = ValidationResult.withLocation("test");
+        final AbstractX509CertificateWrapper certificateWrapper = X509ResourceCertificateParser.parseCertificate(result, certificate.getEncoded());
+        assertNull(certificateWrapper);
+        assertEquals(1, result.getFailuresForCurrentLocation().size());
+        assertEquals(ValidationStatus.PASSED, result.getResult(new ValidationLocation("test"), CERT_SIA_IS_PRESENT).getStatus());
+        assertEquals(ValidationStatus.PASSED, result.getResult(new ValidationLocation("test"), CERT_SIA_CA_REPOSITORY_URI_PRESENT).getStatus());
+        assertEquals(ValidationStatus.ERROR, result.getResult(new ValidationLocation("test"), CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT).getStatus());
     }
 
     @Test

@@ -74,9 +74,10 @@ public class X509ResourceCertificateTest {
     public static final URI TEST_CA_URI = URI.create("rsync://host.foo/ca.cer");
     private static final ValidationLocation CERT_URI_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_URI);
 
-    public static final URI TEST_TA_CRL = URI.create("rsync://host.foo/bar/ta.crl");
-    private static final URI MFT_URI = URI.create("rsync://host.foo/bar/ta.mft");
-    private static final URI PUB_DIR_URI = URI.create("rsync://host.foo/bar/");
+    public static final URI TEST_TA_CRL = URI.create("Rsync://host.foo/bar/ta.crl");
+    private static final URI MFT_URI = URI.create("Rsync://host.foo/bar/ta.mft");
+    private static final URI PUB_DIR_URI = URI.create("RSYNC://host.foo/bar/");
+    private static final URI PUB_NOTIFY_URI = URI.create("HTTPS://host.foo/notify.xml");
 
 
     private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_CRL);
@@ -114,7 +115,9 @@ public class X509ResourceCertificateTest {
 
         X509CertificateInformationAccessDescriptor[] descriptors = {
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, PUB_DIR_URI),
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, MFT_URI)};
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY, PUB_NOTIFY_URI),
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, MFT_URI)
+        };
         builder.withSubjectInformationAccess(descriptors);
 
         return builder;
@@ -234,13 +237,14 @@ public class X509ResourceCertificateTest {
     public void shouldSupportSubjectInformationAccessExtension() throws URISyntaxException {
         X509CertificateInformationAccessDescriptor[] descriptors = {
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, new URI("rsync://foo.host/bar/")),
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, new URI("http://foo.host/bar/"))
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY, new URI("HTTPS://foo.host/notify.xml"))
         };
         X509ResourceCertificateBuilder builder = createSelfSignedEeCertificateBuilder();
         builder.withSubjectInformationAccess(descriptors);
         X509ResourceCertificate cert = builder.build();
         assertArrayEquals(descriptors, cert.getSubjectInformationAccess());
         assertNotNull(cert.findFirstSubjectInformationAccessByMethod(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY));
+        assertEquals(URI.create("https://foo.host/notify.xml"), cert.getRrdpNotifyUri());
     }
 
     @Test

@@ -95,6 +95,7 @@ public final class ValidationString {
     public static final String CRLDP_URI_SYNTAX = "cert.crldp.uri.syntax";
     public static final String CRLDP_RSYNC_URI_PRESENT = "cert.crldp.rsync.uri.present";
     public static final String CRITICAL_EXT_PRESENT = "cert.critical.exts.present";
+    public static final String NON_CRITICAL_EXT_PRESENT = "cert.non.critical.exts.present";
     public static final String POLICY_EXT_CRITICAL = "cert.policy.ext.critical";
     public static final String POLICY_EXT_VALUE = "cert.policy.ext.value";
     public static final String SINGLE_CERT_POLICY = "cert.single.cert.policy";
@@ -111,8 +112,19 @@ public final class ValidationString {
     public static final String CERT_SUBJECT_CORRECT = "cert.subject.correct";
     public static final String CERT_NO_SUBJECT_PK_INFO = "cert.subj.pk.not.present";
 
-    // router certificate
+    // SIA
+    public static final String CERT_SIA_NON_CRITICAL_EXTENSION = "cert.sia.non.critical.extension";
     public static final String CERT_SIA_IS_PRESENT = "cert.sia.present";
+    public static final String CERT_SIA_PARSED = "cert.sia.parsed";
+    public static final String CERT_SIA_URI_SYNTAX = "cert.sia.uri.syntax";
+    public static final String CERT_SIA_CA_REPOSITORY_URI_PRESENT = "cert.sia.ca.repository.uri.present";
+    public static final String CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT = "cert.sia.ca.repository.rsync.uri.present";
+    public static final String CERT_SIA_MANIFEST_URI_PRESENT = "cert.sia.manifest.uri.present";
+    public static final String CERT_SIA_SIGNED_OBJECT_URI_PRESENT = "cert.sia.signed.object.uri.present";
+    public static final String CERT_SIA_RRDP_NOTIFY_URI_HTTPS = "cert.sia.rrdp.notify.uri.https";
+    public static final String CERT_SIA_EE_CERTIFICATE_OTHER_ACCESS_METHODS = "cert.sia.ee.certificate.other.access.methods";
+
+    // router certificate
     public static final String BGPSEC_EXT_PRESENT = "cert.bgpsec.ext.present";
 
     //cms object

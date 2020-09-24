@@ -37,6 +37,7 @@ import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
@@ -44,14 +45,22 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.findFirstRsyncCrlDistributionPoint;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.isRoot;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -76,6 +85,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         validateCertificatePolicy();
         validateResourceExtensions();
         validateCrlDistributionPoints();
+        validateSubjectInformationAccess();
     }
 
     private void validateIssuerAndSubjectDN() {
@@ -105,7 +115,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             return false;
         }
         ASN1Encodable firstCnValue = firstCn.getValue();
-        return firstCnValue != null && isPrintableString(firstCnValue);
+        return isPrintableString(firstCnValue);
     }
 
     //http://tools.ietf.org/html/rfc6487#section-4.4
@@ -127,7 +137,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
                 return;
             }
-            ASN1Sequence policies = ASN1Sequence.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            ASN1Sequence policies = ASN1Sequence.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
             if (!result.rejectIfFalse(policies.size() == 1, SINGLE_CERT_POLICY)) {
                 return;
             }
@@ -163,7 +173,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
         CRLDistPoint crlDistPoint;
         try {
-            crlDistPoint = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            crlDistPoint = CRLDistPoint.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
             result.pass(CRLDP_EXTENSION_PARSED);
         } catch (IOException e) {
             result.error(CRLDP_EXTENSION_PARSED);
@@ -193,13 +203,126 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                     return;
                 }
                 DERIA5String uri = (DERIA5String) name.getName();
-                try {
-                    URI.create(uri.getString());
-                } catch (IllegalArgumentException e) {
-                    result.error(CRLDP_URI_SYNTAX);
-                    return;
-                }
+                validateURI(uri.toString(), CRLDP_URI_SYNTAX);
             }
+        }
+    }
+
+    // See https://tools.ietf.org/html/rfc6487#section-4.8.8
+    // https://tools.ietf.org/html/rfc8182#section-3.2
+    private void validateSubjectInformationAccess() {
+        Set<String> nonCriticalExtensionOIDs = certificate.getNonCriticalExtensionOIDs();
+        if (!result.rejectIfNull(nonCriticalExtensionOIDs, NON_CRITICAL_EXT_PRESENT)) {
+            return;
+        }
+
+        result.rejectIfFalse(nonCriticalExtensionOIDs.contains(Extension.subjectInfoAccess.getId()), CERT_SIA_NON_CRITICAL_EXTENSION);
+
+        byte[] extensionValue = certificate.getExtensionValue(Extension.subjectInfoAccess.getId());
+        if (!result.rejectIfNull(extensionValue, CERT_SIA_IS_PRESENT)) {
+            return;
+        }
+
+        List<AccessDescription> accessDescriptors = new ArrayList<>();
+        try {
+            ASN1Sequence sia = ASN1Sequence.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
+            for (ASN1Encodable encodable : sia) {
+                accessDescriptors.add(AccessDescription.getInstance(encodable));
+            }
+            result.pass(CERT_SIA_PARSED);
+        } catch (IllegalArgumentException | IOException e) {
+            result.error(CERT_SIA_PARSED);
+            return;
+        }
+
+        if (X509CertificateUtil.isCa(certificate)) {
+            validateSiaForCaCertificate(accessDescriptors);
+        } else {
+            validateSiaForEeCertificate(accessDescriptors);
+        }
+    }
+
+    // https://tools.ietf.org/html/rfc6487#section-4.8.8.1
+    // https://tools.ietf.org/html/rfc8182#section-3.2
+    private void validateSiaForCaCertificate(List<AccessDescription> accessDescriptors) {
+        boolean hasCaRepositorySia = false;
+        boolean hasRsyncRepositoryUri = false;
+        boolean hasManifestUri = false;
+        for (AccessDescription descriptor : accessDescriptors) {
+            if (ID_AD_CA_REPOSITORY.equals(descriptor.getAccessMethod())) {
+                hasCaRepositorySia = true;
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                if (location != null && "rsync".equalsIgnoreCase(location.getScheme())) {
+                    hasRsyncRepositoryUri = true;
+                }
+            } else if (ID_AD_RPKI_MANIFEST.equals(descriptor.getAccessMethod())) {
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                if (location != null && "rsync".equalsIgnoreCase(location.getScheme())) {
+                    hasManifestUri = true;
+                }
+            } else if (ID_AD_RPKI_NOTIFY.equals(descriptor.getAccessMethod())) {
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                result.rejectIfFalse(
+                        location != null && "https".equalsIgnoreCase(location.getScheme()),
+                        CERT_SIA_RRDP_NOTIFY_URI_HTTPS,
+                        location.toASCIIString()
+                );
+            }
+        }
+
+        result.rejectIfFalse(hasCaRepositorySia, CERT_SIA_CA_REPOSITORY_URI_PRESENT);
+        result.rejectIfFalse(hasRsyncRepositoryUri, CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT);
+        result.rejectIfFalse(hasManifestUri, CERT_SIA_MANIFEST_URI_PRESENT);
+    }
+
+    // https://tools.ietf.org/html/rfc6487#section-4.8.8.2
+    private void validateSiaForEeCertificate(List<AccessDescription> accessDescriptors) {
+        Set<String> otherAccessMethods = new TreeSet<>();
+        boolean hasSignedObjectUri = false;
+        for (AccessDescription descriptor : accessDescriptors) {
+            if (ID_AD_SIGNED_OBJECT.equals(descriptor.getAccessMethod())) {
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                if (location != null && "rsync".equalsIgnoreCase(location.getScheme())) {
+                    hasSignedObjectUri = true;
+                }
+            } else if (ID_AD_RPKI_NOTIFY.equals(descriptor.getAccessMethod())) {
+                // RFC 8181 section 3.2 (https://tools.ietf.org/html/rfc8182#section-3.2) says all resource certificates
+                // issued by an RRDP using CA must include this access methods. This is in direct contradiction to
+                // RFC 6487 section 4.8.8.2. The intention was to only require this for CA certificates, not EE
+                // certificates. Since the wording is unclear we'll accept this for now. In the future we might warn.
+                URI location = toUri(descriptor, CERT_SIA_URI_SYNTAX);
+                result.rejectIfFalse(
+                        location != null && "https".equalsIgnoreCase(location.getScheme()),
+                        CERT_SIA_RRDP_NOTIFY_URI_HTTPS,
+                        location.toASCIIString()
+                );
+            } else {
+                otherAccessMethods.add(descriptor.getAccessMethod().getId());
+            }
+        }
+
+        result.rejectIfFalse(hasSignedObjectUri, CERT_SIA_SIGNED_OBJECT_URI_PRESENT);
+        result.rejectIfFalse(otherAccessMethods.isEmpty(), CERT_SIA_EE_CERTIFICATE_OTHER_ACCESS_METHODS, String.join(", ", otherAccessMethods));
+    }
+
+    private URI toUri(AccessDescription descriptor, String key) {
+        GeneralName location = descriptor.getAccessLocation();
+        if (location.getTagNo() != GeneralName.uniformResourceIdentifier) {
+            return null;
+        }
+
+        return validateURI(location.getName().toString(), key);
+    }
+
+    private URI validateURI(String uriString, String key) {
+        try {
+            URI uri = new URI(uriString);
+            URI normalized = uri.normalize();
+            result.warnIfFalse(uri.equals(normalized), key, uriString);
+            return normalized;
+        } catch (URISyntaxException e) {
+            result.error(key, uriString);
+            return null;
         }
     }
 }
