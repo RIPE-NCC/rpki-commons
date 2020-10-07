@@ -33,6 +33,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -54,7 +55,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
@@ -67,9 +67,6 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
-
-    // ASN.1 PrintableString type
-    private static final Pattern PRINTABLE_STRING = Pattern.compile("[-A-Za-z0-9 '()+,./:=?]+");
 
     @Override
     public X509ResourceCertificate getCertificate() {
@@ -90,9 +87,9 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
     private void validateIssuerAndSubjectDN() {
         X500Name issuer = X500Name.getInstance(certificate.getIssuerX500Principal().getEncoded());
-        getValidationResult().warnIfFalse(isValidName(issuer), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
+        getValidationResult().rejectIfFalse(isValidName(issuer), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
         X500Name subject = X500Name.getInstance(certificate.getSubjectX500Principal().getEncoded());
-        getValidationResult().warnIfFalse(isValidName(subject), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
+        getValidationResult().rejectIfFalse(isValidName(subject), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
     }
 
     private boolean isValidName(X500Name principal) {
@@ -102,26 +99,42 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
     public boolean mayHaveOneValidSerialNumber(X500Name principal) {
         RDN[] serialNumbers = principal.getRDNs(BCStyle.SERIALNUMBER);
-        return serialNumbers.length <= 1;
+        if (serialNumbers.length == 0) {
+            return true;
+        }
+        return serialNumbers.length == 1 && isPrintableString(serialNumbers[0]);
     }
 
     private boolean hasOneValidCn(X500Name principal) {
         RDN[] cns = principal.getRDNs(BCStyle.CN);
-        if (cns.length != 1) {
+        return cns.length == 1 && isPrintableString(cns[0]);
+    }
+
+    private boolean isPrintableString(RDN rdn) {
+        if (rdn.size() != 1) {
             return false;
         }
-        AttributeTypeAndValue firstCn = cns[0].getFirst();
-        if (firstCn == null) {
+
+        AttributeTypeAndValue first = rdn.getFirst();
+        ASN1Encodable firstValue = first.getValue();
+        // RFC 6487 section 4.4 and 4.5 require PrintableString, but some RPKI objects use UTF-8 string,
+        // so accept that as well.
+        if (!isPrintableString(firstValue) && !isUTF8String(firstValue)) {
             return false;
         }
-        ASN1Encodable firstCnValue = firstCn.getValue();
-        return isPrintableString(firstCnValue);
+
+        String value = firstValue.toString();
+        return DERPrintableString.isPrintableString(value);
     }
 
     //http://tools.ietf.org/html/rfc6487#section-4.4
     //CN must be type PrintableString
     private boolean isPrintableString(ASN1Encodable value){
     	return value instanceof DERPrintableString;
+    }
+
+    private boolean isUTF8String(ASN1Encodable value) {
+        return value instanceof DERUTF8String;
     }
 
     private void validateCertificatePolicy() {
@@ -265,7 +278,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 result.rejectIfFalse(
                         location != null && "https".equalsIgnoreCase(location.getScheme()),
                         CERT_SIA_RRDP_NOTIFY_URI_HTTPS,
-                        location.toASCIIString()
+                        String.valueOf(descriptor.getAccessLocation())
                 );
             }
         }
@@ -294,7 +307,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 result.rejectIfFalse(
                         location != null && "https".equalsIgnoreCase(location.getScheme()),
                         CERT_SIA_RRDP_NOTIFY_URI_HTTPS,
-                        location.toASCIIString()
+                        String.valueOf(descriptor.getAccessLocation())
                 );
             } else {
                 otherAccessMethods.add(descriptor.getAccessMethod().getId());

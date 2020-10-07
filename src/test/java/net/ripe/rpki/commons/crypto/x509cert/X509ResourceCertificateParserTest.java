@@ -52,7 +52,6 @@ import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAc
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
 
 
 public class X509ResourceCertificateParserTest {
@@ -61,8 +60,10 @@ public class X509ResourceCertificateParserTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
-        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withPolicies();
-        X509ResourceCertificate certificate = builder.build();
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        X509ResourceCertificate certificate = builder
+                .withPolicies()  // Without policies
+                .build();
 
         subject.parse("certificate", certificate.getEncoded());
         subject.getCertificate();
@@ -105,6 +106,25 @@ public class X509ResourceCertificateParserTest {
         assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
     }
 
+    @Test
+    public void should_validate_issuer_dn() {
+        assertTrue("serialNumber optional", validateIssuerDn("CN=test"));
+        assertFalse("mulitple serialNumbers not allowed", validateIssuerDn("CN=test, serialNumber=1, serialNumber=2"));
+        assertFalse("single CN required", validateIssuerDn("serialNumber=1"));
+        assertFalse("multiple CNs not allowed", validateIssuerDn("CN=foo, CN=bar, serialNumber=1"));
+        assertFalse("only printable characters allowed for CN", validateIssuerDn("CN=test$, serialNumber=1"));
+        assertFalse("only printable characters allowed for serialNumber", validateIssuerDn("CN=test, serialNumber=$"));
+    }
+
+    @Test
+    public void should_validate_subject_dn() {
+        assertTrue("serialNumber optional", validateSubjectDn("CN=test"));
+        assertFalse("mulitple serialNumbers not allowed", validateSubjectDn("CN=test, serialNumber=1, serialNumber=2"));
+        assertFalse("single CN required", validateSubjectDn("serialNumber=1"));
+        assertFalse("multiple CNs not allowed", validateSubjectDn("CN=foo, CN=bar, serialNumber=1"));
+        assertFalse("only printable characters allowed for CN", validateSubjectDn("CN=test$, serialNumber=1"));
+        assertFalse("only printable characters allowed for serialNumber", validateSubjectDn("CN=test, serialNumber=$"));
+    }
 
     @Test
     public void should_require_rsync_repository_uri() {
@@ -157,5 +177,27 @@ public class X509ResourceCertificateParserTest {
         assertTrue(certificateWrapper instanceof X509RouterCertificate);
         X509RouterCertificate parsed = (X509RouterCertificate) certificateWrapper;
         assertEquals(parsed.getPublicKey(), certificate.getPublicKey());
+    }
+
+    private boolean validateIssuerDn(String name) {
+        X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder()
+                .withCrlDistributionPoints(URI.create("rsync://rpki.example.com/crl.crl"))
+                .withIssuerDN(new X500Principal(name))
+                .build();
+
+        subject.parse("certificate", certificate.getEncoded());
+
+        return subject.getValidationResult().getFailuresForCurrentLocation().isEmpty();
+    }
+
+    private boolean validateSubjectDn(String name) {
+        X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder()
+                .withCrlDistributionPoints(URI.create("rsync://rpki.example.com/crl.crl"))
+                .withSubjectDN(new X500Principal(name))
+                .build();
+
+        subject.parse("certificate", certificate.getEncoded());
+
+        return subject.getValidationResult().getFailuresForCurrentLocation().isEmpty();
     }
 }
