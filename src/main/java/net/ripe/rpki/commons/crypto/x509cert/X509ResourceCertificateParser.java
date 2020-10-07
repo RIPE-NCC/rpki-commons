@@ -99,26 +99,31 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
 
     public boolean mayHaveOneValidSerialNumber(X500Name principal) {
         RDN[] serialNumbers = principal.getRDNs(BCStyle.SERIALNUMBER);
-        return serialNumbers.length <= 1;
+        if (serialNumbers.length == 0) {
+            return true;
+        }
+        return serialNumbers.length == 1 && isPrintableString(serialNumbers[0]);
     }
 
     private boolean hasOneValidCn(X500Name principal) {
         RDN[] cns = principal.getRDNs(BCStyle.CN);
-        if (cns.length != 1) {
-            return false;
-        }
-        AttributeTypeAndValue firstCn = cns[0].getFirst();
-        if (firstCn == null) {
-            return false;
-        }
-        ASN1Encodable firstCnValue = firstCn.getValue();
-        // RFC 6487 section 4.4 and 4.5 require PrintableString, but some RPKI objects use UTF-8 string,
-        // so accept that as well.
-        if (!isPrintableString(firstCnValue) && !isUTF8String(firstCnValue)) {
+        return cns.length == 1 && isPrintableString(cns[0]);
+    }
+
+    private boolean isPrintableString(RDN rdn) {
+        if (rdn.size() != 1) {
             return false;
         }
 
-        String value = firstCnValue.toString();
+        AttributeTypeAndValue first = rdn.getFirst();
+        ASN1Encodable firstValue = first.getValue();
+        // RFC 6487 section 4.4 and 4.5 require PrintableString, but some RPKI objects use UTF-8 string,
+        // so accept that as well.
+        if (!isPrintableString(firstValue) && !isUTF8String(firstValue)) {
+            return false;
+        }
+
+        String value = firstValue.toString();
         return DERPrintableString.isPrintableString(value);
     }
 
