@@ -46,6 +46,16 @@ provisioning protocol.
 
 ## Changelog
 
+### 3020-10 version 1.14
+
+Validate subject information access (SIA) entries according to RFC6487
+section 4.8.8.
+
+Validate issuer and subject distinguished names according to RFC6487
+sections 4.4 and 4.5.
+
+Use case insensitive comparions of URI scheme component.
+
 ### 2020-07 version 1.13
 
 Fix inconsistencies in ValidationOptions behaviour.
