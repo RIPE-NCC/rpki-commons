@@ -138,6 +138,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         validator.validate("grandchild", grandchild);
         assertTrue(validator.getValidationResult().hasFailures());
 
+        System.out.println(validator.getValidationResult().getFailuresForAllLocations());
         assertTrue(validator.getValidationResult().hasFailureForLocation(GRAND_CHILD_VALIDATION_LOCATION));
         assertTrue(ValidationString.RESOURCE_RANGE.equals(validator.getValidationResult().getFailures(GRAND_CHILD_VALIDATION_LOCATION).get(0).getKey()));
     }
@@ -252,7 +253,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
         builder.withSubjectInformationAccess(
-            new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, URI.create("rsync://example.com/root")),
+            new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, URI.create("rsync://example.com/root/")),
             new X509CertificateInformationAccessDescriptor(ID_AD_RPKI_MANIFEST, URI.create("rsync://example.com/root/manifest.mft"))
         );
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
@@ -276,7 +277,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withValidityPeriod(VALIDITY_PERIOD);
         builder.withCrlDistributionPoints(URI.create("rsync://localhost/ta.crl"));
         builder.withSubjectInformationAccess(
-                new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, URI.create("rsync://example.com/repository")),
+                new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, URI.create("rsync://example.com/repository/")),
                 new X509CertificateInformationAccessDescriptor(ID_AD_RPKI_MANIFEST, URI.create("rsync://example.com/repository/manifest.mft"))
         );
         return builder;
