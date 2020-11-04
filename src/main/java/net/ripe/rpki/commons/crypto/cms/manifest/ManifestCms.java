@@ -158,6 +158,7 @@ public class ManifestCms extends RpkiSignedObject {
         DateTime thisUpdateTime = getThisUpdateTime();
         DateTime nextUpdateTime = getNextUpdateTime();
 
+        result.rejectIfFalse(thisUpdateTime.isBefore(nextUpdateTime), ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME, thisUpdateTime.toString(), nextUpdateTime.toString());
         result.rejectIfTrue(thisUpdateTime.isAfterNow(), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, thisUpdateTime.toString());
 
         if(options.isStrictManifestCRLValidityChecks()){

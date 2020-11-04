@@ -246,6 +246,27 @@ public class ManifestCmsTest {
     }
 
     @Test
+    public void shouldRejectWhenThisUpdateTimeIsNotBeforeNextUpdateTime() {
+        X509Crl crl = getRootCrl();
+        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
+
+        subject = getRootManifestBuilder().withThisUpdateTime(NEXT_UPDATE_TIME.plusSeconds(1)).build(MANIFEST_KEY_PAIR.getPrivate());
+
+        IpResourceSet resources = rootCertificate.getResources();
+
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
+        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+
+        subject.validateWithCrl(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toASCIIString(), context, ValidationOptions.strictValidation(), result, crl);
+
+        assertTrue(result.hasFailures());
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.plusSeconds(1).toString(), NEXT_UPDATE_TIME.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME)
+        );
+    }
+
+    @Test
     public void shouldRejectWhenManifestIsTooStale() {
         X509Crl crl = getRootCrl();
 

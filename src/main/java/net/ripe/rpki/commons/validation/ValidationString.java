@@ -188,6 +188,7 @@ public final class ValidationString {
     public static final String MANIFEST_RESOURCE_INHERIT = "mf.resource.inherit";
     public static final String MANIFEST_BEFORE_THIS_UPDATE_TIME = "mf.before.this.update";
     public static final String MANIFEST_PAST_NEXT_UPDATE_TIME = "mf.past.next.update";
+    public static final String MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME = "mf.this.update.before.next.update";
 
     //ghostbusters
     public static final String GHOSTBUSTERS_RECORD_CONTENT_TYPE = "ghostbusters.record.content.type";
