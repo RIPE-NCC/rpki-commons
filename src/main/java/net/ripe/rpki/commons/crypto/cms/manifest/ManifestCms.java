@@ -40,9 +40,11 @@ import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -51,9 +53,12 @@ import org.joda.time.DateTime;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A manifest of files published by a CA certificate.
@@ -70,9 +75,18 @@ public class ManifestCms extends RpkiSignedObject {
 
     public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
 
-    private Map<String, byte[]> hashes;
+    /**
+     * Allowed characters in a manifest entry file name. This is the same as {@link DERPrintableString#isPrintableString(String)},
+     * except that we disallow forward slash (as it is a directory separator) and allow underscore (since some CA use this).
+     *
+     * RFC 6486 is actually not clear what is allowed and simply requires that manifest entries are published in the same repository
+     * as the manifest. Quote from the RFC: "the name of the file in the repository publication point (directory)".
+     */
+    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9 '()+-.:=?,_]+");
 
-    private ManifestCmsGeneralInfo manifestCmsGeneralInfo;
+    private final Map<String, byte[]> hashes;
+
+    private final ManifestCmsGeneralInfo manifestCmsGeneralInfo;
 
     ManifestCms(RpkiSignedObjectInfo cmsObjectData, ManifestCmsGeneralInfo manifestCmsGeneralInfo, Map<String, byte[]> hashes) {
         super(cmsObjectData);
@@ -149,10 +163,21 @@ public class ManifestCms extends RpkiSignedObject {
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
         result.setLocation(new ValidationLocation(location));
         checkManifestValidityTimes(options, result);
+        checkEntries(result);
         X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
         validator.validate(location, getCertificate());
     }
 
+    private void checkEntries(ValidationResult result) {
+        List<String> failedEntries = getFileNames().stream()
+                .filter(s -> s.trim().isEmpty() || s.equals(".") || s.equals("..") || !FILE_NAME_PATTERN.matcher(s).matches())
+                .collect(Collectors.toList());
+        result.rejectIfFalse(
+                failedEntries.isEmpty(),
+                ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE,
+                failedEntries.stream().map(StringEscapeUtils::escapeJava).collect(Collectors.joining(", "))
+        );
+    }
 
     private void checkManifestValidityTimes(ValidationOptions options, ValidationResult result) {
         DateTime thisUpdateTime = getThisUpdateTime();
