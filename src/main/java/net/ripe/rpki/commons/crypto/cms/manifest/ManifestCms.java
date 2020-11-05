@@ -44,7 +44,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -76,13 +75,15 @@ public class ManifestCms extends RpkiSignedObject {
     public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
 
     /**
-     * Allowed characters in a manifest entry file name. This is the same as {@link DERPrintableString#isPrintableString(String)},
-     * except that we disallow forward slash (as it is a directory separator) and allow underscore (since some CA use this).
+     * Allowed characters in a manifest entry file name. We only allow a minimal set of normal characters to avoid
+     * issues with filenames on the local file system. This includes not allowing `/` as it may be used to navigate
+     * to different directories. This is currently consistent with `rpki-client`. We also disallow many other
+     * characters, to be consistent with `routinator`.
      *
      * RFC 6486 is actually not clear what is allowed and simply requires that manifest entries are published in the same repository
      * as the manifest. Quote from the RFC: "the name of the file in the repository publication point (directory)".
      */
-    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9 '()+-.:=?,_]+");
+    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9'()+-.:=,_]+");
 
     private final Map<String, byte[]> hashes;
 
@@ -170,7 +171,7 @@ public class ManifestCms extends RpkiSignedObject {
 
     private void checkEntries(ValidationResult result) {
         List<String> failedEntries = getFileNames().stream()
-                .filter(s -> s.trim().isEmpty() || s.equals(".") || s.equals("..") || !FILE_NAME_PATTERN.matcher(s).matches())
+                .filter(s -> s.isEmpty() || s.equals(".") || s.equals("..") || !FILE_NAME_PATTERN.matcher(s).matches())
                 .collect(Collectors.toList());
         result.rejectIfFalse(
                 failedEntries.isEmpty(),
