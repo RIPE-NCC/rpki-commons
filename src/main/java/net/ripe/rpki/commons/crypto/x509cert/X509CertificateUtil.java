@@ -59,6 +59,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -272,7 +273,21 @@ public final class X509CertificateUtil {
     }
 
     public static URI getRepositoryUri(X509Certificate certificate) {
-        return findFirstSubjectInformationAccessByMethod(certificate, X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY);
+        URI uri = findFirstSubjectInformationAccessByMethod(certificate, X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY);
+        String rawPath = uri.getRawPath();
+        if (rawPath == null) {
+            // Validation will have failed in this case so we should never get here. Return uri to be compatible
+            // with previous behavior.
+            return uri;
+        } else if (rawPath.endsWith("/")) {
+            return uri;
+        } else {
+            try {
+                return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), rawPath + "/", uri.getRawQuery(), uri.getRawFragment());
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+        }
     }
 
     public static URI getRrdpNotifyUri(X509Certificate certificate) {

@@ -353,6 +353,40 @@ public class ManifestCmsTest {
     }
 
     @Test
+    public void shouldRejectFileNamesThatEscapeRepository() {
+        X509Crl crl = getRootCrl();
+        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.minusSeconds(1).getMillis());
+
+        ManifestCmsBuilder builder = getRootManifestBuilder();
+        builder.addFile("this-one-is-ok.roa", new byte[0]);
+        builder.addFile("underscore_is_also_allowed_since_there_are_published_objects", new byte[0]);
+        builder.addFile("", new byte[0]); // empty is not ok
+        builder.addFile("   ", new byte[0]); // blank is not ok
+        builder.addFile("\0", new byte[0]); // control character not ok
+        builder.addFile(".", new byte[0]);
+        builder.addFile("..", new byte[0]);
+        builder.addFile("...", new byte[0]); // this one is ok
+        builder.addFile("cannot-contain-a/slash", new byte[0]);
+
+        subject = builder.build(MANIFEST_KEY_PAIR.getPrivate());
+
+        IpResourceSet resources = rootCertificate.getResources();
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
+
+        ValidationOptions options = ValidationOptions.strictValidation();
+        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+
+        subject.validateWithCrl(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, options, result, crl);
+
+        assertTrue(result.hasFailures());
+
+        assertEquals(
+                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE, ", \\u0000,    , ., .., cannot-contain-a/slash"),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE)
+        );
+    }
+
+    @Test
     public void shouldMatchFiles() {
         ManifestCms mft = getRootManifestCms();
         assertTrue(mft.matchesFiles(files));

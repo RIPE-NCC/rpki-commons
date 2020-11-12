@@ -331,7 +331,13 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         try {
             URI uri = new URI(uriString);
             URI normalized = uri.normalize();
-            result.warnIfFalse(uri.equals(normalized), key, uriString);
+            if (uri.isOpaque() || !uri.isAbsolute() || uri.getHost() == null) {
+                result.error(key, uriString);
+            } else if (!uri.equals(normalized)) {
+                result.warn(key, uriString);
+            } else {
+                result.pass(key, uriString);
+            }
             return normalized;
         } catch (URISyntaxException e) {
             result.error(key, uriString);
