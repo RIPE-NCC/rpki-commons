@@ -48,7 +48,7 @@
         <joda-time.version>2.10.5</joda-time.version>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.clover.reportPath>target/site/clover/clover.xml</sonar.clover.reportPath>
-        <xstream.version>1.4.11.1</xstream.version>
+        <xstream.version>1.4.13-java7</xstream.version>
         <commons-io.version>2.6</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
     </properties>
