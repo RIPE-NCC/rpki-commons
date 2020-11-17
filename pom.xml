@@ -310,6 +310,7 @@
                         <exclude>.idea/**</exclude>
                         <exclude>.gitignore</exclude>
                         <exclude>.gitlab-ci.yml</exclude>
+                        <exclude>.github/**</exclude>
                         <exclude>.m2/**</exclude>
                         <exclude>.pregenerated-test-key-pairs.keystore</exclude>
                         <exclude>builds/**</exclude>
