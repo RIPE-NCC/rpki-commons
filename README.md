@@ -46,6 +46,26 @@ provisioning protocol.
 
 ## Changelog
 
+
+### 2020-10 version 1.16
+
+Upgrade XStream for security updates.
+
+Various other dependency upgrades.
+
+
+### 2020-11 version 1.15
+
+Validate that manifest `this update time` is before `next update time`.
+
+Manifest entry file names should only refer to current directory and
+use a limited set of allowed characters.
+
+Validate that SIA and CRL URIs have the hostname specified and are not
+opaque.
+
+Upgrade to bouncy castle 1.67.
+
 ### 2020-10 version 1.14
 
 Validate subject information access (SIA) entries according to RFC6487
