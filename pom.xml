@@ -54,6 +54,13 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/net.sf.saxon/saxon-dom -->
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon-dom</artifactId>
+            <version>8.7</version>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

@@ -32,7 +32,9 @@ package net.ripe.rpki.commons.provisioning.identity;
 
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -40,8 +42,23 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+//import javax.xml.transform.Transformer;
+//import javax.xml.transform.TransformerConfigurationException;
+//import javax.xml.transform.TransformerException;
+//import javax.xml.transform.TransformerFactory;
+//import javax.xml.transform.dom.DOMSource;
+//import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Base64;
 
@@ -81,6 +98,7 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
             return new ParentIdentity(URI.create(service_uri), parent_handle, child_handle, parser.getCertificate());
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
+            //TODO: make it a checked exception?
             throw new IdentitySerializerException(e);
         }
     }
@@ -95,6 +113,43 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
 
     @Override
     public String serialize(ParentIdentity parentIdentity) {
-        return xStream.toXML(parentIdentity);
+        try {
+            final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+
+            final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+
+            final Document document = documentBuilder.newDocument();
+
+
+            final Element parentResponseElement = document.createElementNS(XMLNS, "parent_response");
+            parentResponseElement.setAttribute("child_handle", parentIdentity.getChildHandle());
+            parentResponseElement.setAttribute("parent_handle", parentIdentity.getParentHandle());
+            parentResponseElement.setAttribute("service_uri", parentIdentity.getUpDownUrl().toString());
+            parentResponseElement.setAttribute("version", Integer.toString(parentIdentity.getVersion()));
+
+            final Element parentBpkiTaElement = document.createElementNS(XMLNS, "parent_bpki_ta");
+            parentBpkiTaElement.setTextContent(Base64.getEncoder().encodeToString(parentIdentity.getParentIdCertificate().getEncoded()));
+
+            parentResponseElement.appendChild(parentBpkiTaElement);
+            document.appendChild(parentResponseElement);
+
+            final  Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            final StringWriter sw = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(sw));
+
+            return sw.toString();
+
+
+        } catch (ParserConfigurationException | TransformerException e) {
+            //TODO: make it a checked exception?
+            throw new IdentitySerializerException(e);
+        }
+
     }
 }
