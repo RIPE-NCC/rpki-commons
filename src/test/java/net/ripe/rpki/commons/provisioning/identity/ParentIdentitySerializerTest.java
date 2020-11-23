@@ -29,6 +29,8 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.junit.Test;
@@ -63,8 +65,6 @@ public class ParentIdentitySerializerTest {
                     "</ns0:parent_bpki_ta>\n" +
                     "</ns0:parent_response>";
 
-    public static final ParentIdentity PARENT_IDENTITY = new ParentIdentitySerializer().deserialize(exampleXml);
-
 
     @Test
     public void shouldDeserializeXml() {
@@ -72,6 +72,7 @@ public class ParentIdentitySerializerTest {
 
         ParentIdentity parentId = serializer.deserialize(exampleXml);
         assertNotNull(parentId);
+        assertEquals(1, parentId.getVersion());
         assertEquals("Bob", parentId.getChildHandle());
         assertEquals("Alice", parentId.getParentHandle());
         assertEquals(URI.create("http://localhost:4401/up-down/Alice/Bob"), parentId.getUpDownUrl());
@@ -85,11 +86,9 @@ public class ParentIdentitySerializerTest {
         String parentHandle = "parent";
         String childHandle = "child";
         ProvisioningIdentityCertificate parentIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
-        ProvisioningIdentityCertificate childIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT_2;
-        ParentIdentity parentIdentity = new ParentIdentity(upDownUrl, parentHandle, childHandle, parentIdCertificate, childIdCertificate);
+        ParentIdentity parentIdentity = new ParentIdentity(upDownUrl, parentHandle, childHandle, parentIdCertificate);
 
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
-
 
         String xml = serializer.serialize(parentIdentity);
 

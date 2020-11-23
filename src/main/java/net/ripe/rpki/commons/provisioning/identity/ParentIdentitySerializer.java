@@ -30,10 +30,27 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.util.Base64;
+
 /**
  * Convert ParentIdentity to/from ISC style XML
  */
 public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity> {
+
+    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
 
     public ParentIdentitySerializer() {
         super();
@@ -41,7 +58,40 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
 
     @Override
     public ParentIdentity deserialize(String xml) {
-        return (ParentIdentity) xStream.fromXML(xml);
+        try {
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(xml));
+            Document doc = db.parse(is);
+
+            final Node root = getElement(doc, "parent_response");
+
+            final String child_handle = getAttributeValue(root, "child_handle");
+            final String parent_handle = getAttributeValue(root, "parent_handle");
+            final String service_uri = getAttributeValue(root, "service_uri");
+
+            final String parent_bpki_ta = getElement(doc, "parent_bpki_ta").getTextContent().replaceAll("\\s+", "");
+
+            ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
+            parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(parent_bpki_ta));
+
+
+            return new ParentIdentity(URI.create(service_uri), parent_handle, child_handle, parser.getCertificate());
+
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new IdentitySerializerException(e);
+        }
+    }
+
+    private String getAttributeValue(final Node node, final String attr) {
+        return node.getAttributes().getNamedItem(attr).getTextContent();
+    }
+
+    private Node getElement(Document doc, String version) {
+        return doc.getElementsByTagNameNS(XMLNS, version).item(0);
     }
 
     @Override
