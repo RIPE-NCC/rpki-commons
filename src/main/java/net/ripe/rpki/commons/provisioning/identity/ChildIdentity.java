@@ -29,31 +29,17 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.util.EqualsSupport;
 
 import java.util.UUID;
 
-@XStreamAlias(ChildIdentity.CHILD_IDENTITY_NODE_NAME)
 public class ChildIdentity extends EqualsSupport {
 
     public static final int VERSION = 1;
 
-    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
-    public static final String CHILD_IDENTITY_NODE_NAME = "child_request";
-
-    @SuppressWarnings("unused")
-    @XStreamAsAttribute
-    @XStreamAlias("version")
     private final int version = VERSION;
-
-    @XStreamAsAttribute
-    @XStreamAlias("child_handle")
     private String handle;
-
-    @XStreamAlias("child_bpki_ta")
     private ProvisioningIdentityCertificate identityCertificate;
 
 
@@ -75,6 +61,10 @@ public class ChildIdentity extends EqualsSupport {
 
     public String getHandle() {
         return handle;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     public ProvisioningIdentityCertificate getIdentityCertificate() {

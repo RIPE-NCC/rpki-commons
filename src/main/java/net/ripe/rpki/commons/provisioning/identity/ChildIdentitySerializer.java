@@ -30,10 +30,24 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
-import com.thoughtworks.xstream.XStreamException;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Base64;
 
 /**
- * Convert ChildIdentity to/from ISC style XML
+ * Convert ChildIdentity to/from ISC style XML - https://datatracker.ietf.org/doc/rfc8183/
  */
 public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
 
@@ -44,15 +58,60 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     @Override
     public ChildIdentity deserialize(String xml) {
         try {
-            return (ChildIdentity) xStream.fromXML(xml);
-        } catch (XStreamException e) {
-            throw new IllegalArgumentException(e);
+
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            final DocumentBuilder db = dbf.newDocumentBuilder();
+            final InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(xml));
+            final Document doc = db.parse(is);
+
+            final Node root = getElement(doc, "child_request");
+
+            final String childHandle = getAttributeValue(root, "child_handle");
+
+            final String childBpkiTa = getBpkiElementContent(doc, "child_bpki_ta");
+
+            final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
+            parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(childBpkiTa));
+
+            return new ChildIdentity(childHandle, parser.getCertificate());
+
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            //TODO: make it a checked exception?
+            throw new IdentitySerializerException(e);
         }
     }
 
     @Override
     public String serialize(ChildIdentity childIdentity) {
-        return xStream.toXML(childIdentity);
+
+
+
+        try {
+            final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+
+            final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+
+            final Document document = documentBuilder.newDocument();
+
+
+            final Element childRequestElement = document.createElementNS(XMLNS, "child_request");
+            childRequestElement.setAttribute("child_handle", childIdentity.getHandle());
+            childRequestElement.setAttribute("version", Integer.toString(childIdentity.getVersion()));
+
+            final Element childBpkiTaElement = document.createElementNS(XMLNS, "child_bpki_ta");
+            childBpkiTaElement.setTextContent(Base64.getEncoder().encodeToString(childIdentity.getIdentityCertificate().getEncoded()));
+
+            childRequestElement.appendChild(childBpkiTaElement);
+            document.appendChild(childRequestElement);
+
+            return toString(document);
+
+        } catch (ParserConfigurationException | TransformerException e) {
+            //TODO: make it a checked exception?
+            throw new IdentitySerializerException(e);
+        }
     }
 
 }

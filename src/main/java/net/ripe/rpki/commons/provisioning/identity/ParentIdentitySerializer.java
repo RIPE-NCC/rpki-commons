@@ -41,15 +41,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.Base64;
 
@@ -59,17 +53,16 @@ import java.util.Base64;
  */
 public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity> {
 
-    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
-
     public ParentIdentitySerializer() {
         super();
     }
 
     @Override
-    public ParentIdentity deserialize(String xml) {
+    public ParentIdentity deserialize(final String xml) {
         try {
 
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
             dbf.setNamespaceAware(true);
             final DocumentBuilder db = dbf.newDocumentBuilder();
             final InputSource is = new InputSource();
@@ -78,16 +71,16 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
 
             final Node root = getElement(doc, "parent_response");
 
-            final String child_handle = getAttributeValue(root, "child_handle");
-            final String parent_handle = getAttributeValue(root, "parent_handle");
-            final String service_uri = getAttributeValue(root, "service_uri");
+            final String childHandle = getAttributeValue(root, "child_handle");
+            final String parentHandle = getAttributeValue(root, "parent_handle");
+            final String serviceUri = getAttributeValue(root, "service_uri");
 
-            final String parent_bpki_ta = getElement(doc, "parent_bpki_ta").getTextContent().replaceAll("\\s+", "");
+            final String parentBpkiTa = getBpkiElementContent(doc, "parent_bpki_ta");
 
             final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-            parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(parent_bpki_ta));
+            parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(parentBpkiTa));
 
-            return new ParentIdentity(URI.create(service_uri), parent_handle, child_handle, parser.getCertificate());
+            return new ParentIdentity(URI.create(serviceUri), parentHandle, childHandle, parser.getCertificate());
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             //TODO: make it a checked exception?
@@ -95,16 +88,8 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
         }
     }
 
-    private String getAttributeValue(final Node node, final String attr) {
-        return node.getAttributes().getNamedItem(attr).getTextContent();
-    }
-
-    private Node getElement(Document doc, String version) {
-        return doc.getElementsByTagNameNS(XMLNS, version).item(0);
-    }
-
     @Override
-    public String serialize(ParentIdentity parentIdentity) {
+    public String serialize(final ParentIdentity parentIdentity) {
         try {
             final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
 
@@ -125,17 +110,7 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
             parentResponseElement.appendChild(parentBpkiTaElement);
             document.appendChild(parentResponseElement);
 
-            final  Transformer transformer = TransformerFactory.newInstance().newTransformer();
-
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-            final StringWriter sw = new StringWriter();
-            transformer.transform(new DOMSource(document), new StreamResult(sw));
-
-            return sw.toString();
+           return toString(document);
 
 
         } catch (ParserConfigurationException | TransformerException e) {
@@ -144,4 +119,5 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
         }
 
     }
+
 }

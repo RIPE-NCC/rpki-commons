@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 public class ChildIdentitySerializerTest {
 
     static final String exampleChildIdXml =
-            "<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\" handle=\"Bob\" version=\"2\" tag=\"1234\">\n" +
+            "<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\" child_handle=\"Bob\" version=\"2\" tag=\"1234\">\n" +
                     "<ns0:child_bpki_ta>\n" +
                     "MIIDIDCCAgigAwIBAgIBATANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDEx5Cb2Ig\n" +
                     "QlBLSSBSZXNvdXJjZSBUcnVzdCBBbmNob3IwHhcNMTEwNzAxMDQwNzIzWhcNMTIw\n" +

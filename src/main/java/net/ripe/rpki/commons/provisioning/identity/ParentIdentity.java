@@ -38,12 +38,13 @@ public class ParentIdentity extends EqualsSupport {
 
     public static final int VERSION = 1;
 
-    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
-    public static final String PARENT_IDENTITY_NODE_NAME = "parent_response";
+    private final int version = VERSION;
+    private String childHandle;
+    private String parentHandle;
+    private URI upDownUrl;
+    private ProvisioningIdentityCertificate parentIdCertificate;
 
-    /*
-    Parameter childCertificate in method signature is only for backwards compatibility.
-     */
+
     public ParentIdentity(URI upDownUrl, String parentHandle,
                           String childHandle,
                           ProvisioningIdentityCertificate parentIdCertificate) {
@@ -53,14 +54,6 @@ public class ParentIdentity extends EqualsSupport {
         this.parentIdCertificate = parentIdCertificate;
     }
 
-
-    private final int version = VERSION;
-    private String childHandle;
-    private String parentHandle;
-    private URI upDownUrl;
-    private ProvisioningIdentityCertificate parentIdCertificate;
-
-
     public String getChildHandle() {
         return childHandle;
     }
@@ -69,11 +62,9 @@ public class ParentIdentity extends EqualsSupport {
         return parentHandle;
     }
 
-
     public ProvisioningIdentityCertificate getParentIdCertificate() {
         return parentIdCertificate;
     }
-
 
     public URI getUpDownUrl() {
         return upDownUrl;
