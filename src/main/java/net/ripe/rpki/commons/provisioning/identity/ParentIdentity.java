@@ -29,14 +29,11 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.util.EqualsSupport;
 
 import java.net.URI;
 
-@XStreamAlias(ParentIdentity.PARENT_IDENTITY_NODE_NAME)
 public class ParentIdentity extends EqualsSupport {
 
     public static final int VERSION = 1;
@@ -57,24 +54,10 @@ public class ParentIdentity extends EqualsSupport {
     }
 
 
-    @SuppressWarnings("unused")
-    @XStreamAsAttribute
-    @XStreamAlias("version")
     private final int version = VERSION;
-
-    @XStreamAsAttribute
-    @XStreamAlias("child_handle")
     private String childHandle;
-
-    @XStreamAsAttribute
-    @XStreamAlias("parent_handle")
     private String parentHandle;
-
-    @XStreamAsAttribute
-    @XStreamAlias("service_uri")
     private URI upDownUrl;
-
-    @XStreamAlias("parent_bpki_ta")
     private ProvisioningIdentityCertificate parentIdCertificate;
 
 

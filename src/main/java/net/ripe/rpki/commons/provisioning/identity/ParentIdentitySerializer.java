@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.provisioning.identity;
 
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,23 +43,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-//import javax.xml.transform.Transformer;
-//import javax.xml.transform.TransformerConfigurationException;
-//import javax.xml.transform.TransformerException;
-//import javax.xml.transform.TransformerFactory;
-//import javax.xml.transform.dom.DOMSource;
-//import javax.xml.transform.stream.StreamResult;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Base64;
+
 
 /**
  * Convert ParentIdentity to/from ISC style XML
