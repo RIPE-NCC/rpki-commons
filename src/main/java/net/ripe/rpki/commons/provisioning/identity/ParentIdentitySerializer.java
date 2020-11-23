@@ -60,12 +60,12 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
     public ParentIdentity deserialize(String xml) {
         try {
 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            InputSource is = new InputSource();
+            final DocumentBuilder db = dbf.newDocumentBuilder();
+            final InputSource is = new InputSource();
             is.setCharacterStream(new StringReader(xml));
-            Document doc = db.parse(is);
+            final Document doc = db.parse(is);
 
             final Node root = getElement(doc, "parent_response");
 
@@ -75,9 +75,8 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
 
             final String parent_bpki_ta = getElement(doc, "parent_bpki_ta").getTextContent().replaceAll("\\s+", "");
 
-            ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
+            final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
             parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(parent_bpki_ta));
-
 
             return new ParentIdentity(URI.create(service_uri), parent_handle, child_handle, parser.getCertificate());
 
