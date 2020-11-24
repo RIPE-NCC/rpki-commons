@@ -104,8 +104,8 @@ public class ManifestCmsTest {
     private static Map<String, byte[]> files = new HashMap<String, byte[]>();
 
     static {
-        files.put("filename1", FILE1_CONTENTS);
-        files.put("filename2", FILE2_CONTENTS);
+        files.put("filename1.cer", FILE1_CONTENTS);
+        files.put("filename2.roa", FILE2_CONTENTS);
     }
 
     private CrlLocator crlLocator;
@@ -143,10 +143,10 @@ public class ManifestCmsTest {
 
     @Test
     public void shouldVerifyFileContents() {
-        assertTrue(subject.verifyFileContents("filename1", FILE1_CONTENTS));
-        assertFalse(subject.verifyFileContents("filename2", FILE1_CONTENTS));
+        assertTrue(subject.verifyFileContents("filename1.cer", FILE1_CONTENTS));
+        assertFalse(subject.verifyFileContents("filename2.roa", FILE1_CONTENTS));
 
-        FileContentSpecification spec = subject.getFileContentSpecification("filename2");
+        FileContentSpecification spec = subject.getFileContentSpecification("filename2.roa");
         assertTrue(spec.isSatisfiedBy(FILE2_CONTENTS));
         assertFalse(spec.isSatisfiedBy(FILE1_CONTENTS));
     }
@@ -210,7 +210,7 @@ public class ManifestCmsTest {
 
         subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
 
-        assertFalse(result.hasFailures());
+        assertFalse("" + result.getFailuresForAllLocations(), result.hasFailures());
         assertEquals(0, result.getFailuresForCurrentLocation().size());
 
 
@@ -359,14 +359,17 @@ public class ManifestCmsTest {
 
         ManifestCmsBuilder builder = getRootManifestBuilder();
         builder.addFile("this-one-is-ok.roa", new byte[0]);
-        builder.addFile("underscore_is_also_allowed_since_there_are_published_objects", new byte[0]);
+        builder.addFile("non-empty-extension-required.", new byte[0]);
+        builder.addFile("multiple.dots.not.allowed", new byte[0]);
+        builder.addFile("underscore_is_also_allowed_since_there_are_published_objects.roa", new byte[0]);
+        builder.addFile("extension-must-be-lowercase.CER", new byte[0]);
+        builder.addFile("only-letters-allowed-for-extension.123", new byte[0]);
         builder.addFile("", new byte[0]); // empty is not ok
         builder.addFile("   ", new byte[0]); // blank is not ok
         builder.addFile("\0", new byte[0]); // control character not ok
         builder.addFile(".", new byte[0]);
         builder.addFile("..", new byte[0]);
-        builder.addFile("...", new byte[0]); // this one is ok
-        builder.addFile("cannot-contain-a/slash", new byte[0]);
+        builder.addFile("cannot-contain-a/slash.cer", new byte[0]);
 
         subject = builder.build(MANIFEST_KEY_PAIR.getPrivate());
 
@@ -381,7 +384,11 @@ public class ManifestCmsTest {
         assertTrue(result.hasFailures());
 
         assertEquals(
-                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE, ", \\u0000,    , ., .., cannot-contain-a/slash"),
+                new ValidationCheck(
+                        ValidationStatus.ERROR,
+                        ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE,
+                        ", \\u0000,    , ., .., cannot-contain-a/slash.cer, extension-must-be-lowercase.CER, multiple.dots.not.allowed, non-empty-extension-required., only-letters-allowed-for-extension.123"
+                ),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE)
         );
     }
