@@ -61,10 +61,10 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
     public ParentIdentity deserialize(final String xml) {
         try {
 
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
 
-            dbf.setNamespaceAware(true);
-            final DocumentBuilder db = dbf.newDocumentBuilder();
+            documentFactory.setNamespaceAware(true);
+            final DocumentBuilder db = documentFactory.newDocumentBuilder();
             final InputSource is = new InputSource();
             is.setCharacterStream(new StringReader(xml));
             final Document doc = db.parse(is);

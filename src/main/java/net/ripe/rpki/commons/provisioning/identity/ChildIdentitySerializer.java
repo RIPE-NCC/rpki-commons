@@ -38,8 +38,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
@@ -58,13 +56,10 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     @Override
     public ChildIdentity deserialize(String xml) {
         try {
-
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            final DocumentBuilder db = dbf.newDocumentBuilder();
             final InputSource is = new InputSource();
             is.setCharacterStream(new StringReader(xml));
-            final Document doc = db.parse(is);
+
+            final Document doc = getDocumentBuilder().parse(is);
 
             final Node root = getElement(doc, "child_request");
 
@@ -89,11 +84,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
 
 
         try {
-            final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-
-            final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-
-            final Document document = documentBuilder.newDocument();
+            final Document document = getDocumentBuilder().newDocument();
 
 
             final Element childRequestElement = document.createElementNS(XMLNS, "child_request");
