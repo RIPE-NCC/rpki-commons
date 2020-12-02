@@ -77,8 +77,8 @@ public class CertificateRepositoryObjectPrinterTest {
                              "Next update time: 2008-09-02T22:43:29.000Z\n" +
                              "Authority Key Identifier: " + aki + "\n" +
                              "Filenames and hashes:\n"
-                             + "    filename1 ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\n"
-                             + "    filename2 cb8379ac2098aa165029e3938a51da0bcecfc008fd6795f401178647f96c5b34\n",
+                             + "    filename1.cer ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\n"
+                             + "    filename2.roa cb8379ac2098aa165029e3938a51da0bcecfc008fd6795f401178647f96c5b34\n",
                      output.getBuffer().toString());
     }
 
