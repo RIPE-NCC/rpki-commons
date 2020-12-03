@@ -75,15 +75,9 @@ public class ManifestCms extends RpkiSignedObject {
     public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
 
     /**
-     * Allowed characters in a manifest entry file name. We only allow a minimal set of normal characters to avoid
-     * issues with filenames on the local file system. This includes not allowing `/` as it may be used to navigate
-     * to different directories. This is currently consistent with `rpki-client`. We also disallow many other
-     * characters, to be consistent with `routinator`.
-     *
-     * RFC 6486 is actually not clear what is allowed and simply requires that manifest entries are published in the same repository
-     * as the manifest. Quote from the RFC: "the name of the file in the repository publication point (directory)".
+     * Allowed format of a manifest entry file name.
      */
-    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9'()+-.:=,_]+");
+    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+\\.[a-z]{3}");
 
     private final Map<String, byte[]> hashes;
 
@@ -171,7 +165,7 @@ public class ManifestCms extends RpkiSignedObject {
 
     private void checkEntries(ValidationResult result) {
         List<String> failedEntries = getFileNames().stream()
-                .filter(s -> s.isEmpty() || s.equals(".") || s.equals("..") || !FILE_NAME_PATTERN.matcher(s).matches())
+                .filter(s -> !FILE_NAME_PATTERN.matcher(s).matches())
                 .collect(Collectors.toList());
         result.rejectIfFalse(
                 failedEntries.isEmpty(),
