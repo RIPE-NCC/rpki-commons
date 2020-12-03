@@ -37,8 +37,6 @@ import java.net.URI;
 public class ParentIdentity extends EqualsSupport {
 
     public static final int VERSION = 1;
-
-    private final int version = VERSION;
     private String childHandle;
     private String parentHandle;
     private URI upDownUrl;
@@ -71,6 +69,6 @@ public class ParentIdentity extends EqualsSupport {
     }
 
     public int getVersion() {
-        return version;
+        return VERSION;
     }
 }

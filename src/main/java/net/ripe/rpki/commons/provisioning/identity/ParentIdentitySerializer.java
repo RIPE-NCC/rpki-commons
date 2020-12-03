@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.w3c.dom.Document;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.Base64;
+import java.util.Optional;
 
 
 /**
@@ -59,32 +61,35 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
 
     @Override
     public ParentIdentity deserialize(final String xml) {
+        final StringReader characterStream = new StringReader(xml);
+
         try {
+            final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
 
-            final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+            final Node root = getElement(doc, "parent_response")
+                .orElseThrow(() -> new IdentitySerializerException("parent_response element not found"));
 
-            documentFactory.setNamespaceAware(true);
-            final DocumentBuilder db = documentFactory.newDocumentBuilder();
-            final InputSource is = new InputSource();
-            is.setCharacterStream(new StringReader(xml));
-            final Document doc = db.parse(is);
+            final String childHandle = getAttributeValue(root, "child_handle")
+                    .orElseThrow(() -> new IdentitySerializerException("child_handle attribute not found"));
 
-            final Node root = getElement(doc, "parent_response");
+            final String parentHandle = getAttributeValue(root, "parent_handle")
+                    .orElseThrow(() -> new IdentitySerializerException("parent_handle attribute not found"));
 
-            final String childHandle = getAttributeValue(root, "child_handle");
-            final String parentHandle = getAttributeValue(root, "parent_handle");
-            final String serviceUri = getAttributeValue(root, "service_uri");
+            final String serviceUri = getAttributeValue(root, "service_uri")
+                    .orElseThrow(() -> new IdentitySerializerException("service_uri attribute not found"));
 
-            final String parentBpkiTa = getBpkiElementContent(doc, "parent_bpki_ta");
+            final String parentBpkiTa = getBpkiElementContent(doc, "parent_bpki_ta")
+                    .orElseThrow(() -> new IdentitySerializerException("parent_bpki_ta element not found"));
 
-            final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-            parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(parentBpkiTa));
+            final ProvisioningIdentityCertificate provisioningIdentityCertificate = getProvisioningIdentityCertificate(parentBpkiTa);
 
-            return new ParentIdentity(URI.create(serviceUri), parentHandle, childHandle, parser.getCertificate());
+            return new ParentIdentity(URI.create(serviceUri), parentHandle, childHandle, provisioningIdentityCertificate);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             //TODO: make it a checked exception?
             throw new IdentitySerializerException(e);
+        } finally {
+            characterStream.close();
         }
     }
 
@@ -110,7 +115,7 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
             parentResponseElement.appendChild(parentBpkiTaElement);
             document.appendChild(parentResponseElement);
 
-           return toString(document);
+           return serialize(document);
 
 
         } catch (ParserConfigurationException | TransformerException e) {

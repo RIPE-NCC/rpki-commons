@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.w3c.dom.Document;
@@ -43,6 +44,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Base64;
+import java.util.Optional;
 
 /**
  * Convert ChildIdentity to/from ISC style XML - https://datatracker.ietf.org/doc/rfc8183/
@@ -55,28 +57,32 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
 
     @Override
     public ChildIdentity deserialize(String xml) {
+        final StringReader characterStream = new StringReader(xml);
+
         try {
-            final InputSource is = new InputSource();
-            is.setCharacterStream(new StringReader(xml));
+            final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
 
-            final Document doc = getDocumentBuilder().parse(is);
+            final Node root = getElement(doc, "child_request")
+                    .orElseThrow(() -> new IdentitySerializerException("child_request element not found"));
 
-            final Node root = getElement(doc, "child_request");
+            final String childHandle = getAttributeValue(root, "child_handle")
+                    .orElseThrow(() -> new IdentitySerializerException("child_handle attribute not found"));
 
-            final String childHandle = getAttributeValue(root, "child_handle");
+            final String childBpkiTa = getBpkiElementContent(doc, "child_bpki_ta")
+                    .orElseThrow(() -> new IdentitySerializerException("child_bpki_ta element not found"));;
 
-            final String childBpkiTa = getBpkiElementContent(doc, "child_bpki_ta");
+            final ProvisioningIdentityCertificate provisioningIdentityCertificate = getProvisioningIdentityCertificate(childBpkiTa);
 
-            final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-            parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(childBpkiTa));
-
-            return new ChildIdentity(childHandle, parser.getCertificate());
+            return new ChildIdentity(childHandle, provisioningIdentityCertificate);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             //TODO: make it a checked exception?
             throw new IdentitySerializerException(e);
+        } finally {
+            characterStream.close();
         }
     }
+
 
     @Override
     public String serialize(ChildIdentity childIdentity) {
@@ -94,7 +100,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
             childRequestElement.appendChild(childBpkiTaElement);
             document.appendChild(childRequestElement);
 
-            return toString(document);
+            return serialize(document);
 
         } catch (ParserConfigurationException | TransformerException e) {
             //TODO: make it a checked exception?

@@ -37,8 +37,6 @@ import java.util.UUID;
 public class ChildIdentity extends EqualsSupport {
 
     public static final int VERSION = 1;
-
-    private final int version = VERSION;
     private String handle;
     private ProvisioningIdentityCertificate identityCertificate;
 
@@ -64,7 +62,7 @@ public class ChildIdentity extends EqualsSupport {
     }
 
     public int getVersion() {
-        return version;
+        return VERSION;
     }
 
     public ProvisioningIdentityCertificate getIdentityCertificate() {

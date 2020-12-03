@@ -29,6 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
+import net.ripe.rpki.commons.validation.ValidationResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -42,6 +45,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.util.Base64;
+import java.util.Optional;
 
 
 public abstract class IdentitySerializer<T> {
@@ -61,19 +66,22 @@ public abstract class IdentitySerializer<T> {
         return documentBuilder;
     }
 
-    protected String getAttributeValue(final Node node, final String attr) {
-        return node.getAttributes().getNamedItem(attr).getTextContent();
+    protected Optional<String> getAttributeValue(final Node node, final String attr) {
+        return Optional.ofNullable(node.getAttributes())
+                .map(a -> a.getNamedItem(attr))
+                .map(item->item.getTextContent());
     }
 
-    protected Node getElement(Document doc, String version) {
-        return doc.getElementsByTagNameNS(XMLNS, version).item(0);
+    protected Optional<Node> getElement(Document doc, String elementName) {
+        final Node node = doc.getElementsByTagNameNS(XMLNS, elementName).item(0);
+        return Optional.ofNullable(node);
     }
 
-    protected String getBpkiElementContent(final Document doc, final String nodeName) {
-        return getElement(doc, nodeName).getTextContent().replaceAll("\\s+", "");
+    protected Optional<String> getBpkiElementContent(final Document doc, final String nodeName) {
+        return getElement(doc, nodeName).map(e -> e.getTextContent().replaceAll("\\s+", ""));
     }
 
-    protected String toString(final Document document) throws TransformerException {
+    protected String serialize(final Document document) throws TransformerException {
         final Transformer transformer = TransformerFactory.newInstance().newTransformer();
 
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
@@ -85,6 +93,12 @@ public abstract class IdentitySerializer<T> {
         transformer.transform(new DOMSource(document), new StreamResult(sw));
 
         return sw.toString();
+    }
+
+    protected ProvisioningIdentityCertificate getProvisioningIdentityCertificate(final String bpkiTa) {
+        final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
+        parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(bpkiTa));
+        return parser.getCertificate();
     }
 
 }
