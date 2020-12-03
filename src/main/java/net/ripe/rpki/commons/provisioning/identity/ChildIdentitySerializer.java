@@ -81,11 +81,8 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     @Override
     public String serialize(ChildIdentity childIdentity) {
 
-
-
         try {
             final Document document = getDocumentBuilder().newDocument();
-
 
             final Element childRequestElement = document.createElementNS(XMLNS, "child_request");
             childRequestElement.setAttribute("child_handle", childIdentity.getHandle());
