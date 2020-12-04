@@ -35,6 +35,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,8 +61,8 @@ public abstract class IdentitySerializer<T> {
 
     protected DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
         final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        documentFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
         documentFactory.setNamespaceAware(true);
 
         final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
