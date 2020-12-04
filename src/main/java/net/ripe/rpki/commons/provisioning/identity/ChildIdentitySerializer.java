@@ -41,7 +41,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Base64;
 
 /**
  * Convert ChildIdentity to/from ISC style XML - https://datatracker.ietf.org/doc/rfc8183/
@@ -92,7 +91,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
             childRequestElement.setAttribute("version", Integer.toString(childIdentity.getVersion()));
 
             final Element childBpkiTaElement = document.createElementNS(XMLNS, "child_bpki_ta");
-            childBpkiTaElement.setTextContent(Base64.getEncoder().encodeToString(childIdentity.getIdentityCertificate().getEncoded()));
+            childBpkiTaElement.setTextContent(childIdentity.getIdentityCertificate().getBase64String());
 
             childRequestElement.appendChild(childBpkiTaElement);
             document.appendChild(childRequestElement);

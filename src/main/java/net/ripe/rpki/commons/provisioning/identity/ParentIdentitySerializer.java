@@ -45,7 +45,6 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.Base64;
 
 
 /**
@@ -108,7 +107,7 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
             parentResponseElement.setAttribute("version", Integer.toString(parentIdentity.getVersion()));
 
             final Element parentBpkiTaElement = document.createElementNS(XMLNS, "parent_bpki_ta");
-            parentBpkiTaElement.setTextContent(Base64.getEncoder().encodeToString(parentIdentity.getParentIdCertificate().getEncoded()));
+            parentBpkiTaElement.setTextContent(parentIdentity.getParentIdCertificate().getBase64String());
 
             parentResponseElement.appendChild(parentBpkiTaElement);
             document.appendChild(parentResponseElement);

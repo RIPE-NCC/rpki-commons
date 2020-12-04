@@ -89,7 +89,7 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeInvalidXml() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("NOT VALID");
         });
 
@@ -100,7 +100,7 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildRequestIsNotPresent() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<xml></xml>");
         });
 
@@ -111,7 +111,7 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildHandleIsNotPresent() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:child_request>");
         });
 
@@ -122,7 +122,7 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildBpkiTaIsNotPresent() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:child_request child_handle=\"Bob\"  xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:child_request>");
         });
 

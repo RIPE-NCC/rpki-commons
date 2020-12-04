@@ -105,4 +105,17 @@ public abstract class IdentitySerializer<T> {
         return parser.getCertificate();
     }
 
+    public static class IdentitySerializerException extends RuntimeException {
+        public IdentitySerializerException(Exception e) {
+            super(e);
+        }
+
+        public IdentitySerializerException(final String message) {
+            super(message);
+        }
+
+        public IdentitySerializerException(final String message, final Exception e) {
+            super(message, e);
+        }
+    }
 }

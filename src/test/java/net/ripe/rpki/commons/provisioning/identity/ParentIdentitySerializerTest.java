@@ -29,8 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import org.junit.Test;
@@ -101,7 +99,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeInvalidXml() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("NOT VALID");
         });
 
@@ -112,7 +110,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfParentResponseIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<xml></xml>");
         });
 
@@ -123,7 +121,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildHandlerIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 
@@ -134,7 +132,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfParentHandlerIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 
@@ -145,7 +143,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfServiceURIIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" parent_handle=\"Alice\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 
@@ -156,7 +154,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfParentBpkiTaIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" parent_handle=\"Alice\" service_uri=\"http://localhost:4401/up-down/Alice/Bob\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 
