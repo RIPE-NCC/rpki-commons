@@ -31,8 +31,6 @@ package net.ripe.rpki.commons.provisioning.identity;
 
 
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
-import net.ripe.rpki.commons.validation.ValidationResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,7 +42,6 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Base64;
-import java.util.Optional;
 
 /**
  * Convert ChildIdentity to/from ISC style XML - https://datatracker.ietf.org/doc/rfc8183/
@@ -75,9 +72,9 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
 
             return new ChildIdentity(childHandle, provisioningIdentityCertificate);
 
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             //TODO: make it a checked exception?
-            throw new IdentitySerializerException(e);
+            throw new IdentitySerializerException("Fail to parse child request", e);
         } finally {
             characterStream.close();
         }

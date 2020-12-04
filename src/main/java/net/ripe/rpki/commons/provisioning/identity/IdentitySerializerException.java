@@ -37,4 +37,8 @@ public class IdentitySerializerException extends RuntimeException {
     public IdentitySerializerException(final String message) {
         super(message);
     }
+
+    public IdentitySerializerException(final String message, final Exception e) {
+        super(message, e);
+    }
 }

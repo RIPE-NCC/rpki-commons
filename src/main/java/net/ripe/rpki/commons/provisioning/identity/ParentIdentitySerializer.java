@@ -30,9 +30,8 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
+
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
-import net.ripe.rpki.commons.validation.ValidationResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -47,7 +46,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.Base64;
-import java.util.Optional;
 
 
 /**
@@ -85,9 +83,9 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
 
             return new ParentIdentity(URI.create(serviceUri), parentHandle, childHandle, provisioningIdentityCertificate);
 
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             //TODO: make it a checked exception?
-            throw new IdentitySerializerException(e);
+            throw new IdentitySerializerException("Fail to parse parent response", e);
         } finally {
             characterStream.close();
         }
@@ -116,7 +114,6 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
             document.appendChild(parentResponseElement);
 
            return serialize(document);
-
 
         } catch (ParserConfigurationException | TransformerException e) {
             //TODO: make it a checked exception?

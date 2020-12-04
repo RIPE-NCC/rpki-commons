@@ -97,6 +97,16 @@ public class ParentIdentitySerializerTest {
         assertEquals(parentIdentity, deserializedParentId);
     }
 
+    @Test
+    public void shouldFailToDeserializeInvalidXml() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
+            serializer.deserialize("NOT VALID");
+        });
+
+        assertEquals("Fail to parse parent response", exception.getMessage());
+    }
 
     @Test
     public void shouldFailToDeserializeXmlIfParentResponseIsNotPresent() {
