@@ -93,12 +93,7 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
     @Override
     public String serialize(final ParentIdentity parentIdentity) {
         try {
-            final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-
-            final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-
-            final Document document = documentBuilder.newDocument();
-
+            final Document document = getDocumentBuilder().newDocument();
 
             final Element parentResponseElement = document.createElementNS(XMLNS, "parent_response");
             parentResponseElement.setAttribute("child_handle", parentIdentity.getChildHandle());
