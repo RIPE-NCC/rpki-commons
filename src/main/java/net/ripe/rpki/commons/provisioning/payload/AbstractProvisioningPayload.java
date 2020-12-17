@@ -54,7 +54,7 @@ public abstract class AbstractProvisioningPayload {
         this(SUPPORTED_VERSION, type);
     }
 
-    private AbstractProvisioningPayload(Integer version, PayloadMessageType type) {
+    protected AbstractProvisioningPayload(Integer version, PayloadMessageType type) {
         this.version = version;
         this.type = type;
     }

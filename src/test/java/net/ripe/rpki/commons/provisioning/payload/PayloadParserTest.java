@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
+import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
@@ -65,6 +66,20 @@ public class PayloadParserTest {
         assertEquals(ValidationString.VALID_PAYLOAD_VERSION, validationCheck.getKey());
     }
 
+    @Test
+    public void shouldParseTypeFromMultilineMessageElement() {
+        String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\n" +
+                "         recipient=\"recipient\"\n" +
+                "         sender=\"sender\"\n" +
+                "         type=\"list\"\n" +
+                "         version=\"1\"/>\n";
+        ValidationResult result = ValidationResult.withLocation("a");
+        AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
+
+        assertFalse(result.hasFailures());
+        assertTrue(wrapper instanceof ResourceClassListQueryPayload);
+    }
 
     @Test
     public void shouldNotParseUnknownType() {

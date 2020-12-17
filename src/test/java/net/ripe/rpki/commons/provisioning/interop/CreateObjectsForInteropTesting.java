@@ -40,7 +40,6 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBu
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -48,7 +47,7 @@ import java.io.IOException;
 
 import static net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.*;
 import static net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadBuilderTest.*;
-import static net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilderTest.*;
+import static net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializerTest.*;
 import static net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilderTest.*;
 import static org.junit.Assert.*;
 

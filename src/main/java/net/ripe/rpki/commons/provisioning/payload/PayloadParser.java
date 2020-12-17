@@ -36,7 +36,7 @@ import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssua
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadSerializerBuilder;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
-import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializer;
 import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerBuilder;
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayload;
@@ -61,7 +61,7 @@ public final class PayloadParser {
     private static final Pattern TYPE_PATTERN = Pattern.compile(".*<message[^>]*type=['\"]([a-z|\\_]*)['\"].*", Pattern.DOTALL);
 
     private static final XmlSerializer<ResourceClassListResponsePayload> LIST_RESPONSE_SERIALIZER = new ResourceClassListResponsePayloadSerializerBuilder().build();
-    private static final XmlSerializer<ResourceClassListQueryPayload> LIST_SERIALIZER = new ResourceClassListQueryPayloadSerializerBuilder().build();
+    private static final XmlSerializer<ResourceClassListQueryPayload> LIST_SERIALIZER = new ResourceClassListQueryPayloadSerializer();
     private static final XmlSerializer<CertificateIssuanceRequestPayload> ISSUE_SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
     private static final XmlSerializer<CertificateIssuanceResponsePayload> ISSUE_RESPONSE_SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder().build();
     private static final XmlSerializer<CertificateRevocationRequestPayload> REVOKE_SERIALIZER = new CertificateRevocationRequestPayloadSerializerBuilder().build();
