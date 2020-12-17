@@ -62,7 +62,8 @@ public abstract class IdentitySerializer<T> {
     protected DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
         final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         documentFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-
+        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         documentFactory.setNamespaceAware(true);
 
         final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
