@@ -37,10 +37,10 @@ import java.net.URI;
 public class ParentIdentity extends EqualsSupport {
 
     public static final int VERSION = 1;
-    private String childHandle;
-    private String parentHandle;
-    private URI upDownUrl;
-    private ProvisioningIdentityCertificate parentIdCertificate;
+    private final String childHandle;
+    private final String parentHandle;
+    private final URI upDownUrl;
+    private final ProvisioningIdentityCertificate parentIdCertificate;
 
 
     public ParentIdentity(URI upDownUrl, String parentHandle,
