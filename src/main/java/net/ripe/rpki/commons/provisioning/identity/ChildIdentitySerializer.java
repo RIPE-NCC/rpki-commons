@@ -53,9 +53,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
 
     @Override
     public ChildIdentity deserialize(String xml) {
-        final StringReader characterStream = new StringReader(xml);
-
-        try {
+        try (final StringReader characterStream = new StringReader(xml)) {
             final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
 
             final Node root = getElement(doc, "child_request")
@@ -74,8 +72,6 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
         } catch (SAXException | IOException | ParserConfigurationException e) {
             //TODO: make it a checked exception?
             throw new IdentitySerializerException("Fail to parse child request", e);
-        } finally {
-            characterStream.close();
         }
     }
 
