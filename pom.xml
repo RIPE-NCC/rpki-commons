@@ -44,11 +44,11 @@
 
         <net.ripe.ipresource.version>1.47</net.ripe.ipresource.version>
         <bouncycastle.version>1.67</bouncycastle.version>
-        <guava.version>30.0-jre</guava.version>
+        <guava.version>30.1-jre</guava.version>
         <joda-time.version>2.10.8</joda-time.version>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.clover.reportPath>target/site/clover/clover.xml</sonar.clover.reportPath>
-        <xstream.version>1.4.14</xstream.version>
+        <xstream.version>1.4.15</xstream.version>
         <commons-io.version>2.6</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
     </properties>
@@ -111,8 +111,8 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <artifactId>mockito-core</artifactId>
+            <version>3.6.28</version>
             <scope>test</scope>
         </dependency>
         <dependency>
