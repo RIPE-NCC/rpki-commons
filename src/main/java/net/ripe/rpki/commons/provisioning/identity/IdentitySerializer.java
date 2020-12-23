@@ -45,8 +45,8 @@ public abstract class IdentitySerializer<T> extends DomXmlSerializer<T> {
 
     public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
 
-    protected Optional<Node> getElement(Document doc, String elementName) {
-        return getElement(doc, XMLNS, elementName);
+    public IdentitySerializer() {
+        super(XMLNS);
     }
 
     protected Optional<String> getBpkiElementContent(final Document doc, final String nodeName) {

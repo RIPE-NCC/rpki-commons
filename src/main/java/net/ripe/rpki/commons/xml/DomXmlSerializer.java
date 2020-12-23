@@ -46,6 +46,13 @@ import java.io.StringWriter;
 import java.util.Optional;
 
 public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
+    protected final String xmlns;
+
+    protected DomXmlSerializer(String xmlns) {
+        this.xmlns = xmlns;
+    }
+
+
     protected DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
         final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         documentFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -64,8 +71,8 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
                 .map(item->item.getTextContent());
     }
 
-    protected Optional<Node> getElement(Document doc, String namespace, String elementName) {
-        final Node node = doc.getElementsByTagNameNS(namespace, elementName).item(0);
+    protected Optional<Node> getElement(Document doc, String elementName) {
+        final Node node = doc.getElementsByTagNameNS(xmlns, elementName).item(0);
         return Optional.ofNullable(node);
     }
 

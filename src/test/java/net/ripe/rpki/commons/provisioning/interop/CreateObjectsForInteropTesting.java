@@ -34,7 +34,7 @@ import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectValidator;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadBuilderTest;
-import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadBuilderTest;
+import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadBuilderTest;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import net.ripe.rpki.commons.validation.ValidationOptions;
@@ -66,7 +66,7 @@ public class CreateObjectsForInteropTesting {
         writeToDisk("identity-cert.cer", ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT.getEncoded());
 
         createValidCmsObjectAndWriteItToDisk(TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD, "resource-class-list-query.cms");
-        createValidCmsObjectAndWriteItToDisk(ResourceClassListResponsePayloadBuilderTest.TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD, "resource-class-list-response.cms");
+        createValidCmsObjectAndWriteItToDisk(ResourceClassListResponsePayloadSerializerTest.TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD, "resource-class-list-response.cms");
 
         createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD, "certificate-issuance-request.cms");
         createValidCmsObjectAndWriteItToDisk(CertificateIssuanceResponsePayloadBuilderTest.TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD, "certificate-issuance-response.cms");

@@ -46,7 +46,7 @@ import java.util.List;
 public class ResourceClassListResponsePayload extends AbstractProvisioningResponsePayload {
 
     @XStreamImplicit(itemFieldName = "class")
-    private List<ResourceClassListResponseClassElement> classElements = new ArrayList<ResourceClassListResponseClassElement>();
+    private List<ResourceClassListResponseClassElement> classElements;
 
     public ResourceClassListResponsePayload(List<ResourceClassListResponseClassElement> classElements) {
         super(PayloadMessageType.list_response);
@@ -54,7 +54,7 @@ public class ResourceClassListResponsePayload extends AbstractProvisioningRespon
     }
 
     public List<ResourceClassListResponseClassElement> getClassElements() {
-        return classElements != null ? classElements : Collections.<ResourceClassListResponseClassElement>emptyList();
+        return classElements != null ? classElements : Collections.emptyList();
     }
 
     @Override
