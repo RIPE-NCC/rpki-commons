@@ -68,13 +68,13 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         NodeList classNodes = message.getElementsByTagNameNS(xmlns, "class");
         for (int i = 0; i < classNodes.getLength(); ++i) {
             Element classElement = (Element) classNodes.item(i);
-            ResourceClassListResponseClassElement clazz = parseClassElement(classElement);
+            ResourceClassListResponseClassElement clazz = parseClassElementXml(classElement);
             classes.add(clazz);
         }
         return new ResourceClassListResponsePayload(classes);
     }
 
-    private ResourceClassListResponseClassElement parseClassElement(Element element) {
+    private ResourceClassListResponseClassElement parseClassElementXml(Element element) {
         ResourceClassListResponseClassElement clazz = new ResourceClassListResponseClassElement();
         clazz.setCertUris(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(element, "cert_url")));
         clazz.setClassName(getRequiredAttributeValue(element, "class_name"));
@@ -86,7 +86,7 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         NodeList certificateElements = element.getElementsByTagNameNS(xmlns, "certificate");
         for (int j = 0; j < certificateElements.getLength(); ++j) {
             Element certificateElement = (Element) certificateElements.item(j);
-            CertificateElement certificate = parseCertificateElement(certificateElement);
+            CertificateElement certificate = parseCertificateElementXml(certificateElement);
             clazz.getCertificateElements().add(certificate);
         }
         NodeList issuerElements = element.getElementsByTagNameNS(xmlns, "issuer");
@@ -95,17 +95,6 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         }
         clazz.setIssuer(parseX509ResourceCertificate(issuerElements.item(0).getTextContent()));
         return clazz;
-    }
-
-    private CertificateElement parseCertificateElement(Element element) {
-        CertificateElement certificate = new CertificateElement();
-        certificate.setIssuerCertificatePublicationLocation(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(element, "cert_url")));
-        certificate.setAllocatedAsn(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "req_resource_set_as")));
-        certificate.setAllocatedIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "req_resource_set_ipv4")));
-        certificate.setAllocatedIpv6(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "req_resource_set_ipv6")));
-        X509ResourceCertificate resourceCertificate = parseX509ResourceCertificate(element.getTextContent());
-        certificate.setCertificate(resourceCertificate);
-        return certificate;
     }
 
     @Override
@@ -120,15 +109,7 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
             node.setAttribute("resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv6()));
             node.setAttribute("resource_set_notafter", DATE_TIME_CONVERTER.toString(classElement.getValidityNotAfter()));
             node.setAttribute("suggested_sia_head", classElement.getSiaHeadUri());
-            classElement.getCertificateElements().stream().map(certificate -> {
-                Element elt = document.createElementNS(xmlns, "certificate");
-                elt.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(certificate.getIssuerCertificatePublicationUris()));
-                elt.setAttribute("req_resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedAsn()));
-                elt.setAttribute("req_resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv4()));
-                elt.setAttribute("req_resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv6()));
-                elt.setTextContent(certificate.getCertificate().getBase64String());
-                return elt;
-            }).forEachOrdered(node::appendChild);
+            classElement.getCertificateElements().stream().map(certificate -> generateCertificateElementXml(document, certificate)).forEachOrdered(node::appendChild);
             X509ResourceCertificate issuer = classElement.getIssuer();
             if (issuer != null) {
                 Element elt = document.createElementNS(xmlns, "issuer");
@@ -137,6 +118,26 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
             }
             result.add(node);
         }
+        return result;
+    }
+
+    private CertificateElement parseCertificateElementXml(Element certificate) {
+        CertificateElement result = new CertificateElement();
+        result.setIssuerCertificatePublicationLocation(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(certificate, "cert_url")));
+        result.setAllocatedAsn(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(certificate, "req_resource_set_as")));
+        result.setAllocatedIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(certificate, "req_resource_set_ipv4")));
+        result.setAllocatedIpv6(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(certificate, "req_resource_set_ipv6")));
+        result.setCertificate(parseX509ResourceCertificate(certificate.getTextContent()));
+        return result;
+    }
+
+    private Element generateCertificateElementXml(Document document, CertificateElement certificate) {
+        Element result = document.createElementNS(xmlns, "certificate");
+        result.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(certificate.getIssuerCertificatePublicationUris()));
+        result.setAttribute("req_resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedAsn()));
+        result.setAttribute("req_resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv4()));
+        result.setAttribute("req_resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv6()));
+        result.setTextContent(certificate.getCertificate().getBase64String());
         return result;
     }
 }
