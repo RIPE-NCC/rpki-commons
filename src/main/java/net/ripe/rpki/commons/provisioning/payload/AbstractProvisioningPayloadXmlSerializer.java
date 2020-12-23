@@ -62,6 +62,8 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected abstract T parseXmlPayload(Element message);
 
+    protected abstract Iterable<? extends Node> generateXmlPayload(Document document, T payload);
+
     protected X509ResourceCertificate parseX509ResourceCertificate(String base64) {
         ValidationResult result = ValidationResult.withLocation("certificate.cer").withoutStoringPassingChecks();
         X509GenericCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, Base64.getMimeDecoder().decode(base64.trim()));
@@ -73,8 +75,6 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
             throw new DomXmlSerializerException("certificate is not a resource certificate: " + certificate);
         }
     }
-
-    protected abstract Iterable<? extends Node> generateXmlPayload(Document document, T payload);
 
     @Override
     public T deserialize(String xml) {

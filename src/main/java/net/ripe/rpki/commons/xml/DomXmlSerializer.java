@@ -53,7 +53,6 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
         this.xmlns = xmlns;
     }
 
-
     protected DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
         final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         documentFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
