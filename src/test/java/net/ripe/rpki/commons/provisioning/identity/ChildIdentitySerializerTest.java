@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 public class ChildIdentitySerializerTest {
 
     static final String exampleChildIdXml =
-            "<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\" handle=\"Bob\" version=\"2\" tag=\"1234\">\n" +
+            "<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\" child_handle=\"Bob\" version=\"2\" tag=\"1234\">\n" +
                     "<ns0:child_bpki_ta>\n" +
                     "MIIDIDCCAgigAwIBAgIBATANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDEx5Cb2Ig\n" +
                     "QlBLSSBSZXNvdXJjZSBUcnVzdCBBbmNob3IwHhcNMTEwNzAxMDQwNzIzWhcNMTIw\n" +
@@ -85,5 +85,61 @@ public class ChildIdentitySerializerTest {
         assertEquals(childIdentity, deserializedChildId);
     }
 
+    @Test
+    public void shouldFailToDeserializeInvalidXml() {
+        ChildIdentitySerializer serializer = new ChildIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("NOT VALID");
+        });
+
+        assertEquals("Fail to parse child request", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfChildRequestIsNotPresent() {
+        ChildIdentitySerializer serializer = new ChildIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<xml></xml>");
+        });
+
+        assertEquals("child_request element not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfChildHandleIsNotPresent() {
+        ChildIdentitySerializer serializer = new ChildIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:child_request>");
+        });
+
+        assertEquals("child_handle attribute not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfChildBpkiTaIsNotPresent() {
+        ChildIdentitySerializer serializer = new ChildIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<ns0:child_request child_handle=\"Bob\"  xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:child_request>");
+        });
+
+        assertEquals("child_bpki_ta element not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfChildBpkiTaIsEmpty() {
+        ChildIdentitySerializer serializer = new ChildIdentitySerializer();
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            serializer.deserialize("<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\" child_handle=\"Bob\" version=\"2\" tag=\"1234\">" +
+                    "<ns0:child_bpki_ta> </ns0:child_bpki_ta>" +
+                    "</ns0:child_request>" );
+        });
+
+        assertEquals("Identity Certificate validation failed", exception.getMessage());
+    }
 
 }

@@ -30,6 +30,23 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
+
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+
+
 /**
  * Convert ParentIdentity to/from ISC style XML
  */
@@ -40,12 +57,59 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
     }
 
     @Override
-    public ParentIdentity deserialize(String xml) {
-        return (ParentIdentity) xStream.fromXML(xml);
+    public ParentIdentity deserialize(final String xml) {
+        try (final StringReader characterStream = new StringReader(xml)) {
+            final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
+
+            final Node root = getElement(doc, "parent_response")
+                .orElseThrow(() -> new IdentitySerializerException("parent_response element not found"));
+
+            final String childHandle = getAttributeValue(root, "child_handle")
+                    .orElseThrow(() -> new IdentitySerializerException("child_handle attribute not found"));
+
+            final String parentHandle = getAttributeValue(root, "parent_handle")
+                    .orElseThrow(() -> new IdentitySerializerException("parent_handle attribute not found"));
+
+            final String serviceUri = getAttributeValue(root, "service_uri")
+                    .orElseThrow(() -> new IdentitySerializerException("service_uri attribute not found"));
+
+            final String parentBpkiTa = getBpkiElementContent(doc, "parent_bpki_ta")
+                    .orElseThrow(() -> new IdentitySerializerException("parent_bpki_ta element not found"));
+
+            final ProvisioningIdentityCertificate provisioningIdentityCertificate = getProvisioningIdentityCertificate(parentBpkiTa);
+
+            return new ParentIdentity(URI.create(serviceUri), parentHandle, childHandle, provisioningIdentityCertificate);
+
+        } catch (SAXException | IOException | ParserConfigurationException e) {
+            //TODO: make it a checked exception?
+            throw new IdentitySerializerException("Fail to parse parent response", e);
+        }
     }
 
     @Override
-    public String serialize(ParentIdentity parentIdentity) {
-        return xStream.toXML(parentIdentity);
+    public String serialize(final ParentIdentity parentIdentity) {
+        try {
+            final Document document = getDocumentBuilder().newDocument();
+
+            final Element parentResponseElement = document.createElementNS(XMLNS, "parent_response");
+            parentResponseElement.setAttribute("child_handle", parentIdentity.getChildHandle());
+            parentResponseElement.setAttribute("parent_handle", parentIdentity.getParentHandle());
+            parentResponseElement.setAttribute("service_uri", parentIdentity.getUpDownUrl().toString());
+            parentResponseElement.setAttribute("version", Integer.toString(parentIdentity.getVersion()));
+
+            final Element parentBpkiTaElement = document.createElementNS(XMLNS, "parent_bpki_ta");
+            parentBpkiTaElement.setTextContent(parentIdentity.getParentIdCertificate().getBase64String());
+
+            parentResponseElement.appendChild(parentBpkiTaElement);
+            document.appendChild(parentResponseElement);
+
+           return serialize(document);
+
+        } catch (ParserConfigurationException | TransformerException e) {
+            //TODO: make it a checked exception?
+            throw new IdentitySerializerException(e);
+        }
+
     }
+
 }

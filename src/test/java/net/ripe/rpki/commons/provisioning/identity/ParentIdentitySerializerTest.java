@@ -63,8 +63,6 @@ public class ParentIdentitySerializerTest {
                     "</ns0:parent_bpki_ta>\n" +
                     "</ns0:parent_response>";
 
-    public static final ParentIdentity PARENT_IDENTITY = new ParentIdentitySerializer().deserialize(exampleXml);
-
 
     @Test
     public void shouldDeserializeXml() {
@@ -72,6 +70,7 @@ public class ParentIdentitySerializerTest {
 
         ParentIdentity parentId = serializer.deserialize(exampleXml);
         assertNotNull(parentId);
+        assertEquals(1, parentId.getVersion());
         assertEquals("Bob", parentId.getChildHandle());
         assertEquals("Alice", parentId.getParentHandle());
         assertEquals(URI.create("http://localhost:4401/up-down/Alice/Bob"), parentId.getUpDownUrl());
@@ -85,17 +84,94 @@ public class ParentIdentitySerializerTest {
         String parentHandle = "parent";
         String childHandle = "child";
         ProvisioningIdentityCertificate parentIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT;
-        ProvisioningIdentityCertificate childIdCertificate = ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT_2;
-        ParentIdentity parentIdentity = new ParentIdentity(upDownUrl, parentHandle, childHandle, parentIdCertificate, childIdCertificate);
+        ParentIdentity parentIdentity = new ParentIdentity(upDownUrl, parentHandle, childHandle, parentIdCertificate);
 
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
-
 
         String xml = serializer.serialize(parentIdentity);
 
         ParentIdentity deserializedParentId = serializer.deserialize(xml);
 
         assertEquals(parentIdentity, deserializedParentId);
+    }
+
+    @Test
+    public void shouldFailToDeserializeInvalidXml() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("NOT VALID");
+        });
+
+        assertEquals("Fail to parse parent response", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfParentResponseIsNotPresent() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<xml></xml>");
+        });
+
+        assertEquals("parent_response element not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfChildHandlerIsNotPresent() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<ns0:parent_response xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
+        });
+
+        assertEquals("child_handle attribute not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfParentHandlerIsNotPresent() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
+        });
+
+        assertEquals("parent_handle attribute not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfServiceURIIsNotPresent() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" parent_handle=\"Alice\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
+        });
+
+        assertEquals("service_uri attribute not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfParentBpkiTaIsNotPresent() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+            serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" parent_handle=\"Alice\" service_uri=\"http://localhost:4401/up-down/Alice/Bob\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
+        });
+
+        assertEquals("parent_bpki_ta element not found", exception.getMessage());
+    }
+
+    @Test
+    public void shouldFailToDeserializeXmlIfParentBpkiTaIsEmpty() {
+        ParentIdentitySerializer serializer = new ParentIdentitySerializer();
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" parent_handle=\"Alice\" service_uri=\"http://localhost:4401/up-down/Alice/Bob\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\">" +
+                    "<ns0:parent_bpki_ta></ns0:parent_bpki_ta>" +
+                    "</ns0:parent_response>" );
+        });
+
+        assertEquals("Identity Certificate validation failed", exception.getMessage());
     }
 
 

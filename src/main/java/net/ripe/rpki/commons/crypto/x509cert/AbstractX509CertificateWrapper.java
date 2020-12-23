@@ -48,6 +48,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.List;
 
 public abstract class AbstractX509CertificateWrapper implements Serializable {
@@ -78,6 +79,10 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         } catch (CertificateEncodingException e) {
             throw new AbstractX509CertificateWrapperException(e);
         }
+    }
+
+    public String getBase64String() {
+        return Base64.getEncoder().encodeToString(this.getEncoded());
     }
 
     public ASN1ObjectIdentifier getCertificatePolicy() {

@@ -29,68 +29,94 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
-import com.thoughtworks.xstream.io.xml.QNameMap;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
-import com.thoughtworks.xstream.mapper.Mapper;
-import com.thoughtworks.xstream.mapper.MapperWrapper;
-import net.ripe.rpki.commons.xml.converters.URIConverter;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
+import net.ripe.rpki.commons.validation.ValidationResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
-import javax.xml.namespace.QName;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
+import java.util.Base64;
+import java.util.Optional;
 
 
 public abstract class IdentitySerializer<T> {
 
-    protected XStream xStream;
-
-    protected IdentitySerializer() {
-
-        QNameMap qNameMap = new QNameMap();
-
-        QName parentIdQName = new QName(ParentIdentity.XMLNS, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
-        qNameMap.registerMapping(parentIdQName, ParentIdentity.PARENT_IDENTITY_NODE_NAME);
-
-        QName childIdQName = new QName(ChildIdentity.XMLNS, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
-        qNameMap.registerMapping(childIdQName, ChildIdentity.CHILD_IDENTITY_NODE_NAME);
-
-        XmlFriendlyNameCoder replacer = new XmlFriendlyNameCoder("_-", "_");
-
-        xStream = new XStream(new SunUnsafeReflectionProvider(), new StaxDriver(qNameMap, replacer)) {
-            @Override
-            protected MapperWrapper wrapMapper(MapperWrapper next) {
-                return new IgnoreUnknownFieldsMapperWrapper(next);
-            }
-        };
-        xStream.autodetectAnnotations(true);
-        xStream.processAnnotations(ParentIdentity.class);
-        xStream.processAnnotations(ChildIdentity.class);
-        xStream.registerConverter(new ProvisioningIdentityCertificateConverterForIdExchange());
-        xStream.registerConverter(new URIConverter());
-    }
+    public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
 
     public abstract T deserialize(String xml);
 
     public abstract String serialize(T object);
 
-    /**
-     * Used to ignore unknown fields when deserialising XML. See <a
-     * href="http://pvoss.wordpress.com/2009/01/08/xstream/">Omit Unexpected XML Elements With
-     * XStream</a>.
-     */
-    private static final class IgnoreUnknownFieldsMapperWrapper extends MapperWrapper {
-        private IgnoreUnknownFieldsMapperWrapper(Mapper wrapped) {
-            super(wrapped);
-        }
+    protected DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+        final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+        documentFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        documentFactory.setNamespaceAware(true);
 
-        @Override
-        public boolean shouldSerializeMember(@SuppressWarnings("rawtypes") Class definedIn, String fieldName) {
-            if (definedIn == Object.class) {
-                return false;
-            }
-            return super.shouldSerializeMember(definedIn, fieldName);
-        }
+        final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+
+        return documentBuilder;
     }
 
+    protected Optional<String> getAttributeValue(final Node node, final String attr) {
+        return Optional.ofNullable(node.getAttributes())
+                .map(a -> a.getNamedItem(attr))
+                .map(item->item.getTextContent());
+    }
+
+    protected Optional<Node> getElement(Document doc, String elementName) {
+        final Node node = doc.getElementsByTagNameNS(XMLNS, elementName).item(0);
+        return Optional.ofNullable(node);
+    }
+
+    protected Optional<String> getBpkiElementContent(final Document doc, final String nodeName) {
+        return getElement(doc, nodeName).map(e -> e.getTextContent().replaceAll("\\s+", ""));
+    }
+
+    protected String serialize(final Document document) throws TransformerException {
+        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+        final StringWriter sw = new StringWriter();
+        transformer.transform(new DOMSource(document), new StreamResult(sw));
+
+        return sw.toString();
+    }
+
+    protected ProvisioningIdentityCertificate getProvisioningIdentityCertificate(final String bpkiTa) {
+        final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
+        parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(bpkiTa));
+        return parser.getCertificate();
+    }
+
+    public static class IdentitySerializerException extends RuntimeException {
+        public IdentitySerializerException(Exception e) {
+            super(e);
+        }
+
+        public IdentitySerializerException(final String message) {
+            super(message);
+        }
+
+        public IdentitySerializerException(final String message, final Exception e) {
+            super(message, e);
+        }
+    }
 }
