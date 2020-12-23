@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.xml;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.XMLConstants;
@@ -65,14 +66,22 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
         return documentBuilder;
     }
 
+    protected String getRequiredAttributeValue(final Element node, final String attr) {
+        String value = node.getAttribute(attr);
+        if (value == null) {
+            throw new DomXmlSerializerException(String.format("attribute '%s' not found", attr));
+        }
+        return value;
+    }
+
     protected Optional<String> getAttributeValue(final Node node, final String attr) {
         return Optional.ofNullable(node.getAttributes())
                 .map(a -> a.getNamedItem(attr))
                 .map(item->item.getTextContent());
     }
 
-    protected Optional<Node> getElement(Document doc, String elementName) {
-        final Node node = doc.getElementsByTagNameNS(xmlns, elementName).item(0);
+    protected Optional<Element> getElement(Document doc, String elementName) {
+        final Element node = (Element) doc.getElementsByTagNameNS(xmlns, elementName).item(0);
         return Optional.ofNullable(node);
     }
 

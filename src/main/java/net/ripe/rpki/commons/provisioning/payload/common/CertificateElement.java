@@ -34,6 +34,7 @@ import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.net.URI;
@@ -41,7 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @XStreamConverter(CertificateElementConverter.class)
-public class CertificateElement {
+public class CertificateElement extends EqualsSupport {
 
     private List<URI> issuerCertificatePublicationLocationUris;
 
@@ -54,12 +55,12 @@ public class CertificateElement {
     private X509ResourceCertificate certificate;
 
     // Setters
-    CertificateElement setIssuerCertificatePublicationLocation(List<URI> issuerCertificatePublicationLocation) {
+    public CertificateElement setIssuerCertificatePublicationLocation(List<URI> issuerCertificatePublicationLocation) {
         this.issuerCertificatePublicationLocationUris = issuerCertificatePublicationLocation;
         return this;
     }
 
-    CertificateElement setCertificate(X509ResourceCertificate certificate) {
+    public CertificateElement setCertificate(X509ResourceCertificate certificate) {
         this.certificate = certificate;
         return this;
     }
@@ -125,11 +126,6 @@ public class CertificateElement {
 
     public void setAllocatedIpv6(IpResourceSet allocatedIpv6) {
         this.allocatedIpv6 = allocatedIpv6;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
     }
 
 }

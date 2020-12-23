@@ -56,10 +56,4 @@ public class ResourceClassListResponsePayload extends AbstractProvisioningRespon
     public List<ResourceClassListResponseClassElement> getClassElements() {
         return classElements != null ? classElements : Collections.emptyList();
     }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
-
 }

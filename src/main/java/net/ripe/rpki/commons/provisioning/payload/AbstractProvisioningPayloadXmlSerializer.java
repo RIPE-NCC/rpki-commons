@@ -29,6 +29,10 @@
  */
 package net.ripe.rpki.commons.provisioning.payload;
 
+import net.ripe.rpki.commons.crypto.x509cert.X509GenericCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
+import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.xml.DomXmlSerializer;
 import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import org.w3c.dom.Document;
@@ -42,6 +46,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Base64;
 
 import static net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload.SUPPORTED_VERSION;
 
@@ -55,7 +60,19 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         this.type = type;
     }
 
-    protected abstract T parseXmlPayload(Node message);
+    protected abstract T parseXmlPayload(Element message);
+
+    protected X509ResourceCertificate parseX509ResourceCertificate(String base64) {
+        ValidationResult result = ValidationResult.withLocation("certificate.cer").withoutStoringPassingChecks();
+        X509GenericCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, Base64.getMimeDecoder().decode(base64.trim()));
+        if (result.hasFailureForCurrentLocation()) {
+            throw new DomXmlSerializerException("resource certificate validation failed: " + result);
+        } else if (certificate instanceof X509ResourceCertificate) {
+            return (X509ResourceCertificate) certificate;
+        } else {
+            throw new DomXmlSerializerException("certificate is not a resource certificate: " + certificate);
+        }
+    }
 
     protected abstract Iterable<? extends Node> generateXmlPayload(Document document, T payload);
 
@@ -64,7 +81,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         try (final Reader characterStream = new StringReader(xml)) {
             Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
 
-            Node message = getElement(doc, "message")
+            Element message = getElement(doc, "message")
                     .orElseThrow(() -> new DomXmlSerializerException("message element not found"));
 
             String versionString = getAttributeValue(message, "version")

@@ -30,8 +30,9 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import net.ripe.rpki.commons.util.EqualsSupport;
 
-public abstract class AbstractProvisioningPayload {
+public abstract class AbstractProvisioningPayload extends EqualsSupport {
 
     public static final String DEFAULT_SENDER = "sender";
     public static final String DEFAULT_RECIPIENT = "recipient";

@@ -32,6 +32,7 @@ package net.ripe.rpki.commons.provisioning.payload.list.request;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayloadXmlSerializer;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Collections;
@@ -49,7 +50,7 @@ public class ResourceClassListQueryPayloadSerializer extends AbstractProvisionin
         super(PayloadMessageType.list);
     }
 
-    protected ResourceClassListQueryPayload parseXmlPayload(Node message) {
+    protected ResourceClassListQueryPayload parseXmlPayload(Element message) {
         return new ResourceClassListQueryPayload();
     }
 

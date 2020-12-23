@@ -38,7 +38,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
 import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import net.ripe.rpki.commons.util.EqualsSupport;
 import org.joda.time.DateTime;
 
 import java.net.URI;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GenericClassElement {
+public class GenericClassElement extends EqualsSupport {
 
     @XStreamAsAttribute
     @XStreamAlias("class_name")
@@ -132,6 +132,18 @@ public class GenericClassElement {
         return resourceSetIpv6;
     }
 
+    public void setResourceSetAs(IpResourceSet resourceSetAs) {
+        this.resourceSetAs = resourceSetAs;
+    }
+
+    public void setResourceSetIpv4(IpResourceSet resourceSetIpv4) {
+        this.resourceSetIpv4 = resourceSetIpv4;
+    }
+
+    public void setResourceSetIpv6(IpResourceSet resourceSetIpv6) {
+        this.resourceSetIpv6 = resourceSetIpv6;
+    }
+
     public void setIpResourceSet(IpResourceSet ipResourceSet) {
         IpResourceSet asns = new IpResourceSet();
         IpResourceSet ipv4 = new IpResourceSet();
@@ -171,11 +183,6 @@ public class GenericClassElement {
 
     protected void setCertificateElements(List<CertificateElement> certificateElements) {
         this.certificateElements = certificateElements;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
     }
 
 }

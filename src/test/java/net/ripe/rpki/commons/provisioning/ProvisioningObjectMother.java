@@ -33,6 +33,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
@@ -66,14 +67,15 @@ public class ProvisioningObjectMother {
 
     public static final X509CRL CRL = generateCrl();
 
-    public static final X509ResourceCertificate X509_CA = generateX509();
-
     public static String PARENT_HANDLE = "test-parent-handle";
     public static String CHILD_HANDLE = "test-child-handle";
 
     public static URI RPKI_CA_CERT_REQUEST_CA_REPO_URI = URI.create("rsync://host/module/subdir/");
     public static URI RPKI_CA_CERT_REQUEST_CA_MFT_URI = URI.create("rsync://host/module/subdir/subject.mft");
+    public static URI RPKI_CA_CERT_REQUEST_CA_CRL_URI = URI.create("rsync://host/module/subdir/subject.crl");
     public static URI RPKI_CA_CERT_REQUEST_CA_NOTIFICATION_URI = URI.create("http://host:7788/module/subdir/notification.xml");
+
+    public static final X509ResourceCertificate X509_CA = generateX509();
 
     public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
     public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -92,6 +94,10 @@ public class ProvisioningObjectMother {
         DateTime now = new DateTime(2011, 3, 1, 0, 0, 0, 0, DateTimeZone.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now, now.plusYears(5)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        builder.withCrlDistributionPoints(RPKI_CA_CERT_REQUEST_CA_CRL_URI);
+        builder.withSubjectInformationAccess(
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, RPKI_CA_CERT_REQUEST_CA_REPO_URI.resolve("subject.cer"))
+        );
         return builder.build();
     }
 

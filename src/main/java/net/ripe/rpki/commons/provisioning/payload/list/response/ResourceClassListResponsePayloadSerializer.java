@@ -32,20 +32,19 @@ package net.ripe.rpki.commons.provisioning.payload.list.response;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayloadXmlSerializer;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
+import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
 import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
+import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import net.ripe.rpki.commons.xml.converters.DateTimeConverter;
-import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * See RFC6492 section 3.3.1 (https://tools.ietf.org/html/rfc6492#section-3.3.1). Example:
@@ -64,9 +63,49 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         super(PayloadMessageType.list_response);
     }
 
-    protected ResourceClassListResponsePayload parseXmlPayload(Node message) {
-        ResourceClassListResponsePayload result = new ResourceClassListResponsePayload(Collections.emptyList());
-        return result;
+    protected ResourceClassListResponsePayload parseXmlPayload(Element message) {
+        List<ResourceClassListResponseClassElement> classes = new ArrayList<>();
+        NodeList classNodes = message.getElementsByTagNameNS(xmlns, "class");
+        for (int i = 0; i < classNodes.getLength(); ++i) {
+            Element classElement = (Element) classNodes.item(i);
+            ResourceClassListResponseClassElement clazz = parseClassElement(classElement);
+            classes.add(clazz);
+        }
+        return new ResourceClassListResponsePayload(classes);
+    }
+
+    private ResourceClassListResponseClassElement parseClassElement(Element element) {
+        ResourceClassListResponseClassElement clazz = new ResourceClassListResponseClassElement();
+        clazz.setCertUris(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(element, "cert_url")));
+        clazz.setClassName(getRequiredAttributeValue(element, "class_name"));
+        clazz.setResourceSetAs(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_as")));
+        clazz.setResourceSetIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_ipv4")));
+        clazz.setResourceSetIpv6(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_ipv6")));
+        clazz.setValidityNotAfter((DateTime) DATE_TIME_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_notafter")));
+        clazz.setSiaHeadUri(getRequiredAttributeValue(element, "suggested_sia_head"));
+        NodeList certificateElements = element.getElementsByTagNameNS(xmlns, "certificate");
+        for (int j = 0; j < certificateElements.getLength(); ++j) {
+            Element certificateElement = (Element) certificateElements.item(j);
+            CertificateElement certificate = parseCertificateElement(certificateElement);
+            clazz.getCertificateElements().add(certificate);
+        }
+        NodeList issuerElements = element.getElementsByTagNameNS(xmlns, "issuer");
+        if (issuerElements.getLength() != 1) {
+            throw new DomXmlSerializerException("missing issuer element");
+        }
+        clazz.setIssuer(parseX509ResourceCertificate(issuerElements.item(0).getTextContent()));
+        return clazz;
+    }
+
+    private CertificateElement parseCertificateElement(Element element) {
+        CertificateElement certificate = new CertificateElement();
+        certificate.setIssuerCertificatePublicationLocation(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(element, "cert_url")));
+        certificate.setAllocatedAsn(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "req_resource_set_as")));
+        certificate.setAllocatedIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "req_resource_set_ipv4")));
+        certificate.setAllocatedIpv6(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "req_resource_set_ipv6")));
+        X509ResourceCertificate resourceCertificate = parseX509ResourceCertificate(element.getTextContent());
+        certificate.setCertificate(resourceCertificate);
+        return certificate;
     }
 
     @Override
@@ -74,8 +113,8 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         List<Node> result = new ArrayList<>();
         for (ResourceClassListResponseClassElement classElement : payload.getClassElements()) {
             Element node = document.createElementNS(xmlns, "class");
-            node.setAttribute("class_name", classElement.getClassName());
             node.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(classElement.getCertificateAuthorityUri()));
+            node.setAttribute("class_name", classElement.getClassName());
             node.setAttribute("resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetAsn()));
             node.setAttribute("resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv4()));
             node.setAttribute("resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv6()));
