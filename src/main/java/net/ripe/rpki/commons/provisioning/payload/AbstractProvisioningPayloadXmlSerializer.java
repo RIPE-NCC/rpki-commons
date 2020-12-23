@@ -66,9 +66,9 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         this.type = type;
     }
 
-    protected abstract T parseXmlPayload(Element message);
+    protected abstract T parseXmlPayload(Element message) throws IOException;
 
-    protected abstract Iterable<? extends Node> generateXmlPayload(Document document, T payload);
+    protected abstract Iterable<? extends Node> generateXmlPayload(Document document, T payload) throws IOException;
 
     protected X509ResourceCertificate parseX509ResourceCertificate(String base64) {
         ValidationResult result = ValidationResult.withLocation("certificate.cer").withoutStoringPassingChecks();
@@ -141,7 +141,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
             document.appendChild(message);
 
             return serialize(document);
-        } catch (ParserConfigurationException | TransformerException e) {
+        } catch (ParserConfigurationException | TransformerException | IOException e) {
             throw new DomXmlSerializerException(e);
         }
     }

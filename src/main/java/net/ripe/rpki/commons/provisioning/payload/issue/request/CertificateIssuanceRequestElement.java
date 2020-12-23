@@ -32,14 +32,14 @@ package net.ripe.rpki.commons.provisioning.payload.issue.request;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 /**
  * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
  */
-public class CertificateIssuanceRequestElement {
+public class CertificateIssuanceRequestElement extends EqualsSupport {
 
     private String className;
     private IpResourceSet allocatedAsn;
@@ -104,11 +104,6 @@ public class CertificateIssuanceRequestElement {
     CertificateIssuanceRequestElement setCertificateRequest(PKCS10CertificationRequest certificate) {
         this.certificateRequest = certificate;
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
     }
 
 }

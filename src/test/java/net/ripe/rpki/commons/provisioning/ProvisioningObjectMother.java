@@ -41,7 +41,7 @@ import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadBuilderTest;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
-import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadBuilderTest;
+import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilder;
@@ -80,7 +80,7 @@ public class ProvisioningObjectMother {
     public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
     public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate();
     public static PKCS10CertificationRequest RPKI_CA_CERT_REQUEST = RpkiCaCertificateRequestBuilderParserTest.createRpkiCaCertificateRequest();
-    private static final CertificateIssuanceRequestPayload RPKI_CA_CERT_REQUEST_PAYLOAD = CertificateIssuanceRequestPayloadBuilderTest.createCertificateIssuanceRequestPayloadForPkcs10Request(RPKI_CA_CERT_REQUEST);
+    private static final CertificateIssuanceRequestPayload RPKI_CA_CERT_REQUEST_PAYLOAD = CertificateIssuanceRequestPayloadSerializerTest.createCertificateIssuanceRequestPayloadForPkcs10Request(RPKI_CA_CERT_REQUEST);
 
     public static ResourceClassListQueryPayload RESOURCE_CLASS_LIST_QUERY_PAYLOAD = createResourceListQueryPayload();
 

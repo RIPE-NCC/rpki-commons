@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.provisioning.payload.issue.request;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -43,9 +43,9 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 
-public class CertificateIssuanceRequestPayloadBuilderTest {
+public class CertificateIssuanceRequestPayloadSerializerTest {
 
-    private static final XStreamXmlSerializer<CertificateIssuanceRequestPayload> SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
+    private static final XmlSerializer<CertificateIssuanceRequestPayload> SERIALIZER = new CertificateIssuanceRequestPayloadSerializer();
 
     public static final CertificateIssuanceRequestPayload TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD = createCertificateIssuanceRequestPayloadForPkcs10Request(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST);
 
@@ -79,9 +79,20 @@ public class CertificateIssuanceRequestPayloadBuilderTest {
 
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD);
 
-        String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" + "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"issue\">" + "\n" + "  <request class_name=\"ripe-region\" req_resource_set_as=\"456,1234\" req_resource_set_ipv4=\"10.0.0.0/8\" req_resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\">[^<]*</request>" + "\n" + "</message>";
+        Pattern expectedXmlRegex = Pattern.compile("<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n" +
+                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"issue\"\\s+version=\"1\">\n" +
+                        "   <request\\s+class_name=\"ripe-region\"\\s+req_resource_set_as=\"456,1234\"\\s+req_resource_set_ipv4=\"10.0.0.0/8\"\\s+req_resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\">[^<]*</request>\n" +
+                        "</message>\n",
+                Pattern.DOTALL);
 
-        assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
+        assertTrue("actual: " + actualXml, expectedXmlRegex.matcher(actualXml).matches());
+    }
+
+    @Test
+    public void shouldDeserializeXml() {
+        String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD);
+        CertificateIssuanceRequestPayload deserialized = SERIALIZER.deserialize(actualXml);
+        assertEquals(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD, deserialized);
     }
 
     @Test
