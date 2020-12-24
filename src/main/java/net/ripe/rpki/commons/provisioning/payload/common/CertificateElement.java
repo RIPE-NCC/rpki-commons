@@ -35,7 +35,6 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.net.URI;
 import java.util.Iterator;

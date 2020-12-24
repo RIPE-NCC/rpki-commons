@@ -34,8 +34,6 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificatePa
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.xml.DomXmlSerializer;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 
 import java.util.Base64;
 import java.util.Optional;

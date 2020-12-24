@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.provisioning.identity;
 
 
-
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,8 +37,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;

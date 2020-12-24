@@ -63,7 +63,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
                     .orElseThrow(() -> new IdentitySerializerException("child_handle attribute not found"));
 
             final String childBpkiTa = getBpkiElementContent(doc, "child_bpki_ta")
-                    .orElseThrow(() -> new IdentitySerializerException("child_bpki_ta element not found"));;
+                    .orElseThrow(() -> new IdentitySerializerException("child_bpki_ta element not found"));
 
             final ProvisioningIdentityCertificate provisioningIdentityCertificate = getProvisioningIdentityCertificate(childBpkiTa);
 
