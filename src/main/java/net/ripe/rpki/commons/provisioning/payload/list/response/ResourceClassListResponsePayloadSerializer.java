@@ -124,9 +124,9 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
     private CertificateElement parseCertificateElementXml(Element certificate) {
         CertificateElement result = new CertificateElement();
         result.setIssuerCertificatePublicationLocation(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(certificate, "cert_url")));
-        result.setAllocatedAsn(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(certificate, "req_resource_set_as")));
-        result.setAllocatedIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(certificate, "req_resource_set_ipv4")));
-        result.setAllocatedIpv6(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(certificate, "req_resource_set_ipv6")));
+        result.setAllocatedAsn(getAttributeValue(certificate, "req_resource_set_as").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
+        result.setAllocatedIpv4(getAttributeValue(certificate, "req_resource_set_ipv4").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
+        result.setAllocatedIpv6(getAttributeValue(certificate, "req_resource_set_ipv6").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
         result.setCertificate(parseX509ResourceCertificate(certificate.getTextContent()));
         return result;
     }
@@ -134,9 +134,15 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
     private Element generateCertificateElementXml(Document document, CertificateElement certificate) {
         Element result = document.createElementNS(xmlns, "certificate");
         result.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(certificate.getIssuerCertificatePublicationUris()));
-        result.setAttribute("req_resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedAsn()));
-        result.setAttribute("req_resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv4()));
-        result.setAttribute("req_resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv6()));
+        if (certificate.getAllocatedAsn() != null) {
+            result.setAttribute("req_resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedAsn()));
+        }
+        if (certificate.getAllocatedIpv4() != null) {
+            result.setAttribute("req_resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv4()));
+        }
+        if (certificate.getAllocatedIpv6() != null) {
+            result.setAttribute("req_resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedIpv6()));
+        }
         result.setTextContent(certificate.getCertificate().getBase64String());
         return result;
     }
