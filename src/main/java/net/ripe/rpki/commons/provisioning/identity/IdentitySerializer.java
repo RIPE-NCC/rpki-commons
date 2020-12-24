@@ -33,6 +33,7 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.xml.DomXmlSerializer;
+import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import org.w3c.dom.Document;
 
 import java.util.Base64;
@@ -57,7 +58,7 @@ public abstract class IdentitySerializer<T> extends DomXmlSerializer<T> {
         return parser.getCertificate();
     }
 
-    public static class IdentitySerializerException extends RuntimeException {
+    public static class IdentitySerializerException extends DomXmlSerializerException {
         public IdentitySerializerException(Exception e) {
             super(e);
         }

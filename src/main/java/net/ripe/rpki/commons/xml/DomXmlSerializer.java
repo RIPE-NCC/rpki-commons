@@ -31,7 +31,6 @@ package net.ripe.rpki.commons.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -59,24 +58,17 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
         documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
         documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         documentFactory.setNamespaceAware(true);
-
-        final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-
-        return documentBuilder;
+        return documentFactory.newDocumentBuilder();
     }
 
     protected String getRequiredAttributeValue(final Element node, final String attr) {
-        String value = node.getAttribute(attr);
-        if (value == null) {
+        return getAttributeValue(node, attr).<DomXmlSerializerException>orElseThrow(() -> {
             throw new DomXmlSerializerException(String.format("attribute '%s' not found", attr));
-        }
-        return value;
+        });
     }
 
-    protected Optional<String> getAttributeValue(final Node node, final String attr) {
-        return Optional.ofNullable(node.getAttributes())
-                .map(a -> a.getNamedItem(attr))
-                .map(item->item.getTextContent());
+    protected Optional<String> getAttributeValue(final Element node, final String attr) {
+        return node.hasAttribute(attr) ? Optional.of(node.getAttribute(attr)) : Optional.empty();
     }
 
     protected Optional<Element> getElement(Document doc, String elementName) {

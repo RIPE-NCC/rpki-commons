@@ -33,7 +33,6 @@ package net.ripe.rpki.commons.provisioning.identity;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -58,17 +57,12 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
         try (final StringReader characterStream = new StringReader(xml)) {
             final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
 
-            final Node root = getElement(doc, "parent_response")
+            final Element root = getElement(doc, "parent_response")
                 .orElseThrow(() -> new IdentitySerializerException("parent_response element not found"));
 
-            final String childHandle = getAttributeValue(root, "child_handle")
-                    .orElseThrow(() -> new IdentitySerializerException("child_handle attribute not found"));
-
-            final String parentHandle = getAttributeValue(root, "parent_handle")
-                    .orElseThrow(() -> new IdentitySerializerException("parent_handle attribute not found"));
-
-            final String serviceUri = getAttributeValue(root, "service_uri")
-                    .orElseThrow(() -> new IdentitySerializerException("service_uri attribute not found"));
+            final String childHandle = getRequiredAttributeValue(root, "child_handle");
+            final String parentHandle = getRequiredAttributeValue(root, "parent_handle");
+            final String serviceUri = getRequiredAttributeValue(root, "service_uri");
 
             final String parentBpkiTa = getBpkiElementContent(doc, "parent_bpki_ta")
                     .orElseThrow(() -> new IdentitySerializerException("parent_bpki_ta element not found"));

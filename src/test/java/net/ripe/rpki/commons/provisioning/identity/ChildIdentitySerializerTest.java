@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.provisioning.identity;
 
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
@@ -111,11 +112,11 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildHandleIsNotPresent() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(DomXmlSerializerException.class, () -> {
             serializer.deserialize("<ns0:child_request xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:child_request>");
         });
 
-        assertEquals("child_handle attribute not found", exception.getMessage());
+        assertEquals("attribute 'child_handle' not found", exception.getMessage());
     }
 
     @Test
