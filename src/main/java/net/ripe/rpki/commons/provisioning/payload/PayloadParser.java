@@ -42,7 +42,7 @@ import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassLis
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayload;
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadSerializer;
 import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadSerializer;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.xml.XmlSerializer;
@@ -65,7 +65,7 @@ public final class PayloadParser {
     private static final XmlSerializer<CertificateIssuanceRequestPayload> ISSUE_SERIALIZER = new CertificateIssuanceRequestPayloadSerializer();
     private static final XmlSerializer<CertificateIssuanceResponsePayload> ISSUE_RESPONSE_SERIALIZER = new CertificateIssuanceResponsePayloadSerializer();
     private static final XmlSerializer<CertificateRevocationRequestPayload> REVOKE_SERIALIZER = new CertificateRevocationRequestPayloadSerializer();
-    private static final XmlSerializer<CertificateRevocationResponsePayload> REVOKE_RESPONSE_SERIALIZER = new CertificateRevocationResponsePayloadSerializerBuilder().build();
+    private static final XmlSerializer<CertificateRevocationResponsePayload> REVOKE_RESPONSE_SERIALIZER = new CertificateRevocationResponsePayloadSerializer();
     private static final XmlSerializer<RequestNotPerformedResponsePayload> ERROR_RESPONSE_SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
 
     private static final Map<PayloadMessageType, XmlSerializer<? extends AbstractProvisioningPayload>> TYPE_MAP = new HashMap<>();

@@ -35,7 +35,7 @@ import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectValidator;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerTest;
-import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadBuilderTest;
+import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadBuilderSerializerTest;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -72,7 +72,7 @@ public class CreateObjectsForInteropTesting {
         createValidCmsObjectAndWriteItToDisk(CertificateIssuanceResponsePayloadSerializerTest.TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD, "certificate-issuance-response.cms");
 
         createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD, "certificate-revocation-request.cms");
-        createValidCmsObjectAndWriteItToDisk(CertificateRevocationResponsePayloadBuilderTest.TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD, "certificate-revocation-response.cms");
+        createValidCmsObjectAndWriteItToDisk(CertificateRevocationResponsePayloadBuilderSerializerTest.TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD, "certificate-revocation-response.cms");
     }
 
     public void createValidCmsObjectAndWriteItToDisk(AbstractProvisioningPayload payload, String fileName) throws IOException {

@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.provisioning.payload.revocation.request;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
 import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.junit.Test;
@@ -59,7 +58,7 @@ public class CertificateRevocationRequestPayloadSerializerTest {
     }
 
     @Test
-    public void shouldBuildValidRevocationCms() throws Exception {
+    public void shouldBuildValidRevocationCms() {
         assertEquals("sender", TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD.getSender());
         assertEquals("recipient", TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD.getRecipient());
 

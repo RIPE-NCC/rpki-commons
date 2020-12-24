@@ -36,23 +36,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.io.IOException;
 import java.util.Collections;
 
 /**
- * See RFC6492 section 3.3.1 (https://tools.ietf.org/html/rfc6492#section-3.3.1). Example:
- *
- * <code>
- * &lt;?xml version="1.0" encoding="UTF-8"?>
- * &lt;message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="list"/>
- * </code>
+ * See RFC6492 section 3.5.1 (https://tools.ietf.org/html/rfc6492#section-3.5.1).
  */
 public class CertificateRevocationRequestPayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<CertificateRevocationRequestPayload> {
     public CertificateRevocationRequestPayloadSerializer() {
         super(PayloadMessageType.revoke);
     }
 
-    protected CertificateRevocationRequestPayload parseXmlPayload(Element message) throws IOException {
+    protected CertificateRevocationRequestPayload parseXmlPayload(Element message) {
         Element requestElement = getSingleChildElement(message, "key");
         String className = getRequiredAttributeValue(requestElement, "class_name");
         String ski = getRequiredAttributeValue(requestElement, "ski");
@@ -60,7 +54,7 @@ public class CertificateRevocationRequestPayloadSerializer extends AbstractProvi
     }
 
     @Override
-    protected Iterable<? extends Node> generateXmlPayload(Document document, CertificateRevocationRequestPayload payload) throws IOException {
+    protected Iterable<? extends Node> generateXmlPayload(Document document, CertificateRevocationRequestPayload payload) {
         CertificateRevocationKeyElement key = payload.getKeyElement();
         Element keyElement = document.createElementNS(xmlns, "key");
         keyElement.setAttribute("class_name", key.getClassName());
