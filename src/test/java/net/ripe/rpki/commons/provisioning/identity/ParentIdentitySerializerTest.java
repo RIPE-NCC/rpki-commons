@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.provisioning.identity;
 
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
+import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import org.junit.Test;
 
 import java.net.URI;
@@ -121,33 +122,33 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildHandlerIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(DomXmlSerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 
-        assertEquals("child_handle attribute not found", exception.getMessage());
+        assertEquals("attribute 'child_handle' not found", exception.getMessage());
     }
 
     @Test
     public void shouldFailToDeserializeXmlIfParentHandlerIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(DomXmlSerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 
-        assertEquals("parent_handle attribute not found", exception.getMessage());
+        assertEquals("attribute 'parent_handle' not found", exception.getMessage());
     }
 
     @Test
     public void shouldFailToDeserializeXmlIfServiceURIIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(DomXmlSerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" parent_handle=\"Alice\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 
-        assertEquals("service_uri attribute not found", exception.getMessage());
+        assertEquals("attribute 'service_uri' not found", exception.getMessage());
     }
 
     @Test

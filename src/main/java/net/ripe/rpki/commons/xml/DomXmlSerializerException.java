@@ -27,20 +27,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.provisioning.payload.list.request;
+package net.ripe.rpki.commons.xml;
 
-import net.ripe.rpki.commons.provisioning.payload.ProvisioningPayloadXmlSerializerBuilder;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
-
-public class ResourceClassListQueryPayloadSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<ResourceClassListQueryPayload> {
-
-    public ResourceClassListQueryPayloadSerializerBuilder() {
-        super(ResourceClassListQueryPayload.class);
+public class DomXmlSerializerException extends RuntimeException {
+    public DomXmlSerializerException(Exception e) {
+        super(e);
     }
 
-    @Override
-    public XStreamXmlSerializer<ResourceClassListQueryPayload> build() {
-        getXStream().processAnnotations(ResourceClassListQueryPayload.class);
-        return super.build();
+    public DomXmlSerializerException(final String message) {
+        super(message);
+    }
+
+    public DomXmlSerializerException(final String message, final Exception e) {
+        super(message, e);
     }
 }

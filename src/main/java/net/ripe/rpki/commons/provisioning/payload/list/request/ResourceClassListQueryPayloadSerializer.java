@@ -27,20 +27,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.provisioning.payload.list.response;
+package net.ripe.rpki.commons.provisioning.payload.list.request;
 
-import net.ripe.rpki.commons.provisioning.payload.ProvisioningPayloadXmlSerializerBuilder;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayloadXmlSerializer;
+import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
-public class ResourceClassListResponsePayloadSerializerBuilder extends ProvisioningPayloadXmlSerializerBuilder<ResourceClassListResponsePayload> {
+import java.util.Collections;
 
-    public ResourceClassListResponsePayloadSerializerBuilder() {
-        super(ResourceClassListResponsePayload.class);
+/**
+ * See RFC6492 section 3.3.1 (https://tools.ietf.org/html/rfc6492#section-3.3.1). Example:
+ *
+ * <code>
+ * &lt;?xml version="1.0" encoding="UTF-8"?>
+ * &lt;message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="list"/>
+ * </code>
+ */
+public class ResourceClassListQueryPayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<ResourceClassListQueryPayload> {
+    public ResourceClassListQueryPayloadSerializer() {
+        super(PayloadMessageType.list);
+    }
+
+    protected ResourceClassListQueryPayload parseXmlPayload(Element message) {
+        return new ResourceClassListQueryPayload();
     }
 
     @Override
-    public XStreamXmlSerializer<ResourceClassListResponsePayload> build() {
-        getXStream().processAnnotations(ResourceClassListResponseClassElement.class);
-        return super.build();
+    protected Iterable<? extends Node> generateXmlPayload(Document document, ResourceClassListQueryPayload payload) {
+        return Collections.emptyList();
     }
 }

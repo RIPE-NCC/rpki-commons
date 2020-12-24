@@ -36,16 +36,16 @@ import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssua
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadSerializerBuilder;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
-import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializer;
 import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializer;
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayload;
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadSerializerBuilder;
 import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadSerializerBuilder;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.apache.commons.lang.NotImplementedException;
 
 import java.util.HashMap;
@@ -60,15 +60,15 @@ public final class PayloadParser {
 
     private static final Pattern TYPE_PATTERN = Pattern.compile(".*<message[^>]*type=['\"]([a-z|\\_]*)['\"].*", Pattern.DOTALL);
 
-    private static final XStreamXmlSerializer<ResourceClassListResponsePayload> LIST_RESPONSE_SERIALIZER = new ResourceClassListResponsePayloadSerializerBuilder().build();
-    private static final XStreamXmlSerializer<ResourceClassListQueryPayload> LIST_SERIALIZER = new ResourceClassListQueryPayloadSerializerBuilder().build();
-    private static final XStreamXmlSerializer<CertificateIssuanceRequestPayload> ISSUE_SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
-    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayload> ISSUE_RESPONSE_SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder().build();
-    private static final XStreamXmlSerializer<CertificateRevocationRequestPayload> REVOKE_SERIALIZER = new CertificateRevocationRequestPayloadSerializerBuilder().build();
-    private static final XStreamXmlSerializer<CertificateRevocationResponsePayload> REVOKE_RESPONSE_SERIALIZER = new CertificateRevocationResponsePayloadSerializerBuilder().build();
-    private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> ERROR_RESPONSE_SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
+    private static final XmlSerializer<ResourceClassListResponsePayload> LIST_RESPONSE_SERIALIZER = new ResourceClassListResponsePayloadSerializer();
+    private static final XmlSerializer<ResourceClassListQueryPayload> LIST_SERIALIZER = new ResourceClassListQueryPayloadSerializer();
+    private static final XmlSerializer<CertificateIssuanceRequestPayload> ISSUE_SERIALIZER = new CertificateIssuanceRequestPayloadSerializerBuilder().build();
+    private static final XmlSerializer<CertificateIssuanceResponsePayload> ISSUE_RESPONSE_SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder().build();
+    private static final XmlSerializer<CertificateRevocationRequestPayload> REVOKE_SERIALIZER = new CertificateRevocationRequestPayloadSerializerBuilder().build();
+    private static final XmlSerializer<CertificateRevocationResponsePayload> REVOKE_RESPONSE_SERIALIZER = new CertificateRevocationResponsePayloadSerializerBuilder().build();
+    private static final XmlSerializer<RequestNotPerformedResponsePayload> ERROR_RESPONSE_SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
 
-    private static final Map<PayloadMessageType, XStreamXmlSerializer<? extends AbstractProvisioningPayload>> TYPE_MAP = new HashMap<PayloadMessageType, XStreamXmlSerializer<? extends AbstractProvisioningPayload>>();
+    private static final Map<PayloadMessageType, XmlSerializer<? extends AbstractProvisioningPayload>> TYPE_MAP = new HashMap<>();
 
     static {
         TYPE_MAP.put(PayloadMessageType.list, LIST_SERIALIZER);
@@ -97,7 +97,7 @@ public final class PayloadParser {
         }
 
         PayloadMessageType messageType = PayloadMessageType.valueOf(type);
-        XStreamXmlSerializer<? extends AbstractProvisioningPayload> serializer = TYPE_MAP.get(messageType);
+        XmlSerializer<? extends AbstractProvisioningPayload> serializer = TYPE_MAP.get(messageType);
         AbstractProvisioningPayload payload = serializer.deserialize(payloadXml);
         validationResult.rejectIfFalse(AbstractProvisioningPayload.SUPPORTED_VERSION.equals(payload.getVersion()), ValidationString.VALID_PAYLOAD_VERSION);
         if (validationResult.hasFailures()) {

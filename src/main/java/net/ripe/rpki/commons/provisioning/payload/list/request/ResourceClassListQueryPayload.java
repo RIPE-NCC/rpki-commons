@@ -39,4 +39,8 @@ public class ResourceClassListQueryPayload extends AbstractProvisioningQueryPayl
     protected ResourceClassListQueryPayload() {
         super(PayloadMessageType.list);
     }
+
+    public ResourceClassListQueryPayload(Integer version, PayloadMessageType type) {
+        super(version, type);
+    }
 }

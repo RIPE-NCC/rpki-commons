@@ -29,8 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.request;
 
+import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -38,15 +39,17 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-public class ResourceClassListQueryPayloadBuilderTest {
+public class ResourceClassListQueryPayloadSerializerTest {
 
-    private static final XStreamXmlSerializer<ResourceClassListQueryPayload> SERIALIZER = new ResourceClassListQueryPayloadSerializerBuilder().build();
-    public static final ResourceClassListQueryPayload TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD = createResourceClassListQueryPayload();
+    private static final XmlSerializer<ResourceClassListQueryPayload> SERIALIZER = new ResourceClassListQueryPayloadSerializer();
+    public static final ResourceClassListQueryPayload TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD = new ResourceClassListQueryPayload();
 
-    private static ResourceClassListQueryPayload createResourceClassListQueryPayload() {
-        ResourceClassListQueryPayloadBuilder builder = new ResourceClassListQueryPayloadBuilder();
-        return builder.build();
-    }
+    public static final String XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\n" +
+            "         recipient=\"recipient attribute\"\n" +
+            "         sender=\"sender attribute\"\n" +
+            "         type=\"list\"\n" +
+            "         version=\"1\"/>\n";
 
     @Test
     public void shouldCreateParsableProvisioningObject() throws IOException {
@@ -54,14 +57,24 @@ public class ResourceClassListQueryPayloadBuilderTest {
         assertEquals("recipient", TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD.getRecipient());
     }
 
+    @Test
+    public void shouldParseXml() {
+        ResourceClassListQueryPayload payload = SERIALIZER.deserialize(XML);
+
+        assertEquals(Integer.valueOf(1), payload.getVersion());
+        assertEquals("sender attribute", payload.getSender());
+        assertEquals("recipient attribute", payload.getRecipient());
+        assertEquals(PayloadMessageType.list, payload.getType());
+    }
+
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.1
     @Test
     public void shouldCreateXmlConformDraft() {
-        String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
-                "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"list\"/>";
+        ResourceClassListQueryPayload payload = new ResourceClassListQueryPayload();
+        payload.setSender("sender attribute");
+        payload.setRecipient("recipient attribute");
 
-        String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD);
-        assertEquals(expectedXml, actualXml);
+        assertEquals(XML, SERIALIZER.serialize(payload));
     }
 
     @Test

@@ -32,81 +32,33 @@ package net.ripe.rpki.commons.provisioning.identity;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.xml.DomXmlSerializer;
+import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
 import java.util.Base64;
 import java.util.Optional;
 
 
-public abstract class IdentitySerializer<T> {
+public abstract class IdentitySerializer<T> extends DomXmlSerializer<T> {
 
     public static final String XMLNS = "http://www.hactrn.net/uris/rpki/rpki-setup/";
 
-    public abstract T deserialize(String xml);
-
-    public abstract String serialize(T object);
-
-    protected DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
-        final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-        documentFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        documentFactory.setNamespaceAware(true);
-
-        final DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-
-        return documentBuilder;
-    }
-
-    protected Optional<String> getAttributeValue(final Node node, final String attr) {
-        return Optional.ofNullable(node.getAttributes())
-                .map(a -> a.getNamedItem(attr))
-                .map(item->item.getTextContent());
-    }
-
-    protected Optional<Node> getElement(Document doc, String elementName) {
-        final Node node = doc.getElementsByTagNameNS(XMLNS, elementName).item(0);
-        return Optional.ofNullable(node);
+    public IdentitySerializer() {
+        super(XMLNS);
     }
 
     protected Optional<String> getBpkiElementContent(final Document doc, final String nodeName) {
         return getElement(doc, nodeName).map(e -> e.getTextContent().replaceAll("\\s+", ""));
     }
 
-    protected String serialize(final Document document) throws TransformerException {
-        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-        final StringWriter sw = new StringWriter();
-        transformer.transform(new DOMSource(document), new StreamResult(sw));
-
-        return sw.toString();
-    }
-
     protected ProvisioningIdentityCertificate getProvisioningIdentityCertificate(final String bpkiTa) {
         final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-        parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getDecoder().decode(bpkiTa));
+        parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getMimeDecoder().decode(bpkiTa));
         return parser.getCertificate();
     }
 
-    public static class IdentitySerializerException extends RuntimeException {
+    public static class IdentitySerializerException extends DomXmlSerializerException {
         public IdentitySerializerException(Exception e) {
             super(e);
         }
