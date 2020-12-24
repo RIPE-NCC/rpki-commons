@@ -33,7 +33,7 @@ import com.google.common.io.Files;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectValidator;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
-import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadBuilderTest;
+import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponsePayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.revocation.response.CertificateRevocationResponsePayloadBuilderTest;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
@@ -69,7 +69,7 @@ public class CreateObjectsForInteropTesting {
         createValidCmsObjectAndWriteItToDisk(ResourceClassListResponsePayloadSerializerTest.TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD, "resource-class-list-response.cms");
 
         createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD, "certificate-issuance-request.cms");
-        createValidCmsObjectAndWriteItToDisk(CertificateIssuanceResponsePayloadBuilderTest.TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD, "certificate-issuance-response.cms");
+        createValidCmsObjectAndWriteItToDisk(CertificateIssuanceResponsePayloadSerializerTest.TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD, "certificate-issuance-response.cms");
 
         createValidCmsObjectAndWriteItToDisk(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD, "certificate-revocation-request.cms");
         createValidCmsObjectAndWriteItToDisk(CertificateRevocationResponsePayloadBuilderTest.TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD, "certificate-revocation-response.cms");

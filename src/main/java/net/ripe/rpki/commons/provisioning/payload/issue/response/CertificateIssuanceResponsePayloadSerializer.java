@@ -27,17 +27,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.provisioning.payload.list.response;
+package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayloadXmlSerializer;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
+import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.util.Collections;
 
 /**
  * See RFC6492 section 3.3.1 (https://tools.ietf.org/html/rfc6492#section-3.3.1). Example:
@@ -47,28 +47,25 @@ import java.util.stream.Collectors;
  * &lt;message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="list"/>
  * </code>
  */
-public class ResourceClassListResponsePayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<ResourceClassListResponsePayload> {
+public class CertificateIssuanceResponsePayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<CertificateIssuanceResponsePayload> {
+    private static final IpResourceSetProvisioningConverter IP_RESOURCE_SET_PROVISIONING_CONVERTER = IpResourceSetProvisioningConverter.INSTANCE;
 
-    public ResourceClassListResponsePayloadSerializer() {
-        super(PayloadMessageType.list_response);
+    public CertificateIssuanceResponsePayloadSerializer() {
+        super(PayloadMessageType.issue_response);
     }
 
-    protected ResourceClassListResponsePayload parseXmlPayload(Element message) {
-        List<ResourceClassListResponseClassElement> classes = getChildElements(message, "class")
-                .stream()
-                .map(element -> parseClassElementXml(element, ResourceClassListResponseClassElement::new))
-                .collect(Collectors.toList());
-        return new ResourceClassListResponsePayload(classes);
+    protected CertificateIssuanceResponsePayload parseXmlPayload(Element messageElement) throws IOException {
+        Element classElement = getSingleChildElement(messageElement, "class");
+        // Ensure only a single certificate element is present
+        getSingleChildElement(classElement, "certificate");
+        CertificateIssuanceResponseClassElement clazz = parseClassElementXml(classElement, CertificateIssuanceResponseClassElement::new);
+        return new CertificateIssuanceResponsePayload(clazz);
     }
 
     @Override
-    protected Iterable<? extends Node> generateXmlPayload(Document document, ResourceClassListResponsePayload payload) {
-        List<Node> result = new ArrayList<>();
-        for (ResourceClassListResponseClassElement classElement : payload.getClassElements()) {
-            Element node = generateClassElementXml(document, classElement);
-            result.add(node);
-        }
-        return result;
+    protected Iterable<? extends Node> generateXmlPayload(Document document, CertificateIssuanceResponsePayload payload) throws IOException {
+        CertificateIssuanceResponseClassElement clazz = payload.getClassElement();
+        Element classElement = generateClassElementXml(document, clazz);
+        return Collections.singletonList(classElement);
     }
-
 }

@@ -31,13 +31,10 @@ package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayloadXmlSerializer;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
-import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -52,24 +49,18 @@ import java.util.Collections;
  * </code>
  */
 public class CertificateIssuanceRequestPayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<CertificateIssuanceRequestPayload> {
-    private static final IpResourceSetProvisioningConverter IP_RESOURCE_SET_PROVISIONING_CONVERTER = IpResourceSetProvisioningConverter.INSTANCE;
-
     public CertificateIssuanceRequestPayloadSerializer() {
         super(PayloadMessageType.issue);
     }
 
     protected CertificateIssuanceRequestPayload parseXmlPayload(Element message) throws IOException {
-        NodeList requestElements = message.getElementsByTagNameNS(xmlns, "request");
-        if (requestElements.getLength() != 1) {
-            throw new DomXmlSerializerException("missing or multiple request element(s)");
-        }
-        Element element = (Element) requestElements.item(0);
+        Element requestElement = getSingleChildElement(message, "request");
         CertificateIssuanceRequestElement request = new CertificateIssuanceRequestElement();
-        request.setClassName(getRequiredAttributeValue(element, "class_name"));
-        request.setAllocatedAsn(getAttributeValue(element, "req_resource_set_as").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
-        request.setAllocatedIpv4(getAttributeValue(element, "req_resource_set_ipv4").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
-        request.setAllocatedIpv6(getAttributeValue(element, "req_resource_set_ipv6").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
-        request.setCertificateRequest(new PKCS10CertificationRequest(Base64.getMimeDecoder().decode(element.getTextContent())));
+        request.setClassName(getRequiredAttributeValue(requestElement, "class_name"));
+        request.setAllocatedAsn(getAttributeValue(requestElement, "req_resource_set_as").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
+        request.setAllocatedIpv4(getAttributeValue(requestElement, "req_resource_set_ipv4").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
+        request.setAllocatedIpv6(getAttributeValue(requestElement, "req_resource_set_ipv6").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
+        request.setCertificateRequest(new PKCS10CertificationRequest(Base64.getMimeDecoder().decode(requestElement.getTextContent())));
         return new CertificateIssuanceRequestPayload(request);
     }
 

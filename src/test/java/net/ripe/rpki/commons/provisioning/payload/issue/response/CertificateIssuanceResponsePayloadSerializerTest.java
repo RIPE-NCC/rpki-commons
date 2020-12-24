@@ -36,7 +36,9 @@ import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElementBuilder;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElementBuilder;
+import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
 import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -54,10 +56,10 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 
-public class CertificateIssuanceResponsePayloadBuilderTest {
-    private static final XStreamXmlSerializer<CertificateIssuanceResponsePayload> SERIALIZER = new CertificateIssuanceResponsePayloadSerializerBuilder().build();
+public class CertificateIssuanceResponsePayloadSerializerTest {
+    private static final XmlSerializer<CertificateIssuanceResponsePayload> SERIALIZER = new CertificateIssuanceResponsePayloadSerializer();
 
-    private static final DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 12).withZone(DateTimeZone.UTC);
+    private static final DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 0).withZone(DateTimeZone.UTC);
 
     public static final CertificateIssuanceResponsePayload TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD = createCertificateIssuanceResponsePayload();
 
@@ -89,20 +91,30 @@ public class CertificateIssuanceResponsePayloadBuilderTest {
         assertEquals(PayloadMessageType.issue_response, TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD.getType());
     }
 
-    // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
+    // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2
     @Test
     public void shouldHavePayloadXmlConformStandard() {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);
 
-        String expectedXmlRegex = "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>"
-                + "\n"
-                + "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"issue_response\">"
-                + "\n"
-                + "  <class class_name=\"a classname\" cert_url=\"rsync://localhost/so%2Cme/where,http://some/other\" resource_set_as=\"456,1234\" resource_set_ipv4=\"192.168.0.0/24\" resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\" resource_set_notafter=\"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\" suggested_sia_head=\"rsync://some/where\">\n"
-                + "    <certificate cert_url=\"rsync://jaja/jj%2Ca\" req_resource_set_as=\"123\" req_resource_set_ipv4=\"10.0.0.0/8,192.168.0.0/16\" req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>"
-                + "\n" + "    <issuer>[^<]*</issuer>" + "\n" + "  </class>" + "\n" + "</message>";
+        Pattern expectedXmlRegex = Pattern.compile("<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n"
+                        + "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"issue_response\"\\s+version=\"1\">\n"
+                        + "   <class\\s+cert_url=\"rsync://localhost/so%2Cme/where,http://some/other\"\\s+class_name=\"a classname\"\\s+resource_set_as=\"456,1234\"\\s+resource_set_ipv4=\"192.168.0.0/24\"\\s+resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\"\\s+resource_set_notafter=\"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\"\\s+suggested_sia_head=\"rsync://some/where\">\n"
+                        + "      <certificate\\s+cert_url=\"rsync://jaja/jj%2Ca\"\\s+req_resource_set_as=\"123\"\\s+req_resource_set_ipv4=\"10.0.0.0/8,192.168.0.0/16\"\\s+req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>\n"
+                        + "      <issuer>[^<]*</issuer>\n"
+                        + "   </class>\n"
+                        + "</message>\n",
+                Pattern.DOTALL
+        );
 
-        assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
+        assertTrue("actual: " + actualXml, expectedXmlRegex.matcher(actualXml).matches());
+    }
+
+    @Test
+    public void shouldDeserializeXml() {
+        String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);
+        CertificateIssuanceResponsePayload deserialized = SERIALIZER.deserialize(actualXml);
+        // Deal with one-way comma encoding in URIs.
+        assertEquals(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD.toString(), deserialized.toString().replace("%2C", ","));
     }
 
     @Test
