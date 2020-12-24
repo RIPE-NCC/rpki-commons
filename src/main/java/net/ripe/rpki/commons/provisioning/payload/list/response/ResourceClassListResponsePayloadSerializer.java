@@ -82,7 +82,7 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         clazz.setResourceSetIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_ipv4")));
         clazz.setResourceSetIpv6(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_ipv6")));
         clazz.setValidityNotAfter((DateTime) DATE_TIME_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_notafter")));
-        clazz.setSiaHeadUri(getRequiredAttributeValue(element, "suggested_sia_head"));
+        clazz.setSiaHeadUri(getAttributeValue(element, "suggested_sia_head").orElse(null));
         NodeList certificateElements = element.getElementsByTagNameNS(xmlns, "certificate");
         for (int j = 0; j < certificateElements.getLength(); ++j) {
             Element certificateElement = (Element) certificateElements.item(j);
@@ -108,7 +108,9 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
             node.setAttribute("resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv4()));
             node.setAttribute("resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv6()));
             node.setAttribute("resource_set_notafter", DATE_TIME_CONVERTER.toString(classElement.getValidityNotAfter()));
-            node.setAttribute("suggested_sia_head", classElement.getSiaHeadUri());
+            if (classElement.getSiaHeadUri() != null) {
+                node.setAttribute("suggested_sia_head", classElement.getSiaHeadUri());
+            }
             classElement.getCertificateElements().stream().map(certificate -> generateCertificateElementXml(document, certificate)).forEachOrdered(node::appendChild);
             X509ResourceCertificate issuer = classElement.getIssuer();
             if (issuer != null) {
