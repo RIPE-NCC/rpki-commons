@@ -53,6 +53,12 @@ import static net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPay
 public abstract class AbstractProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> extends DomXmlSerializer<T> {
     private static final String XMLNS = "http://www.apnic.net/specs/rescerts/up-down/";
 
+    /**
+     * We use the MIME decoder (RFC 2045) here to make the ProcessApnicPdusTest#apnic_pdu_2011_08_15_1_has_errors test
+     * work. The standard requires a stricter base-64 encoding from RFC 4648 which we use for encoding.
+     */
+    private static final Base64.Decoder BASE64_DECODER = Base64.getMimeDecoder();
+
     private final PayloadMessageType type;
 
     protected AbstractProvisioningPayloadXmlSerializer(PayloadMessageType type) {
@@ -66,7 +72,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected X509ResourceCertificate parseX509ResourceCertificate(String base64) {
         ValidationResult result = ValidationResult.withLocation("certificate.cer").withoutStoringPassingChecks();
-        X509GenericCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, Base64.getMimeDecoder().decode(base64.trim()));
+        X509GenericCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, BASE64_DECODER.decode(base64.trim()));
         if (result.hasFailureForCurrentLocation()) {
             throw new DomXmlSerializerException("resource certificate validation failed: " + result);
         } else if (certificate instanceof X509ResourceCertificate) {
