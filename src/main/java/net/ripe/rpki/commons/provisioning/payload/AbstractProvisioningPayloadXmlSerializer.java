@@ -90,8 +90,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
             Element message = getElement(doc, "message")
                     .orElseThrow(() -> new DomXmlSerializerException("message element not found"));
 
-            String versionString = getAttributeValue(message, "version")
-                    .orElseThrow(() -> new DomXmlSerializerException("version attribute not found"));
+            String versionString = getRequiredAttributeValue(message, "version");
             Integer version;
             try {
                 version = Integer.parseUnsignedInt(versionString);
@@ -102,14 +101,9 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
                 throw new DomXmlSerializerException("version attribute is not '1': " + version);
             }
 
-            String sender = getAttributeValue(message, "sender")
-                    .orElseThrow(() -> new DomXmlSerializerException("sender attribute not found"));
-
-            String recipient = getAttributeValue(message, "recipient")
-                    .orElseThrow(() -> new DomXmlSerializerException("recipient attribute not found"));
-
-            String typeString = getAttributeValue(message, "type")
-                    .orElseThrow(() -> new DomXmlSerializerException("type attribute not found"));
+            String sender = getRequiredAttributeValue(message, "sender");
+            String recipient = getRequiredAttributeValue(message, "recipient");
+            String typeString = getRequiredAttributeValue(message, "type");
             PayloadMessageType type;
             try {
                 type = PayloadMessageType.valueOf(typeString);
