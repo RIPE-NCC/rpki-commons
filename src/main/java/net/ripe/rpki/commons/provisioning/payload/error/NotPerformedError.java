@@ -46,27 +46,25 @@ public enum NotPerformedError {
     REV_NO_SUCH_KEY(1302),
     INTERNAL_SERVER_ERROR(2001);
 
-    private Integer errorCode;
+    private int errorCode;
 
-    private static final Map<Integer, NotPerformedError> CODE_MAP;
+    private static final Map<Integer, NotPerformedError> CODE_MAP = new HashMap<>();
 
     static {
-        CODE_MAP = new HashMap<Integer, NotPerformedError>();
-
         for (NotPerformedError error : NotPerformedError.values()) {
             CODE_MAP.put(error.getErrorCode(), error);
         }
     }
 
-    NotPerformedError(Integer errorCode) {
+    NotPerformedError(int errorCode) {
         this.errorCode = errorCode;
     }
 
-    public Integer getErrorCode() {
+    public int getErrorCode() {
         return errorCode;
     }
 
-    public static NotPerformedError getError(Integer errorCode) {
+    public static NotPerformedError getError(int errorCode) {
         return CODE_MAP.get(errorCode);
     }
 }

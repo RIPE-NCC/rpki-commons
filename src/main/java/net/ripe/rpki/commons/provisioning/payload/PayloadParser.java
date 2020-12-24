@@ -30,7 +30,7 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
 import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayload;
-import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializerBuilder;
+import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializer;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializer;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
@@ -66,7 +66,7 @@ public final class PayloadParser {
     private static final XmlSerializer<CertificateIssuanceResponsePayload> ISSUE_RESPONSE_SERIALIZER = new CertificateIssuanceResponsePayloadSerializer();
     private static final XmlSerializer<CertificateRevocationRequestPayload> REVOKE_SERIALIZER = new CertificateRevocationRequestPayloadSerializer();
     private static final XmlSerializer<CertificateRevocationResponsePayload> REVOKE_RESPONSE_SERIALIZER = new CertificateRevocationResponsePayloadSerializer();
-    private static final XmlSerializer<RequestNotPerformedResponsePayload> ERROR_RESPONSE_SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
+    private static final XmlSerializer<RequestNotPerformedResponsePayload> ERROR_RESPONSE_SERIALIZER = new RequestNotPerformedResponsePayloadSerializer();
 
     private static final Map<PayloadMessageType, XmlSerializer<? extends AbstractProvisioningPayload>> TYPE_MAP = new HashMap<>();
 
