@@ -32,20 +32,22 @@ package net.ripe.rpki.commons.provisioning.payload.revocation.request;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
+import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
-public class CertificateRevocationRequestPayloadBuilderTest {
+public class CertificateRevocationRequestPayloadSerializerTest {
 
-    private static final XStreamXmlSerializer<CertificateRevocationRequestPayload> SERIALIZER = new CertificateRevocationRequestPayloadSerializerBuilder().build();
+    private static final XmlSerializer<CertificateRevocationRequestPayload> SERIALIZER = new CertificateRevocationRequestPayloadSerializer();
 
     public static final CertificateRevocationRequestPayload TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD = createCertificateRevocationRequestPayload();
 
@@ -70,13 +72,22 @@ public class CertificateRevocationRequestPayloadBuilderTest {
     public void shouldProduceXmlConformStandard() {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD);
 
-        String expectedXmlRegex =
-                "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>" + "\n" +
-                        "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"revoke\">" + "\n" +
-                        "  <key class_name=\"a classname\" ski=\"[^\"]*\"/>" + "\n" +
-                        "</message>";
+        Pattern expectedXmlRegex = Pattern.compile(
+                "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n" +
+                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"revoke\"\\s+version=\"1\">\n" +
+                        "   <key\\s+class_name=\"a classname\"\\s+ski=\"[^\"]*\"/>\n" +
+                        "</message>\n",
+                Pattern.DOTALL
+        );
 
-        assertTrue(Pattern.matches(expectedXmlRegex, actualXml));
+        assertTrue("actual xml:" + actualXml, expectedXmlRegex.matcher(actualXml).matches());
+    }
+
+    @Test
+    public void shouldDeserializeXml() {
+        String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD);
+        CertificateRevocationRequestPayload deserialized = SERIALIZER.deserialize(actualXml);
+        assertEquals(TEST_CERTIFICATE_REVOCATION_REQUEST_PAYLOAD, deserialized);
     }
 
     @Test

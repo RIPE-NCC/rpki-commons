@@ -31,8 +31,9 @@ package net.ripe.rpki.commons.provisioning.payload.revocation;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import net.ripe.rpki.commons.util.EqualsSupport;
 
-public class CertificateRevocationKeyElement {
+public class CertificateRevocationKeyElement extends EqualsSupport {
 
     @XStreamAlias("class_name")
     @XStreamAsAttribute

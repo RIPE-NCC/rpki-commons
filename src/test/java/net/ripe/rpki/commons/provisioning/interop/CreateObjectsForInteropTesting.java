@@ -48,7 +48,7 @@ import java.io.IOException;
 import static net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.*;
 import static net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializerTest.*;
 import static net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadSerializerTest.*;
-import static net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilderTest.*;
+import static net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadSerializerTest.*;
 import static org.junit.Assert.*;
 
 public class CreateObjectsForInteropTesting {
