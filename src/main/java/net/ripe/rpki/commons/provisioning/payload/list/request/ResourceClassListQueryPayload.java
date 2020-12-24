@@ -40,7 +40,4 @@ public class ResourceClassListQueryPayload extends AbstractProvisioningQueryPayl
         super(PayloadMessageType.list);
     }
 
-    public ResourceClassListQueryPayload(Integer version, PayloadMessageType type) {
-        super(version, type);
-    }
 }
