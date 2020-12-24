@@ -29,19 +29,13 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.rpki.commons.util.EqualsSupport;
 
 public class CertificateRevocationKeyElement extends EqualsSupport {
 
-    @XStreamAlias("class_name")
-    @XStreamAsAttribute
     private String className;
 
-    // byte arrays are not allowed as attribute; hence we do the encoding ourselves
-    @XStreamAlias("ski")
-    @XStreamAsAttribute
+    // (XStream legacy) byte arrays are not allowed as attribute; hence we do the encoding ourselves
     private String publicKeyHash;
 
     public CertificateRevocationKeyElement(String className, String publicKeyHash) {

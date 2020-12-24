@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.common;
 
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
@@ -40,7 +39,6 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
-@XStreamConverter(CertificateElementConverter.class)
 public class CertificateElement extends EqualsSupport {
 
     private List<URI> issuerCertificatePublicationLocationUris;

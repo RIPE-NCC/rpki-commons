@@ -29,23 +29,17 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.response;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * See http://tools.ietf.org/html/rfc6492#section-3.3.2
  */
-@XStreamAlias("message")
 public class ResourceClassListResponsePayload extends AbstractProvisioningResponsePayload {
 
-    @XStreamImplicit(itemFieldName = "class")
     private List<ResourceClassListResponseClassElement> classElements;
 
     public ResourceClassListResponsePayload(List<ResourceClassListResponseClassElement> classElements) {
