@@ -63,12 +63,10 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
 
     @Override
     protected Iterable<? extends Node> generateXmlPayload(Document document, ResourceClassListResponsePayload payload) {
-        List<Node> result = new ArrayList<>();
-        for (ResourceClassListResponseClassElement classElement : payload.getClassElements()) {
-            Element node = generateClassElementXml(document, classElement);
-            result.add(node);
-        }
-        return result;
+        return payload.getClassElements()
+                .stream()
+                .map(clazz -> generateClassElementXml(document, clazz))
+                .collect(Collectors.toList());
     }
 
 }
