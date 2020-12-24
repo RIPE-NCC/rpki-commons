@@ -40,16 +40,9 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * See RFC6492 section 3.3.1 (https://tools.ietf.org/html/rfc6492#section-3.3.1). Example:
- *
- * <code>
- * &lt;?xml version="1.0" encoding="UTF-8"?>
- * &lt;message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="list"/>
- * </code>
+ * See RFC6492 section 3.4.2 (https://tools.ietf.org/html/rfc6492#section-3.4.2).
  */
 public class CertificateIssuanceResponsePayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<CertificateIssuanceResponsePayload> {
-    private static final IpResourceSetProvisioningConverter IP_RESOURCE_SET_PROVISIONING_CONVERTER = IpResourceSetProvisioningConverter.INSTANCE;
-
     public CertificateIssuanceResponsePayloadSerializer() {
         super(PayloadMessageType.issue_response);
     }
