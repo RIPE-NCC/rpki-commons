@@ -39,7 +39,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
-import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadBuilderTest;
+import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
@@ -122,7 +122,7 @@ public class ProvisioningObjectMother {
     }
 
     public static ProvisioningCmsObject createRequestNotPerformedResponseObject() {
-        return createCmsForPayload(RequestNotPerformedResponsePayloadBuilderTest.NOT_PERFORMED_PAYLOAD);
+        return createCmsForPayload(RequestNotPerformedResponsePayloadSerializerTest.NOT_PERFORMED_PAYLOAD);
     }
 
     public static ProvisioningCmsObject createRevocationRequestCmsObject() throws Exception {

@@ -30,21 +30,24 @@
 package net.ripe.rpki.commons.provisioning.payload.error;
 
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
+import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
+import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class RequestNotPerformedResponsePayloadBuilderTest {
+public class RequestNotPerformedResponsePayloadSerializerTest {
 
     private static final String TEST_ERROR_DESCRIPTION = "Something went wrong";
 
     private static final NotPerformedError TEST_ERROR = NotPerformedError.INTERNAL_SERVER_ERROR;
 
-    private static final XStreamXmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializerBuilder().build();
+    private static final XmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializer();
 
     public static RequestNotPerformedResponsePayload NOT_PERFORMED_PAYLOAD = createRequestNotPerformedResponsePayload();
 
@@ -68,14 +71,23 @@ public class RequestNotPerformedResponsePayloadBuilderTest {
     public void shouldProduceXmlConformDraft() {
         String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
 
-        String expectedXml =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" +
-                        "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"error_response\">" + "\n" +
-                        "  <status>" + TEST_ERROR.getErrorCode() + "</status>" + "\n" +
-                        "  <description xml:lang=\"en-US\">" + TEST_ERROR_DESCRIPTION + "</description>" + "\n" +
-                        "</message>";
+        Pattern expectedXml = Pattern.compile(
+                "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n" +
+                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"error_response\"\\s+version=\"1\">\n" +
+                        "   <status>" + TEST_ERROR.getErrorCode() + "</status>\n" +
+                        "   <description xml:lang=\"en-US\">" + TEST_ERROR_DESCRIPTION + "</description>\n" +
+                        "</message>\n",
+                Pattern.DOTALL
+        );
 
-        assertEquals(expectedXml, actualXml);
+        assertTrue("actual xml: " + actualXml, expectedXml.matcher(actualXml).matches());
+    }
+
+    @Test
+    public void shouldDeserializeXml() {
+        String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
+        RequestNotPerformedResponsePayload deserialized = SERIALIZER.deserialize(actualXml);
+        assertEquals(NOT_PERFORMED_PAYLOAD, deserialized);
     }
 
     @Test
