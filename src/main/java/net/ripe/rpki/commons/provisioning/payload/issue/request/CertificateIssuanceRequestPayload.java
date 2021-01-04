@@ -29,19 +29,14 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
 /**
  * See: http://tools.ietf.org/html/rfc6492#section-3.4.1
  */
-@XStreamAlias("message")
 public class CertificateIssuanceRequestPayload extends AbstractProvisioningQueryPayload {
 
-    @XStreamAlias("request")
-    @XStreamConverter(CertificateIssuanceRequestElementConverter.class)
     private CertificateIssuanceRequestElement requestElement;
 
     public CertificateIssuanceRequestPayload(CertificateIssuanceRequestElement requestElement) {

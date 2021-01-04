@@ -29,15 +29,9 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.common;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
-import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import net.ripe.rpki.commons.util.EqualsSupport;
 import org.joda.time.DateTime;
 
@@ -48,44 +42,22 @@ import java.util.List;
 
 public class GenericClassElement extends EqualsSupport {
 
-    @XStreamAsAttribute
-    @XStreamAlias("class_name")
     private String className;
 
-    @XStreamAlias("cert_url")
-    @XStreamAsAttribute
-    @XStreamConverter(CertificateUrlListConverter.class)
     private List<URI> certificateAuthorityUri;
 
-    @XStreamAlias("resource_set_as")
-    @XStreamAsAttribute
-    @XStreamConverter(IpResourceSetProvisioningConverter.class)
     private IpResourceSet resourceSetAs = new IpResourceSet();
 
-    @XStreamAlias("resource_set_ipv4")
-    @XStreamAsAttribute
-    @XStreamConverter(IpResourceSetProvisioningConverter.class)
     private IpResourceSet resourceSetIpv4 = new IpResourceSet();
 
-    @XStreamAlias("resource_set_ipv6")
-    @XStreamAsAttribute
-    @XStreamConverter(IpResourceSetProvisioningConverter.class)
     private IpResourceSet resourceSetIpv6 = new IpResourceSet();
 
-    @XStreamAlias("certificate")
-    @XStreamImplicit(itemFieldName = "certificate")
     private List<CertificateElement> certificateElements = new ArrayList<CertificateElement>();
 
-    @XStreamConverter(X509ResourceCertificateBase64Converter.class)
-    @XStreamAlias("issuer")
     private X509ResourceCertificate issuer;
 
-    @XStreamAlias("resource_set_notafter")
-    @XStreamAsAttribute
     private DateTime validityNotAfter;
 
-    @XStreamAlias("suggested_sia_head")
-    @XStreamAsAttribute
     private String siaHeadUri;
 
     public DateTime getValidityNotAfter() {

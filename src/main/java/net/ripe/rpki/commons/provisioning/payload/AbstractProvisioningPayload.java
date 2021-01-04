@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.provisioning.payload;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import net.ripe.rpki.commons.util.EqualsSupport;
 
 public abstract class AbstractProvisioningPayload extends EqualsSupport {
@@ -39,16 +38,12 @@ public abstract class AbstractProvisioningPayload extends EqualsSupport {
 
     public static final Integer SUPPORTED_VERSION = 1;
 
-    @XStreamAsAttribute
     private Integer version;
 
-    @XStreamAsAttribute
     private String sender = DEFAULT_SENDER;
 
-    @XStreamAsAttribute
     private String recipient = DEFAULT_RECIPIENT;
 
-    @XStreamAsAttribute
     private PayloadMessageType type;
 
     protected AbstractProvisioningPayload(PayloadMessageType type) {

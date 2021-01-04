@@ -29,18 +29,13 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.error;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
-@XStreamAlias("message")
 public class RequestNotPerformedResponsePayload extends AbstractProvisioningResponsePayload {
 
-    @XStreamConverter(NotPerformedErrorConverter.class)
     private NotPerformedError status;
 
-    @XStreamConverter(DescriptionElementConverter.class)
     private String description;
 
     protected RequestNotPerformedResponsePayload(NotPerformedError status, String description) {
