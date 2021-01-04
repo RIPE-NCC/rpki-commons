@@ -177,11 +177,11 @@ public class GenericClassElement extends EqualsSupport {
         this.issuer = issuer;
     }
 
-    protected List<CertificateElement> getCertificateElements() {
+    public List<CertificateElement> getCertificateElements() {
         return certificateElements;
     }
 
-    protected void setCertificateElements(List<CertificateElement> certificateElements) {
+    public void setCertificateElements(List<CertificateElement> certificateElements) {
         this.certificateElements = certificateElements;
     }
 

@@ -38,7 +38,4 @@ public abstract class AbstractProvisioningQueryPayload extends AbstractProvision
         super(type);
     }
 
-    public AbstractProvisioningQueryPayload(Integer version, PayloadMessageType type) {
-        super(version, type);
-    }
 }

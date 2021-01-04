@@ -33,8 +33,6 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
 
-import java.util.List;
-
 
 /**
  * See: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
@@ -43,19 +41,6 @@ import java.util.List;
  * as opposed to just one in the CertificateIssuanceResponse.
  */
 public class ResourceClassListResponseClassElement extends GenericClassElement {
-
-    // only reason for overriding is the different access modifier
-    @Override
-    public List<CertificateElement> getCertificateElements() {
-        return super.getCertificateElements();
-    }
-
-    // only reason for overriding is the different access modifier
-    @Override
-    public void setCertificateElements(List<CertificateElement> resourceClasses) {
-        super.setCertificateElements(resourceClasses);
-    }
-
     public boolean containsResourceCertificate(X509ResourceCertificate resourceCertificate) {
         if (getCertificateElements() == null) {
             return false;
