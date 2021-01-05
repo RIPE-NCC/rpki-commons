@@ -29,14 +29,13 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
-import com.thoughtworks.xstream.converters.SingleValueConverter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 
-public class DateTimeConverter implements SingleValueConverter {
+public class DateTimeConverter {
 
     private static final DateTimeFormatter FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
@@ -52,12 +51,10 @@ public class DateTimeConverter implements SingleValueConverter {
     }
 
     @SuppressWarnings("rawtypes")
-    @Override
     public boolean canConvert(Class type) {
         return DateTime.class.equals(type);
     }
 
-    @Override
     public Object fromString(String s) {
         try {
             return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.parseDateTime(s);
@@ -66,7 +63,6 @@ public class DateTimeConverter implements SingleValueConverter {
         }
     }
 
-    @Override
     public String toString(Object datetime) {
         // TODO: Test this! Was failing for me when running unit tests from different time zone
         DateTime dateTimeWithZone = ((DateTime) datetime).withZone(DateTimeZone.UTC);

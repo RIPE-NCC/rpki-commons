@@ -29,22 +29,18 @@
  */
 package net.ripe.rpki.commons.provisioning.serialization;
 
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CertificateUrlListConverter extends AbstractSingleValueConverter {
+public class CertificateUrlListConverter {
 
     public static final CertificateUrlListConverter INSTANCE = new CertificateUrlListConverter();
 
-    @Override
     public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
         return type == List.class;
     }
 
-    @Override
     public List<URI> fromString(String str) {
         List<URI> result = new ArrayList<URI>();
         for (String uri : str.split(",")) {
@@ -54,7 +50,6 @@ public class CertificateUrlListConverter extends AbstractSingleValueConverter {
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public String toString(Object obj) {
         if (obj == null) {
             return null;
