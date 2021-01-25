@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.xml;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -109,5 +110,19 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
         transformer.transform(new DOMSource(document), new StreamResult(sw));
 
         return sw.toString();
+    }
+
+    public Element addChild(Document doc, Node parent, String childName) {
+        final Element child = doc.createElement(childName);
+        parent.appendChild(child);
+        return child;
+    }
+
+    protected String getElementTextContent(Element element) {
+        try {
+            return element.getTextContent();
+        } catch (DOMException e) {
+            throw new DomXmlSerializerException("Error reading " + element.getLocalName() + " content", e);
+        }
     }
 }
