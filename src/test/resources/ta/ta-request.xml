@@ -1,0 +1,44 @@
+<requests.TrustAnchorRequest>
+  <creationTimestamp>1572266158744</creationTimestamp>
+  <taCertificatePublicationUri>rsync://rpki.ripe.net/ta/</taCertificatePublicationUri>
+  <taRequests>
+    <requests.SigningRequest>
+      <requestId>0aca0128-b93e-81ad-c36f-584be0ac10bd</requestId>
+      <resourceCertificateRequest>
+        <resourceClassName>DEFAULT</resourceClassName>
+        <subjectDN>CN=2a7dd1d787d793e4c8af56e197d4eed92af6ba13</subjectDN>
+        <subjectInformationAccess>
+          <X509CertificateInformationAccessDescriptor>
+            <method>1.3.6.1.5.5.7.48.5</method>
+            <location>rsync://rpki.ripe.net/repository/aca/</location>
+          </X509CertificateInformationAccessDescriptor>
+          <X509CertificateInformationAccessDescriptor>
+            <method>1.3.6.1.5.5.7.48.10</method>
+            <location>rsync://rpki.ripe.net/repository/aca/Kn3R14fXk-TIr1bhl9Tu2Sr2uhM.mft</location>
+          </X509CertificateInformationAccessDescriptor>
+          <X509CertificateInformationAccessDescriptor>
+            <method>1.3.6.1.5.5.7.48.13</method>
+            <location>https://rrdp.ripe.net/notification.xml</location>
+          </X509CertificateInformationAccessDescriptor>
+        </subjectInformationAccess>
+        <ipResourceSet></ipResourceSet>
+        <encodedSubjectPublicKey>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6tpCG1pIpjJ5eJnl7r/Hu6Ts4prrrF4Q
+qH2x3P0itM/j5idgpvki9AUk+qZUigFDw64JA0Of4dImyW0UKFP44r4iA+W7IwjpDjl5Wqr8tiTp
+4ZitHR31QtFw3NHITf6EYmnE2/tj3bWQTk90oH4DdqELDfujbllXLn8fXofakYViOAidPXDx4k86
+ZL4tOVU1cDU2d/AIXQXL2wiMLlWCs/Wk8O0eYTdhT+w6rvZgGsmflycldFIyzSFt0iCAefgSgAeY
+24ycPy+gawsoUMamtCuxV/Vf0D9/43YfxO1NQodQdQtFiCCMJ8b0IgMEs9H5pfpqLEsl5TfruUNp
+AqHKRwIDAQAB</encodedSubjectPublicKey>
+      </resourceCertificateRequest>
+    </requests.SigningRequest>
+  </taRequests>
+  <siaDescriptors>
+    <X509CertificateInformationAccessDescriptor>
+      <method>1.3.6.1.5.5.7.48.13</method>
+      <location>https://rrdp.ripe.net/notification.xml</location>
+    </X509CertificateInformationAccessDescriptor>
+    <X509CertificateInformationAccessDescriptor>
+      <method>1.3.6.1.5.5.7.48.5</method>
+      <location>rsync://rpki.ripe.net/repository/</location>
+    </X509CertificateInformationAccessDescriptor>
+  </siaDescriptors>
+</requests.TrustAnchorRequest>
