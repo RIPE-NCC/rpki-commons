@@ -161,6 +161,9 @@ public final class Asn1Util {
 
     /**
      * ASId ::= INTEGER
+     *
+     * @ensures ASId is a valid 32-bit ASN
+     * @throws IllegalArgumentException when the wrong encoding is used or value is not a valid 32-bit ASN.
      */
     public static Asn parseAsId(ASN1Encodable der) {
         return new Asn(expect(der, ASN1Integer.class).getValue());
