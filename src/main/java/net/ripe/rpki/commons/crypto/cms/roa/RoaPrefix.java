@@ -35,18 +35,27 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+import javax.annotation.CheckForNull;
 import java.io.Serializable;
 
 public class RoaPrefix extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final IpRange prefix;
+    @CheckForNull
     private final Integer maximumLength;
 
     public RoaPrefix(IpRange prefix) {
         this(prefix, null);
     }
 
+    /**
+     * Instantiate an RoaPrefix.
+     *
+     * @param prefix prefix of the ROA
+     * @param maximumLength maximumLength of the ROA
+     * @ensures that the maximumLength is valid compared to the prefix and for the address family of the prefix.
+     */
     public RoaPrefix(IpRange prefix, Integer maximumLength) {
         Validate.notNull(prefix, "prefix is required");
         Validate.isTrue(prefix.isLegalPrefix(), "prefix is not a legal prefix");

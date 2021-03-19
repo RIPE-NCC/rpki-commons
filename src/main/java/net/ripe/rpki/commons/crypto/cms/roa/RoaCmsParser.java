@@ -107,6 +107,10 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
         BigInteger maxLength = null;
         if (seq.size() > 1) {
             maxLength = expect(seq.getObjectAt(1), ASN1Integer.class).getValue();
+            /**
+             * Check for overflow of int32, further check (compared to prefix) is performed by
+             * {@link RoaPrefix#RoaPrefix(IpRange, Integer)}
+             */
             if (!validationResult.rejectIfFalse((maxLength.compareTo(BigInteger.ZERO) >= 0) && (maxLength.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0), PREFIX_LENGTH)) {
                 throw new IllegalArgumentException("prefix max length invalid");
             }
