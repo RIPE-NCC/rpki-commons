@@ -38,10 +38,8 @@ import net.ripe.rpki.commons.ta.domain.request.SigningRequest;
 import net.ripe.rpki.commons.ta.domain.request.TaRequest;
 import net.ripe.rpki.commons.ta.domain.request.TrustAnchorRequest;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -56,6 +54,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRequest> {
@@ -179,7 +178,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
         try (final Reader characterStream = new StringReader(xml)) {
             final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
 
-            final Element taRequestElement = getElement(doc, REQUESTS_TRUST_ANCHOR_REQUEST)
+            final Element taRequestElement = getElementWithPossibleLegacyName(doc, REQUESTS_TRUST_ANCHOR_REQUEST)
                     .orElseThrow(() -> new DomXmlSerializerException("requests.TrustAnchorRequest element not found"));
 
             final Element creationTimestampElement = getSingleChildElement(taRequestElement, CREATION_TIMESTAMP);
@@ -234,7 +233,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
 
     private List<TaRequest> getTaRevocationRequests(Element taRequestElement) {
         List<TaRequest> taRequests = new ArrayList<>();
-        final List<Element> revocationRequestElements = getChildElements(taRequestElement, REQUESTS_REVOCATION_REQUEST);
+        final List<Element> revocationRequestElements = getChildElementsWithPossibleLegacyName(taRequestElement, REQUESTS_REVOCATION_REQUEST);
         for(Element revocationRequestElement: revocationRequestElements) {
 
             final Element resourceClassNameElement = getSingleChildElement(revocationRequestElement, RESOURCE_CLASS_NAME);
@@ -255,7 +254,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
 
     private List<TaRequest> getTaSigningRequests(Element taRequestElement) {
         List<TaRequest> taRequests = new ArrayList<>();
-        final List<Element> signingRequestElements = getChildElements(taRequestElement, REQUESTS_SIGNING_REQUEST);
+        final List<Element> signingRequestElements = getChildElementsWithPossibleLegacyName(taRequestElement, REQUESTS_SIGNING_REQUEST);
         for(Element signingRequestElement: signingRequestElements) {
             final Element resourceCertificateRequestElement = getSingleChildElement(signingRequestElement, RESOURCE_CERTIFICATE_REQUEST);
 
@@ -291,5 +290,31 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new DomXmlSerializerException("Unable to inject "+fieldName+": "+value + " into "+obj.getClass().getSimpleName(), e);
         }
+    }
+
+    /*
+     * Some existing requests on the database have been serialized with full name (package + class name)
+     * This is not the same behaviour as the TA <-> core exchange, but only present for the core <-> core exchanges
+     */
+    protected List<Element> getChildElementsWithPossibleLegacyName(Element parent, String tagName) {
+        final List<Element> childElements = getChildElements(parent, tagName);
+        if(!childElements.isEmpty()) {
+            return childElements;
+        }
+
+        return getChildElements(parent, "net.ripe.rpki.offline."+tagName);
+    }
+
+    /*
+     * Some existing requests on the database have been serialized with full name (package + class name)
+     * This is not the same behaviour as the TA <-> core exchange, but only present for the core <-> core exchanges
+     */
+    private Optional<Element> getElementWithPossibleLegacyName(Document doc, String elementName) {
+        final Optional<Element> element = getElement(doc, elementName);
+        if(element.isPresent()) {
+            return element;
+        }
+
+        return getElement(doc, "net.ripe.rpki.offline."+elementName);
     }
 }

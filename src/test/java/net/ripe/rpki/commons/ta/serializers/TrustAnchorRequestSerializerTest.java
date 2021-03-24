@@ -64,10 +64,13 @@ import java.util.UUID;
 
 import static net.ripe.rpki.commons.ta.serializers.Utils.cleanupBase64;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class TrustAnchorRequestSerializerTest {
 
     private static final String TA_REQUEST_PATH = "src/test/resources/ta/ta-request.xml";
+    private static final String LEGACY_TA_REQUEST_PATH = "src/test/resources/ta/legacy-ta-request.xml";
     public static final java.util.Base64.Encoder BASE64_ENCODER = java.util.Base64.getMimeEncoder(10_000, "\n".getBytes());
 
     private Document document;
@@ -392,6 +395,19 @@ public class TrustAnchorRequestSerializerTest {
         assertEquals(revocationRequest0.getResourceClassName(), revocationRequest1.getResourceClassName());
         assertEquals(revocationRequest0.getEncodedPublicKey(), revocationRequest1.getEncodedPublicKey());
 
+    }
+
+    @Test
+    public void itShouldDeserializeLegacyXmlRequestElements() throws IOException {
+
+        final String stateXML = Files.toString(new File(LEGACY_TA_REQUEST_PATH), Charsets.UTF_8);
+
+        final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
+        final TrustAnchorRequest trustAnchorRequest = trustAnchorRequestSerializer.deserialize(stateXML);
+
+
+        assertFalse(trustAnchorRequest.getTaRequests().isEmpty());
+        assertEquals(2, trustAnchorRequest.getTaRequests().size());
     }
 
     private final String signingRequest = "<requests.TrustAnchorRequest>\n" +
