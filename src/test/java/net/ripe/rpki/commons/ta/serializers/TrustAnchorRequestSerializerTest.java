@@ -71,6 +71,7 @@ public class TrustAnchorRequestSerializerTest {
 
     private static final String TA_REQUEST_PATH = "src/test/resources/ta/ta-request.xml";
     private static final String LEGACY_TA_REQUEST_PATH = "src/test/resources/ta/legacy-ta-request.xml";
+    private static final String TA_REQUEST_NO_TA_URI_PATH = "src/test/resources/ta/ta-request-without-ta-publication-uri.xml";
     public static final java.util.Base64.Encoder BASE64_ENCODER = java.util.Base64.getMimeEncoder(10_000, "\n".getBytes());
 
     private Document document;
@@ -408,6 +409,19 @@ public class TrustAnchorRequestSerializerTest {
 
         assertFalse(trustAnchorRequest.getTaRequests().isEmpty());
         assertEquals(2, trustAnchorRequest.getTaRequests().size());
+    }
+
+
+    @Test
+    public void itShouldDeserializeXmlWithoutTaCertificatePublicationUriElement() throws IOException {
+
+        final String stateXML = Files.toString(new File(TA_REQUEST_NO_TA_URI_PATH), Charsets.UTF_8);
+
+        final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
+        final TrustAnchorRequest trustAnchorRequest = trustAnchorRequestSerializer.deserialize(stateXML);
+
+        assertNotNull(trustAnchorRequest);
+
     }
 
     private final String signingRequest = "<requests.TrustAnchorRequest>\n" +
