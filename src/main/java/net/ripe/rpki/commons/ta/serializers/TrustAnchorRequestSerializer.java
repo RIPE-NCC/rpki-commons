@@ -178,7 +178,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
         try (final Reader characterStream = new StringReader(xml)) {
             final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
 
-            final Element taRequestElement = getElementWithLegacyName(doc, REQUESTS_TRUST_ANCHOR_REQUEST)
+            final Element taRequestElement = getElementWithPossibleLegacyName(doc, REQUESTS_TRUST_ANCHOR_REQUEST)
                     .orElseThrow(() -> new DomXmlSerializerException("requests.TrustAnchorRequest element not found"));
 
             final Element creationTimestampElement = getSingleChildElement(taRequestElement, CREATION_TIMESTAMP);
@@ -233,7 +233,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
 
     private List<TaRequest> getTaRevocationRequests(Element taRequestElement) {
         List<TaRequest> taRequests = new ArrayList<>();
-        final List<Element> revocationRequestElements = getChildElementsWithLegacyName(taRequestElement, REQUESTS_REVOCATION_REQUEST);
+        final List<Element> revocationRequestElements = getChildElementsWithPossibleLegacyName(taRequestElement, REQUESTS_REVOCATION_REQUEST);
         for(Element revocationRequestElement: revocationRequestElements) {
 
             final Element resourceClassNameElement = getSingleChildElement(revocationRequestElement, RESOURCE_CLASS_NAME);
@@ -254,7 +254,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
 
     private List<TaRequest> getTaSigningRequests(Element taRequestElement) {
         List<TaRequest> taRequests = new ArrayList<>();
-        final List<Element> signingRequestElements = getChildElementsWithLegacyName(taRequestElement, REQUESTS_SIGNING_REQUEST);
+        final List<Element> signingRequestElements = getChildElementsWithPossibleLegacyName(taRequestElement, REQUESTS_SIGNING_REQUEST);
         for(Element signingRequestElement: signingRequestElements) {
             final Element resourceCertificateRequestElement = getSingleChildElement(signingRequestElement, RESOURCE_CERTIFICATE_REQUEST);
 
@@ -292,7 +292,11 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
         }
     }
 
-    protected List<Element> getChildElementsWithLegacyName(Element parent, String tagName) {
+    /*
+     * Some existing requests on the database have been serialized with full name (package + class name)
+     * This is not the same behaviour as the TA <-> core exchange, but only present for the core <-> core exchanges
+     */
+    protected List<Element> getChildElementsWithPossibleLegacyName(Element parent, String tagName) {
         final List<Element> childElements = getChildElements(parent, tagName);
         if(!childElements.isEmpty()) {
             return childElements;
@@ -301,8 +305,11 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
         return getChildElements(parent, "net.ripe.rpki.offline."+tagName);
     }
 
-
-    private Optional<Element> getElementWithLegacyName(Document doc, String elementName) {
+    /*
+     * Some existing requests on the database have been serialized with full name (package + class name)
+     * This is not the same behaviour as the TA <-> core exchange, but only present for the core <-> core exchanges
+     */
+    private Optional<Element> getElementWithPossibleLegacyName(Document doc, String elementName) {
         final Optional<Element> element = getElement(doc, elementName);
         if(element.isPresent()) {
             return element;
