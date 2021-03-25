@@ -192,12 +192,9 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
 
             // The TA_CERTIFICATE_PUBLICATION_URI is present only for TA exchanges, but for some reason this parser is used for exchanges between other CA inside core
             final Optional<Element> taCertificatePublicationUriElement = getOptionalSingleChildElement(taRequestElement, TA_CERTIFICATE_PUBLICATION_URI);
-            final URI taCertificatePublicationUri;
-            if(taCertificatePublicationUriElement.isPresent()) {
-                taCertificatePublicationUri = URI.create(getElementTextContent(taCertificatePublicationUriElement.get()));
-            } else  {
-                taCertificatePublicationUri = null;
-            }
+            final URI taCertificatePublicationUri = taCertificatePublicationUriElement
+                    .map(uri -> URI.create(getElementTextContent(taCertificatePublicationUriElement.get())))
+                    .orElse(null);
 
             final Element requestsListElement = getSingleChildElement(taRequestElement, TA_REQUESTS);
             final List<TaRequest> taRequests = getTaSigningRequests(requestsListElement);
