@@ -89,6 +89,14 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
         return (Element) nodeList.item(0);
     }
 
+    protected Optional<Element> getOptionalSingleChildElement(Element parent, String tagName) {
+        NodeList nodeList = parent.getElementsByTagNameNS(xmlns, tagName);
+        if(nodeList.getLength() == 0){
+            return Optional.empty();
+        }
+        return Optional.of(getSingleChildElement(parent, tagName));
+    }
+
     protected List<Element> getChildElements(Element parent, String tagName) {
         NodeList nodeList = parent.getElementsByTagNameNS(xmlns, tagName);
         ArrayList<Element> result = new ArrayList<>(nodeList.getLength());
