@@ -40,9 +40,7 @@ import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERTaggedObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -56,7 +54,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 
     private Asn asn;
 
-    private List<RoaPrefix> prefixes = new ArrayList<RoaPrefix>();
+    private List<RoaPrefix> prefixes = new ArrayList<>();
 
     @Override
     public void parse(ValidationResult result, byte[] encoded) {
@@ -173,7 +171,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
         expect(der, ASN1Sequence.class);
         ASN1Sequence seq = (ASN1Sequence) der;
 
-        List<RoaPrefix> roaPrefixList = new ArrayList<RoaPrefix>();
+        List<RoaPrefix> roaPrefixList = new ArrayList<>();
         boolean errorOccured = false;
         for (int i = 0; i < seq.size(); ++i) {
             try {
@@ -188,7 +186,7 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
             validationResult.rejectIfFalse(true, ADDR_FAMILY);
         }
 
-        validationResult.rejectIfFalse(roaPrefixList.size() > 0, ROA_PREFIX_LIST);
+        validationResult.rejectIfTrue(roaPrefixList.isEmpty(), ROA_PREFIX_LIST);
         return roaPrefixList;
     }
 
