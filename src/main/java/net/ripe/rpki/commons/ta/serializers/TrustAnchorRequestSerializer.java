@@ -274,7 +274,9 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
 
             final X509CertificateInformationAccessDescriptor[] x509CertificateInformationAccessDescriptors = getX509CertificateInformationAccessDescriptorArray(subjectInformationAccessElement);
 
-            final TaRequest taRequest = new SigningRequest(new ResourceCertificateRequestData(resourceClassName, subjectDN, subjectPublicKey, x509CertificateInformationAccessDescriptors));
+            final TaRequest taRequest = new SigningRequest(
+                    ResourceCertificateRequestData.forTASigningRequest(resourceClassName, subjectDN, subjectPublicKey, x509CertificateInformationAccessDescriptors)
+            );
 
             final Element requestIdElement = getSingleChildElement(signingRequestElement, REQUEST_ID);
             final String requestId = getElementTextContent(requestIdElement);
