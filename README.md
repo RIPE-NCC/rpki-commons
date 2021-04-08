@@ -43,6 +43,14 @@ certificate, using a trust anchor and set of known constraints.
 This library also contains an implementation of the RPKI certificate
 provisioning protocol.
 
+Releasing
+----------
+
+To release a version of rpki-commons you can push a tag
+`rpki-commons-<VERSION>`. The RIPENCC internal Gitlab pipeline will build and
+publish the artifacts for `<VERSION>`. E.g. a tag `rpki-commons-1.0` updates the
+POM version to `1.0` and then builds and releases the artifacts.
+
 
 ## Changelog
 
