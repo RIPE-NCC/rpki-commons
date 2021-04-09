@@ -173,6 +173,11 @@ public class X509CrlBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void shouldRejectNegativeBigCrlNumber() {
+        subject.withNumber(BigInteger.valueOf(-10));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void shouldRejectVeryBigCrlNumber() {
         subject.withNumber(BigInteger.valueOf(2).pow(160));
     }

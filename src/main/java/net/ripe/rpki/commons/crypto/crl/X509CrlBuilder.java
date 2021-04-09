@@ -95,11 +95,13 @@ public class X509CrlBuilder {
         return nextUpdateTime;
     }
 
+    /**
+     * CRL number must be representable in 20 octets
+     * https://tools.ietf.org/html/rfc5280#section-5.2.3
+     */
     public X509CrlBuilder withNumber(BigInteger number) {
-        // CRL number must be representable in 20 octets
-        // https://tools.ietf.org/html/rfc5280#section-5.2.3
-        if (number.abs().bitLength() > 20 * 8) {
-            throw new IllegalArgumentException(number + " is too big for a CRL, it must be representable by 20 octets or less.");
+        if (number.signum() <= 0 || number.abs().bitLength() > 20 * 8) {
+            throw new IllegalArgumentException(number + " CRL number must be positive and be representable by 20 octets or less.");
         }
         this.crlNumber = new CRLNumber(number);
         return this;
