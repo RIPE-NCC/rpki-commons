@@ -314,6 +314,7 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(publicKey, "no publicKey");
         Validate.notNull(signingKeyPair, "no signingKeyPair");
         Validate.notNull(validityPeriod, "no validityPeriod");
+        Validate.isTrue("RSA".equals(publicKey.getAlgorithm()), "publicKey algorithm is not RSA");
         if (!ca) {
             Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
                     "keyCertSign only allowed for ca");

@@ -166,4 +166,19 @@ public class X509CrlBuilderTest {
         subject.addEntry(BigInteger.valueOf(42), UTC.dateTime());
         assertFalse(subject.isSatisfiedByEntries(nonEmptyCrl));
     }
+
+    @Test
+    public void shouldNotRejectReasonableCrlNumber() {
+        subject.withNumber(BigInteger.valueOf(2).pow(150));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldRejectNegativeBigCrlNumber() {
+        subject.withNumber(BigInteger.valueOf(-10));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldRejectVeryBigCrlNumber() {
+        subject.withNumber(BigInteger.valueOf(2).pow(160));
+    }
 }
