@@ -42,7 +42,6 @@ import org.junit.Test;
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
-import java.security.PublicKey;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 import static org.junit.Assert.*;
@@ -62,37 +61,6 @@ public class X509ResourceCertificateBuilderTest {
         DateTime now = UTC.dateTime();
         subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
-    }
-
-    @Test
-    public void shouldUseOnlyTheEncodedFormOfThePublicKey() {
-        PublicKey publicKey = new PublicKey() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String getFormat() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public byte[] getEncoded() {
-                return TEST_KEY_PAIR.getPublic().getEncoded();
-            }
-
-            @Override
-            public String getAlgorithm() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                throw new UnsupportedOperationException();
-            }
-        };
-
-        subject.withPublicKey(publicKey);
-
-        subject.build();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -220,4 +188,3 @@ public class X509ResourceCertificateBuilderTest {
 
 
 }
-
