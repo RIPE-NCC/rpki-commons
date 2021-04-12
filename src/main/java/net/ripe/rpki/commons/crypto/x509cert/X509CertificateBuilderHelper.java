@@ -237,6 +237,15 @@ public final class X509CertificateBuilderHelper {
         return this;
     }
 
+    /**
+     * Build the X509 certificate.
+     *
+     * @requires endDate to be set before certificate is built. It is <b>NOT</b>
+     * possible to create a certificate with an open-ended/unlimited lifetime by
+     * using null. If an certificate has no well-defined expiration date, use the
+     * GeneralizedTime value of 99991231235959Z as specified in RFC 5280 section
+     * 4.1.2.5 [https://tools.ietf.org/html/rfc5280#section-4.1.2.5].
+     */
     public X509Certificate generateCertificate() {
         X509v3CertificateBuilder certificateGenerator = createCertificateGenerator();
         try {
