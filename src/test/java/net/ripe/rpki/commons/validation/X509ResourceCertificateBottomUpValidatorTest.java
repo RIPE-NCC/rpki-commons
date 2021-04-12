@@ -249,7 +249,6 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withCa(true);
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
-        builder.withSubjectKeyIdentifier(true);
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
         builder.withSubjectInformationAccess(
@@ -272,7 +271,6 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withCa(true);
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
-        builder.withSubjectKeyIdentifier(true);
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(VALIDITY_PERIOD);
         builder.withCrlDistributionPoints(URI.create("rsync://localhost/ta.crl"));
@@ -296,7 +294,6 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withValidityPeriod(VALIDITY_PERIOD);
         builder.withAuthorityKeyIdentifier(true);
-        builder.withSubjectKeyIdentifier(true);
         builder.withResources(CHILD_RESOURCE_SET);
         builder.withCrlDistributionPoints(URI.create("rsync://localhost/prod.crl"));
         return builder;

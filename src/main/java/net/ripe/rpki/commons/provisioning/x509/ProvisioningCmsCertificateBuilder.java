@@ -90,7 +90,6 @@ public class ProvisioningCmsCertificateBuilder {
         builderHelper.withCa(false);
         builderHelper.withKeyUsage(KeyUsage.digitalSignature);
         builderHelper.withAuthorityKeyIdentifier(true);
-        builderHelper.withSubjectKeyIdentifier(true);
         final DateTime now = UTC.dateTime();
         builderHelper.withValidityPeriod(new ValidityPeriod(now, now.plusDays(DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW)));
     }

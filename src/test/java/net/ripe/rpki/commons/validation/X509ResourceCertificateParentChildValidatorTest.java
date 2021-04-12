@@ -245,7 +245,6 @@ public class X509ResourceCertificateParentChildValidatorTest {
         builder.withCa(true);
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
-        builder.withSubjectKeyIdentifier(true);
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
         builder.withSigningKeyPair(ROOT_KEY_PAIR);
@@ -265,7 +264,6 @@ public class X509ResourceCertificateParentChildValidatorTest {
         builder.withCa(true);
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
-        builder.withSubjectKeyIdentifier(true);
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(VALIDITY_PERIOD);
         return builder;

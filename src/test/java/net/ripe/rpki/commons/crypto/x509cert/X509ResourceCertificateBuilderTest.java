@@ -137,7 +137,6 @@ public class X509ResourceCertificateBuilderTest {
     @Test
     public void shouldHaveSubjectKeyIdentifierForResourceCertificates() {
         subject.withResources(IpResourceSet.parse("10/8"));
-        subject.withSubjectKeyIdentifier(true);
         X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getSubjectKeyIdentifier());

@@ -143,8 +143,6 @@ public abstract class GenericRpkiCertificateBuilder {
         }
 
         builder.withSignatureProvider(signatureProvider);
-
-        builder.withSubjectKeyIdentifier(true);
         builder.withKeyUsage(keyUsage);
 
         return builder;
