@@ -48,11 +48,10 @@ public class RpkiSignedObjectEeCertificateBuilder extends GenericRpkiCertificate
     public X509ResourceCertificate build() {
         validateFields();
 
-        X509ResourceCertificateBuilder builder = createGenericRpkiCertificateBuilder();
+        X509ResourceCertificateBuilder builder = createGenericRpkiCertificateBuilder(KeyUsage.digitalSignature);
 
         // Implicit by standard:
         builder.withCa(false);
-        builder.withKeyUsage(KeyUsage.digitalSignature);
 
         X509CertificateInformationAccessDescriptor[] siaDescriptors = {
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, cmsPublicationUri)
