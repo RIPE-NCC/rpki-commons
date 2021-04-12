@@ -55,13 +55,11 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
     public X509ResourceCertificate build() {
         validateFields();
 
-        X509ResourceCertificateBuilder builder = createGenericRpkiCertificateBuilder();
+        X509ResourceCertificateBuilder builder = createGenericRpkiCertificateBuilder(KeyUsage.keyCertSign | KeyUsage.cRLSign);
 
         // Implicitly required by standards
         builder.withCa(true);
-        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withAuthorityKeyIdentifier(true);
-
 
         X509CertificateInformationAccessDescriptor[] descriptors = {
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, caRepositoryUri),

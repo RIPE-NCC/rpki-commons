@@ -115,7 +115,7 @@ public abstract class GenericRpkiCertificateBuilder {
         this.signatureProvider = signatureProvider;
     }
 
-    protected X509ResourceCertificateBuilder createGenericRpkiCertificateBuilder() {
+    protected X509ResourceCertificateBuilder createGenericRpkiCertificateBuilder(int keyUsage) {
 
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
 
@@ -136,7 +136,7 @@ public abstract class GenericRpkiCertificateBuilder {
             builder.withCrlDistributionPoints(crlUri);
 
             X509CertificateInformationAccessDescriptor[] aiaDescriptors = {
-                    new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, parentResourceCertificatePublicationUri)
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, parentResourceCertificatePublicationUri)
             };
             builder.withAuthorityInformationAccess(aiaDescriptors);
             builder.withAuthorityKeyIdentifier(true);
@@ -145,6 +145,7 @@ public abstract class GenericRpkiCertificateBuilder {
         builder.withSignatureProvider(signatureProvider);
 
         builder.withSubjectKeyIdentifier(true);
+        builder.withKeyUsage(keyUsage);
 
         return builder;
     }
