@@ -39,8 +39,11 @@ import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static org.junit.Assert.assertNull;
 
 
 public class X509CertificateBuilderHelperTest {
@@ -64,6 +67,12 @@ public class X509CertificateBuilderHelperTest {
     public void shouldFailOnIncorrectAlgorithm() {
         subject.withSignatureAlgorithm("foo");
         subject.generateCertificate();
+    }
+
+    @Test
+    public void shouldMakeSureTheresNoExtendedKeyUsage() throws CertificateParsingException {
+        final X509Certificate x509Certificate = subject.generateCertificate();
+        assertNull(x509Certificate.getExtendedKeyUsage());
     }
 
 }

@@ -34,6 +34,7 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
 import net.ripe.rpki.commons.util.UTC;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,10 +44,16 @@ import org.junit.Test;
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
+import static net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER;
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class X509RouterCertificateBuilderTest {
@@ -118,6 +125,14 @@ public class X509RouterCertificateBuilderTest {
         subject.withCa(false);
         subject.withKeyUsage(KeyUsage.keyCertSign);
         subject.build();
+    }
+
+    @Test
+    public void shouldHaveExtendedKeyUsage() throws CertificateParsingException {
+        final X509RouterCertificate x509RouterCertificate = subject.build();
+        final List<String> extendedKeyUsage = x509RouterCertificate.getCertificate().getExtendedKeyUsage();
+        assertEquals(1, extendedKeyUsage.size());
+        assertEquals(OID_KP_BGPSEC_ROUTER.toString(), extendedKeyUsage.get(0));
     }
 
     @Test
