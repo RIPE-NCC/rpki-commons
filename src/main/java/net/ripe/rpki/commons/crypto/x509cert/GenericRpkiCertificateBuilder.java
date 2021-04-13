@@ -52,9 +52,6 @@ public abstract class GenericRpkiCertificateBuilder {
     private X500Principal issuer;
     private ValidityPeriod validityPeriod;
 
-    private URI crlUri;
-    private URI parentResourceCertificatePublicationUri;
-
     private String signatureProvider = "SunRsaSign";
 
     public void withPublicKey(PublicKey publicKey) {
@@ -89,23 +86,8 @@ public abstract class GenericRpkiCertificateBuilder {
         this.validityPeriod = validityPeriod;
     }
 
-
-    public void withCrlUri(URI crlUri) {
-        Validate.notNull(crlUri, "CRL Uri can not be null");
-        validateIsRsyncUri(crlUri);
-        this.crlUri = crlUri;
-    }
-
     protected void validateIsRsyncUri(URI crlUri) {
         Validate.isTrue(crlUri.toString().startsWith("rsync:"), "Rsync URI is required, multiple repositories not supported by this builder at this time");
-    }
-
-    protected boolean isSelfSigned() {
-        return signingKeyPair.getPublic().equals(publicKey);
-    }
-
-    public void withParentResourceCertificatePublicationUri(URI parentResourceCertificatePublicationUri) {
-        this.parentResourceCertificatePublicationUri = parentResourceCertificatePublicationUri;
     }
 
     /**
@@ -132,16 +114,6 @@ public abstract class GenericRpkiCertificateBuilder {
 
         builder.withValidityPeriod(validityPeriod);
 
-        if (!isSelfSigned()) {
-            builder.withCrlDistributionPoints(crlUri);
-
-            X509CertificateInformationAccessDescriptor[] aiaDescriptors = {
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, parentResourceCertificatePublicationUri)
-            };
-            builder.withAuthorityInformationAccess(aiaDescriptors);
-            builder.withAuthorityKeyIdentifier(true);
-        }
-
         builder.withSignatureProvider(signatureProvider);
         builder.withKeyUsage(keyUsage);
 
@@ -156,15 +128,7 @@ public abstract class GenericRpkiCertificateBuilder {
         Validate.notNull(subject, "Subject is required");
         Validate.notNull(issuer, "Issuer is required");
         Validate.notNull(validityPeriod, "ValidityPeriod is required");
-
-
-        if (!isSelfSigned()) {
-            Validate.notNull(crlUri, "CRL URI is required (except for self-signed (root) certificates)");
-            Validate.notNull(parentResourceCertificatePublicationUri, "Parent Certificate Publication URI is required");
-        }
-
         Validate.notNull(signatureProvider, "SignatureProvider is required");
     }
-
 
 }

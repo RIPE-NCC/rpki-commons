@@ -29,32 +29,46 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 
 import java.net.URI;
 
 /**
- * Builder for Embedded EE Certificates used in RpkiSignedObjects
+ * Builder for any not self-signed certificates.
  */
-public class RpkiSignedObjectEeCertificateBuilder extends RpkiAuthoritySignedCertificateBuilder {
+public abstract class RpkiAuthoritySignedCertificateBuilder extends GenericRpkiCertificateBuilder {
 
-    private URI cmsPublicationUri;
+    private URI crlUri;
+    private URI parentResourceCertificatePublicationUri;
 
-    public void withCorrespondingCmsPublicationPoint(URI cmsPublicationUri) {
-        this.cmsPublicationUri = cmsPublicationUri;
+    public void withCrlUri(URI crlUri) {
+        Validate.notNull(crlUri, "CRL Uri can not be null");
+        validateIsRsyncUri(crlUri);
+        this.crlUri = crlUri;
     }
 
-    public X509ResourceCertificate build() {
-        validateFields();
+    public void withParentResourceCertificatePublicationUri(URI parentResourceCertificatePublicationUri) {
+        this.parentResourceCertificatePublicationUri = parentResourceCertificatePublicationUri;
+    }
 
-        X509ResourceCertificateBuilder builder = createGenericRpkiCertificateBuilder(KeyUsage.digitalSignature);
+    @Override
+    protected X509ResourceCertificateBuilder createGenericRpkiCertificateBuilder(int keyUsage) {
+        final X509ResourceCertificateBuilder builder = super.createGenericRpkiCertificateBuilder(keyUsage);
 
-        // Implicit by standard:
-        builder.withCa(false);
+        builder.withCrlDistributionPoints(crlUri);
 
-        builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor(
-            X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, cmsPublicationUri));
+        builder.withAuthorityInformationAccess(new X509CertificateInformationAccessDescriptor(
+            X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, parentResourceCertificatePublicationUri));
 
-        return builder.build();
+        builder.withAuthorityKeyIdentifier(true);
+        return builder;
+    }
+
+    @Override
+    protected void validateFields() {
+        super.validateFields();
+        Validate.notNull(crlUri, "CRL URI is required (except for self-signed (root) certificates)");
+        Validate.notNull(parentResourceCertificatePublicationUri, "Parent Certificate Publication URI is required");
     }
 }
