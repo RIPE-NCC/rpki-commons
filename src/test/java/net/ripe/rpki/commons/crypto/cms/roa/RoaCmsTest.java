@@ -143,12 +143,6 @@ public class RoaCmsTest {
         subject = new RoaCmsBuilder().withAsn(TEST_ASN).withPrefixes(allPrefixes).withCertificate(caCert).build(TEST_KEY_PAIR.getPrivate());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldRequireSubjectKeyIdentifier() {
-        X509ResourceCertificate cert = createCertificateBuilder(new IpResourceSet(TEST_IPV4_PREFIX_1.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV6_PREFIX.getPrefix())).withSubjectKeyIdentifier(false).build();
-        subject = new RoaCmsBuilder().withAsn(TEST_ASN).withPrefixes(allPrefixes).withCertificate(cert).build(TEST_KEY_PAIR.getPrivate());
-    }
-
     @Test
     public void shouldUseNotValidBeforeTimeForSigningTime() {
         RoaCms roaCms = createRoaCms(allPrefixes);

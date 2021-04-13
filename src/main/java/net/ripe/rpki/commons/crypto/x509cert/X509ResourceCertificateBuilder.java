@@ -112,11 +112,6 @@ public class X509ResourceCertificateBuilder {
         return this;
     }
 
-    public X509ResourceCertificateBuilder withSubjectKeyIdentifier(boolean add) {
-        builderHelper.withSubjectKeyIdentifier(add);
-        return this;
-    }
-
     public X509ResourceCertificateBuilder withAuthorityKeyIdentifier(boolean add) {
         builderHelper.withAuthorityKeyIdentifier(add);
         return this;

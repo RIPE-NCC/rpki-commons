@@ -109,8 +109,6 @@ public final class X509CertificateBuilderHelper {
 
     private boolean router = false;
 
-    private boolean addSubjectKeyIdentifier = true;
-
     private boolean addAuthorityKeyIdentifier = true;
 
     private URI[] crlDistributionPoints;
@@ -197,11 +195,6 @@ public final class X509CertificateBuilderHelper {
         return this;
     }
 
-    public X509CertificateBuilderHelper withSubjectKeyIdentifier(boolean add) {
-        this.addSubjectKeyIdentifier = add;
-        return this;
-    }
-
     public X509CertificateBuilderHelper withAuthorityKeyIdentifier(boolean add) {
         this.addAuthorityKeyIdentifier = add;
         return this;
@@ -263,9 +256,8 @@ public final class X509CertificateBuilderHelper {
         try {
             X509v3CertificateBuilder generator = createX509V3CertificateGenerator();
 
-            if (addSubjectKeyIdentifier) {
-                addSubjectKeyIdentifier(generator);
-            }
+            addSubjectKeyIdentifier(generator);
+
             if (addAuthorityKeyIdentifier) {
                 addAuthorityKeyIdentifier(generator);
             }

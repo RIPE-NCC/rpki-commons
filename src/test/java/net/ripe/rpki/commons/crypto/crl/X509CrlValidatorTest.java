@@ -179,7 +179,6 @@ public class X509CrlValidatorTest {
         builder.withCa(true);
         builder.withKeyUsage(KeyUsage.keyCertSign);
         builder.withAuthorityKeyIdentifier(true);
-        builder.withSubjectKeyIdentifier(true);
         builder.withResources(ROOT_RESOURCE_SET);
         builder.withAuthorityKeyIdentifier(false);
         builder.withSigningKeyPair(ROOT_KEY_PAIR);

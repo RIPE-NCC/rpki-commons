@@ -117,11 +117,6 @@ public class X509RouterCertificateBuilder {
         return this;
     }
 
-    public X509RouterCertificateBuilder withSubjectKeyIdentifier(boolean add) {
-        builderHelper.withSubjectKeyIdentifier(add);
-        return this;
-    }
-
     public X509RouterCertificateBuilder withAuthorityKeyIdentifier(boolean add) {
         builderHelper.withAuthorityKeyIdentifier(add);
         return this;
