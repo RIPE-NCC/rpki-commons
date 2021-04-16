@@ -41,16 +41,15 @@ import org.bouncycastle.util.io.TeeOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 // From original CMSUtils of Bouncy Castle, needed for modified CMSSignedDataGenerator.
 public class CMSUtils {
 
-    static ASN1Set createDerSetFromList(List derObjects) {
+    static <T extends ASN1Encodable> ASN1Set createDerSetFromList(List<T> derObjects) {
         ASN1EncodableVector v = new ASN1EncodableVector();
-        for (Object derObject : derObjects) {
-            v.add((ASN1Encodable) derObject);
+        for (T derObject : derObjects) {
+            v.add(derObject);
         }
         return new DERSet(v);
     }
@@ -62,11 +61,10 @@ public class CMSUtils {
         return algId;
     }
 
-    static OutputStream attachSignersToOutputStream(Collection signers, OutputStream s) {
+    static OutputStream attachSignersToOutputStream(Collection<SignerInfoGenerator> signers, OutputStream s) {
         OutputStream result = s;
-        for (Object signer : signers) {
-            SignerInfoGenerator signerGen = (SignerInfoGenerator) signer;
-            result = getSafeTeeOutputStream(result, signerGen.getCalculatingOutputStream());
+        for (SignerInfoGenerator signer : signers) {
+            result = getSafeTeeOutputStream(result, signer.getCalculatingOutputStream());
         }
         return result;
     }
