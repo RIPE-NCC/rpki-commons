@@ -38,7 +38,7 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;

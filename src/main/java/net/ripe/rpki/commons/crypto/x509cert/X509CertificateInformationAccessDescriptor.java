@@ -30,7 +30,7 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.GeneralName;

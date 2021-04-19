@@ -31,7 +31,7 @@ package net.ripe.rpki.commons.validation.roa;
 
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 import java.util.Comparator;

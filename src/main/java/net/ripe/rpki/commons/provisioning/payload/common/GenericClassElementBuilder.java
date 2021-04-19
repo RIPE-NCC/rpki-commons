@@ -33,7 +33,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponseClassElement;
 import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponseClassElement;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 

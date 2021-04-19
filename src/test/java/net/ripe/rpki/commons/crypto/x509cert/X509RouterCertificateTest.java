@@ -88,7 +88,7 @@ public class X509RouterCertificateTest {
                 .withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireCertificate() {
         new X509RouterCertificate(null);
     }

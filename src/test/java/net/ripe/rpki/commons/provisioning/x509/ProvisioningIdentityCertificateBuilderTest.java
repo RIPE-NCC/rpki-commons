@@ -79,20 +79,20 @@ public class ProvisioningIdentityCertificateBuilderTest {
         assertNotNull(identityCert);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSelfSigningKeyPair() {
         subject = new ProvisioningIdentityCertificateBuilder();
         subject.withSelfSigningSubject(ProvisioningIdentityCertificateBuilderTest.SELF_SIGNING_DN);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSelfSigningDN() {
         subject.withSelfSigningSubject(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSignatureProvider() {
         subject.withSignatureProvider(null);
         subject.build();

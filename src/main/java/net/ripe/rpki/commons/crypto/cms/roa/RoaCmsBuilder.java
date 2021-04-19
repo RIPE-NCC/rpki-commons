@@ -36,7 +36,7 @@ import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;

@@ -31,7 +31,7 @@ package net.ripe.rpki.commons.ta.domain.request;
 
 
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public class SigningRequest extends TaRequest {
 

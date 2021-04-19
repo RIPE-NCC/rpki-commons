@@ -157,7 +157,7 @@ public class X509ResourceCertificateTest {
         crlLocator = mock(CrlLocator.class);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireCertificate() {
         new X509ResourceCertificate(null);
     }
