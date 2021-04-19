@@ -295,7 +295,8 @@ public abstract class RpkiSignedObjectParser {
         
         //Check if the signedAttributes are allowed
         verifyOptionalSignedAttributes(signer);
-        
+        verifyUnsignedAttributes(signer);
+
         SignerId signerId = signer.getSID();
         try {
             validationResult.rejectIfFalse(signerId.match(new JcaX509CertificateHolder(certificate)), SIGNER_ID_MATCH);
@@ -338,6 +339,13 @@ public abstract class RpkiSignedObjectParser {
         if (errorMessage != null) {
             validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION, errorMessage);
         }
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.6.7
+     */
+    private void verifyUnsignedAttributes(SignerInformation signer) {
+        validationResult.rejectIfFalse(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);
     }
 
     protected static BigInteger getRpkiObjectVersion(ASN1Sequence seq) {
