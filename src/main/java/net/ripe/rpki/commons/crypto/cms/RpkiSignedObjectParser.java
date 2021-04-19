@@ -145,7 +145,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     protected void parseContent(CMSSignedDataParser sp) {
-        validationResult.rejectIfFalse(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
+        verifyVersion(sp);
 
         final CMSTypedStream signedContent = sp.getSignedContent();
         contentType = signedContent.getContentType();
@@ -158,6 +158,13 @@ public abstract class RpkiSignedObjectParser {
             validationResult.error(DECODE_CONTENT);
             return;
         }
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.1
+     */
+    private void verifyVersion(CMSSignedDataParser sp) {
+        validationResult.rejectIfFalse(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
     }
 
     private void parseCmsCertificate(CMSSignedDataParser sp) {
@@ -279,7 +286,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
-        validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
+        verifySignerVersion(signer);
         validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
         validationResult.rejectIfFalse(ALLOWED_SIGNATURE_ALGORITHM_OIDS.contains(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
@@ -305,6 +312,13 @@ public abstract class RpkiSignedObjectParser {
         }
 
         return true;
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.6.1
+     */
+    private void verifySignerVersion(SignerInformation signer) {
+        validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
     }
 
     private boolean verifyAndStoreSigningTime(SignerInformation signer) {
