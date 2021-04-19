@@ -42,6 +42,9 @@
         <build.number>DEV</build.number>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <java.language.version>1.8</java.language.version>
+        <java.runtime.version>1.8</java.runtime.version>
+
         <net.ripe.ipresource.version>1.47</net.ripe.ipresource.version>
         <bouncycastle.version>1.68</bouncycastle.version>
         <guava.version>30.1.1-jre</guava.version>
@@ -297,6 +300,16 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.language.version}</source>
+                    <target>${java.runtime.version}</target>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                        <arg>-Xlint:-processing</arg>
+                        <arg>-Xlint:-serial</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
 
             <plugin>
