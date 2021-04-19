@@ -50,14 +50,14 @@ import java.util.EnumSet;
  * @see RpkiCaCertificateBuilder
  */
 public class X509ResourceCertificateBuilder {
-
-    private X509CertificateBuilderHelper builderHelper;
+    private final X509CertificateBuilderHelper builderHelper;
     private IpResourceSet resources = new IpResourceSet();
     private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
 
     public X509ResourceCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
         builderHelper.withResources(resources);
+        // https://tools.ietf.org/html/rfc6487#section-4.8.9
         builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
     }
 

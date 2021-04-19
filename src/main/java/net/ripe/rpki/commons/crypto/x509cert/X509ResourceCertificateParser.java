@@ -150,6 +150,10 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
                 return;
             }
+            // https://tools.ietf.org/html/rfc6487
+            // 4.8.9.  Certificate Policies
+            // This extension MUST be present and MUST be marked critical.  It MUST
+            // include exactly one policy, as specified in the RPKI CP [RFC6484]
             ASN1Sequence policies = ASN1Sequence.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
             if (!result.rejectIfFalse(policies.size() == 1, SINGLE_CERT_POLICY)) {
                 return;

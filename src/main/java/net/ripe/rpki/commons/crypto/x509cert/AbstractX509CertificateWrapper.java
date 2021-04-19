@@ -55,6 +55,10 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    // https://tools.ietf.org/html/rfc6484#section-1.2
+    //    id-cp-ipAddr-asNumber OBJECT IDENTIFIER ::= { iso(1)
+    //                         identified-organization(3) dod(6) internet(1)
+    //                         security(5) mechanisms(5) pkix(7) cp(14) 2 }
     public static final ASN1ObjectIdentifier POLICY_OID = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.14.2");
 
     public static final PolicyInformation POLICY_INFORMATION = new PolicyInformation(POLICY_OID);
