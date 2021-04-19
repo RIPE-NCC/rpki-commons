@@ -56,7 +56,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     private DateTime thisUpdateTime;
     private DateTime nextUpdateTime;
     private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-    private Map<String, byte[]> files = new TreeMap<String, byte[]>();
+    private Map<String, byte[]> files = new TreeMap<>();
 
 
     public ManifestCmsBuilder() {
@@ -101,10 +101,6 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     public void addFile(String fileName, byte[] contents) {
         byte[] digestValue = ManifestCms.hashContents(contents);
         files.put(fileName, digestValue);
-    }
-
-    public void addFileHash(String fileName, byte[] hash) {
-        files.put(fileName, hash);
     }
 
     ASN1Encodable encodeFileAndHash(String fileName, byte[] hash) {

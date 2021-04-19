@@ -75,10 +75,10 @@ public class RoaCmsTest {
 
     @Before
     public void setUp() {
-        ipv4Prefixes = new ArrayList<RoaPrefix>();
+        ipv4Prefixes = new ArrayList<>();
         ipv4Prefixes.add(TEST_IPV4_PREFIX_1);
         ipv4Prefixes.add(TEST_IPV4_PREFIX_2);
-        allPrefixes = new ArrayList<RoaPrefix>(ipv4Prefixes);
+        allPrefixes = new ArrayList<>(ipv4Prefixes);
         allPrefixes.add(TEST_IPV6_PREFIX);
         allResources = new IpResourceSet();
         for (RoaPrefix prefix : allPrefixes) {
