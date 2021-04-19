@@ -139,6 +139,20 @@
             </exclusions>
         </dependency>
 
+		<dependency>
+			<groupId>com.pholser</groupId>
+			<artifactId>junit-quickcheck-core</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.pholser</groupId>
+			<artifactId>junit-quickcheck-generators</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
+
+
         <!-- Used in unit tests for Equals Hashcode tests. -->
         <dependency>
             <groupId>com.google.guava</groupId>

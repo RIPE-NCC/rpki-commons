@@ -103,20 +103,26 @@ public class RoaCmsTest {
         return roaCmsTest.subject;
     }
 
-    public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes) {
+    public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes){
+        return createCertificate(prefixes, TEST_KEY_PAIR);
+    }
+    public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes, KeyPair keyPair) {
         IpResourceSet resources = new IpResourceSet();
         for (RoaPrefix prefix : prefixes) {
             resources.add(prefix.getPrefix());
         }
-        X509ResourceCertificateBuilder builder = createCertificateBuilder(resources);
+        X509ResourceCertificateBuilder builder = createCertificateBuilder(resources, keyPair);
         return builder.build();
     }
 
     private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources) {
+            return createCertificateBuilder(resources, TEST_KEY_PAIR);
+    }
+    private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources, KeyPair keyPair) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
-        builder.withPublicKey(TEST_KEY_PAIR.getPublic());
-        builder.withSigningKeyPair(TEST_KEY_PAIR);
+        builder.withPublicKey(keyPair.getPublic());
+        builder.withSigningKeyPair(keyPair);
         final DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
         builder.withResources(resources);
