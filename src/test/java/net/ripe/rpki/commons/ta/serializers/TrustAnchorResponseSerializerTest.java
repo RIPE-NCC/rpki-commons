@@ -69,17 +69,16 @@ import static org.junit.Assert.assertTrue;
 
 public class TrustAnchorResponseSerializerTest {
     private static final String TA_RESPONSE_PATH = "src/test/resources/ta/ta-response.xml";
-    private static final String TA_RESPONSE_PATH1 = "src/test/resources/ta/response.xml";
 
     private Document document;
-    private XPath xpath = XPathFactory.newInstance().newXPath();
+    private final XPath xpath = XPathFactory.newInstance().newXPath();
 
     private TrustAnchorResponse response;
 
 
     @Before
-    public void loadState() throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
-        final String responseXML = Files.toString(new File(TA_RESPONSE_PATH), Charsets.UTF_8);
+    public void loadState() throws IOException, SAXException, ParserConfigurationException {
+        final String responseXML = Files.asCharSource(new File(TA_RESPONSE_PATH), Charsets.UTF_8).read();
 
         final TrustAnchorResponseSerializer trustAnchorResponseSerializer = new TrustAnchorResponseSerializer();
         response = trustAnchorResponseSerializer.deserialize(responseXML);
@@ -170,7 +169,7 @@ public class TrustAnchorResponseSerializerTest {
 
     @Test
     public void shouldSerialiseAndDeserialise() throws IOException {
-        final String responseXML = Files.toString(new File(TA_RESPONSE_PATH), Charsets.UTF_8);
+        final String responseXML = Files.asCharSource(new File(TA_RESPONSE_PATH), Charsets.UTF_8).read();
 
         final TrustAnchorResponseSerializer trustAnchorResponseSerializer = new TrustAnchorResponseSerializer();
         TrustAnchorResponse response = trustAnchorResponseSerializer.deserialize(responseXML);

@@ -75,13 +75,13 @@ public class TrustAnchorRequestSerializerTest {
     public static final java.util.Base64.Encoder BASE64_ENCODER = java.util.Base64.getMimeEncoder(10_000, "\n".getBytes());
 
     private Document document;
-    private XPath xpath = XPathFactory.newInstance().newXPath();
+    private final XPath xpath = XPathFactory.newInstance().newXPath();
 
     private TrustAnchorRequest request;
 
     @Before
     public void loadState() throws IOException, SAXException, ParserConfigurationException {
-        final String stateXML = Files.toString(new File(TA_REQUEST_PATH), Charsets.UTF_8);
+        final String stateXML = Files.asCharSource(new File(TA_REQUEST_PATH), Charsets.UTF_8).read();
 
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         request = trustAnchorRequestSerializer.deserialize(stateXML);
@@ -102,7 +102,7 @@ public class TrustAnchorRequestSerializerTest {
     }
 
     @Test
-    public void shouldReadBasicFields() throws IOException, XPathExpressionException {
+    public void shouldReadBasicFields() throws XPathExpressionException {
         assertEquals(Long.valueOf(xpathQuery("/requests.TrustAnchorRequest/creationTimestamp")), request.getCreationTimestamp());
         assertEquals(URI.create(xpathQuery("/requests.TrustAnchorRequest/taCertificatePublicationUri")), request.getTaCertificatePublicationUri());
     }
@@ -401,7 +401,7 @@ public class TrustAnchorRequestSerializerTest {
     @Test
     public void itShouldDeserializeLegacyXmlRequestElements() throws IOException {
 
-        final String stateXML = Files.toString(new File(LEGACY_TA_REQUEST_PATH), Charsets.UTF_8);
+        final String stateXML = Files.asCharSource(new File(LEGACY_TA_REQUEST_PATH), Charsets.UTF_8).read();
 
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         final TrustAnchorRequest trustAnchorRequest = trustAnchorRequestSerializer.deserialize(stateXML);
@@ -415,7 +415,7 @@ public class TrustAnchorRequestSerializerTest {
     @Test
     public void itShouldDeserializeXmlWithoutTaCertificatePublicationUriElement() throws IOException {
 
-        final String stateXML = Files.toString(new File(TA_REQUEST_NO_TA_URI_PATH), Charsets.UTF_8);
+        final String stateXML = Files.asCharSource(new File(TA_REQUEST_NO_TA_URI_PATH), Charsets.UTF_8).read();
 
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         final TrustAnchorRequest trustAnchorRequest = trustAnchorRequestSerializer.deserialize(stateXML);
