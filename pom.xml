@@ -303,6 +303,7 @@
                 <configuration>
                     <source>${java.language.version}</source>
                     <target>${java.runtime.version}</target>
+                    <encoding>UTF-8</encoding>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
