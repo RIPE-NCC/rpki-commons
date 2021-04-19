@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.ipresource.IpResourceSet;
+import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
@@ -37,10 +38,12 @@ import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.annotation.meta.TypeQualifier;
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.EnumSet;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 import static org.junit.Assert.assertNull;
@@ -73,6 +76,19 @@ public class X509CertificateBuilderHelperTest {
     public void shouldMakeSureTheresNoExtendedKeyUsage() throws CertificateParsingException {
         final X509Certificate x509Certificate = subject.generateCertificate();
         assertNull(x509Certificate.getExtendedKeyUsage());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailOnEmptyResources() {
+        subject.withResources(new IpResourceSet());
+        subject.generateCertificate();
+    }
+
+    @Test
+    public void shouldNotFailOnOneInheritResourceType() {
+        subject.withResources(new IpResourceSet());
+        subject.withInheritedResourceTypes(EnumSet.of(IpResourceType.IPv4));
+        subject.generateCertificate();
     }
 
 }
