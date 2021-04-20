@@ -62,6 +62,9 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class RpkiSignedObjectParser {
 
+    private static final int CMS_OBJECT_VERSION = 3;
+    private static final int CMS_OBJECT_SIGNER_VERSION = 3;
+
     private byte[] encoded;
 
     private X509ResourceCertificate certificate;
@@ -124,11 +127,11 @@ public abstract class RpkiSignedObjectParser {
         CMSSignedDataParser sp;
         try {
             sp = new CMSSignedDataParser(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER, encoded);
+            validationResult.pass(CMS_DATA_PARSING);
         } catch (CMSException e) {
-            validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
+            validationResult.error(CMS_DATA_PARSING);
             return;
         }
-        validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
 
         if (!validationResult.hasFailures()) {
             parseContent(sp);
@@ -142,6 +145,8 @@ public abstract class RpkiSignedObjectParser {
     }
 
     protected void parseContent(CMSSignedDataParser sp) {
+        validationResult.rejectIfFalse(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
+
         final CMSTypedStream signedContent = sp.getSignedContent();
         contentType = signedContent.getContentType();
 
@@ -274,6 +279,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
+        validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
         validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
         validationResult.rejectIfFalse(ALLOWED_SIGNATURE_ALGORITHM_OIDS.contains(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
