@@ -136,13 +136,13 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        if (!validationResult.hasFailures()) {
-            parseContent(sp);
-        }
-        if (!validationResult.hasFailures()) {
-            parseCmsCertificate(sp);
-        }
-        if (!validationResult.hasFailures()) {
+        parseContent(sp);
+        parseCmsCertificate(sp);
+
+        verifyVersion(sp);
+        verifyCrl(sp);
+
+        if (certificate != null) {
             verifyCmsSigning(sp, certificate.getCertificate());
         }
     }
@@ -159,9 +159,6 @@ public abstract class RpkiSignedObjectParser {
             validationResult.error(DECODE_CONTENT);
             return;
         }
-
-        verifyVersion(sp);
-        verifyCrl(sp);
     }
 
     /**
