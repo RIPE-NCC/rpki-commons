@@ -48,7 +48,7 @@ import static org.junit.Assert.assertTrue;
 public class RoaCMSBuilderPropertyTest {
 
     @Property public void buildEncodedParseCheck(
-            @InRange(min="1", max="65536")  long asNum,
+            @InRange(min="1", max="4294967295")  long asNum,
             @InRange(min="12", max="24") Integer maxLength
     ){
 
