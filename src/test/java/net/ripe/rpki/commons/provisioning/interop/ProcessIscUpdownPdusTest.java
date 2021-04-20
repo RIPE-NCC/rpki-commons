@@ -95,18 +95,17 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldReadIscIssuerXml() throws IOException {
-        String parentXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), StandardCharsets.UTF_8);
+        String parentXml = Files.asCharSource(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), StandardCharsets.UTF_8).read();
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
         ParentIdentity parentId = serializer.deserialize(parentXml);
         assertNotNull(parentId);
     }
 
     public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException {
-        String childIdXml = Files.toString(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), StandardCharsets.UTF_8);
+        String childIdXml = Files.asCharSource(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), StandardCharsets.UTF_8).read();
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
         ChildIdentity childId = serializer.deserialize(childIdXml);
-        ProvisioningIdentityCertificate childCert = childId.getIdentityCertificate();
-        return childCert;
+        return childId.getIdentityCertificate();
     }
 
     @Test
@@ -147,7 +146,7 @@ public class ProcessIscUpdownPdusTest {
 
     @Test
     public void shouldParseRpkidParentResponseXml() throws IOException {
-        String xml = Files.toString(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), StandardCharsets.UTF_8);
+        String xml = Files.asCharSource(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), StandardCharsets.UTF_8).read();
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
         ParentIdentity parentId = serializer.deserialize(xml);
@@ -163,7 +162,7 @@ public class ProcessIscUpdownPdusTest {
 
         for (String fileName : files) {
 
-            String base64Encoded = Files.toString(new File(PATH_TO_TEST_PDUS + "/" + fileName), StandardCharsets.UTF_8);
+            String base64Encoded = Files.asCharSource(new File(PATH_TO_TEST_PDUS + "/" + fileName), StandardCharsets.UTF_8).read();
 
             final byte[] encoded = decoder.decode(base64Encoded);
 

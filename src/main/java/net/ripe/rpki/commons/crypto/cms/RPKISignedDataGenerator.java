@@ -48,7 +48,6 @@ import org.bouncycastle.cms.SignerInformation;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 
 import static net.ripe.rpki.commons.crypto.cms.CMSUtils.attachSignersToOutputStream;
 import static net.ripe.rpki.commons.crypto.cms.CMSUtils.createDerSetFromList;

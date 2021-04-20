@@ -125,7 +125,7 @@ public class RPKISignedData
 
         if (certs != null)
         {
-            for (Enumeration en = certs.getObjects(); en.hasMoreElements();)
+            for (Enumeration<?> en = certs.getObjects(); en.hasMoreElements();)
             {
                 Object obj = en.nextElement();
                 if (obj instanceof ASN1TaggedObject)
@@ -154,7 +154,7 @@ public class RPKISignedData
 
         if (crls != null)         // no need to check if otherCert is true
         {
-            for (Enumeration en = crls.getObjects(); en.hasMoreElements();)
+            for (Enumeration<?> en = crls.getObjects(); en.hasMoreElements();)
             {
                 Object obj = en.nextElement();
                 if (obj instanceof ASN1TaggedObject)
@@ -193,7 +193,7 @@ public class RPKISignedData
     }
 
     private boolean checkForVersion3(ASN1Set signerInfs) {
-        for (Enumeration e = signerInfs.getObjects(); e.hasMoreElements(); ) {
+        for (Enumeration<?> e = signerInfs.getObjects(); e.hasMoreElements(); ) {
             SignerInfo s = SignerInfo.getInstance(e.nextElement());
             if (s.getVersion().getValue().intValue() == 3) {
                 return true;
@@ -204,7 +204,7 @@ public class RPKISignedData
 
     private RPKISignedData(ASN1Sequence seq)
     {
-        Enumeration     e = seq.getObjects();
+        Enumeration<?> e = seq.getObjects();
 
         version = ASN1Integer.getInstance(e.nextElement());
         digestAlgorithms = ((ASN1Set)e.nextElement());

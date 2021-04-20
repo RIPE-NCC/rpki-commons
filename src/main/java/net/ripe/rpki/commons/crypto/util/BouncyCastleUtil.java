@@ -42,6 +42,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.util.Encodable;
 import org.bouncycastle.util.Selector;
 import org.bouncycastle.util.StoreException;
 
@@ -63,9 +64,9 @@ public final class BouncyCastleUtil {
     private BouncyCastleUtil() {
     }
 
-    public static final class X509CRLHolderStoreSelector implements Selector {
+    public static final class X509CRLHolderStoreSelector implements Selector<Encodable> {
         @Override
-        public boolean match(Object obj) {
+        public boolean match(Encodable obj) {
             return obj instanceof X509CRLHolder;
         }
 
@@ -75,9 +76,9 @@ public final class BouncyCastleUtil {
         }
     }
 
-    public static final class X509CertificateHolderStoreSelector implements Selector {
+    public static final class X509CertificateHolderStoreSelector implements Selector<Encodable> {
         @Override
-        public boolean match(Object obj) {
+        public boolean match(Encodable obj) {
             return obj instanceof X509CertificateHolder;
         }
 
