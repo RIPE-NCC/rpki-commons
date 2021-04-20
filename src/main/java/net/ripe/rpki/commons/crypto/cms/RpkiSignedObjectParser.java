@@ -50,11 +50,14 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.cert.CRLException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
@@ -145,8 +148,6 @@ public abstract class RpkiSignedObjectParser {
     }
 
     protected void parseContent(CMSSignedDataParser sp) {
-        verifyVersion(sp);
-
         final CMSTypedStream signedContent = sp.getSignedContent();
         contentType = signedContent.getContentType();
 
@@ -158,6 +159,9 @@ public abstract class RpkiSignedObjectParser {
             validationResult.error(DECODE_CONTENT);
             return;
         }
+
+        verifyVersion(sp);
+        verifyCrl(sp);
     }
 
     /**
@@ -165,6 +169,30 @@ public abstract class RpkiSignedObjectParser {
      */
     private void verifyVersion(CMSSignedDataParser sp) {
         validationResult.rejectIfFalse(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.5
+     */
+    private void verifyCrl(CMSSignedDataParser sp) {
+        List<? extends X509CRL> crls = extractCrl(sp);
+        if (!validationResult.rejectIfNull(crls, GET_CERTS_AND_CRLS)) {
+            return;
+        }
+
+        validationResult.rejectIfFalse(crls.size() == 0, CMS_NO_CRL_ALLOWED);
+    }
+
+    private List<? extends X509CRL> extractCrl(CMSSignedDataParser sp) {
+        try {
+            return BouncyCastleUtil.extractCrls(sp);
+        } catch (CMSException | StoreException | CRLException e) {
+            return null;
+        } catch (Exception e) {
+            System.out.println("got exception " + e);
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void parseCmsCertificate(CMSSignedDataParser sp) {
