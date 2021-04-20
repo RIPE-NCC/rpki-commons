@@ -34,6 +34,7 @@ import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -101,6 +102,11 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     public void addFile(String fileName, byte[] contents) {
         byte[] digestValue = ManifestCms.hashContents(contents);
         files.put(fileName, digestValue);
+    }
+
+    public void addFileHash(String fileName, byte[] hash) {
+        Validate.isTrue(hash!= null && hash.length == 32, "Hash should be 32 bytes");
+        files.put(fileName, hash);
     }
 
     ASN1Encodable encodeFileAndHash(String fileName, byte[] hash) {
