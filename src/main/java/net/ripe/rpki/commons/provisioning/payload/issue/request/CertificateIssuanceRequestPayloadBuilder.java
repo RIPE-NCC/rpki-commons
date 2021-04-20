@@ -31,7 +31,7 @@ package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 /**

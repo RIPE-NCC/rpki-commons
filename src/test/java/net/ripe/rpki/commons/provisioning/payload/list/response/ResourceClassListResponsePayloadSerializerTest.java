@@ -38,7 +38,7 @@ import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElementBuil
 import net.ripe.rpki.commons.util.EqualsSupport;
 import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 import net.ripe.rpki.commons.xml.XmlSerializer;
-import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;

@@ -30,7 +30,7 @@
 package net.ripe.rpki.commons.ta.domain.response;
 
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.util.UUID;
 

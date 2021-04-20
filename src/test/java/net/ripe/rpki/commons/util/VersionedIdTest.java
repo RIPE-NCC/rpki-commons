@@ -68,7 +68,7 @@ public class VersionedIdTest {
         VersionedId.parse("");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldFailToParseNullString() {
         VersionedId.parse(null);
     }

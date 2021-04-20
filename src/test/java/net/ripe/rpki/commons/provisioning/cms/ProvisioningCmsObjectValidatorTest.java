@@ -87,7 +87,7 @@ public class ProvisioningCmsObjectValidatorTest {
         assertTrue(validationResult.hasFailures());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldFailIfCmsObjectDoesNotContainAnyCACertificate() {
         ValidationResult validationResult = ValidationResult.withLocation("n/a");
 
@@ -101,7 +101,7 @@ public class ProvisioningCmsObjectValidatorTest {
         assertTrue(validationResult.hasFailures());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldFaiIfCmsObjectContainsMultipleCACertificate() {
         ValidationResult validationResult = ValidationResult.withLocation("n/a");
 
