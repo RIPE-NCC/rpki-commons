@@ -35,8 +35,9 @@ import org.joda.time.DateTime;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
-import java.security.KeyPair;
 
+import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.createValidManifestEECertificate;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.junit.Assert.assertTrue;
 
@@ -44,18 +45,19 @@ import static org.junit.Assert.assertTrue;
 public class ManifestCMSBuilderPropertyTest {
 
     @Property public void buildEncodedParseCheck(
-            KeyPair keyPair,
             byte[] content,
-            BigInteger manifestNumber
+            BigInteger manifestNumber,
+            Integer validityHours
     ){
             ManifestCmsBuilder builder = new ManifestCmsBuilder();
             builder.addFile("test.crl", content);
             builder.withManifestNumber(manifestNumber);
             builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-            builder.withCertificate(ManifestCmsParserTest.createValidManifestEECertificate(keyPair));
-            builder.withThisUpdateTime(DateTime.now());
-            builder.withNextUpdateTime(DateTime.now().plusHours(2));
-            ManifestCms manifestCms = builder.build(keyPair.getPrivate());
+            builder.withCertificate(createValidManifestEECertificate(TEST_KEY_PAIR));
+            DateTime start = DateTime.now();
+            builder.withThisUpdateTime(start);
+            builder.withNextUpdateTime(start.plusHours(validityHours));
+            ManifestCms manifestCms = builder.build(TEST_KEY_PAIR.getPrivate());
 
             ManifestCmsParser mftParser = new ManifestCmsParser();
             mftParser.parse("test.mft", manifestCms.getEncoded());
