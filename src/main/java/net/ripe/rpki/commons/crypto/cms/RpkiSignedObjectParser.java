@@ -185,10 +185,6 @@ public abstract class RpkiSignedObjectParser {
             return BouncyCastleUtil.extractCrls(sp);
         } catch (CMSException | StoreException | CRLException e) {
             return null;
-        } catch (Exception e) {
-            System.out.println("got exception " + e);
-            e.printStackTrace();
-            return null;
         }
     }
 
