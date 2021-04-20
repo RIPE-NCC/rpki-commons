@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation.request;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1</a>

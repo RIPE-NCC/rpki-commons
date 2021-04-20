@@ -110,13 +110,13 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldForceCertificate() throws CMSException {
         subject.withCmsCertificate(null);
         subject.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldForceCrl() throws CMSException {
         subject.withCrl(null);
         subject.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate());

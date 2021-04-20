@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public class CertificateRepositoryObjectFile<T extends CertificateRepositoryObject> {
 

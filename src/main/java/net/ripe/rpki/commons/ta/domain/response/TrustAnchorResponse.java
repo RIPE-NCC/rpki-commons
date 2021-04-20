@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.ta.domain.response;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 import java.net.URI;

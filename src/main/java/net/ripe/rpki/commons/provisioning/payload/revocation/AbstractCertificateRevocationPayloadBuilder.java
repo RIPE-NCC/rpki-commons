@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.provisioning.payload.revocation;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.security.PublicKey;
 

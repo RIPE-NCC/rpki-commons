@@ -31,7 +31,7 @@ package net.ripe.rpki.commons.provisioning.payload.common;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.net.URI;
 import java.util.List;

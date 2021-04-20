@@ -37,7 +37,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public class ManifestCmsConverter implements Converter {
 

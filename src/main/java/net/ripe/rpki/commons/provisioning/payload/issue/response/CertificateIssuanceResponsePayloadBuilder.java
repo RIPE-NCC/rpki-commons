@@ -30,7 +30,7 @@
 package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
 import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 
 /**
