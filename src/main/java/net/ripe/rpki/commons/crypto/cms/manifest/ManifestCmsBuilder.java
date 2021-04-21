@@ -104,7 +104,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     public void addFileHash(String fileName, byte[] hash) {
-        assert hash!= null && hash.length == 32: "Hash should be 32 bytes";
+        assert hash!= null && hash.length == 32: "Hash must be 32 bytes";
         files.put(fileName, hash);
     }
 
