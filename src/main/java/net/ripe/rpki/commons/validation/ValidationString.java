@@ -140,6 +140,7 @@ public final class ValidationString {
     public static final String CERT_IS_X509CERT = "cms.cert.is.x509";
     public static final String CERT_IS_EE_CERT = "cms.cert.is.ee.cert";
     public static final String ONLY_ONE_CRL_ALLOWED = "cms.only.one.crl";
+    public static final String CMS_NO_CRL_ALLOWED = "cms.no.crl";
     public static final String CRL_IS_X509CRL = "cms.crl.is.x509";
     public static final String CERT_HAS_SKI = "cms.cert.has.ski";
     public static final String GET_SIGNER_INFO = "cms.signature.signer.info";
