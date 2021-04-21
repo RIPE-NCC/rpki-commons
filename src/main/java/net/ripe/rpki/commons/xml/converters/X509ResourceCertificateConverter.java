@@ -37,7 +37,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public class X509ResourceCertificateConverter implements Converter {
 

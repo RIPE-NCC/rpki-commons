@@ -36,7 +36,7 @@ import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
@@ -52,7 +52,7 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64Encoder;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayOutputStream;
@@ -88,7 +88,7 @@ public final class X509CertificateUtil {
             if (extensionValue == null) {
                 return null;
             }
-            return SubjectKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
+            return SubjectKeyIdentifier.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
             throw new X509CertificateOperationException("Cannot get SubjectKeyIdentifier for certificate", e);
         }
@@ -100,7 +100,7 @@ public final class X509CertificateUtil {
             if (extensionValue == null) {
                 return null;
             }
-            return AuthorityKeyIdentifier.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getKeyIdentifier();
+            return AuthorityKeyIdentifier.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getKeyIdentifier();
         } catch (IOException e) {
             throw new X509CertificateOperationException("Can not get AuthorityKeyIdentifier for certificate", e);
         }
@@ -162,7 +162,7 @@ public final class X509CertificateUtil {
                  */
                 return false;
             }
-            BasicConstraints constraints = BasicConstraints.getInstance(X509ExtensionUtil.fromExtensionValue(basicConstraintsExtension));
+            BasicConstraints constraints = BasicConstraints.getInstance(JcaX509ExtensionUtils.parseExtensionValue(basicConstraintsExtension));
             return constraints.isCA();
         } catch (IOException e) {
             throw new X509CertificateOperationException(e);
@@ -188,7 +188,7 @@ public final class X509CertificateUtil {
             if (extensionValue == null) {
                 return null;
             }
-            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
+            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getAccessDescriptions();
             return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
         } catch (IOException e) {
             throw new X509CertificateOperationException(e);
@@ -201,7 +201,7 @@ public final class X509CertificateUtil {
             if (extensionValue == null) {
                 return null;
             }
-            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue)).getAccessDescriptions();
+            AccessDescription[] accessDescriptions = AuthorityInformationAccess.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getAccessDescriptions();
             return X509CertificateInformationAccessDescriptor.convertAccessDescriptors(accessDescriptions);
         } catch (IOException e) {
             throw new X509CertificateOperationException(e);
@@ -236,7 +236,7 @@ public final class X509CertificateUtil {
             return null;
         }
         try {
-            CRLDistPoint crldp = CRLDistPoint.getInstance(X509ExtensionUtil.fromExtensionValue(extensionValue));
+            CRLDistPoint crldp = CRLDistPoint.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
             return convertCrlDistributionPointToUris(crldp);
         } catch (IOException e) {
             return null;

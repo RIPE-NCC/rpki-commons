@@ -82,25 +82,25 @@ public class ProvisioningCmsCertificateBuilderTest {
         assertNotNull(cmsCertificate);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequirePublicKey() {
         subject.withPublicKey(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireIssuerDN() {
         subject.withIssuerDN(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSubjectDN() {
         subject.withSubjectDN(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSerial() {
         subject.withSerial(null);
         subject.build();

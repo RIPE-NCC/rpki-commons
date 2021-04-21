@@ -38,7 +38,7 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -51,6 +51,7 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.CMSSignedGenerator;
@@ -62,7 +63,6 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.StoreException;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -267,7 +267,7 @@ public class ProvisioningCmsObjectParser {
                  */
                 return true;
             }
-            BasicConstraints constraints = BasicConstraints.getInstance(X509ExtensionUtil.fromExtensionValue(basicConstraintsExtension));
+            BasicConstraints constraints = BasicConstraints.getInstance(JcaX509ExtensionUtils.parseExtensionValue(basicConstraintsExtension));
             return !constraints.isCA();
         } catch (IOException e) {
             throw new ProvisioningCmsObjectParserException("error while reading cms object certificate", e);

@@ -34,8 +34,8 @@ import net.ripe.ipresource.IpAddress;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.ipresource.UniqueIpResource;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.*;
 
 import java.io.ByteArrayOutputStream;

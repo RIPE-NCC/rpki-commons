@@ -140,6 +140,7 @@ public final class ValidationString {
     public static final String CERT_IS_X509CERT = "cms.cert.is.x509";
     public static final String CERT_IS_EE_CERT = "cms.cert.is.ee.cert";
     public static final String ONLY_ONE_CRL_ALLOWED = "cms.only.one.crl";
+    public static final String CMS_NO_CRL_ALLOWED = "cms.no.crl";
     public static final String CRL_IS_X509CRL = "cms.crl.is.x509";
     public static final String CERT_HAS_SKI = "cms.cert.has.ski";
     public static final String GET_SIGNER_INFO = "cms.signature.signer.info";
@@ -158,6 +159,8 @@ public final class ValidationString {
     public static final String MSG_DIGEST_VALUE_COUNT = "cms.msg.digest.value.count";
     public static final String SIGNING_TIME_ATTR_PRESENT = "cms.signing.time.attr.present";
     public static final String ONLY_ONE_SIGNING_TIME_ATTR = "cms.only.one.signing.time.attr";
+    public static final String ONLY_ONE_BINARY_SIGNING_TIME_ATTR = "cms.only.one.binary.signing.time.attr";
+    public static final String SIGNING_TIME_MUST_EQUAL_BINARY_SIGNING_TIME = "cms.signing.time.must.equal.binary.signing.time";
     public static final String SIGNER_ID_MATCH = "cms.signer.id.match.cert";
     public static final String SIGNATURE_VERIFICATION = "cms.signature";
     public static final String UNSIGNED_ATTRS_OMITTED = "cms.unsigned.attrs.omitted";
