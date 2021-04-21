@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.util.UTC;
@@ -37,12 +38,13 @@ import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
-import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
@@ -93,6 +95,14 @@ public class X509ResourceCertificateParserTest {
         X509ResourceCertificate parsed = subject.getCertificate();
 
         assertEquals(certificate, parsed);
+    }
+
+    @Test
+    public void shouldAcceptCertificateWithIdCtCps() throws IOException {
+        byte[] encoded = Files.toByteArray(new File("src/test/resources/resourcecertificate/apnic-rpki-root-iana-origin-includes-policy-with-cps.cer"));
+
+        subject.parse("certificate", encoded);
+        assertTrue(subject.getValidationResult().hasNoFailuresOrWarnings());
     }
 
     @Test

@@ -38,14 +38,7 @@ import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 
 import java.io.IOException;
@@ -64,6 +57,7 @@ import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAc
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.findFirstRsyncCrlDistributionPoint;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.isRoot;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static org.bouncycastle.asn1.x509.PolicyQualifierId.id_qt_cps;
 
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
@@ -143,6 +137,8 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             return;
         }
 
+        // https://tools.ietf.org/html/rfc6487#section-4.8.9
+        // Certificate Policies - This extension MUST be present and MUST be marked critical.
         result.rejectIfFalse(criticalExtensionOIDs.contains(Extension.certificatePolicies.getId()), POLICY_EXT_CRITICAL);
 
         try {
@@ -150,10 +146,8 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             if (!result.rejectIfNull(extensionValue, POLICY_EXT_VALUE)) {
                 return;
             }
-            // https://tools.ietf.org/html/rfc6487
-            // 4.8.9.  Certificate Policies
-            // This extension MUST be present and MUST be marked critical.  It MUST
-            // include exactly one policy, as specified in the RPKI CP [RFC6484]
+            // https://tools.ietf.org/html/rfc6487#section-4.8.9
+            // It MUST include exactly one policy, as specified in the RPKI CP [RFC6484]
             ASN1Sequence policies = ASN1Sequence.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue));
             if (!result.rejectIfFalse(policies.size() == 1, SINGLE_CERT_POLICY)) {
                 return;
@@ -164,6 +158,20 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
                 return;
             }
             result.rejectIfFalse(POLICY_OID.equals(policy.getPolicyIdentifier()), POLICY_ID_VERSION);
+
+            // https://tools.ietf.org/html/rfc7318#section-2
+            // [RFC6484].  Exactly one policy qualifier MAY be included.
+            ASN1Sequence qualifiers = policy.getPolicyQualifiers();
+            if (qualifiers != null) {
+                result.warnIfTrue(qualifiers.size() != 1, POLICY_QUALIFIER_NUMBER);
+
+                // If a policy qualifier is included, the policyQualifierId MUST be the
+                // Certification Practice Statement (CPS) pointer qualifier type (id-qt-cps).
+                if (qualifiers.size() == 1) {
+                    PolicyQualifierInfo policyQualifierInfo = PolicyQualifierInfo.getInstance(qualifiers.getObjectAt(0));
+                    result.warnIfFalse(id_qt_cps.equals(policyQualifierInfo.getPolicyQualifierId()), POLICY_QUALIFIER_TYPE);
+                }
+            }
         } catch (IOException e) {
             result.rejectIfFalse(false, POLICY_VALIDATION);
         }

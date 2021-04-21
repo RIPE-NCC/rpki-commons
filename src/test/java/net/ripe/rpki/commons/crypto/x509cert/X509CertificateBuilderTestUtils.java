@@ -39,7 +39,7 @@ public class X509CertificateBuilderTestUtils {
     public static void setPoliciesOnBuilderHelperAttribute(Object builder, PolicyInformation... policies) {
         try {
             X509CertificateBuilderHelper builderHelper = (X509CertificateBuilderHelper) FieldUtils.readField(builder, "builderHelper", true);
-            FieldUtils.writeField(builderHelper, "policies", policies);
+            FieldUtils.writeField(builderHelper, "policies", policies, true);
             FieldUtils.writeField(builder, "builderHelper", builderHelper, true);
         } catch (IllegalAccessException e) {
         }
