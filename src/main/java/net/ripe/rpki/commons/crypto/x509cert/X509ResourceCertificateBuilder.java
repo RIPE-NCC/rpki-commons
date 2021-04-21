@@ -132,11 +132,6 @@ public class X509ResourceCertificateBuilder {
         return this;
     }
 
-    public X509ResourceCertificateBuilder withPolicies(PolicyInformation... policies) {
-        builderHelper.withPolicies(policies);
-        return this;
-    }
-
     public X509ResourceCertificate build() {
         if (inheritedResourceTypes.isEmpty()) {
             Validate.notNull(resources, "no resources");

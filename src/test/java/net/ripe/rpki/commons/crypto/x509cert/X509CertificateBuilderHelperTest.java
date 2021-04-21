@@ -53,7 +53,7 @@ import static org.junit.Assert.assertNull;
 
 
 public class X509CertificateBuilderHelperTest {
-    private final PolicyInformation CAB_BASELINE_REQUIREMENTS_POLICY = new PolicyInformation(new ASN1ObjectIdentifier("2.23.140.1.2.2"));
+    public final static PolicyInformation CAB_BASELINE_REQUIREMENTS_POLICY = new PolicyInformation(new ASN1ObjectIdentifier("2.23.140.1.2.2"));
 
     private X509CertificateBuilderHelper subject;
 

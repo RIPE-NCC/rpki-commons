@@ -37,6 +37,7 @@ import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
+import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -48,6 +49,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.CAB_BASELINE_REQUIREMENTS_POLICY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -61,8 +63,21 @@ public class X509ResourceCertificateParserTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
         X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        // Remove the default CPS policy
+        X509CertificateBuilderTestUtils.setPoliciesOnBuilderHelperAttribute(builder);
         X509ResourceCertificate certificate = builder
-                .withPolicies()  // Without policies
+                .build();
+
+        subject.parse("certificate", certificate.getEncoded());
+        subject.getCertificate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailWhenOtherCertificatePolicyIsPresent() {
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        // Set another policy
+        X509CertificateBuilderTestUtils.setPoliciesOnBuilderHelperAttribute(builder, CAB_BASELINE_REQUIREMENTS_POLICY);
+        X509ResourceCertificate certificate = builder
                 .build();
 
         subject.parse("certificate", certificate.getEncoded());
