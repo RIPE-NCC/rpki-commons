@@ -68,11 +68,20 @@ public class ManifestCmsBuilderTest {
         subject.addFile("foo1", content);
         subject.addFile("foo3", content);
 
+
         ManifestCms result = subject.build(TEST_KEY_PAIR.getPrivate());
+
+        assertTrue(subject.containsFile("foo1"));
+        assertTrue(subject.containsFile("foo3"));
+
         assertEquals(2, result.size());
+        assertEquals(2, result.getFiles().size());
+
         assertTrue(result.containsFile("foo1"));
         assertTrue(result.containsFile("foo3"));
+
         assertFalse(result.containsFile("abracadabra"));
+
     }
 
     @SuppressWarnings("deprecation")
