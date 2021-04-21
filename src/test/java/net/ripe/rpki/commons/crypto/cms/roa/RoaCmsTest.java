@@ -75,10 +75,10 @@ public class RoaCmsTest {
 
     @Before
     public void setUp() {
-        ipv4Prefixes = new ArrayList<RoaPrefix>();
+        ipv4Prefixes = new ArrayList<>();
         ipv4Prefixes.add(TEST_IPV4_PREFIX_1);
         ipv4Prefixes.add(TEST_IPV4_PREFIX_2);
-        allPrefixes = new ArrayList<RoaPrefix>(ipv4Prefixes);
+        allPrefixes = new ArrayList<>(ipv4Prefixes);
         allPrefixes.add(TEST_IPV6_PREFIX);
         allResources = new IpResourceSet();
         for (RoaPrefix prefix : allPrefixes) {
@@ -103,20 +103,26 @@ public class RoaCmsTest {
         return roaCmsTest.subject;
     }
 
-    public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes) {
+    public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes){
+        return createCertificate(prefixes, TEST_KEY_PAIR);
+    }
+    public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes, KeyPair keyPair) {
         IpResourceSet resources = new IpResourceSet();
         for (RoaPrefix prefix : prefixes) {
             resources.add(prefix.getPrefix());
         }
-        X509ResourceCertificateBuilder builder = createCertificateBuilder(resources);
+        X509ResourceCertificateBuilder builder = createCertificateBuilder(resources, keyPair);
         return builder.build();
     }
 
     private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources) {
+            return createCertificateBuilder(resources, TEST_KEY_PAIR);
+    }
+    private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources, KeyPair keyPair) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
-        builder.withPublicKey(TEST_KEY_PAIR.getPublic());
-        builder.withSigningKeyPair(TEST_KEY_PAIR);
+        builder.withPublicKey(keyPair.getPublic());
+        builder.withSigningKeyPair(keyPair);
         final DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
         builder.withResources(resources);

@@ -126,6 +126,19 @@ public class ManifestCmsParserTest {
 
     private ManifestCmsParser parser;
 
+    static X509ResourceCertificate createValidManifestEECertificate(KeyPair keyPair) {
+        X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
+        builder.withCa(false).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
+        builder.withPublicKey(keyPair.getPublic());
+        builder.withSigningKeyPair(keyPair);
+        builder.withResources(new IpResourceSet());
+        builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
+        builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
+        builder.withSubjectInformationAccess(
+                new X509CertificateInformationAccessDescriptor(ID_AD_SIGNED_OBJECT, URI.create("rsync://example.com/repository/manifest.mft"))
+        );
+        return builder.build();
+    }
 
     static X509ResourceCertificate createValidManifestEECertificate() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
