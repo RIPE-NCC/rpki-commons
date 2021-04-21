@@ -93,6 +93,7 @@ public class RPKIContentInfo
     /**
      * @deprecated use getInstance()
      */
+    @Deprecated
     public RPKIContentInfo(ASN1Sequence seq) {
         super(seq);
         if (seq.size() < 1 || seq.size() > 2) {

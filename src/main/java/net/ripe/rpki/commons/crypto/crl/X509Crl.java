@@ -37,10 +37,10 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
@@ -227,7 +227,7 @@ public class X509Crl implements CertificateRepositoryObject {
             if (extensionValue == null) {
                 return null;
             }
-            ASN1Integer number = (ASN1Integer) X509ExtensionUtil.fromExtensionValue(extensionValue);
+            ASN1Integer number = (ASN1Integer) JcaX509ExtensionUtils.parseExtensionValue(extensionValue);
             return number.getPositiveValue();
         } catch (IOException e) {
             throw new X509CrlException("cannot get CRLNumber extension from CRL", e);

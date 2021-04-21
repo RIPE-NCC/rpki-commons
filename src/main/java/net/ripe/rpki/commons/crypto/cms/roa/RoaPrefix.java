@@ -31,9 +31,9 @@ package net.ripe.rpki.commons.crypto.cms.roa;
 
 import net.ripe.ipresource.IpRange;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.annotation.CheckForNull;
 import java.io.Serializable;

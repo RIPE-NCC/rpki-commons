@@ -32,7 +32,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;

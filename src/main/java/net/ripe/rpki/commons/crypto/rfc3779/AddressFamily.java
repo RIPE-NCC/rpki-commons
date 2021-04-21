@@ -31,7 +31,7 @@ package net.ripe.rpki.commons.crypto.rfc3779;
 
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DEROctetString;
 

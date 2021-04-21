@@ -35,7 +35,7 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AccessDescription;
@@ -284,6 +284,7 @@ public final class X509CertificateBuilderHelper {
                 addPolicies(generator);
             }
             if (resources != null) {
+                validateResource(resources);
                 addResourceExtensions(generator);
             }
             return generator;
@@ -292,20 +293,40 @@ public final class X509CertificateBuilderHelper {
         }
     }
 
+    /**
+     * https://tools.ietf.org/html/rfc6487#section-7
+     *
+     * Resource extension validation implies that at least IP or ASN extension
+     * must be present. This means at least one IPvX or ASN must be either set
+     * explicitly or inherited..
+     */
+    protected void validateResource(IpResourceSet resources) {
+        // at least one resource type must be either set or inherited
+        final boolean atLeastOneResourceTypeUsed = EnumSet.allOf(IpResourceType.class)
+            .stream()
+            .anyMatch(resourceType ->
+                resources.containsType(resourceType) || inheritedResourceTypes.contains(resourceType));
+
+        if (!atLeastOneResourceTypeUsed) {
+            throw new IllegalArgumentException("Resources set " + resources + " must contain at least one IP address or ASN");
+        }
+    }
+
+
     private void addBgpExtension(X509v3CertificateBuilder generator) throws CertIOException {
         generator.addExtension(Extension.extendedKeyUsage, true,
-                new ExtendedKeyUsage(KeyPurposeId.getInstance(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER)));
+            new ExtendedKeyUsage(KeyPurposeId.getInstance(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER)));
     }
 
     private X509v3CertificateBuilder createX509V3CertificateGenerator() {
         validateCertificateFields();
         return new X509v3CertificateBuilder(
-                BouncyCastleUtil.principalToName(issuerDN),
-                serial,
-                new Date(validityPeriod.getNotValidBefore().getMillis()),
-                new Date(validityPeriod.getNotValidAfter().getMillis()),
-                BouncyCastleUtil.principalToName(subjectDN),
-                BouncyCastleUtil.createSubjectPublicKeyInfo(publicKey));
+            BouncyCastleUtil.principalToName(issuerDN),
+            serial,
+            new Date(validityPeriod.getNotValidBefore().getMillis()),
+            new Date(validityPeriod.getNotValidAfter().getMillis()),
+            BouncyCastleUtil.principalToName(subjectDN),
+            BouncyCastleUtil.createSubjectPublicKeyInfo(publicKey));
     }
 
     private void validateCertificateFields() {
@@ -395,7 +416,7 @@ public final class X509CertificateBuilderHelper {
         }
         GeneralNames names = new GeneralNames(seq);
         DistributionPointName distributionPoint = new DistributionPointName(
-                names);
+            names);
         DistributionPoint[] dps = {new DistributionPoint(distributionPoint, null, null)};
         return new CRLDistPoint(dps);
     }

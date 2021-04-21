@@ -63,7 +63,7 @@ public class X509ResourceCertificateBuilderTest {
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireResourcesForResourceCertificates() {
         subject.withResources(null);
         subject.build();
@@ -75,37 +75,37 @@ public class X509ResourceCertificateBuilderTest {
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireIssuer() {
         subject.withIssuerDN(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSubject() {
         subject.withSubjectDN(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSerial() {
         subject.withSerial(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequirePublicKey() {
         subject.withPublicKey(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireSigningKeyPair() {
         subject.withSigningKeyPair(null);
         subject.build();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldRequireValidityPeriod() {
         subject.withValidityPeriod(null);
         subject.build();

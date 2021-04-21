@@ -103,7 +103,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         assertEquals(publicationUri, certificate.getAuthorityInformationAccess()[0].getLocation());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldNotBuildWithoutSerialNumber() {
         // given
         createValidEeBuilder();
@@ -113,7 +113,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         buildOrFail();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldNotBuildWithoutResourceCertificatePublicationUri() {
         // given
         createValidEeBuilder();
@@ -123,7 +123,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         buildOrFail();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldNotBuildWithoutValidityPeriod() {
         // given
         createValidEeBuilder();
@@ -132,7 +132,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         buildOrFail();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldNotBuildWithoutIssuer() {
         // given
         createValidEeBuilder();
@@ -141,7 +141,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         buildOrFail();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldNotBuildWithoutSigningKeyPair() {
         // given
         createValidEeBuilder();
@@ -150,7 +150,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         buildOrFail();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldNotBuildWithoutManifestUri() {
         // given
         createValidEeBuilder();
@@ -159,7 +159,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         buildOrFail();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldNotBuildWithoutCrlPublicationUri() {
         // given
         createValidEeBuilder();

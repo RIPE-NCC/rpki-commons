@@ -50,17 +50,23 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.cert.CRLException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class RpkiSignedObjectParser {
+
+    private static final int CMS_OBJECT_VERSION = 3;
+    private static final int CMS_OBJECT_SIGNER_VERSION = 3;
 
     private byte[] encoded;
 
@@ -124,19 +130,19 @@ public abstract class RpkiSignedObjectParser {
         CMSSignedDataParser sp;
         try {
             sp = new CMSSignedDataParser(BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER, encoded);
+            validationResult.pass(CMS_DATA_PARSING);
         } catch (CMSException e) {
-            validationResult.rejectIfFalse(false, CMS_DATA_PARSING);
+            validationResult.error(CMS_DATA_PARSING);
             return;
         }
-        validationResult.rejectIfFalse(true, CMS_DATA_PARSING);
 
-        if (!validationResult.hasFailures()) {
-            parseContent(sp);
-        }
-        if (!validationResult.hasFailures()) {
-            parseCmsCertificate(sp);
-        }
-        if (!validationResult.hasFailures()) {
+        parseContent(sp);
+        parseCmsCertificate(sp);
+
+        verifyVersion(sp);
+        verifyCrl(sp);
+
+        if (certificate != null) {
             verifyCmsSigning(sp, certificate.getCertificate());
         }
     }
@@ -152,6 +158,33 @@ public abstract class RpkiSignedObjectParser {
         } catch (IOException e) {
             validationResult.error(DECODE_CONTENT);
             return;
+        }
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.1
+     */
+    private void verifyVersion(CMSSignedDataParser sp) {
+        validationResult.rejectIfFalse(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.5
+     */
+    private void verifyCrl(CMSSignedDataParser sp) {
+        List<? extends X509CRL> crls = extractCrl(sp);
+        if (!validationResult.rejectIfNull(crls, GET_CERTS_AND_CRLS)) {
+            return;
+        }
+
+        validationResult.rejectIfFalse(crls.size() == 0, CMS_NO_CRL_ALLOWED);
+    }
+
+    private List<? extends X509CRL> extractCrl(CMSSignedDataParser sp) {
+        try {
+            return BouncyCastleUtil.extractCrls(sp);
+        } catch (CMSException | StoreException | CRLException e) {
+            return null;
         }
     }
 
@@ -274,6 +307,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
+        verifySignerVersion(signer);
         validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
         validationResult.rejectIfFalse(ALLOWED_SIGNATURE_ALGORITHM_OIDS.contains(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
@@ -289,7 +323,8 @@ public abstract class RpkiSignedObjectParser {
         
         //Check if the signedAttributes are allowed
         verifyOptionalSignedAttributes(signer);
-        
+        verifyUnsignedAttributes(signer);
+
         SignerId signerId = signer.getSID();
         try {
             validationResult.rejectIfFalse(signerId.match(new JcaX509CertificateHolder(certificate)), SIGNER_ID_MATCH);
@@ -298,6 +333,13 @@ public abstract class RpkiSignedObjectParser {
         }
 
         return true;
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.6.1
+     */
+    private void verifySignerVersion(SignerInformation signer) {
+        validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
     }
 
     private boolean verifyAndStoreSigningTime(SignerInformation signer) {
@@ -332,6 +374,13 @@ public abstract class RpkiSignedObjectParser {
         if (errorMessage != null) {
             validationResult.rejectIfFalse(false, SIGNATURE_VERIFICATION, errorMessage);
         }
+    }
+
+    /**
+     * https://tools.ietf.org/html/rfc6488#section-2.1.6.7
+     */
+    private void verifyUnsignedAttributes(SignerInformation signer) {
+        validationResult.rejectIfFalse(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);
     }
 
     protected static BigInteger getRpkiObjectVersion(ASN1Sequence seq) {

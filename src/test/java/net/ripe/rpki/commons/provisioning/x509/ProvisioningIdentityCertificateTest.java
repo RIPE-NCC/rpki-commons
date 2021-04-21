@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 
 public class ProvisioningIdentityCertificateTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldCheckForNullArgument() {
         new ProvisioningIdentityCertificate(null);
     }
