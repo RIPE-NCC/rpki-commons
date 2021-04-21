@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -64,6 +65,10 @@ import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class RpkiSignedObjectParser {
+
+    // binary-signing-time is not yet in BC CMSAttributes; define it here until
+    // https://github.com/bcgit/bc-java/pull/932 is merged.
+    public static final ASN1ObjectIdentifier BINARY_SIGNING_TIME_OID = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.2.46");
 
     private static final int CMS_OBJECT_VERSION = 3;
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
@@ -241,7 +246,7 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        if (!verifyAndStoreSigningTime(signer)) {
+        if (!extractSigningTime(signer)) {
             return;
         }
 
@@ -269,18 +274,15 @@ public abstract class RpkiSignedObjectParser {
             return null; // Caller will validate that the SignerInformationStore is not null
         }
     }
-    
+
     private boolean isAllowedSignedAttribute(Attribute signedAttribute) {
-    	
-    	//This isn't in the bouncy castle file CMSAttributes, where the other CMS OID come from.
-    	ASN1ObjectIdentifier binarySigningTimeOID = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.2.46");
-    	ASN1ObjectIdentifier attributeOID = signedAttribute.getAttrType();
-    	
-    	//Check if the attribute is any of the allowed ones.
-    	return binarySigningTimeOID.equals(attributeOID)
+        ASN1ObjectIdentifier attributeOID = signedAttribute.getAttrType();
+
+        //Check if the attribute is any of the allowed ones.
+        return BINARY_SIGNING_TIME_OID.equals(attributeOID)
                 || CMSAttributes.signingTime.equals(attributeOID)
                 || CMSAttributes.contentType.equals(attributeOID)
-    			|| CMSAttributes.messageDigest.equals(attributeOID);
+                        || CMSAttributes.messageDigest.equals(attributeOID);
     }
 
     private boolean verifyOptionalSignedAttributes(SignerInformation signer) {
@@ -315,12 +317,12 @@ public abstract class RpkiSignedObjectParser {
         }
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
-        
+
         //http://tools.ietf.org/html/rfc6488#section-2.1.6.4
         //MUST include contentType and messageDigest
         //MAY include signingTime, binary-signing-time, or both
         //Other attributes MUST NOT be included
-        
+
         //Check if the signedAttributes are allowed
         verifyOptionalSignedAttributes(signer);
         verifyUnsignedAttributes(signer);
@@ -342,23 +344,46 @@ public abstract class RpkiSignedObjectParser {
         validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
     }
 
-    private boolean verifyAndStoreSigningTime(SignerInformation signer) {
-        Attribute signingTimeAttribute = signer.getSignedAttributes().get(CMSAttributes.signingTime);
-        if (signingTimeAttribute != null) {
-            if (!validationResult.rejectIfFalse(signingTimeAttribute.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
-                return false;
-            }
-            Time signingTimeDate = Time.getInstance(signingTimeAttribute.getAttrValues().getObjectAt(0));
-            signingTime = UTC.dateTime(signingTimeDate.getDate().getTime());
+    /**
+     * Extract signing time from the signer information.
+     *
+     * Signing time is either provided in the signing-time [RFC5652] or binary-signing-time [RFC6019]
+     * attribute, or neither. As stated in RFC 6019 Section 4 [Security Considerations] "only one
+     * of these attributes SHOULD be present". [..] "However, if both of these attributes are present,
+     * they MUST provide the same date and time."
+     */
+    private boolean extractSigningTime(SignerInformation signer) {
+        ImmutablePair<DateTime, Boolean> signingTime = extractTime(CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer);
+        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(BINARY_SIGNING_TIME_OID, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer);
+        boolean valid = signingTime.right && binarySigningTime.right;
+
+        if (signingTime.left != null && binarySigningTime.left != null) {
+            valid = validationResult.rejectIfFalse(signingTime.left.equals(binarySigningTime.left), SIGNING_TIME_MUST_EQUAL_BINARY_SIGNING_TIME) && valid;
         }
-        return true;
+
+        if (valid) {
+            this.signingTime = signingTime.left != null ? signingTime.left : binarySigningTime.left;
+        }
+        return valid;
+    }
+
+    private ImmutablePair<DateTime, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer) {
+        Attribute attr = signer.getSignedAttributes().get(identifier);
+        if (attr == null) {
+            return ImmutablePair.of(null, true);
+        }
+        if (!validationResult.rejectIfFalse(attr.getAttrValues().size() == 1, onlyOneValidationKey)) {
+            return ImmutablePair.of(null, false);
+        }
+        DateTime value = UTC.dateTime(Time.getInstance(attr.getAttrValues().getObjectAt(0)).getDate().getTime());
+        return ImmutablePair.of(value, true);
     }
 
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
         String errorMessage = null;
         try {
             /*
-			 * Use the public key for the "verifier" not the certificate, because otherwise
+                         * Use the public key for the "verifier" not the certificate, because otherwise
              * BC will reject the CMS if the signingTime is outside of the EE certificate validity
              * time. This happens occasionally and is no ground to reject according to standards:
              * http://tools.ietf.org/html/rfc6488#section-2.1.6.4.3
