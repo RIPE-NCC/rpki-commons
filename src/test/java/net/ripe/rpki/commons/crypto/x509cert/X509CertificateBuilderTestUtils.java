@@ -42,6 +42,7 @@ public class X509CertificateBuilderTestUtils {
             FieldUtils.writeField(builderHelper, "policies", policies, true);
             FieldUtils.writeField(builder, "builderHelper", builderHelper, true);
         } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }
