@@ -73,6 +73,7 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
      * @param content the content to be signed.
      * @param encapsulate true if the content should be encapsulated in the signature, false otherwise.
      */
+    @Override
     public CMSSignedData generate(
         // FIXME Avoid accessing more than once to support CMSProcessableInputStream
         CMSTypedData content,
@@ -91,10 +92,10 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
             SignerInformation signer = (SignerInformation) o;
             digestAlgs.add(fixAlgID(signer.getDigestAlgorithmID()));
 
-            assert signer.getContentType().equals(content.getContentType()) : "Precalculated signer info must match content type";
+            if(!signer.getContentType().equals(content.getContentType())){
+                throw new IllegalArgumentException("Precalculated signer info must match content type");
+            }
             signerInfos.add(signer.toASN1Structure());
-
-
         }
 
         //
