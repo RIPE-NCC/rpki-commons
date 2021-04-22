@@ -42,7 +42,11 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
 
     private IpResourceSet resources;
 
-    public X509ResourceCertificateParentChildValidator(ValidationOptions options, ValidationResult result, X509ResourceCertificate parent, X509Crl crl, IpResourceSet resources) {
+    public X509ResourceCertificateParentChildValidator(ValidationOptions options,
+                                                       ValidationResult result,
+                                                       X509ResourceCertificate parent,
+                                                       X509Crl crl,
+                                                       IpResourceSet resources) {
         super(options, result, parent, crl);
         this.resources = resources;
     }
