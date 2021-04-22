@@ -117,6 +117,12 @@ public class X509CertificateBuilderHelperTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void shouldFailOnNeutralIntegerSerial() {
+        subject.withSerial(BigInteger.ZERO);
+        subject.generateCertificate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnTooLargeSerial() {
         subject.withSerial(BigInteger.ONE.shiftLeft(160));
         subject.generateCertificate();

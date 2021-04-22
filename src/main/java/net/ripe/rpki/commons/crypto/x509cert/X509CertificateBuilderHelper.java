@@ -344,7 +344,7 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(subjectDN, "no subjectDN");
         Validate.notNull(serial, "no serial");
         Validate.isTrue(
-                serial.compareTo(BigInteger.ZERO) >= 0 && serial.compareTo(MAX_20_OCTETS) <= 0,
+                serial.compareTo(BigInteger.ZERO) > 0 && serial.compareTo(MAX_20_OCTETS) <= 0,
                 "serial number not in (0..MAX)"
         );
         Validate.notNull(publicKey, "no publicKey");
