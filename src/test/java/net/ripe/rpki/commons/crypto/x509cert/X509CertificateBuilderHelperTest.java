@@ -109,4 +109,16 @@ public class X509CertificateBuilderHelperTest {
         // And further attempts to set it are rejected (e.g. in an subtype).
         subject.withPolicies(CAB_BASELINE_REQUIREMENTS_POLICY);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailOnNegativeSerial() {
+        subject.withSerial(BigInteger.ONE.negate());
+        subject.generateCertificate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailOnTooLargeSerial() {
+        subject.withSerial(BigInteger.ONE.shiftLeft(160));
+        subject.generateCertificate();
+    }
 }
