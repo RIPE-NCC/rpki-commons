@@ -163,7 +163,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
             // [RFC6484].  Exactly one policy qualifier MAY be included.
             ASN1Sequence qualifiers = policy.getPolicyQualifiers();
             if (qualifiers != null) {
-                result.warnIfTrue(qualifiers.size() != 1, POLICY_QUALIFIER_NUMBER);
+                result.warnIfFalse(qualifiers.size() <= 1, POLICY_QUALIFIER_NUMBER);
 
                 // If a policy qualifier is included, the policyQualifierId MUST be the
                 // Certification Practice Statement (CPS) pointer qualifier type (id-qt-cps).
