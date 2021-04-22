@@ -91,12 +91,12 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
             SignerInformation signer = (SignerInformation) o;
             digestAlgs.add(fixAlgID(signer.getDigestAlgorithmID()));
 
+            assert signer.getContentType().equals(content.getContentType()) : "Precalculated signer info must match content type";
             signerInfos.add(signer.toASN1Structure());
 
-            assert signer.getContentType().equals(content.getContentType()) : "Precalculated signer info must match content type";
 
         }
-        
+
         //
         // add the SignerInfo objects
         //
