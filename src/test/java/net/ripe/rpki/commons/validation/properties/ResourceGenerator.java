@@ -54,7 +54,7 @@ public class ResourceGenerator {
     }
 
     static IpResource generateAsn(SourceOfRandomness sourceOfRandomness) {
-        return new Asn(sourceOfRandomness.nextInt(1, Integer.MAX_VALUE));
+        return new Asn(sourceOfRandomness.nextLong(Asn.ASN_MIN_VALUE, Asn.ASN32_MAX_VALUE));
     }
 
     /**
