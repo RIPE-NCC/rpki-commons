@@ -59,6 +59,7 @@ import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(JUnitQuickcheck.class)
@@ -110,15 +111,51 @@ public class X509ResourceCertificateParentChildValidatorPropertyTest {
             .withResources(childResourceSet)
             .build();
 
-//        System.out.println("parentResourceSet = " + parentResourceSet);
-//        System.out.println("childResourceSet = " + childResourceSet);
-
         X509Crl rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
         X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(
             options, result, parentCertificate, rootCrl, parentResourceSet);
 
         validator.validate("child.cer", childCertificate);
         assertFalse(result.hasFailures());
+    }
+
+    @Property
+    public void validParentChildOverClaiming(List<@From(IpResourceGen.class) IpResource> parentResources,
+                                             int childResourceCount,
+                                             List<@From(IpResourceGen.class) IpResource> extraChildResources) {
+        if (parentResources.isEmpty()) {
+            return;
+        }
+
+        final IpResourceSet parentResourceSet = new IpResourceSet();
+        final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
+
+        parentResources.forEach(parentResourceSet::add);
+
+        // some part of the parent resources become child
+        parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
+        if (childResourceSet.isEmpty()) {
+            return;
+        }
+
+        final X509ResourceCertificate parentCertificate = createRootCertificateBuilder()
+            .withResources(parentResourceSet)
+            .build();
+
+        final X509ResourceCertificate childCertificate = createChildCertificateBuilder()
+            .withResources(childResourceSet)
+            .build();
+
+        X509Crl rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(
+            options, result, parentCertificate, rootCrl, parentResourceSet);
+
+        validator.validate("child.cer", childCertificate);
+        if (extraChildResources.isEmpty()) {
+            assertFalse(result.hasFailures());
+        } else {
+            assertTrue(result.hasFailures());
+        }
     }
 
     private X509ResourceCertificateBuilder createRootCertificateBuilder() {
