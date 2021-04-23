@@ -29,6 +29,10 @@
  */
 package net.ripe.rpki.commons.validation;
 
+import com.pholser.junit.quickcheck.From;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -38,23 +42,30 @@ import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.util.UTC;
+import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildLooseValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
+import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
+import net.ripe.rpki.commons.validation.properties.IpResourceGen;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.util.EnumSet;
+import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
+@RunWith(JUnitQuickcheck.class)
 public class X509ResourceCertificateParentChildValidatorTest {
 
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
@@ -224,6 +235,117 @@ public class X509ResourceCertificateParentChildValidatorTest {
         validate(validator, child);
 
         assertTrue(result.hasFailures());
+    }
+
+    @Property
+    public void validParentChildSubResources(List<@From(IpResourceGen.class) IpResource> parentResources, int childResourceCount) {
+        if (parentResources.isEmpty()) {
+            return;
+        }
+
+        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
+
+        // some part of the parent resources become child
+        final IpResourceSet childResourceSet = new IpResourceSet(
+            parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()));
+        if (childResourceSet.isEmpty()) {
+            return;
+        }
+
+        ValidationResult result = validateParentChildPair(parentResourceSet, childResourceSet);
+        assertFalse(result.hasFailures());
+    }
+
+    @Property
+    public void validParentChildOverClaiming(List<@From(IpResourceGen.class) IpResource> parentResources,
+                                             int childResourceCount,
+                                             List<@From(IpResourceGen.class) IpResource> extraChildResources) {
+        if (parentResources.isEmpty()) {
+            return;
+        }
+
+        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
+        final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
+
+        // some part of the parent resources become child
+        parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
+        if (childResourceSet.isEmpty()) {
+            return;
+        }
+
+        ValidationResult result = validateParentChildPair(parentResourceSet, childResourceSet);
+        if (extraChildResources.isEmpty()) {
+            assertFalse(result.hasFailures());
+        } else {
+            IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
+            overclaiming.removeAll(parentResourceSet);
+            if (!overclaiming.isEmpty()) {
+                final ValidationCheck failure = result.getFailuresForAllLocations().get(0);
+                assertEquals("cert.resource.range.is.valid", failure.getKey());
+                assertEquals(overclaiming.toString(), failure.getParams()[0]);
+            }
+        }
+    }
+
+    @Property
+    public void validParentChildOverClaimingLooseValidation(List<@From(IpResourceGen.class) IpResource> parentResources,
+                                                            int childResourceCount,
+                                                            List<@From(IpResourceGen.class) IpResource> extraChildResources) {
+        if (parentResources.isEmpty()) {
+            return;
+        }
+
+        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
+        final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
+
+        // some part of the parent resources become child
+        parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
+        if (childResourceSet.isEmpty()) {
+            return;
+        }
+
+        ValidationResult result = validateParentChildReconsidered(parentResourceSet, childResourceSet);
+        assertFalse(result.hasFailures());
+        if (!extraChildResources.isEmpty()) {
+            IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
+            overclaiming.removeAll(parentResourceSet);
+            if (!overclaiming.isEmpty()) {
+                final ValidationCheck warning = result.getWarnings().get(0);
+                assertEquals("cert.resource.range.is.valid", warning.getKey());
+                assertEquals(overclaiming.toString(), warning.getParams()[0]);
+            }
+        }
+    }
+
+    private ValidationResult validateParentChildReconsidered(IpResourceSet parentResourceSet, IpResourceSet childResourceSet) {
+        return validateParentChildPairImpl(parentResourceSet, childResourceSet, true);
+    }
+
+    private ValidationResult validateParentChildPair(IpResourceSet parentResourceSet, IpResourceSet childResourceSet) {
+        return validateParentChildPairImpl(parentResourceSet, childResourceSet, false);
+    }
+
+    private ValidationResult validateParentChildPairImpl(IpResourceSet parentResourceSet, IpResourceSet childResourceSet, boolean reconsidered) {
+        final X509ResourceCertificate parentCertificate = createRootCertificateBuilder()
+            .withResources(parentResourceSet)
+            .build();
+
+        final X509ResourceCertificate childCertificate = createChildCertificateBuilder()
+            .withResources(childResourceSet)
+            .withInheritedResourceTypes(EnumSet.noneOf(IpResourceType.class))
+            .build();
+
+        X509Crl rootCrl = getRootCRL().build(ROOT_KEY_PAIR.getPrivate());
+        ValidationResult result = ValidationResult.withLocation("n/a");
+        final X509ResourceCertificateValidator validator;
+        if (reconsidered) {
+            validator = new X509ResourceCertificateParentChildLooseValidator(options, result, rootCrl,
+                new CertificateRepositoryObjectValidationContext(URI.create("rsync://parent.cer"), parentCertificate));
+        } else {
+            validator = new X509ResourceCertificateParentChildValidator(options, result, parentCertificate, rootCrl, parentResourceSet);
+        }
+        validator.validate("child.cer", childCertificate);
+        return result;
     }
 
 
