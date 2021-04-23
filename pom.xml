@@ -59,7 +59,7 @@
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
-            <version>10.3</version>
+            <version>10.5</version>
         </dependency>
 
         <dependency>
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.8.0</version>
+            <version>3.9.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -326,6 +326,10 @@
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
                 <version>6.1.5</version>
+                <configuration>
+                    <!-- Skip temporarily due to https://github.com/jeremylong/DependencyCheck/issues/3310 -->
+                    <skip>true</skip>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
