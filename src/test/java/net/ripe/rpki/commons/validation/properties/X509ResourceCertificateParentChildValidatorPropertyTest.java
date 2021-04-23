@@ -62,7 +62,6 @@ import java.util.List;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 
 @RunWith(JUnitQuickcheck.class)
@@ -93,13 +92,11 @@ public class X509ResourceCertificateParentChildValidatorPropertyTest {
             return;
         }
 
-        final IpResourceSet parentResourceSet = new IpResourceSet();
-        final IpResourceSet childResourceSet = new IpResourceSet();
-
-        parentResources.forEach(parentResourceSet::add);
+        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
 
         // some part of the parent resources become child
-        parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
+        final IpResourceSet childResourceSet = new IpResourceSet(
+            parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()));
         if (childResourceSet.isEmpty()) {
             return;
         }
@@ -116,10 +113,8 @@ public class X509ResourceCertificateParentChildValidatorPropertyTest {
             return;
         }
 
-        final IpResourceSet parentResourceSet = new IpResourceSet();
+        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
         final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
-
-        parentResources.forEach(parentResourceSet::add);
 
         // some part of the parent resources become child
         parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
@@ -149,10 +144,8 @@ public class X509ResourceCertificateParentChildValidatorPropertyTest {
             return;
         }
 
-        final IpResourceSet parentResourceSet = new IpResourceSet();
+        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
         final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
-
-        parentResources.forEach(parentResourceSet::add);
 
         // some part of the parent resources become child
         parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
