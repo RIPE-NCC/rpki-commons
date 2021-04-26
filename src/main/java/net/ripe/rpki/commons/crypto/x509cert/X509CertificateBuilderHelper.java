@@ -219,8 +219,16 @@ public final class X509CertificateBuilderHelper {
         return this;
     }
 
+    /**
+     * @requires policies to be unset.
+     * @param policies new certificate policies to apply.
+     * @return the builder
+     */
     public X509CertificateBuilderHelper withPolicies(
             PolicyInformation... policies) {
+        if (this.policies != null) {
+            throw new IllegalStateException("Certificate policies can not be overridden once set.");
+        }
         this.policies = policies;
         return this;
     }
@@ -378,6 +386,7 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void addPolicies(X509v3CertificateBuilder generator) throws CertIOException {
+        // DERSequence checks for null elements.
         generator.addExtension(Extension.certificatePolicies, true, new DERSequence(policies));
     }
 

@@ -103,6 +103,8 @@ public final class ValidationString {
     public static final String POLICY_ID_PRESENT = "cert.policy.id.present";
     public static final String POLICY_ID_VERSION = "cert.policy.id.version";
     public static final String POLICY_VALIDATION = "cert.policy.validation";
+    public static final String POLICY_QUALIFIER_NUMBER = "cert.policy.qualifiers.number";
+    public static final String POLICY_QUALIFIER_TYPE = "cert.policy.qualifiers.qualifierid";
     public static final String RESOURCE_EXT_PRESENT = "cert.resource.ext.present";
     public static final String RESOURCE_EXT_NOT_PRESENT = "cert.resource.ext.not.present";
     public static final String IP_RESOURCE_PRESENT = "cert.ip.resource.present";
