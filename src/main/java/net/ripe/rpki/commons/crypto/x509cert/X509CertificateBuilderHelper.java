@@ -85,6 +85,8 @@ public final class X509CertificateBuilderHelper {
 
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
+    private static final BigInteger MAX_20_OCTETS = BigInteger.ONE.shiftLeft(160).subtract(BigInteger.ONE);
+
     private String signatureProvider = DEFAULT_SIGNATURE_PROVIDER;
 
     private String signatureAlgorithm = DEFAULT_SIGNATURE_ALGORITHM;
@@ -341,6 +343,10 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(issuerDN, "no issuerDN");
         Validate.notNull(subjectDN, "no subjectDN");
         Validate.notNull(serial, "no serial");
+        Validate.isTrue(
+                serial.compareTo(BigInteger.ZERO) > 0 && serial.compareTo(MAX_20_OCTETS) <= 0,
+                "serial number not in (0..MAX)"
+        );
         Validate.notNull(publicKey, "no publicKey");
         Validate.notNull(signingKeyPair, "no signingKeyPair");
         Validate.notNull(validityPeriod, "no validityPeriod");
