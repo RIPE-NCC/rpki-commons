@@ -33,6 +33,8 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.util.UTC;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -46,10 +48,12 @@ import java.security.cert.X509Certificate;
 import java.util.EnumSet;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_INFORMATION;
 import static org.junit.Assert.assertNull;
 
 
 public class X509CertificateBuilderHelperTest {
+    public final static PolicyInformation CAB_BASELINE_REQUIREMENTS_POLICY = new PolicyInformation(new ASN1ObjectIdentifier("2.23.140.1.2.2"));
 
     private X509CertificateBuilderHelper subject;
 
@@ -91,4 +95,36 @@ public class X509CertificateBuilderHelperTest {
         subject.generateCertificate();
     }
 
+    public void shouldAcceptArbitraryPolicyWhichShouldBeCritical() {
+        // Take a non-RPKI policy
+        subject.withPolicies(CAB_BASELINE_REQUIREMENTS_POLICY);
+        // And ensure it is critical
+        subject.generateCertificate().getCriticalExtensionOIDs().contains(CAB_BASELINE_REQUIREMENTS_POLICY.getPolicyIdentifier().toString());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldFailOnRepeatedPolicies() {
+        // Policy is set once (e.g. in constructor of supertype).
+        subject.withPolicies(POLICY_INFORMATION);
+        // And further attempts to set it are rejected (e.g. in an subtype).
+        subject.withPolicies(CAB_BASELINE_REQUIREMENTS_POLICY);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailOnNegativeSerial() {
+        subject.withSerial(BigInteger.ONE.negate());
+        subject.generateCertificate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailOnNeutralIntegerSerial() {
+        subject.withSerial(BigInteger.ZERO);
+        subject.generateCertificate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailOnTooLargeSerial() {
+        subject.withSerial(BigInteger.ONE.shiftLeft(160));
+        subject.generateCertificate();
+    }
 }
