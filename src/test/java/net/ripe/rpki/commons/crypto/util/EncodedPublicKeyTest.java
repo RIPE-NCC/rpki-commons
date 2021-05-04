@@ -32,33 +32,38 @@ package net.ripe.rpki.commons.crypto.util;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.security.PublicKey;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 
 public class EncodedPublicKeyTest {
 
-    private static final byte[] ENCODED_PUBLIC_KEY = new byte[]{0};
+    private static final PublicKey PUBLIC_KEY = KeyPairFactoryTest.TEST_KEY_PAIR.getPublic();
 
     public EncodedPublicKey subject;
 
 
     @Before
     public void setUp() {
-        subject = new EncodedPublicKey(ENCODED_PUBLIC_KEY);
+        // Make sure we're using an appropriate test key
+        assertEquals("RSA", PUBLIC_KEY.getAlgorithm());
+        subject = new EncodedPublicKey(PUBLIC_KEY.getEncoded());
     }
 
     @Test
     public void shouldReturnEncodedPart() {
-        assertEquals(ENCODED_PUBLIC_KEY, subject.getEncoded());
+        assertArrayEquals(PUBLIC_KEY.getEncoded(), subject.getEncoded());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void shouldNotSpportFormat() {
-        subject.getFormat();
+    @Test
+    public void shouldReturnFormat() {
+        assertEquals(PUBLIC_KEY.getFormat(), subject.getFormat()); subject.getFormat();
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void shouldNotSpportAlgorithm() {
-        subject.getAlgorithm();
+    @Test
+    public void shouldReturnAlgorithm() {
+        assertEquals(PUBLIC_KEY.getAlgorithm(), subject.getAlgorithm());
     }
 }
