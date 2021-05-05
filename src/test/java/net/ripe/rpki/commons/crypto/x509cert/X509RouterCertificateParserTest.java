@@ -64,7 +64,8 @@ public class X509RouterCertificateParserTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
-        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder().withPolicies();
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        X509CertificateBuilderTestUtils.setPoliciesOnBuilderHelperAttribute(builder);
         X509ResourceCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());
