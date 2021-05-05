@@ -260,7 +260,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     public void validParentChildOverClaiming(List<@From(IpResourceGen.class) IpResource> parentResources,
                                              int childResourceCount,
                                              List<@From(IpResourceGen.class) IpResource> extraChildResources) {
-        if (parentResources.isEmpty()) {
+        assumeThat(parentResources.isEmpty(), is(false));
             return;
         }
 
