@@ -82,8 +82,9 @@ public class ResourceGenerator {
      */
     static IpResource generateV6Prefix(SourceOfRandomness sourceOfRandomness) {
         BigInteger maxIpv6 = new BigInteger(new byte[16]);
-        for (int i = 0; i < 128; i++)
+        for (int i = 0; i < 128; i++) {
             maxIpv6 = maxIpv6.setBit(i);
+        }
 
         final BigInteger base = sourceOfRandomness.nextBigInteger(128);
         final int prefixLength = sourceOfRandomness.nextInt(46, 128);
@@ -92,7 +93,6 @@ public class ResourceGenerator {
         final BigInteger begin = base.and(mask);
         final BigInteger end   = base.or(mask.not()).and(maxIpv6);
 
-        final IpRange range = IpRange.range(new Ipv6Address(begin), new Ipv6Address(end));
-        return range;
+        return IpRange.range(new Ipv6Address(begin), new Ipv6Address(end));
     }
 }
