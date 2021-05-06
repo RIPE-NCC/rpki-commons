@@ -88,7 +88,7 @@ import java.util.EnumSet;
  *
  * There are complicated relationships between these two ways of setting resources
  * (@see X509CertificateBuilderHelper.validateResource)
- * which results in a inevitable runtime check. Thus moving resource setting
+ * which results in an inevitable runtime check. Thus moving resource setting
  * into a separate resource-specialised builder doesn't make sense.
  *
  */
