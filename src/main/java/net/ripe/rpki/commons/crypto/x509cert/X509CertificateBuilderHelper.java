@@ -80,7 +80,7 @@ import java.util.EnumSet;
  * dynamic typing would be required.. hence delegation.
  *
  * Even though RPKI is all about resource certificates, there is not resource-specific
- * version if this builder helper as it is not so easy to make sure that resources are
+ * version of this builder helper as it is not so easy to make sure that resources are
  * set in a compile-time guaranteed fashion. Resources can be set
  *
  *  - using withResources;
