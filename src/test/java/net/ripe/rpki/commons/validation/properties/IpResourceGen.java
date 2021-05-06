@@ -27,43 +27,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto.util;
+package net.ripe.rpki.commons.validation.properties;
 
-import org.junit.Before;
-import org.junit.Test;
+import com.pholser.junit.quickcheck.generator.GenerationStatus;
+import com.pholser.junit.quickcheck.generator.Generator;
+import com.pholser.junit.quickcheck.random.SourceOfRandomness;
+import net.ripe.ipresource.IpResource;
 
-import java.security.PublicKey;
+public class IpResourceGen extends Generator<IpResource> {
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-
-public class EncodedPublicKeyTest {
-
-    private static final PublicKey PUBLIC_KEY = KeyPairFactoryTest.TEST_KEY_PAIR.getPublic();
-
-    public EncodedPublicKey subject;
-
-
-    @Before
-    public void setUp() {
-        // Make sure we're using an appropriate test key
-        assertEquals("RSA", PUBLIC_KEY.getAlgorithm());
-        subject = new EncodedPublicKey(PUBLIC_KEY.getEncoded());
+    public IpResourceGen() {
+        super(IpResource.class);
     }
 
-    @Test
-    public void shouldReturnEncodedPart() {
-        assertArrayEquals(PUBLIC_KEY.getEncoded(), subject.getEncoded());
+    @Override
+    public IpResource generate(SourceOfRandomness sourceOfRandomness, GenerationStatus generationStatus) {
+        return ResourceGenerator.generateIpResource(sourceOfRandomness);
     }
 
-    @Test
-    public void shouldReturnFormat() {
-        assertEquals(PUBLIC_KEY.getFormat(), subject.getFormat()); subject.getFormat();
-    }
-
-    @Test
-    public void shouldReturnAlgorithm() {
-        assertEquals(PUBLIC_KEY.getAlgorithm(), subject.getAlgorithm());
-    }
 }

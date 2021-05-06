@@ -44,11 +44,7 @@ import java.security.PublicKey;
 import java.util.EnumSet;
 
 /**
- * Generic Builder for X509ResourceCertificates<br />
- * Note that you may want to use one of the following more specific builders to build standard conform signed object EE or CA certificates:
- *
- * @see RpkiSignedObjectEeCertificateBuilder
- * @see RpkiCaCertificateBuilder
+ * Generic Builder for X509RouterCertificates.
  */
 public class X509RouterCertificateBuilder {
 

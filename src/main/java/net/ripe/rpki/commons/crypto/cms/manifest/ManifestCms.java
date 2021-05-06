@@ -126,7 +126,10 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     public boolean matchesFiles(Map<String, byte[]> filesToMatch) {
-
+        // A Manifest matches a set of files when:
+        //   * The file names are unique (implied by hashes being a Map),
+        //   * The manifest and the set of files contain the same file names, and
+        //   * For each file, the hash of the content matches the hash on the manifest.
         if (hashes.keySet().equals(filesToMatch.keySet())) {
             for (Entry<String, byte[]> entry : hashes.entrySet()) {
                 String fileName = entry.getKey();

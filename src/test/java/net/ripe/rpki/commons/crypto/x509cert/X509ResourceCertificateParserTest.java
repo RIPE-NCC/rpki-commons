@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.util.UTC;
@@ -42,12 +43,15 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.CAB_BASELINE_REQUIREMENTS_POLICY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -61,8 +65,21 @@ public class X509ResourceCertificateParserTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
         X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        // Remove the default CPS policy
+        X509CertificateBuilderTestUtils.setPoliciesOnBuilderHelperAttribute(builder);
         X509ResourceCertificate certificate = builder
-                .withPolicies()  // Without policies
+                .build();
+
+        subject.parse("certificate", certificate.getEncoded());
+        subject.getCertificate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailWhenOtherCertificatePolicyIsPresent() {
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
+        // Set another policy
+        X509CertificateBuilderTestUtils.setPoliciesOnBuilderHelperAttribute(builder, CAB_BASELINE_REQUIREMENTS_POLICY);
+        X509ResourceCertificate certificate = builder
                 .build();
 
         subject.parse("certificate", certificate.getEncoded());
@@ -78,6 +95,14 @@ public class X509ResourceCertificateParserTest {
         X509ResourceCertificate parsed = subject.getCertificate();
 
         assertEquals(certificate, parsed);
+    }
+
+    @Test
+    public void shouldAcceptCertificateWithIdCtCps() throws IOException {
+        byte[] encoded = Files.toByteArray(new File("src/test/resources/resourcecertificate/apnic-rpki-root-iana-origin-includes-policy-with-cps.cer"));
+
+        subject.parse("certificate", encoded);
+        assertTrue(subject.getValidationResult().hasNoFailuresOrWarnings());
     }
 
     @Test
