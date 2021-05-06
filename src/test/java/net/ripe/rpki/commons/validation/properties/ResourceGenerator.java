@@ -72,7 +72,7 @@ public class ResourceGenerator {
 
         final long mask = maxV4Ip << (32 - prefixLength);
         long begin = base & mask;
-        long end   = base | ~mask;
+        long end   = base | ~mask & maxV4Ip;
 
         return IpRange.range(new Ipv4Address(begin), new Ipv4Address(end));
     }
