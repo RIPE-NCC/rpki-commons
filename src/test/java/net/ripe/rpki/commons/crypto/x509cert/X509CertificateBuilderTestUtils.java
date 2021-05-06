@@ -27,43 +27,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.crypto.util;
+package net.ripe.rpki.commons.crypto.x509cert;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.bouncycastle.asn1.x509.PolicyInformation;
 
-import java.security.PublicKey;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-
-public class EncodedPublicKeyTest {
-
-    private static final PublicKey PUBLIC_KEY = KeyPairFactoryTest.TEST_KEY_PAIR.getPublic();
-
-    public EncodedPublicKey subject;
-
-
-    @Before
-    public void setUp() {
-        // Make sure we're using an appropriate test key
-        assertEquals("RSA", PUBLIC_KEY.getAlgorithm());
-        subject = new EncodedPublicKey(PUBLIC_KEY.getEncoded());
-    }
-
-    @Test
-    public void shouldReturnEncodedPart() {
-        assertArrayEquals(PUBLIC_KEY.getEncoded(), subject.getEncoded());
-    }
-
-    @Test
-    public void shouldReturnFormat() {
-        assertEquals(PUBLIC_KEY.getFormat(), subject.getFormat()); subject.getFormat();
-    }
-
-    @Test
-    public void shouldReturnAlgorithm() {
-        assertEquals(PUBLIC_KEY.getAlgorithm(), subject.getAlgorithm());
+public class X509CertificateBuilderTestUtils {
+    /**
+     * Reflectively set policies to create non-compliant objects.
+     */
+    public static void setPoliciesOnBuilderHelperAttribute(Object builder, PolicyInformation... policies) {
+        try {
+            X509CertificateBuilderHelper builderHelper = (X509CertificateBuilderHelper) FieldUtils.readField(builder, "builderHelper", true);
+            FieldUtils.writeField(builderHelper, "policies", policies, true);
+            FieldUtils.writeField(builder, "builderHelper", builderHelper, true);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -331,7 +331,11 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>5.3.0</version>
+                <version>6.1.5</version>
+                <configuration>
+                    <!-- Skip temporarily due to https://github.com/jeremylong/DependencyCheck/issues/3310 -->
+                    <skip>true</skip>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

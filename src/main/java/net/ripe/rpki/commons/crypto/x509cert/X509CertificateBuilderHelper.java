@@ -85,6 +85,8 @@ public final class X509CertificateBuilderHelper {
 
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
+    private static final BigInteger MAX_20_OCTETS = BigInteger.ONE.shiftLeft(160).subtract(BigInteger.ONE);
+
     private String signatureProvider = DEFAULT_SIGNATURE_PROVIDER;
 
     private String signatureAlgorithm = DEFAULT_SIGNATURE_ALGORITHM;
@@ -219,8 +221,16 @@ public final class X509CertificateBuilderHelper {
         return this;
     }
 
+    /**
+     * @requires policies to be unset.
+     * @param policies new certificate policies to apply.
+     * @return the builder
+     */
     public X509CertificateBuilderHelper withPolicies(
             PolicyInformation... policies) {
+        if (this.policies != null) {
+            throw new IllegalStateException("Certificate policies can not be overridden once set.");
+        }
         this.policies = policies;
         return this;
     }
@@ -333,6 +343,10 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(issuerDN, "no issuerDN");
         Validate.notNull(subjectDN, "no subjectDN");
         Validate.notNull(serial, "no serial");
+        Validate.isTrue(
+                serial.compareTo(BigInteger.ZERO) > 0 && serial.compareTo(MAX_20_OCTETS) <= 0,
+                "serial number not in (0..MAX)"
+        );
         Validate.notNull(publicKey, "no publicKey");
         Validate.notNull(signingKeyPair, "no signingKeyPair");
         Validate.notNull(validityPeriod, "no validityPeriod");
@@ -378,6 +392,7 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void addPolicies(X509v3CertificateBuilder generator) throws CertIOException {
+        // DERSequence checks for null elements.
         generator.addExtension(Extension.certificatePolicies, true, new DERSequence(policies));
     }
 
