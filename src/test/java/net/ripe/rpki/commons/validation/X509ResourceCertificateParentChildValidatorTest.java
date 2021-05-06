@@ -60,7 +60,6 @@ import java.security.KeyPair;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.google.common.collect.Range.greaterThan;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
