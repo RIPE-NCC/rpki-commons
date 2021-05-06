@@ -60,8 +60,10 @@ import java.security.KeyPair;
 import java.util.EnumSet;
 import java.util.List;
 
+import static com.google.common.collect.Range.greaterThan;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -241,9 +243,8 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
     @Property
     public void validParentChildSubResources(List<@From(IpResourceGen.class) IpResource> parentResources, int childResourceCount) {
-        if (parentResources.isEmpty()) {
-            return;
-        }
+        assumeThat(parentResources.size(), greaterThan(0));
+        assumeThat(childResourceCount, greaterThan(0));
 
         final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
 
@@ -262,16 +263,14 @@ public class X509ResourceCertificateParentChildValidatorTest {
     public void validParentChildOverClaiming(List<@From(IpResourceGen.class) IpResource> parentResources,
                                              int childResourceCount,
                                              List<@From(IpResourceGen.class) IpResource> extraChildResources) {
-        assumeThat(parentResources.isEmpty(), is(false));
+        assumeThat(parentResources.size(), greaterThan(0));
 
         final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
         final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
 
         // some part of the parent resources become child
         parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
-        if (childResourceSet.isEmpty()) {
-            return;
-        }
+        assumeThat(childResourceSet.isEmpty(), is(false));
 
         ValidationResult result = validateParentChildPair(parentResourceSet, childResourceSet);
         if (extraChildResources.isEmpty()) {
