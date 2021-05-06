@@ -77,21 +77,18 @@ public class ResourceGenerator {
         return IpRange.range(new Ipv4Address(begin), new Ipv4Address(end));
     }
 
+    private static final BigInteger MAX_IPV6 = BigInteger.ONE.shiftLeft(128).subtract(BigInteger.ONE);
+
     /**
      * The same as for Ipv4 but the numbers are bigger.
      */
     static IpResource generateV6Prefix(SourceOfRandomness sourceOfRandomness) {
-        BigInteger maxIpv6 = new BigInteger(new byte[16]);
-        for (int i = 0; i < 128; i++) {
-            maxIpv6 = maxIpv6.setBit(i);
-        }
-
         final BigInteger base = sourceOfRandomness.nextBigInteger(128);
         final int prefixLength = sourceOfRandomness.nextInt(46, 128);
 
-        final BigInteger mask = maxIpv6.shiftLeft(128 - prefixLength);
+        final BigInteger mask = MAX_IPV6.shiftLeft(128 - prefixLength);
         final BigInteger begin = base.and(mask);
-        final BigInteger end   = base.or(mask.not()).and(maxIpv6);
+        final BigInteger end   = base.or(mask.not()).and(MAX_IPV6);
 
         return IpRange.range(new Ipv6Address(begin), new Ipv6Address(end));
     }
