@@ -78,6 +78,19 @@ import java.util.EnumSet;
  * Because we want to maintain the pattern where a specific Certificate builder
  * can be chained like: builder.withValidity(val).withSubjectDn(subject) etc...
  * dynamic typing would be required.. hence delegation.
+ *
+ * Even though RPKI is all about resource certificates, there is not resource-specific
+ * version of this builder helper as it is not so easy to make sure that resources are
+ * set in a compile-time guaranteed fashion. Resources can be set
+ *
+ *  - using withResources;
+ *  - using withInheritedResourceTypes.
+ *
+ * There are complicated relationships between these two ways of setting resources
+ * (@see X509CertificateBuilderHelper.validateResource)
+ * which results in an inevitable runtime check. Thus moving resource setting
+ * into a separate resource-specialised builder doesn't make sense.
+ *
  */
 public final class X509CertificateBuilderHelper {
 
