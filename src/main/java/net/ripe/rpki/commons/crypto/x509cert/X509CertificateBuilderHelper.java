@@ -86,7 +86,7 @@ import java.util.EnumSet;
  *  - using withResources;
  *  - using withInheritedResourceTypes.
  *
- * There is complicated relationships between these two ways of setting resources
+ * There are complicated relationships between these two ways of setting resources
  * (@see X509CertificateBuilderHelper.validateResource)
  * which results in a inevitable runtime check. Thus moving resource setting
  * into a separate resource-specialised builder doesn't make sense.
