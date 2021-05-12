@@ -33,12 +33,13 @@ package net.ripe.rpki.commons.ta.domain.request;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import org.joda.time.DateTimeUtils;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TrustAnchorRequest {
+public class TrustAnchorRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
