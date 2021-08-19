@@ -37,6 +37,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -64,6 +66,24 @@ public class BBNCertificateConformanceTest {
         // CRL Dist Pt has CRL Issuer 6487#4.8.6
         boolean hasFailure = parseCertificate("root/badCertCRLDPCrlIssuer.cer");
         assertTrue(hasFailure);
+    }
+
+    @Test
+    public void shouldRejectCertificateWithIncorrectKeyUsageBits() throws IOException {
+        // 127 KUsageExtra         # has disallowed key usage bit (nonRepudiation) 6487#4.8.4
+        // 217 KUsageDigitalSig    # has disallowed key usage bit (digitalSignature) 6487#4.8.4
+        // 128 KUsageNoCertSign    # lacks bit for signing certificates 6487#4.8.4
+        // 129 KUsageNoCrit        # key usage extension not critical 6487#4.8.4
+        // 131 KUsageNoCRLSign     # lacks bit for signing CRLs 6487#4.8.4
+        final List<String> testCaseNames = Arrays.asList("KUsageExtra", "KUsageDigitalSig", "KUsageNoCertSign", "KUsageNoCrit", "KUsageNoCRLSign");
+        testCaseNames.forEach(testCase -> {
+            final String fileName = String.format("root/badCert%s.cer", testCase);
+            try {
+                assertFalse("Should reject certificate with " + testCase, parseCertificate(fileName));
+            } catch (IOException e) {
+                assertTrue(false);
+            }
+        });
     }
 
     private boolean parseCertificate(String certificate) throws IOException {

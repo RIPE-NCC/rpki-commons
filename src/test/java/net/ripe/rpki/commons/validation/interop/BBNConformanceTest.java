@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.validation.interop;
 
 import com.google.common.io.Files;
+import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
@@ -68,6 +69,8 @@ public class BBNConformanceTest {
                     new ManifestCmsParser().parse(result, encoded);
                 } else if (file.getName().endsWith("roa")) {
                     new RoaCmsParser().parse(result, encoded);
+                } else if (file.getName().endsWith("gbr")) {
+                    new GhostbustersCmsParser().parse(result, encoded);
                 }
 
                 if (result.hasFailures() && file.getName().startsWith("good")) {
