@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import com.google.common.base.Joiner;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
@@ -49,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
@@ -67,12 +65,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     @Override
     public X509ResourceCertificate getCertificate() {
         if (!isSuccess()) {
-            final String failures = Joiner.on(", ").join(
-                    result.getFailuresForAllLocations().stream()
-                          .map(validationCheck -> validationCheck.toString())
-                          .collect(Collectors.toList())
-            );
-            throw new IllegalArgumentException(String.format("Resource Certificate validation failed: %s", failures));
+            throw new IllegalArgumentException(String.format("Resource Certificate validation failed: %s", result.getFailuresForAllLocations()));
         }
         return new X509ResourceCertificate(getX509Certificate());
     }
