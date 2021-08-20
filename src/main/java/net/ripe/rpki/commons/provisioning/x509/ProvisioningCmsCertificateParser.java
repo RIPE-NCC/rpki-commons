@@ -40,7 +40,7 @@ public class ProvisioningCmsCertificateParser extends X509CertificateParser<Prov
     @Override
     public ProvisioningCmsCertificate getCertificate() {
         if (!isSuccess()) {
-            throw new IllegalArgumentException("Provisioning CMS Certificate validation failed");
+            throw new IllegalArgumentException(String.format("Provisioning CMS Certificate validation failed: %s", result.getFailuresForAllLocations()));
         }
         return new ProvisioningCmsCertificate(getX509Certificate());
     }
