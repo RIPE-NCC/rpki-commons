@@ -69,6 +69,18 @@ public class BBNCertificateConformanceTest {
     }
 
     @Test
+    public void shouldRejectCertificateWithoutKeyUsageBit() throws  IOException {
+        // 179 NoKeyUsage          # no key usage extension 6487#4.8,4.8.4
+        assertTrue(parseCertificate("root/badCertNoKeyUsage.cer"));
+    }
+
+    @Test
+    public void shouldRejectCertificateWithTwoKeyUsageBits() throws  IOException {
+        // 180 2KeyUsage           # two key usage extensions 5280#4.2
+        assertTrue(parseCertificate("root/badCert2KeyUsage.cer"));
+    }
+
+    @Test
     public void shouldRejectCertificateWithIncorrectKeyUsageBits() throws IOException {
         // 127 KUsageExtra         # has disallowed key usage bit (nonRepudiation) 6487#4.8.4
         // 217 KUsageDigitalSig    # has disallowed key usage bit (digitalSignature) 6487#4.8.4
@@ -79,11 +91,19 @@ public class BBNCertificateConformanceTest {
         testCaseNames.forEach(testCase -> {
             final String fileName = String.format("root/badCert%s.cer", testCase);
             try {
-                assertFalse("Should reject certificate with " + testCase, parseCertificate(fileName));
+                assertTrue("Should reject certificate with " + testCase + " from " + fileName, parseCertificate(fileName));
             } catch (IOException e) {
                 assertTrue(false);
             }
         });
+    }
+
+    private boolean certificateHasWarningOrFailure(String certificate) throws IOException {
+        File file = new File(PATH_TO_BBN_OBJECTS, certificate);
+        byte[] encoded = Files.toByteArray(file);
+        ValidationResult result = ValidationResult.withLocation(file.getName());
+        new X509ResourceCertificateParser().parse(result, encoded);
+        return result.hasFailures() || result.hasWarnings();
     }
 
     private boolean parseCertificate(String certificate) throws IOException {
