@@ -29,15 +29,14 @@
  */
 package net.ripe.rpki.commons.xml;
 
+import net.ripe.rpki.commons.util.XML;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -55,15 +54,6 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
 
     protected DomXmlSerializer(String xmlns) {
         this.xmlns = xmlns;
-    }
-
-    protected DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
-        final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-        documentFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        documentFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        documentFactory.setNamespaceAware(true);
-        return documentFactory.newDocumentBuilder();
     }
 
     protected String getRequiredAttributeValue(final Element node, final String attr) {

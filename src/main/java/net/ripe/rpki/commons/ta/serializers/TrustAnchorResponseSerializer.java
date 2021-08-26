@@ -38,6 +38,7 @@ import net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.ta.domain.response.TrustAnchorResponse;
+import net.ripe.rpki.commons.util.XML;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.xml.DomXmlSerializer;
 import net.ripe.rpki.commons.xml.DomXmlSerializerException;
@@ -45,7 +46,6 @@ import net.ripe.rpki.commons.ta.domain.response.ErrorResponse;
 import net.ripe.rpki.commons.ta.domain.response.RevocationResponse;
 import net.ripe.rpki.commons.ta.domain.response.SigningResponse;
 import net.ripe.rpki.commons.ta.domain.response.TaResponse;
-import net.ripe.rpki.commons.ta.domain.response.TrustAnchorResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -108,7 +108,7 @@ public class TrustAnchorResponseSerializer extends DomXmlSerializer<TrustAnchorR
             return null;
         }
         try {
-            final Document doc = getDocumentBuilder().newDocument();
+            final Document doc = XML.newSecureDocumentBuilder().newDocument();
             final Element responseTrustAnchorResponseElement = addChild(doc, doc, TRUST_ANCHOR_RESPONSE);
 
             final Long creationTimestamp = trustAnchorResponse.getRequestCreationTimestamp();
@@ -195,7 +195,7 @@ public class TrustAnchorResponseSerializer extends DomXmlSerializer<TrustAnchorR
     @Override
     public TrustAnchorResponse deserialize(String xml) {
         try (final Reader characterStream = new StringReader(xml)) {
-            final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
+            final Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
 
             final Element taResponseElement = getElement(doc, TRUST_ANCHOR_RESPONSE)
                 .orElseThrow(() -> new DomXmlSerializerException(TRUST_ANCHOR_RESPONSE + " element not found"));
