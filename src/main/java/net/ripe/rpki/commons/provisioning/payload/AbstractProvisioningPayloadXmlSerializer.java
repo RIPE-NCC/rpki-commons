@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
 import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
 import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
+import net.ripe.rpki.commons.util.XML;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.xml.DomXmlSerializer;
 import net.ripe.rpki.commons.xml.DomXmlSerializerException;
@@ -98,7 +99,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     @Override
     public T deserialize(String xml) {
         try (final Reader characterStream = new StringReader(xml)) {
-            Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
+            Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
 
             Element message = getElement(doc, "message")
                     .orElseThrow(() -> new DomXmlSerializerException("message element not found"));
@@ -139,7 +140,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     @Override
     public String serialize(T payload) {
         try {
-            final Document document = getDocumentBuilder().newDocument();
+            final Document document = XML.newSecureDocumentBuilder().newDocument();
 
             final Element message = document.createElementNS(xmlns, "message");
             message.setAttribute("version", String.valueOf(payload.getVersion()));

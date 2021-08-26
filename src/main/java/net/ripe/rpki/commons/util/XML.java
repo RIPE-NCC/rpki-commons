@@ -27,44 +27,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.xml;
+package net.ripe.rpki.commons.util;
 
-import com.thoughtworks.xstream.XStream;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-public class AliasedTypePermissionTest {
-    private XStream xStream;
-    private AliasedTypePermission permission;
-
-    @Before
-    public void initialize() {
-        this.xStream = new XStream();
-        this.permission = new AliasedTypePermission(xStream);
-    }
+/**
+ * Utilities for working with XML.
+ */
+public class XML {
+    private XML() {}
 
     /**
-     * Initially rejected but accepted after being aliased.
+     * Create a new document builder that is not vulnerable to XML External Entity injection.
+     *
+     * @return newly configured DocumentBuilder
+     * @throws ParserConfigurationException when feature is not available.
      */
-    @Test
-    public void shouldAcceptAliasedTypes() {
-        Assert.assertFalse(this.permission.allows(SerializeMe.class));
+    public static DocumentBuilder newSecureDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // following internal documentation and https://rules.sonarsource.com/java/RSPEC-2755
+        // completely disable internal and external doctype declarations
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 
-        xStream.alias("serialize-me", SerializeMe.class);
+        factory.setNamespaceAware(true);
 
-        Assert.assertTrue(this.permission.allows(SerializeMe.class));
-    }
-
-    @Test
-    public void shouldAcceptAliasedPackageMembers() {
-        Assert.assertFalse(this.permission.allows(SerializeMe.class));
-
-        xStream.aliasPackage("rpki-commons", "net.ripe.rpki.commons");
-
-        Assert.assertTrue(this.permission.allows(SerializeMe.class));
-    }
-
-    private static class SerializeMe {
+        return factory.newDocumentBuilder();
     }
 }

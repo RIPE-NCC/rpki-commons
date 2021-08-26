@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.ta.serializers;
 
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
+import net.ripe.rpki.commons.util.XML;
 import net.ripe.rpki.commons.xml.DomXmlSerializer;
 import net.ripe.rpki.commons.xml.DomXmlSerializerException;
 import net.ripe.rpki.commons.ta.domain.request.ResourceCertificateRequestData;
@@ -90,7 +91,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
         }
 
         try {
-            final Document doc = getDocumentBuilder().newDocument();
+            final Document doc = XML.newSecureDocumentBuilder().newDocument();
             final Element requestsTrustAnchorRequestElement = addChild(doc, doc, REQUESTS_TRUST_ANCHOR_REQUEST);
 
             final URI taCertificatePublicationUri = trustAnchorRequest.getTaCertificatePublicationUri();
@@ -176,7 +177,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
     @Override
     public TrustAnchorRequest deserialize(final String xml) {
         try (final Reader characterStream = new StringReader(xml)) {
-            final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
+            final Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
 
             final Element taRequestElement = getElementWithPossibleLegacyName(doc, REQUESTS_TRUST_ANCHOR_REQUEST)
                     .orElseThrow(() -> new DomXmlSerializerException("requests.TrustAnchorRequest element not found"));

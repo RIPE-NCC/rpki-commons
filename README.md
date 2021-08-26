@@ -55,6 +55,15 @@ POM version to `1.0` and then builds and releases the artifacts.
 ## Changelog
 
 
+### 2021-08 version 1.23
+
+XStream 1.4.18
+
+### 2020-2021 version 1.17-1.22
+
+ Refactored the XML parsing to use manually constructed parsers for untrusted
+ documents. Only internal documents use XStream.
+
 ### 2020-10 version 1.16
 
 Upgrade XStream for security updates.

@@ -39,6 +39,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509CertificateObject;
 import net.ripe.rpki.commons.ta.domain.response.TaResponse;
 import net.ripe.rpki.commons.ta.domain.response.TrustAnchorResponse;
 import net.ripe.rpki.commons.ta.domain.response.SigningResponse;
+import net.ripe.rpki.commons.util.XML;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Before;
@@ -49,7 +50,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -83,7 +83,7 @@ public class TrustAnchorResponseSerializerTest {
         final TrustAnchorResponseSerializer trustAnchorResponseSerializer = new TrustAnchorResponseSerializer();
         response = trustAnchorResponseSerializer.deserialize(responseXML);
 
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        DocumentBuilder builder = XML.newSecureDocumentBuilder();
         document = builder.parse(new File(TA_RESPONSE_PATH));
     }
 
