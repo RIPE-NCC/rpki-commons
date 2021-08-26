@@ -34,14 +34,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AliasedTypePermissionTest {
+import java.util.ArrayList;
+
+public class AliasedNetRipeTypePermissionTest {
     private XStream xStream;
-    private AliasedTypePermission permission;
+    private AliasedNetRipeTypePermission permission;
 
     @Before
     public void initialize() {
         this.xStream = new XStream();
-        this.permission = new AliasedTypePermission(xStream);
+        this.permission = new AliasedNetRipeTypePermission(xStream);
     }
 
     /**
@@ -63,6 +65,17 @@ public class AliasedTypePermissionTest {
         xStream.aliasPackage("rpki-commons", "net.ripe.rpki.commons");
 
         Assert.assertTrue(this.permission.allows(SerializeMe.class));
+    }
+
+    /**
+     * Reject a non-ripe type. If a non-ripe type needs to be accepted because of an default alias exists for it,
+     * it should be allowed explicitly.
+     */
+    @Test
+    public void shoudldRejectNonRipeTypes() {
+        xStream.alias("non-ripe-type", ArrayList.class);
+
+        Assert.assertFalse(this.permission.allows(ArrayList.class));
     }
 
     private static class SerializeMe {

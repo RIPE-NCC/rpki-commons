@@ -53,6 +53,7 @@ public class RoaCmsConverterTest {
         subject = new RoaCmsConverter();
         xStream = new XStream();
         xStream.registerConverter(subject);
+        xStream.allowTypes(new Class[]{RoaCms.class});
     }
 
     @Test

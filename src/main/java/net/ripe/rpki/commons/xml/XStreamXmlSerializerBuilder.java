@@ -36,7 +36,6 @@ import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvide
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
-import com.thoughtworks.xstream.security.*;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -104,16 +103,15 @@ public class XStreamXmlSerializerBuilder<T> {
         }
 
         xStream.setMode(XStream.NO_REFERENCES);
-        // Setup the security framework for xStream (adds white-list of simple and default types)
-        XStream.setupDefaultSecurity(xStream);
+        // Since XStream 1.4.18 sets up the default allow-list implicitly there is no need to activate it.
 
         // Allow type this serializer is instantiated for as well as its descendant types
         xStream.allowTypes(new Class[]{ this.objectType });
         xStream.allowTypeHierarchy(this.objectType);
         // Not all registered types are part of this module.
-        // A wildcard could pull in classes that are not safe to deserialize -> allow types for which there
-        // exists an alias.
-        xStream.addPermission(new AliasedTypePermission(xStream));
+        // A wildcard could pull in classes that are not safe to deserialize -> allow types from net.ripe
+        // for which there exists an alias.
+        xStream.addPermission(new AliasedNetRipeTypePermission(xStream));
 
         registerIpResourceRelated();
         registerDateTimeRelated();
@@ -159,9 +157,15 @@ public class XStreamXmlSerializerBuilder<T> {
         withConverter(new X500PrincipalConverter());
         withAliasType("versionedId", VersionedId.class);
         withConverter(new VersionedIdConverter());
+
         withConverter(new X509ResourceCertificateConverter());
+        withAllowedType(X509ResourceCertificate.class);
+
         withConverter(new ManifestCmsConverter());
+        withAllowedType(ManifestCms.class);
+
         withConverter(new RoaCmsConverter());
+        withAllowedType(RoaCms.class);
     }
 
     public final XStreamXmlSerializerBuilder<T> withConverter(Converter converter) {
