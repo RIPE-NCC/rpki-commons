@@ -40,7 +40,7 @@ public class ProvisioningIdentityCertificateParser extends X509CertificateParser
     @Override
     public ProvisioningIdentityCertificate getCertificate() {
         if (!isSuccess()) {
-            throw new IllegalArgumentException("Identity Certificate validation failed");
+            throw new IllegalArgumentException(String.format("Identity Certificate validation failed: %s", result.getFailuresForAllLocations()));
         }
         return new ProvisioningIdentityCertificate(getX509Certificate());
     }

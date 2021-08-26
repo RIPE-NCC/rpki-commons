@@ -140,7 +140,7 @@ public class ChildIdentitySerializerTest {
                     "</ns0:child_request>" );
         });
 
-        assertEquals("Identity Certificate validation failed", exception.getMessage());
+        assertEquals("Identity Certificate validation failed: [ValidationCheck[key=cert.parsed,params={},status=ERROR]]", exception.getMessage());
     }
 
 }

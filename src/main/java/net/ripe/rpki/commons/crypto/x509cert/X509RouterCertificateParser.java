@@ -45,7 +45,7 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
     @Override
     public X509RouterCertificate getCertificate() {
         if (!isSuccess()) {
-            throw new IllegalArgumentException("Router certificate validation failed");
+            throw new IllegalArgumentException(String.format("Router certificate validation failed: %s", result.getFailuresForAllLocations()));
         }
         return new X509RouterCertificate(getX509Certificate());
     }
