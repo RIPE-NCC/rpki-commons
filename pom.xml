@@ -293,22 +293,6 @@
         </profile>
     </profiles>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-clover2-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <jdk>1.6</jdk>
-                    <licenseLocation>${clover2.licenseLocation}</licenseLocation>
-                    <generateXml>true</generateXml>
-                    <includesTestSourceRoots>false</includesTestSourceRoots>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-
     <build>
         <finalName>${project.artifactId}-${build.number}</finalName>
 
