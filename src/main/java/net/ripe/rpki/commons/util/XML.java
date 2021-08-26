@@ -48,6 +48,7 @@ public class XML {
      */
     public static DocumentBuilder newSecureDocumentBuilder() throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // following internal documentation and https://rules.sonarsource.com/java/RSPEC-2755
         // completely disable internal and external doctype declarations
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 
