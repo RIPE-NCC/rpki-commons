@@ -39,6 +39,7 @@ import net.ripe.rpki.commons.ta.domain.request.SigningRequest;
 import net.ripe.rpki.commons.ta.domain.request.TaRequest;
 import net.ripe.rpki.commons.ta.domain.request.TrustAnchorRequest;
 import net.ripe.rpki.commons.ta.serializers.TrustAnchorRequestSerializer;
+import net.ripe.rpki.commons.util.XML;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Before;
@@ -50,7 +51,6 @@ import org.xml.sax.SAXException;
 
 import javax.security.auth.x500.X500Principal;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -86,7 +86,7 @@ public class TrustAnchorRequestSerializerTest {
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         request = trustAnchorRequestSerializer.deserialize(stateXML);
 
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        DocumentBuilder builder = XML.newSecureDocumentBuilder();
         document = builder.parse(new File(TA_REQUEST_PATH));
     }
 

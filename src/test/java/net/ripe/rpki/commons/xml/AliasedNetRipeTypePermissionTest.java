@@ -30,27 +30,54 @@
 package net.ripe.rpki.commons.xml;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.TypePermission;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-/**
- * XStream TypePermission that accepts all types that have been aliased.
- */
-public class AliasedTypePermission implements TypePermission {
-    private final XStream xStream;
+import java.util.ArrayList;
 
-    public AliasedTypePermission(XStream xStream) {
-        this.xStream = xStream;
+public class AliasedNetRipeTypePermissionTest {
+    private XStream xStream;
+    private AliasedNetRipeTypePermission permission;
+
+    @Before
+    public void initialize() {
+        this.xStream = new XStream();
+        this.permission = new AliasedNetRipeTypePermission(xStream);
     }
 
     /**
-     * Allow types that have an alias by checking whether their serialized name differs from their
-     * fully qualified name.
-     *
-     * @param type type to check
-     * @return whether an alias has been applied to the type
+     * Initially rejected but accepted after being aliased.
      */
-    @Override
-    public boolean allows(Class type) {
-        return !type.getName().equals(xStream.getMapper().serializedClass(type));
+    @Test
+    public void shouldAcceptAliasedTypes() {
+        Assert.assertFalse(this.permission.allows(SerializeMe.class));
+
+        xStream.alias("serialize-me", SerializeMe.class);
+
+        Assert.assertTrue(this.permission.allows(SerializeMe.class));
+    }
+
+    @Test
+    public void shouldAcceptAliasedPackageMembers() {
+        Assert.assertFalse(this.permission.allows(SerializeMe.class));
+
+        xStream.aliasPackage("rpki-commons", "net.ripe.rpki.commons");
+
+        Assert.assertTrue(this.permission.allows(SerializeMe.class));
+    }
+
+    /**
+     * Reject a non-ripe type. If a non-ripe type needs to be accepted because of an default alias exists for it,
+     * it should be allowed explicitly.
+     */
+    @Test
+    public void shoudldRejectNonRipeTypes() {
+        xStream.alias("non-ripe-type", ArrayList.class);
+
+        Assert.assertFalse(this.permission.allows(ArrayList.class));
+    }
+
+    private static class SerializeMe {
     }
 }

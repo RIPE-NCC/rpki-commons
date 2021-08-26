@@ -31,6 +31,7 @@ package net.ripe.rpki.commons.provisioning.identity;
 
 
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
+import net.ripe.rpki.commons.util.XML;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -53,7 +54,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     @Override
     public ChildIdentity deserialize(String xml) {
         try (final StringReader characterStream = new StringReader(xml)) {
-            final Document doc = getDocumentBuilder().parse(new InputSource(characterStream));
+            final Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
 
             final Element root = getElement(doc, "child_request")
                     .orElseThrow(() -> new IdentitySerializerException("child_request element not found"));
@@ -78,7 +79,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     public String serialize(ChildIdentity childIdentity) {
 
         try {
-            final Document document = getDocumentBuilder().newDocument();
+            final Document document = XML.newSecureDocumentBuilder().newDocument();
 
             final Element childRequestElement = document.createElementNS(XMLNS, "child_request");
             childRequestElement.setAttribute("child_handle", childIdentity.getHandle());

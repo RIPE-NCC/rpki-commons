@@ -27,55 +27,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package net.ripe.rpki.commons.xml.converters;
+package net.ripe.rpki.commons.util;
 
-import com.thoughtworks.xstream.XStream;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
-import java.util.regex.Pattern;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-public class RoaCmsConverterTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    private XStream xStream;
-    private RoaCmsConverter subject;
 
-    private String expectedXmlRegEx =
-            "<net\\.ripe\\..*\\.RoaCms>\n" +
-                    "  <encoded>[^<]*</encoded>\n" +
-                    "</net\\.ripe\\..*\\.RoaCms>";
+public class XMLTest {
+    public final static String INTERNAL_ENTITY_TEST = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<!DOCTYPE foo [<!ENTITY toreplace \"3\"> ]>\n" +
+            "<stockCheck>\n" +
+            "    <productId>&toreplace;</productId>\n" +
+            "    <storeId>1</storeId>\n" +
+            "</stockCheck>";
+    public final static String EXTERNAL_ENTITY_TEST = "<!--?xml version=\"1.0\" ?-->\n" +
+            "<!DOCTYPE foo [<!ENTITY example SYSTEM \"/etc/passwd\"> ]>\n" +
+            "<data>&example;</data>";
 
-    @Before
-    public void setUp() {
-        subject = new RoaCmsConverter();
-        xStream = new XStream();
-        xStream.registerConverter(subject);
-        xStream.allowTypes(new Class[]{RoaCms.class});
+    private static InputStream inputStreamFrom(String s) {
+        return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
-    public void shouldSupportResourceCertificate() {
-        Assert.assertTrue(subject.canConvert(RoaCms.class));
+    public void doesNotResolveInternalEntities() throws ParserConfigurationException, IOException, SAXException {
+        assertThrows(SAXParseException.class, () -> XML.newSecureDocumentBuilder().parse(inputStreamFrom(INTERNAL_ENTITY_TEST)));
     }
 
     @Test
-    public void shouldOnlyUseEncodedWhenSerializingRoa() {
-        RoaCms roa = RoaCmsTest.getRoaCms();
-        String xml = xStream.toXML(roa);
-        Assert.assertTrue(Pattern.matches(expectedXmlRegEx, xml));
+    public void doesNotResolveExternalEntities() {
+        assertThrows(SAXParseException.class, () -> XML.newSecureDocumentBuilder().parse(inputStreamFrom(EXTERNAL_ENTITY_TEST)));
     }
-
-    @Test
-    public void shouldDoRoundTripSerializeAndDesirializeRoa() {
-        RoaCms roa = RoaCmsTest.getRoaCms();
-        String xml = xStream.toXML(roa);
-
-        RoaCms processedRoa = (RoaCms) xStream.fromXML(xml);
-
-        Assert.assertEquals(roa, processedRoa);
-    }
-
 }
