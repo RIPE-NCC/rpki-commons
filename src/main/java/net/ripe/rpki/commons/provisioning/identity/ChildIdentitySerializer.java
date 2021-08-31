@@ -54,7 +54,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     @Override
     public ChildIdentity deserialize(String xml) {
         try (final StringReader characterStream = new StringReader(xml)) {
-            final Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
+            final Document doc = XML.newNamespaceAwareDocumentBuilder().parse(new InputSource(characterStream));
 
             final Element root = getElement(doc, "child_request")
                     .orElseThrow(() -> new IdentitySerializerException("child_request element not found"));
@@ -79,7 +79,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     public String serialize(ChildIdentity childIdentity) {
 
         try {
-            final Document document = XML.newSecureDocumentBuilder().newDocument();
+            final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
 
             final Element childRequestElement = document.createElementNS(XMLNS, "child_request");
             childRequestElement.setAttribute("child_handle", childIdentity.getHandle());

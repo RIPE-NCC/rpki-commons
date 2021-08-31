@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.util;
 
 import org.junit.Test;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -40,8 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 
 
 public class XMLTest {
@@ -61,11 +59,21 @@ public class XMLTest {
 
     @Test
     public void doesNotResolveInternalEntities() throws ParserConfigurationException, IOException, SAXException {
-        assertThrows(SAXParseException.class, () -> XML.newSecureDocumentBuilder().parse(inputStreamFrom(INTERNAL_ENTITY_TEST)));
+        assertThrows(SAXParseException.class, () -> XML.newNamespaceAwareDocumentBuilder().parse(inputStreamFrom(INTERNAL_ENTITY_TEST)));
     }
 
     @Test
     public void doesNotResolveExternalEntities() {
-        assertThrows(SAXParseException.class, () -> XML.newSecureDocumentBuilder().parse(inputStreamFrom(EXTERNAL_ENTITY_TEST)));
+        assertThrows(SAXParseException.class, () -> XML.newNamespaceAwareDocumentBuilder().parse(inputStreamFrom(EXTERNAL_ENTITY_TEST)));
+    }
+
+    @Test
+    public void isNamespaceAware() throws ParserConfigurationException {
+        assertTrue(XML.newNamespaceAwareDocumentBuilder().isNamespaceAware());
+    }
+
+    @Test
+    public void isNotNamespaceAware() throws ParserConfigurationException {
+        assertFalse(XML.newNonNamespaceAwareDocumentBuilder().isNamespaceAware());
     }
 }

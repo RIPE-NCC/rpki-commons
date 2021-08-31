@@ -38,7 +38,6 @@ import net.ripe.rpki.commons.ta.domain.request.RevocationRequest;
 import net.ripe.rpki.commons.ta.domain.request.SigningRequest;
 import net.ripe.rpki.commons.ta.domain.request.TaRequest;
 import net.ripe.rpki.commons.ta.domain.request.TrustAnchorRequest;
-import net.ripe.rpki.commons.ta.serializers.TrustAnchorRequestSerializer;
 import net.ripe.rpki.commons.util.XML;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Base64;
@@ -86,7 +85,7 @@ public class TrustAnchorRequestSerializerTest {
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         request = trustAnchorRequestSerializer.deserialize(stateXML);
 
-        DocumentBuilder builder = XML.newSecureDocumentBuilder();
+        DocumentBuilder builder = XML.newNamespaceAwareDocumentBuilder();
         document = builder.parse(new File(TA_REQUEST_PATH));
     }
 

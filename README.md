@@ -54,6 +54,9 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
+### 2021-08-31 version 1.24
+
+Add factory for non-namespace aware XML builder to prevent code duplication.
 
 ### 2021-08 version 1.23
 
