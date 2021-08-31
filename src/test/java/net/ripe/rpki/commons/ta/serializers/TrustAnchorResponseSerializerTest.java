@@ -83,7 +83,7 @@ public class TrustAnchorResponseSerializerTest {
         final TrustAnchorResponseSerializer trustAnchorResponseSerializer = new TrustAnchorResponseSerializer();
         response = trustAnchorResponseSerializer.deserialize(responseXML);
 
-        DocumentBuilder builder = XML.newSecureDocumentBuilder();
+        DocumentBuilder builder = XML.newNamespaceAwareDocumentBuilder();
         document = builder.parse(new File(TA_RESPONSE_PATH));
     }
 

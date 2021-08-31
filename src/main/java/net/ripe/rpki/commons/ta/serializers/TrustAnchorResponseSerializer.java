@@ -108,7 +108,7 @@ public class TrustAnchorResponseSerializer extends DomXmlSerializer<TrustAnchorR
             return null;
         }
         try {
-            final Document doc = XML.newSecureDocumentBuilder().newDocument();
+            final Document doc = XML.newNamespaceAwareDocumentBuilder().newDocument();
             final Element responseTrustAnchorResponseElement = addChild(doc, doc, TRUST_ANCHOR_RESPONSE);
 
             final Long creationTimestamp = trustAnchorResponse.getRequestCreationTimestamp();
@@ -195,7 +195,7 @@ public class TrustAnchorResponseSerializer extends DomXmlSerializer<TrustAnchorR
     @Override
     public TrustAnchorResponse deserialize(String xml) {
         try (final Reader characterStream = new StringReader(xml)) {
-            final Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
+            final Document doc = XML.newNamespaceAwareDocumentBuilder().parse(new InputSource(characterStream));
 
             final Element taResponseElement = getElement(doc, TRUST_ANCHOR_RESPONSE)
                 .orElseThrow(() -> new DomXmlSerializerException(TRUST_ANCHOR_RESPONSE + " element not found"));

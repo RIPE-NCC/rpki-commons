@@ -99,7 +99,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     @Override
     public T deserialize(String xml) {
         try (final Reader characterStream = new StringReader(xml)) {
-            Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
+            Document doc = XML.newNamespaceAwareDocumentBuilder().parse(new InputSource(characterStream));
 
             Element message = getElement(doc, "message")
                     .orElseThrow(() -> new DomXmlSerializerException("message element not found"));
@@ -140,7 +140,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     @Override
     public String serialize(T payload) {
         try {
-            final Document document = XML.newSecureDocumentBuilder().newDocument();
+            final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
 
             final Element message = document.createElementNS(xmlns, "message");
             message.setAttribute("version", String.valueOf(payload.getVersion()));

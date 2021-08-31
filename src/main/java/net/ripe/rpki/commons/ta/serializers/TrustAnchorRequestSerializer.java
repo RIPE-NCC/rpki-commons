@@ -91,7 +91,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
         }
 
         try {
-            final Document doc = XML.newSecureDocumentBuilder().newDocument();
+            final Document doc = XML.newNamespaceAwareDocumentBuilder().newDocument();
             final Element requestsTrustAnchorRequestElement = addChild(doc, doc, REQUESTS_TRUST_ANCHOR_REQUEST);
 
             final URI taCertificatePublicationUri = trustAnchorRequest.getTaCertificatePublicationUri();
@@ -177,7 +177,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
     @Override
     public TrustAnchorRequest deserialize(final String xml) {
         try (final Reader characterStream = new StringReader(xml)) {
-            final Document doc = XML.newSecureDocumentBuilder().parse(new InputSource(characterStream));
+            final Document doc = XML.newNamespaceAwareDocumentBuilder().parse(new InputSource(characterStream));
 
             final Element taRequestElement = getElementWithPossibleLegacyName(doc, REQUESTS_TRUST_ANCHOR_REQUEST)
                     .orElseThrow(() -> new DomXmlSerializerException("requests.TrustAnchorRequest element not found"));
