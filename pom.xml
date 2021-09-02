@@ -20,7 +20,7 @@
     <licenses>
         <license>
             <name>The BSD License</name>
-            <url>https://raw.github.com/RIPE-NCC/rpki-commons/master/LICENSE.txt</url>
+            <url>https://raw.github.com/RIPE-NCC/rpki-commons/main/LICENSE.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
