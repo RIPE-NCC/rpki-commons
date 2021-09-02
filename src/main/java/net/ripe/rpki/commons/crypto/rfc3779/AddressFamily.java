@@ -36,6 +36,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DEROctetString;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * See {@link http://www.ietf.org/rfc/rfc3779.txt},
@@ -106,7 +107,7 @@ public class AddressFamily extends EqualsSupport implements Comparable<AddressFa
         if (rc != 0) {
             return rc;
         }
-        if (this.getSubsequentAddressFamilyIdentifier() == that.getSubsequentAddressFamilyIdentifier()) {
+        if (Objects.equals(this.getSubsequentAddressFamilyIdentifier(), that.getSubsequentAddressFamilyIdentifier())) {
             return 0;
         } else if (this.getSubsequentAddressFamilyIdentifier() == null) {
             return -1;
