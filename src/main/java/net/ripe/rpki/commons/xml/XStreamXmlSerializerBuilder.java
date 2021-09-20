@@ -36,6 +36,9 @@ import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvide
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.security.NullPermission;
+import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -103,11 +106,17 @@ public class XStreamXmlSerializerBuilder<T> {
         }
 
         xStream.setMode(XStream.NO_REFERENCES);
+
         // Since XStream 1.4.18 sets up the default allow-list implicitly there is no need to activate it.
 
+        // Prohibit all types and then only add the necessary ones
+        xStream.addPermission(NoTypePermission.NONE);
+        xStream.addPermission(NullPermission.NULL);
+        xStream.addPermission(PrimitiveTypePermission.PRIMITIVES);
+
         // Allow type this serializer is instantiated for as well as its descendant types
-        xStream.allowTypes(new Class[]{ this.objectType });
         xStream.allowTypeHierarchy(this.objectType);
+        xStream.allowTypes(new Class[]{ this.objectType });
         // Not all registered types are part of this module.
         // A wildcard could pull in classes that are not safe to deserialize -> allow types from net.ripe
         // for which there exists an alias.
