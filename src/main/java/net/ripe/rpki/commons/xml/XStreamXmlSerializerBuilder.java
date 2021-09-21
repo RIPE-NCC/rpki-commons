@@ -107,10 +107,10 @@ public class XStreamXmlSerializerBuilder<T> {
 
         xStream.setMode(XStream.NO_REFERENCES);
 
-        // Since XStream 1.4.18 sets up the default allow-list implicitly there is no need to activate it.
-
-        // Prohibit all types and then only add the necessary ones
+        // Prohibit deserialisation of all types
         xStream.addPermission(NoTypePermission.NONE);
+
+        // And only add the necessary ones
         xStream.addPermission(NullPermission.NULL);
         xStream.addPermission(PrimitiveTypePermission.PRIMITIVES);
 
