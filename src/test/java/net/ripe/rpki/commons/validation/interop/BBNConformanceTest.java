@@ -30,6 +30,7 @@
 package net.ripe.rpki.commons.validation.interop;
 
 import com.google.common.io.Files;
+import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
@@ -43,6 +44,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+
+import static org.junit.Assert.assertTrue;
 
 public class BBNConformanceTest {
 
@@ -62,7 +65,9 @@ public class BBNConformanceTest {
             ValidationResult result = ValidationResult.withLocation(file.getName());
 
             try {
-                CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, result);
+                final CertificateRepositoryObject res = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, result);
+                // Check that invariant that "parsing errors or result" holds.
+                assertTrue(result.hasFailures() || res != null);
 
                 if (result.hasFailures() && file.getName().startsWith("good")) {
                     System.err.println("Supposed to be good: " + file.getName());
