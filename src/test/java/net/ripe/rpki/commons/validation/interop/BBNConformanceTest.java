@@ -34,6 +34,7 @@ import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
@@ -61,17 +62,7 @@ public class BBNConformanceTest {
             ValidationResult result = ValidationResult.withLocation(file.getName());
 
             try {
-                if (file.getName().endsWith("cer")) {
-                    new X509ResourceCertificateParser().parse(result, encoded);
-                } else if (file.getName().endsWith("crl")) {
-                    X509Crl.parseDerEncoded(encoded, result);
-                } else if (file.getName().endsWith("mft")) {
-                    new ManifestCmsParser().parse(result, encoded);
-                } else if (file.getName().endsWith("roa")) {
-                    new RoaCmsParser().parse(result, encoded);
-                } else if (file.getName().endsWith("gbr")) {
-                    new GhostbustersCmsParser().parse(result, encoded);
-                }
+                CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, result);
 
                 if (result.hasFailures() && file.getName().startsWith("good")) {
                     System.err.println("Supposed to be good: " + file.getName());
