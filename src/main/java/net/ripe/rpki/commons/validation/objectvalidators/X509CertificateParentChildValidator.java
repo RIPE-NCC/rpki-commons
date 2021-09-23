@@ -29,27 +29,26 @@
  */
 package net.ripe.rpki.commons.validation.objectvalidators;
 
+import com.google.common.primitives.Booleans;
+import net.ripe.rpki.commons.crypto.JavaSecurityConstants;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
 import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.bouncycastle.asn1.x509.Extension;
 import org.joda.time.DateTime;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.util.Arrays;
 
+import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
 public abstract class X509CertificateParentChildValidator<T extends AbstractX509CertificateWrapper> {
-
-    // http://www.ietf.org/rfc/rfc2459.txt
-    private static final int DIG_SIGN_INDEX = 0;
-    private static final int KEYCERTSIGN_INDEX = 5;
-    private static final int CRLSIGN_INDEX = 6;
 
     private T parent;
 
@@ -130,17 +129,30 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
         result.rejectIfFalse(parent.getSubject().equals(child.getIssuer()), PREV_SUBJECT_EQ_ISSUER);
     }
 
+    /**
+     * https://datatracker.ietf.org/doc/html/rfc6487#section-4.8.4
+     *
+     * KeyUsage validation added as warning to be similar to current checks.
+     */
     protected void verifyKeyUsage() {
         boolean[] keyUsage = child.getCertificate().getKeyUsage();
         if (!result.warnIfNull(keyUsage, KEY_USAGE_EXT_PRESENT)) {
             return;
         }
 
+        if (!result.rejectIfFalse(child.getCertificate().getCriticalExtensionOIDs().contains(Extension.keyUsage.getId()), KEY_USAGE_EXT_CRITICAL)) {
+            return;
+        }
+
         if (child.isCa()) {
-            result.warnIfFalse(keyUsage[KEYCERTSIGN_INDEX], KEY_CERT_SIGN);
-            result.warnIfFalse(keyUsage[CRLSIGN_INDEX], CRL_SIGN);
+            if (result.warnIfFalse(Booleans.countTrue(keyUsage) == 2, KEY_USAGE_INVALID)) {
+                result.warnIfFalse(keyUsage[KEYCERTSIGN_INDEX], KEY_CERT_SIGN);
+                result.warnIfFalse(keyUsage[CRLSIGN_INDEX], CRL_SIGN);
+            }
         } else {
-            result.warnIfFalse(keyUsage[DIG_SIGN_INDEX], DIG_SIGN);
+            if (result.warnIfFalse(Booleans.countTrue(keyUsage) == 1, KEY_USAGE_INVALID)) {
+                result.warnIfFalse(keyUsage[DIG_SIGN_INDEX], DIG_SIGN);
+            }
         }
     }
 

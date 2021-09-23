@@ -42,6 +42,7 @@ import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -123,6 +124,7 @@ public class RoaCmsTest {
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(keyPair.getPublic());
         builder.withSigningKeyPair(keyPair);
+        builder.withKeyUsage(KeyUsage.digitalSignature);
         final DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
         builder.withResources(resources);

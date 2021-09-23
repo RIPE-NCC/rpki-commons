@@ -187,8 +187,19 @@ public class X509ResourceCertificateParentChildValidatorTest {
     }
 
     @Test
-    public void shouldWarnOnInvalidKeyUsage() {
+    public void shouldWarnOnInvalidKeyUsage_wrong_number() {
         child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
+
+        X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
+        validate(validator, child);
+
+        assertFalse(result.hasFailures());
+        assertEquals(result.getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_USAGE_INVALID), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_USAGE_INVALID));
+    }
+
+    @Test
+    public void shouldWarnOnInvalidKeyUsage_missing_required_value() {
+        child = createChildCertificateBuilder().withKeyUsage(KeyUsage.digitalSignature | KeyUsage.nonRepudiation).build();
 
         X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
         validate(validator, child);
