@@ -72,7 +72,7 @@ snapshot:deploy:
       fi
     - mvn $MAVEN_CLI_OPTS package gpg:sign deploy -s ci_settings.xml
   only:
-    - master
+    - main
 
 release:deploy:
   stage: deploy

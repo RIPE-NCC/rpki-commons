@@ -1,11 +1,15 @@
 #
 # based on https://github.com/actions/setup-java
 #
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         # test against latest update of each major Java version, as well as specific updates of LTS versions:
@@ -13,6 +17,13 @@ jobs:
     name: Java ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Cache maven artifacts
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
+
       - name: Setup java
         uses: actions/setup-java@v1
         with:
