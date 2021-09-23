@@ -158,6 +158,7 @@ public class ManifestCms extends RpkiSignedObject {
         return getCertificate().getParentCertificateUri();
     }
 
+    @Override
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
         result.setLocation(new ValidationLocation(location));
         checkManifestValidityTimes(options, result);

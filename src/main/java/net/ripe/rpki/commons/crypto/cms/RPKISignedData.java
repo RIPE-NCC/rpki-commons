@@ -277,6 +277,7 @@ public class RPKISignedData
     /**
      * Produce an object suitable for an ASN1OutputStream.
      */
+    @Override
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector  v = new ASN1EncodableVector();

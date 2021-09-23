@@ -69,9 +69,10 @@ public class RemoteCertificateFetcher {
     private CertificateRepositoryObject getRemoteObject(String sourcePath) {
         String tempDestinationPath = ConfigurationUtil.getTempDirectory() + "/rsync-tmp-" + UUID.randomUUID();
         File tempDestinationFile = new File(tempDestinationPath);
+        boolean dirCreated = false;
         try {
             if (!tempDestinationFile.exists()) {
-                tempDestinationFile.getParentFile().mkdir();
+                dirCreated = tempDestinationFile.getParentFile().mkdir();
             }
             rsync.reset();
             rsync.setSource(sourcePath);
@@ -90,6 +91,9 @@ public class RemoteCertificateFetcher {
         } finally {
             if (tempDestinationFile.exists()) {
                 tempDestinationFile.delete();
+            }
+            if (dirCreated) {
+                tempDestinationFile.getParentFile().delete();
             }
         }
     }

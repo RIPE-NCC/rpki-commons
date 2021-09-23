@@ -468,7 +468,6 @@ public class ManifestCmsTest {
     private X509CrlBuilder getRootCrlBuilder() {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(X509ResourceCertificateTest.TEST_SELF_SIGNED_CERTIFICATE_NAME);
-        final DateTime now = UTC.dateTime();
         builder.withThisUpdateTime(NEXT_UPDATE_TIME.minusHours(24));
         builder.withNextUpdateTime(NEXT_UPDATE_TIME.plusHours(24));
         builder.withNumber(BigInteger.TEN);
