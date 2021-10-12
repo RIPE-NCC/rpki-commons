@@ -4,7 +4,13 @@ import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang3.ArrayUtils;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -94,6 +100,24 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         return "EC".equals(publicKey.getAlgorithm()) && publicKey instanceof ECPublicKey;
     }
 
+    void validateEcSecp256r1Pk() {
+        final byte[] enc = certificate.getPublicKey().getEncoded();
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(enc));
+        final AlgorithmIdentifier algorithm = subjectPublicKeyInfo.getAlgorithm();
+        final ASN1ObjectIdentifier algorithmOid = algorithm.getAlgorithm();
+
+        // https://datatracker.ietf.org/doc/html/rfc8208#section-3.1
+        // o  algorithm (an AlgorithmIdentifier type): The id-ecPublicKey OID
+        // MUST be used in the algorithm field, as specified in Section 2.1.1
+        // of [RFC5480].
+        if(result.rejectIfFalse(X9ObjectIdentifiers.id_ecPublicKey.equals(algorithmOid), PUBLIC_KEY_CERT_ALGORITHM, algorithmOid.getId())){
+            // The value for the associated parameters MUST be
+            // secp256r1, as specified in Section 2.1.1.1 of [RFC5480].
+            ASN1ObjectIdentifier curveOid = (ASN1ObjectIdentifier) algorithm.getParameters();
+            result.rejectIfFalse(SECObjectIdentifiers.secp256r1.equals(curveOid), PUBLIC_KEY_CERT_ALGORITHM, curveOid.getId());
+        }
+    }
+
     void validateEcPk() {
         final PublicKey publicKey = certificate.getPublicKey();
         result.rejectIfFalse(isEcPk(publicKey), PUBLIC_KEY_CERT_ALGORITHM, publicKey.getAlgorithm());
@@ -160,10 +184,14 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         return certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
     }
 
+    /**
+     * BGP sec Extended Key Usage extension is present and MUST NOT [rfc6547] be marked as critical.
+     * @return whether BgpSec extension is present and non-critical.
+     */
     protected boolean isBgpSecExtensionPresent() {
         try {
             final List<String> extendedKeyUsage = certificate.getExtendedKeyUsage();
-            return extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+            return extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId()) && !certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
         } catch (CertificateParsingException e) {
             return false;
         }
