@@ -55,7 +55,7 @@ public class RequestNotPerformedResponsePayloadSerializer extends AbstractProvis
             final int errorCode = Integer.parseInt(statusElement.getTextContent().trim());
             return new RequestNotPerformedResponsePayload(NotPerformedError.getError(errorCode), description);
         } catch (NumberFormatException e) {
-            throw new DomXmlSerializerException("Illegal status code");
+            throw new DomXmlSerializerException("Illegal status code", e);
         }
     }
 
