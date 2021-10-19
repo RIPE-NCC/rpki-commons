@@ -48,6 +48,7 @@ import net.ripe.rpki.commons.provisioning.payload.revocation.request.Certificate
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
 import net.ripe.rpki.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBuilderParserTest;
 import net.ripe.rpki.commons.util.UTC;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -89,6 +90,8 @@ public class ProvisioningObjectMother {
 
         builder.withSubjectDN(new X500Principal("CN=zz.subject")).withIssuerDN(new X500Principal("CN=zz.issuer"));
         builder.withSerial(BigInteger.ONE);
+        builder.withCa(true);
+        builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = new DateTime(2011, 3, 1, 0, 0, 0, 0, DateTimeZone.UTC);
@@ -96,7 +99,8 @@ public class ProvisioningObjectMother {
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(RPKI_CA_CERT_REQUEST_CA_CRL_URI);
         builder.withSubjectInformationAccess(
-                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, RPKI_CA_CERT_REQUEST_CA_REPO_URI.resolve("subject.cer"))
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, RPKI_CA_CERT_REQUEST_CA_REPO_URI),
+                new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST, RPKI_CA_CERT_REQUEST_CA_MFT_URI)
         );
         return builder.build();
     }
