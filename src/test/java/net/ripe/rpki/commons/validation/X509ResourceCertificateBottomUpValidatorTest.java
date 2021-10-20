@@ -189,8 +189,19 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     }
 
     @Test
-    public void testShouldWarnOnInvalidKeyUsage() {
+    public void testShouldWarnOnInvalidKeyUsage_wrong_number() {
         child = createChildBuilder().withKeyUsage(KeyUsage.digitalSignature).build();
+
+        X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
+        validator.validate("child", child);
+        assertFalse(validator.getValidationResult().hasFailures());
+
+        assertEquals(validator.getValidationResult().getResult(CHILD_VALIDATION_LOCATION, ValidationString.KEY_USAGE_INVALID), new ValidationCheck(ValidationStatus.WARNING, ValidationString.KEY_USAGE_INVALID));
+    }
+
+    @Test
+    public void testShouldWarnOnInvalidKeyUsage_wrong_bit() {
+        child = createChildBuilder().withKeyUsage(KeyUsage.digitalSignature | KeyUsage.decipherOnly).build();
 
         X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
         validator.validate("child", child);

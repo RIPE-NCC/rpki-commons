@@ -30,9 +30,12 @@
 package net.ripe.rpki.commons.validation.interop;
 
 import com.google.common.io.Files;
+import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
@@ -41,6 +44,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+
+import static org.junit.Assert.assertTrue;
 
 public class BBNConformanceTest {
 
@@ -60,15 +65,9 @@ public class BBNConformanceTest {
             ValidationResult result = ValidationResult.withLocation(file.getName());
 
             try {
-                if (file.getName().endsWith("cer")) {
-                    new X509ResourceCertificateParser().parse(result, encoded);
-                } else if (file.getName().endsWith("crl")) {
-                    X509Crl.parseDerEncoded(encoded, result);
-                } else if (file.getName().endsWith("mft")) {
-                    new ManifestCmsParser().parse(result, encoded);
-                } else if (file.getName().endsWith("roa")) {
-                    new RoaCmsParser().parse(result, encoded);
-                }
+                final CertificateRepositoryObject res = CertificateRepositoryObjectFactory.createCertificateRepositoryObject(encoded, result);
+                // Check that invariant that "parsing errors or result" holds.
+                assertTrue(result.hasFailures() || res != null);
 
                 if (result.hasFailures() && file.getName().startsWith("good")) {
                     System.err.println("Supposed to be good: " + file.getName());

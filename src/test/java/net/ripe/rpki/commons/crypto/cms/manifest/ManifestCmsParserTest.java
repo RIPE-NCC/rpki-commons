@@ -37,6 +37,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDes
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import org.bouncycastle.asn1.BERTags;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -128,7 +129,7 @@ public class ManifestCmsParserTest {
 
     static X509ResourceCertificate createValidManifestEECertificate(KeyPair keyPair) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        builder.withCa(false).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
+        builder.withCa(false).withKeyUsage(KeyUsage.digitalSignature).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(keyPair.getPublic());
         builder.withSigningKeyPair(keyPair);
         builder.withResources(new IpResourceSet());
@@ -142,7 +143,7 @@ public class ManifestCmsParserTest {
 
     static X509ResourceCertificate createValidManifestEECertificate() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        builder.withCa(false).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
+        builder.withCa(false).withKeyUsage(KeyUsage.digitalSignature).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         builder.withResources(new IpResourceSet());
@@ -156,7 +157,7 @@ public class ManifestCmsParserTest {
 
     static X509ResourceCertificate createTenSlashEightResourceCertificate() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        builder.withCa(false).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
+        builder.withCa(false).withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         builder.withResources(IpResourceSet.parse("10.0.0.0/8"));

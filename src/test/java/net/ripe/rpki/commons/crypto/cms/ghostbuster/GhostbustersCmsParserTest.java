@@ -36,7 +36,6 @@ import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDes
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.util.UTC;
-import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
@@ -50,8 +49,9 @@ import java.net.URI;
 import java.security.KeyPair;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-import static net.ripe.rpki.commons.validation.ValidationString.*;
-import static org.junit.Assert.*;
+import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GhostbustersCmsParserTest {
 
@@ -89,8 +89,8 @@ public class GhostbustersCmsParserTest {
         ValidationResult validationResult = validatePayload("");
 
         assertTrue(validationResult.hasFailures());
-        ValidationCheck check = validationResult.getFailuresForCurrentLocation().iterator().next();
-        assertEquals(GHOSTBUSTERS_RECORD_SINGLE_VCARD, check.getKey());
+        assertTrue(validationResult.getFailuresForCurrentLocation().stream()
+            .anyMatch(c -> GHOSTBUSTERS_RECORD_SINGLE_VCARD.equals(c.getKey())));
     }
 
     @Test
@@ -99,8 +99,8 @@ public class GhostbustersCmsParserTest {
             "END:VCARD\n");
 
         assertTrue(validationResult.hasFailures());
-        ValidationCheck check = validationResult.getFailuresForCurrentLocation().iterator().next();
-        assertEquals(GHOSTBUSTERS_RECORD_SINGLE_VCARD, check.getKey());
+        assertTrue(validationResult.getFailuresForCurrentLocation().stream()
+            .anyMatch(c -> GHOSTBUSTERS_RECORD_SINGLE_VCARD.equals(c.getKey())));
     }
 
     private ValidationResult validatePayload(String vCardPayload) {

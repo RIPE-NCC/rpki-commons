@@ -29,6 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.primitives.Booleans;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.*;
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
@@ -73,6 +75,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     @Override
     protected void doTypeSpecificValidation() {
         validateIssuerAndSubjectDN();
+        validateKeyUsage();
         validateCertificatePolicy();
         validateResourceExtensions();
         validateCrlDistributionPoints();
@@ -84,6 +87,33 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
         getValidationResult().rejectIfFalse(isValidName(issuer), CERT_ISSUER_CORRECT, certificate.getIssuerX500Principal().toString());
         X500Name subject = X500Name.getInstance(certificate.getSubjectX500Principal().getEncoded());
         getValidationResult().rejectIfFalse(isValidName(subject), CERT_SUBJECT_CORRECT, certificate.getSubjectX500Principal().toString());
+    }
+
+    /**
+     * https://datatracker.ietf.org/doc/html/rfc6487#section-4.8.4
+     *
+     * KeyUsage validation added as warning to be similar to current checks.
+     */
+    protected void validateKeyUsage() {
+        final boolean[] keyUsage = certificate.getKeyUsage();
+        if (!result.rejectIfNull(keyUsage, KEY_USAGE_EXT_PRESENT)) {
+            return;
+        }
+
+        if (!result.rejectIfFalse(certificate.getCriticalExtensionOIDs().contains(Extension.keyUsage.getId()), KEY_USAGE_EXT_CRITICAL)) {
+            return;
+        }
+
+        if (X509CertificateUtil.isCa(certificate)) {
+            if (result.rejectIfFalse(Booleans.countTrue(keyUsage) == 2, KEY_USAGE_INVALID)) {
+                result.rejectIfFalse(keyUsage[KEYCERTSIGN_INDEX], KEY_CERT_SIGN);
+                result.rejectIfFalse(keyUsage[CRLSIGN_INDEX], CRL_SIGN);
+            }
+        } else {
+            if (result.rejectIfFalse(Booleans.countTrue(keyUsage) == 1, KEY_USAGE_INVALID)) {
+                result.rejectIfFalse(keyUsage[DIG_SIGN_INDEX], DIG_SIGN);
+            }
+        }
     }
 
     private boolean isValidName(X500Name principal) {
