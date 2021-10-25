@@ -235,7 +235,7 @@ public class XStreamXmlSerializerBuilder<T> {
         return xStream;
     }
 
-    private final class MyXStream extends XStream {
+    private final static class MyXStream extends XStream {
 
         private MyXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
             super(new SunUnsafeReflectionProvider(), hierarchicalStreamDriver);

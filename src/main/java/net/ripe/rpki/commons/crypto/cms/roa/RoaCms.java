@@ -86,6 +86,7 @@ public class RoaCms extends RpkiSignedObject implements Roa {
         return parser.getRoaCms();
     }
 
+    @Override
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
         X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
         validator.validate(location, getCertificate());

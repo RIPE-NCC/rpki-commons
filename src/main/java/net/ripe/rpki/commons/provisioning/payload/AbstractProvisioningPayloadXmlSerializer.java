@@ -105,7 +105,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
                     .orElseThrow(() -> new DomXmlSerializerException("message element not found"));
 
             String versionString = getRequiredAttributeValue(message, "version");
-            Integer version;
+            int version;
             try {
                 version = Integer.parseUnsignedInt(versionString);
             } catch (NumberFormatException e) {
@@ -118,13 +118,13 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
             String sender = getRequiredAttributeValue(message, "sender");
             String recipient = getRequiredAttributeValue(message, "recipient");
             String typeString = getRequiredAttributeValue(message, "type");
-            PayloadMessageType type;
+            PayloadMessageType deserialisedType;
             try {
-                type = PayloadMessageType.valueOf(typeString);
+                deserialisedType = PayloadMessageType.valueOf(typeString);
             } catch (IllegalArgumentException e) {
                 throw new DomXmlSerializerException("type is not supported: " + typeString, e);
             }
-            if (type != this.type) {
+            if (deserialisedType != this.type) {
                 throw new DomXmlSerializerException(String.format("type attribute is not '%s'", this.type.toString()));
             }
 

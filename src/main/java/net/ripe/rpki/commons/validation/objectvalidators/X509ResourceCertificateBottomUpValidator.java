@@ -118,7 +118,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     private void buildCertificationList() {
         certificates.add(0, new CertificateWithLocation(this.certificate, this.location));
         result.setLocation(this.location);
-        if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.valueOf(MAX_CHAIN_LENGTH).toString())) {
+        if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.toString(MAX_CHAIN_LENGTH))) {
             return;
         }
 
@@ -141,7 +141,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
             cert = parser.getCertificate();
             certificates.add(0, new CertificateWithLocation(cert, parentLocation));
-            if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.valueOf(MAX_CHAIN_LENGTH).toString())) {
+            if (!result.rejectIfFalse(certificates.size() <= MAX_CHAIN_LENGTH, CERT_CHAIN_LENGTH, Integer.toString(MAX_CHAIN_LENGTH))) {
                 return;
             }
         }
@@ -157,12 +157,12 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     }
 
     private void checkTrustAnchor() {
-        if ((trustAnchors != null) && (trustAnchors.size() > 0)) {
+        if ((trustAnchors != null) && (!trustAnchors.isEmpty())) {
             result.rejectIfFalse(trustAnchors.contains(certificates.get(0).getCertificate()), ROOT_IS_TA);
         }
     }
 
-    private class CertificateWithLocation {
+    private static class CertificateWithLocation {
 
         private final X509ResourceCertificate certificate;
         private final ValidationLocation location;

@@ -35,14 +35,15 @@ public final class Specifications {
     }
 
     public static <T> Specification<T> alwaysTrue() {
-        return new AlwaysTrueSpecification<T>();
+        return new AlwaysTrueSpecification<>();
     }
 
     public static <T> Specification<T> alwaysFalse() {
-        return new AlwaysFalseSpecification<T>();
+        return new AlwaysFalseSpecification<>();
     }
 
     private static final class AlwaysFalseSpecification<T> implements Specification<T> {
+        @Override
         public boolean isSatisfiedBy(T candidate) {
             return false;
         }
@@ -59,6 +60,7 @@ public final class Specifications {
     }
 
     private static final class AlwaysTrueSpecification<T> implements Specification<T> {
+        @Override
         public boolean isSatisfiedBy(T candidate) {
             return true;
         }
@@ -73,5 +75,4 @@ public final class Specifications {
             return (this == obj) || (obj instanceof AlwaysTrueSpecification);
         }
     }
-
 }

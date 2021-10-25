@@ -48,11 +48,11 @@ import java.util.stream.Collectors;
  * </code>
  */
 public class ResourceClassListResponsePayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<ResourceClassListResponsePayload> {
-
     public ResourceClassListResponsePayloadSerializer() {
         super(PayloadMessageType.list_response);
     }
 
+    @Override
     protected ResourceClassListResponsePayload parseXmlPayload(Element message) {
         List<ResourceClassListResponseClassElement> classes = getChildElements(message, "class")
                 .stream()

@@ -46,6 +46,7 @@ public class CertificateRevocationRequestPayloadSerializer extends AbstractProvi
         super(PayloadMessageType.revoke);
     }
 
+    @Override
     protected CertificateRevocationRequestPayload parseXmlPayload(Element message) {
         Element requestElement = getSingleChildElement(message, "key");
         String className = getRequiredAttributeValue(requestElement, "class_name");

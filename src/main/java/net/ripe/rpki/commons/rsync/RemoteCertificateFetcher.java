@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+@Deprecated
 public class RemoteCertificateFetcher {
 
     private Rsync rsync;
@@ -67,11 +68,13 @@ public class RemoteCertificateFetcher {
     }
 
     private CertificateRepositoryObject getRemoteObject(String sourcePath) {
+        // ConfigurationUtil does not return the system temp directory but another one
         String tempDestinationPath = ConfigurationUtil.getTempDirectory() + "/rsync-tmp-" + UUID.randomUUID();
         File tempDestinationFile = new File(tempDestinationPath);
+        boolean dirCreated = false;
         try {
             if (!tempDestinationFile.exists()) {
-                tempDestinationFile.getParentFile().mkdir();
+                dirCreated = tempDestinationFile.getParentFile().mkdir();
             }
             rsync.reset();
             rsync.setSource(sourcePath);
@@ -90,6 +93,9 @@ public class RemoteCertificateFetcher {
         } finally {
             if (tempDestinationFile.exists()) {
                 tempDestinationFile.delete();
+            }
+            if (dirCreated) {
+                tempDestinationFile.getParentFile().delete();
             }
         }
     }

@@ -37,8 +37,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -49,10 +47,16 @@ public class RequestNotPerformedResponsePayloadSerializer extends AbstractProvis
         super(PayloadMessageType.error_response);
     }
 
+    @Override
     protected RequestNotPerformedResponsePayload parseXmlPayload(Element messageElement) {
         Element statusElement = getSingleChildElement(messageElement, "status");
         String description = getChildElements(messageElement, "description").stream().findFirst().map(Element::getTextContent).orElse(null);
-        return new RequestNotPerformedResponsePayload(NotPerformedError.getError(Integer.parseInt(statusElement.getTextContent().trim())), description);
+        try {
+            final int errorCode = Integer.parseInt(statusElement.getTextContent().trim());
+            return new RequestNotPerformedResponsePayload(NotPerformedError.getError(errorCode), description);
+        } catch (NumberFormatException e) {
+            throw new DomXmlSerializerException("Illegal status code", e);
+        }
     }
 
     @Override

@@ -55,14 +55,9 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.EnumSet;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -361,7 +356,7 @@ public class X509ResourceCertificateTest {
                 .withResources(TEST_RESOURCE_SET)
                 .withCrlDistributionPoints(TEST_TA_CRL)
                 .build();
-        BigInteger serialNumber = BigInteger.valueOf(new Random(UTC.dateTime().getMillis()).nextLong());
+        BigInteger serialNumber = BigInteger.valueOf(new SecureRandom().nextLong());
 
         X509ResourceCertificate subject = createBasicBuilder()
                 .withResources(TEST_RESOURCE_SET)

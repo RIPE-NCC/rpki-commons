@@ -120,8 +120,6 @@ public final class X509CertificateUtil {
      * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
      *
      * @throws X509CertificateOperationException
-     *
-     * @throws IOException
      */
     public static String getEncodedSubjectPublicKeyInfo(X509Certificate certificate) {
 

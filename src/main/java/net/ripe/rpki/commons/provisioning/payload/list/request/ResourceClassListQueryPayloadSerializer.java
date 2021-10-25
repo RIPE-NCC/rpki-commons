@@ -50,6 +50,7 @@ public class ResourceClassListQueryPayloadSerializer extends AbstractProvisionin
         super(PayloadMessageType.list);
     }
 
+    @Override
     protected ResourceClassListQueryPayload parseXmlPayload(Element message) {
         return new ResourceClassListQueryPayload();
     }

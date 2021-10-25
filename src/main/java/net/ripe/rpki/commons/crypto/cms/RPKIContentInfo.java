@@ -121,11 +121,13 @@ public class RPKIContentInfo
         this.content = content;
     }
 
+    @Override
     public ASN1ObjectIdentifier getContentType()
     {
         return contentType;
     }
 
+    @Override
     public ASN1Encodable getContent()
     {
         return content;
@@ -134,6 +136,7 @@ public class RPKIContentInfo
     /**
      * Produce an object suitable for an ASN1OutputStream.
      */
+    @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector v = new ASN1EncodableVector();
 

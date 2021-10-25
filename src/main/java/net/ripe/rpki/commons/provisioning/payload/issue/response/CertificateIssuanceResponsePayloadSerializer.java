@@ -47,6 +47,7 @@ public class CertificateIssuanceResponsePayloadSerializer extends AbstractProvis
         super(PayloadMessageType.issue_response);
     }
 
+    @Override
     protected CertificateIssuanceResponsePayload parseXmlPayload(Element messageElement) throws IOException {
         Element classElement = getSingleChildElement(messageElement, "class");
         // Ensure only a single certificate element is present

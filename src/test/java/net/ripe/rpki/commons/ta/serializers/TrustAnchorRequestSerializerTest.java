@@ -101,7 +101,7 @@ public class TrustAnchorRequestSerializerTest {
     }
 
     @Test
-    public void shouldReadBasicFields() throws XPathExpressionException {
+    public void shouldReadBasicFields() throws XPathExpressionException, NumberFormatException {
         assertEquals(Long.valueOf(xpathQuery("/requests.TrustAnchorRequest/creationTimestamp")), request.getCreationTimestamp());
         assertEquals(URI.create(xpathQuery("/requests.TrustAnchorRequest/taCertificatePublicationUri")), request.getTaCertificatePublicationUri());
     }
@@ -184,7 +184,7 @@ public class TrustAnchorRequestSerializerTest {
     @Test
     public void itShouldDeserializeSigningRequestCreationTimestamp() {
         final TrustAnchorRequest taRequest = new TrustAnchorRequestSerializer().deserialize(signingRequest);
-        assertEquals(Long.parseLong("1558700883582"), taRequest.getCreationTimestamp().longValue());
+        assertEquals(1558700883582L, taRequest.getCreationTimestamp().longValue());
     }
 
     @Test
@@ -246,7 +246,7 @@ public class TrustAnchorRequestSerializerTest {
     @Test
     public void itShouldDeserializeRevocationRequestCreationTimestamp() {
         final TrustAnchorRequest taRequest = new TrustAnchorRequestSerializer().deserialize(revocationRequest);
-        assertEquals(Long.parseLong("1610359575105"), taRequest.getCreationTimestamp().longValue());
+        assertEquals(1610359575105L, taRequest.getCreationTimestamp().longValue());
     }
 
     @Test

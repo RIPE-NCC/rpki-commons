@@ -106,14 +106,20 @@ public class VersionedId implements Serializable {
         StringTokenizer tokenizer = new StringTokenizer(s, ":");
         int count = tokenizer.countTokens();
         Validate.isTrue(count == 1 || count == 2, "invalid number of tokens in versioned id");
-        long id = Long.parseLong(tokenizer.nextToken());
-        long version;
-        if (tokenizer.hasMoreTokens()) {
-            version = Long.parseLong(tokenizer.nextToken());
-        } else {
-            version = 0;
+
+
+        try {
+            long id = Long.parseLong(tokenizer.nextToken());
+            long version;
+            if (tokenizer.hasMoreTokens()) {
+                    version = Long.parseLong(tokenizer.nextToken());
+            } else {
+                version = 0;
+            }
+            return new VersionedId(id, version);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("versioned id can not be parsed from " + s);
         }
-        return new VersionedId(id, version);
     }
 
 }

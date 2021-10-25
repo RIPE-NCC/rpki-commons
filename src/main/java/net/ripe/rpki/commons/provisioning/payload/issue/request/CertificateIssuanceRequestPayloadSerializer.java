@@ -48,6 +48,7 @@ public class CertificateIssuanceRequestPayloadSerializer extends AbstractProvisi
         super(PayloadMessageType.issue);
     }
 
+    @Override
     protected CertificateIssuanceRequestPayload parseXmlPayload(Element message) throws IOException {
         Element requestElement = getSingleChildElement(message, "request");
         CertificateIssuanceRequestElement request = new CertificateIssuanceRequestElement();

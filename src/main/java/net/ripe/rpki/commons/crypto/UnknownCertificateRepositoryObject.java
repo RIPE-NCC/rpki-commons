@@ -49,6 +49,7 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
         this.encoded = encoded;
     }
 
+    @Override
     public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         result.warn(VALIDATOR_REPO_EXECUTION, "This object type is not supported for " + location);
     }
@@ -73,14 +74,17 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
         return false;
     }
 
+    @Override
     public URI getCrlUri() {
         throw new UnsupportedOperationException("Unknown object type");
     }
 
+    @Override
     public URI getParentCertificateUri() {
         throw new UnsupportedOperationException("Unknown object type");
     }
 
+    @Override
     public byte[] getEncoded() {
         return encoded;
     }
