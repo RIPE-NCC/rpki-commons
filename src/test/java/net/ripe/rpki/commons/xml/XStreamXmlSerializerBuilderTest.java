@@ -51,6 +51,7 @@ import org.junit.Test;
 import javax.security.auth.x500.X500Principal;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.SortedSet;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
@@ -249,6 +250,8 @@ public class XStreamXmlSerializerBuilderTest {
     public void shouldAllowArrayOfExplicitlyAllowedType() {
         XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
         builder.withAllowedType(SerializeMe.class);
+        builder.withAllowedType(SerializeMe[].class);
+        builder.withAllowedType(OtherSerializeMe.class);
         XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
 
         final OtherSerializeMe input = new OtherSerializeMe(new SerializeMe[]{
@@ -326,9 +329,11 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test(expected = ConversionException.class)
     public void shouldNotPopCalculatorApp() {
-        XStreamXmlSerializer<SerializeMe> builder = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT).build();
+        XStreamXmlSerializer<SerializeMe> serializer = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT)
+            .withAllowedTypeHierarchy(SortedSet.class)
+            .build();
         // Exploit example from https://www.baeldung.com/java-xstream-remote-code-execution
-        builder.deserialize(
+        serializer.deserialize(
            "<sorted-set>\n" +
                 "    <string>foo</string>\n" +
                 "    <dynamic-proxy>\n" +
