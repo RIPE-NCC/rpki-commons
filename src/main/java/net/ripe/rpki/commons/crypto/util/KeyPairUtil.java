@@ -31,13 +31,11 @@ package net.ripe.rpki.commons.crypto.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.bouncycastle.util.encoders.Base64Encoder;
-import org.bouncycastle.util.encoders.HexEncoder;
+import org.bouncycastle.util.encoders.Hex;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.Base64;
 
 public final class KeyPairUtil {
 
@@ -47,8 +45,8 @@ public final class KeyPairUtil {
 
     /**
      * Get Base64 encoded public key as string. Primarily for generating
-     * filenames and transferring public keys across the wire.. Not fit for
-     * decoding: strips the trailing '=' characters!
+     * filenames and transferring public keys across the wire. Strips the trailing
+     * '=' characters, which some decoders may not like!
      */
     public static String getEncodedKeyIdentifier(PublicKey key) {
         String encoded = base64UrlEncode(getKeyIdentifier(key));
@@ -65,15 +63,7 @@ public final class KeyPairUtil {
     }
 
     static String hexEncodeHashData(byte[] keyHashData) {
-        HexEncoder hexEncoder = new HexEncoder();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            hexEncoder.encode(keyHashData, 0, keyHashData.length, out);
-            out.flush();
-            return out.toString();
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Exception hex encoding data", e);
-        }
+        return Hex.toHexString(keyHashData);
     }
 
     public static byte[] getKeyIdentifier(PublicKey key) {
@@ -85,27 +75,7 @@ public final class KeyPairUtil {
     }
 
     public static String base64UrlEncode(byte[] data) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            new FileSystemSafeBase64UrlEncoder().encode(data, 0, data.length, out);
-            out.flush();
-            return out.toString();
-        } catch (IOException e) {
-            throw new IllegalArgumentException(
-                    "Exception when base64url encoding data", e);
-        }
+        return Base64.getUrlEncoder().encodeToString(data);
     }
 
-    /**
-     * @see <a href="http://tools.ietf.org/html/rfc4648#section-5">Base 64
-     *      Encoding with URL and Filename Safe Alphabet</a>
-     */
-    public static class FileSystemSafeBase64UrlEncoder extends Base64Encoder {
-
-        public FileSystemSafeBase64UrlEncoder() {
-            encodingTable[encodingTable.length - 2] = (byte) '-';
-            encodingTable[encodingTable.length - 1] = (byte) '_';
-            initialiseDecodingTable();
-        }
-    }
 }
