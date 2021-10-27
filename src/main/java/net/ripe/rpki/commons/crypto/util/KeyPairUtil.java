@@ -56,7 +56,7 @@ public final class KeyPairUtil {
     /**
      * Get ASCII Hex encoded hash of the public key; for use in certificate
      * subjects as described here:
-     * http://tools.ietf.org/html/draft-ietf-sidr-res-certs-21#section-8
+     * https://datatracker.ietf.org/doc/html/rfc6487#section-8
      */
     public static String getAsciiHexEncodedPublicKeyHash(PublicKey publicKey) {
         return hexEncodeHashData(getKeyIdentifier(publicKey));
