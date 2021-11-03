@@ -186,7 +186,9 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     protected boolean isBgpSecExtensionPresent() {
         try {
             final List<String> extendedKeyUsage = certificate.getExtendedKeyUsage();
-            return extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId()) && !certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+            return extendedKeyUsage != null
+                    && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId())
+                    && !certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
         } catch (CertificateParsingException e) {
             return false;
         }
