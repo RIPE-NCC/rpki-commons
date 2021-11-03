@@ -118,11 +118,6 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         }
     }
 
-    void validateEcPk() {
-        final PublicKey publicKey = certificate.getPublicKey();
-        result.rejectIfFalse(isEcPk(publicKey), PUBLIC_KEY_CERT_ALGORITHM, publicKey.getAlgorithm());
-    }
-
     protected void doTypeSpecificValidation() {
     }
 
