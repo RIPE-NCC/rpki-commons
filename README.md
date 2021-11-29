@@ -7,8 +7,9 @@ License
 Copyright (c) 2010-2021 RIPE NCC
 All rights reserved.
 
-This software is licensed under the terms of the BSD 3-Clause License. If a copy
-of the license was not distributed to you, you can obtain one at
+This software, including all its separate source codes, is licensed under the
+terms of the BSD 3-Clause License. If a copy of the license was not distributed
+to you, you can obtain one at
 https://github.com/RIPE-NCC/rpki-commons/blob/main/LICENSE.txt.
 
 Description
