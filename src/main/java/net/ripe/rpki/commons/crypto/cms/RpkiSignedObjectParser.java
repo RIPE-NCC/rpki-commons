@@ -36,11 +36,6 @@ import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class RpkiSignedObjectParser {
-
-    // binary-signing-time is not yet in BC CMSAttributes; define it here until
-    // https://github.com/bcgit/bc-java/pull/932 is merged.
-    public static final ASN1ObjectIdentifier BINARY_SIGNING_TIME_OID = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.2.46");
-
     private static final int CMS_OBJECT_VERSION = 3;
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
 
@@ -250,10 +245,10 @@ public abstract class RpkiSignedObjectParser {
         ASN1ObjectIdentifier attributeOID = signedAttribute.getAttrType();
 
         //Check if the attribute is any of the allowed ones.
-        return BINARY_SIGNING_TIME_OID.equals(attributeOID)
+        return CMSAttributes.binarySigningTime.equals(attributeOID)
                 || CMSAttributes.signingTime.equals(attributeOID)
                 || CMSAttributes.contentType.equals(attributeOID)
-                        || CMSAttributes.messageDigest.equals(attributeOID);
+                || CMSAttributes.messageDigest.equals(attributeOID);
     }
 
     private boolean verifyOptionalSignedAttributes(SignerInformation signer) {
@@ -325,7 +320,7 @@ public abstract class RpkiSignedObjectParser {
      */
     private boolean extractSigningTime(SignerInformation signer) {
         ImmutablePair<DateTime, Boolean> signingTime = extractTime(CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer);
-        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(BINARY_SIGNING_TIME_OID, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer);
+        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(CMSAttributes.binarySigningTime, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer);
         boolean valid = signingTime.right && binarySigningTime.right;
 
         if (signingTime.left != null && binarySigningTime.left != null) {
