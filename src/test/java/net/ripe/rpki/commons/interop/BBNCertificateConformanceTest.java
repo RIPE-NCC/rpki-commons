@@ -3,8 +3,10 @@ package net.ripe.rpki.commons.interop;
 import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +19,7 @@ public class BBNCertificateConformanceTest {
 
     private static final String PATH_TO_BBN_OBJECTS = "src/test/resources/conformance/";
 
-    @Ignore("Early ripe ncc ta certificates have crldp set")
+    @Disabled("Early ripe ncc ta certificates have crldp set")
     @Test
     public void shouldRejectSelfSignedCertificateWithCRLDP() throws IOException {
         // CRLDP is present in the trust anchor 6487#4.8.6
@@ -51,22 +53,18 @@ public class BBNCertificateConformanceTest {
         assertTrue(parseCertificate("root/badCert2KeyUsage.cer"));
     }
 
-    @Test
-    public void shouldRejectCertificateWithIncorrectKeyUsageBits() throws IOException {
-        // 127 KUsageExtra         # has disallowed key usage bit (nonRepudiation) 6487#4.8.4
-        // 217 KUsageDigitalSig    # has disallowed key usage bit (digitalSignature) 6487#4.8.4
-        // 128 KUsageNoCertSign    # lacks bit for signing certificates 6487#4.8.4
-        // 129 KUsageNoCrit        # key usage extension not critical 6487#4.8.4
-        // 131 KUsageNoCRLSign     # lacks bit for signing CRLs 6487#4.8.4
-        final List<String> testCaseNames = Arrays.asList("KUsageExtra", "KUsageDigitalSig", "KUsageNoCertSign", "KUsageNoCrit", "KUsageNoCRLSign");
-        testCaseNames.forEach(testCase -> {
-            final String fileName = String.format("root/badCert%s.cer", testCase);
-            try {
-                assertTrue("Should reject certificate with " + testCase + " from " + fileName, parseCertificate(fileName));
-            } catch (IOException e) {
-                assertTrue(false);
-            }
-        });
+    @CsvSource({
+            "127, KUsageExtra,          has disallowed key usage bit (nonRepudiation) 6487#4.8.4",
+            "217, KUsageDigitalSig,     has disallowed key usage bit (digitalSignature) 6487#4.8.4",
+            "128, KUsageNoCertSign,     lacks bit for signing certificates 6487#4.8.4",
+            "129, KUsageNoCrit,         key usage extension not critical 6487#4.8.4",
+            "131, KUsageNoCRLSign,      lacks bit for signing CRLs 6487#4.8.4"
+    })
+    @ParameterizedTest(name = "{displayName} - {0} {1} {2}")
+    public void shouldRejectCertificateWithIncorrectKeyUsageBits(String testCasenumber, String testCaseFile, String testCaseDescription) throws IOException {
+        final String fileName = String.format("root/badCert%s.cer", testCaseFile);
+
+        assertTrue("Should reject certificate with " + testCaseDescription + " from " + fileName, parseCertificate(fileName));
     }
 
     private boolean certificateHasWarningOrFailure(String certificate) throws IOException {

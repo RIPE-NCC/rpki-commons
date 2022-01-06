@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.Time;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cms.*;
@@ -110,6 +111,8 @@ public abstract class RpkiSignedObjectParser {
         parseContent(sp);
         parseCmsCertificate(sp);
 
+        //https://datatracker.ietf.org/doc/html/rfc6488#section-3
+        verifyContentType();
         verifyVersion(sp);
         verifyCrl(sp);
 
@@ -131,6 +134,21 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
     }
+
+    /**
+     * https://datatracker.ietf.org/doc/html/rfc6488#section-2
+     */
+    private void verifyContentType() {
+        // CMSSignedDataParser does not check that the contentType of the ContentInfo is id-signeddata.
+        // and does not allow you to access it => use the CMS Signed Data implementation that is in BC.
+        try {
+            final CMSSignedData signedData = new CMSSignedData(encoded);
+            validationResult.rejectIfFalse(CMSObjectIdentifiers.signedData.equals(signedData.toASN1Structure().getContentType()), CMS_CONTENT_TYPE);
+        } catch (CMSException e) {
+            validationResult.error(CMS_DATA_PARSING);
+        }
+    }
+
 
     /**
      * https://tools.ietf.org/html/rfc6488#section-2.1.1
@@ -276,6 +294,7 @@ public abstract class RpkiSignedObjectParser {
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
         verifySignerVersion(signer);
+
         validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
         validationResult.rejectIfFalse(ALLOWED_SIGNATURE_ALGORITHM_OIDS.contains(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
