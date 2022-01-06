@@ -61,28 +61,6 @@ public class RPKIContentInfo
         return getInstance(ASN1Sequence.getInstance(obj, explicit));
     }
 
-    /**
-     * @deprecated use getInstance()
-     */
-    @Deprecated
-    public RPKIContentInfo(ASN1Sequence seq) {
-        super(seq);
-        if (seq.size() < 1 || seq.size() > 2) {
-            throw new IllegalArgumentException("Bad sequence size: " + seq.size());
-        }
-
-        contentType = (ASN1ObjectIdentifier) seq.getObjectAt(0);
-
-        if (seq.size() > 1) {
-            ASN1TaggedObject tagged = (ASN1TaggedObject) seq.getObjectAt(1);
-            if (!tagged.isExplicit() || tagged.getTagNo() != 0) {
-                throw new IllegalArgumentException("Bad tag for 'content'");
-            }
-
-            content = tagged.getObject();
-        }
-    }
-
     public RPKIContentInfo(
         ASN1ObjectIdentifier contentType,
         ASN1Encodable        content)

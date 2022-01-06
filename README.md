@@ -66,6 +66,7 @@ POM version to `1.0` and then builds and releases the artifacts.
   * Check KeyUsage bits in resource certificates
   * Added multiple BBN compliance test certificates as unit-tests
   * Simplified Base64 encoding
+  * Use and support bouncy castle 1.70
 
 ### 2021-08-31 version 1.24,1.25
 
