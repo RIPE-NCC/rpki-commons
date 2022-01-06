@@ -4,7 +4,7 @@ RPKI - Commons
 License
 -------
 
-Copyright (c) 2010-2021 RIPE NCC
+Copyright (c) 2010-2022 RIPE NCC
 All rights reserved.
 
 This software, including all its separate source codes, is licensed under the
@@ -59,7 +59,15 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
-### 2021-08-31 version 1.24
+### 2022-xx-xx version 1.26
+
+  * LICENSE is now in README and repository and not explicitly part of each file.
+  * Copyright year updated to 2022
+  * Check KeyUsage bits in resource certificates
+  * Added multiple BBN compliance test certificates as unit-tests
+  * Simplified Base64 encoding
+
+### 2021-08-31 version 1.24,1.25
 
 Add factory for non-namespace aware XML builder to prevent code duplication.
 
