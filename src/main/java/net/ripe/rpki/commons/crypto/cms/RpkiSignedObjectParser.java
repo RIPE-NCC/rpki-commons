@@ -32,7 +32,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
@@ -364,14 +363,24 @@ public abstract class RpkiSignedObjectParser {
 
     private ImmutablePair<DateTime, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer, Function<ASN1Encodable, DateTime> timeExtractor) {
         // Do not use AttributeSet, this would deduplicate.
-        ASN1EncodableVector attrValues = signer.getSignedAttributes().getAll(identifier);
-        if (attrValues.size() == 0) {
+        ASN1EncodableVector signingTimeAttributes = signer.getSignedAttributes().getAll(identifier);
+        if (signingTimeAttributes.size() == 0) {
             return ImmutablePair.of(null, true);
         }
-        if (!validationResult.rejectIfFalse(attrValues.size() == 1, onlyOneValidationKey)) {
+
+        // https://datatracker.ietf.org/doc/html/rfc6019#section-3
+        // The SignedAttributes MUST NOT include multiple instances of [either type of time attribute]
+        if (!validationResult.rejectIfFalse(signingTimeAttributes.size() == 1, onlyOneValidationKey)) {
             return ImmutablePair.of(null, false);
         }
-        return ImmutablePair.of(timeExtractor.apply(attrValues.get(0)), true);
+
+        final ASN1Encodable[] signingTimeValues = Attribute.getInstance(signingTimeAttributes.get(0)).getAttributeValues();
+        // Both signingTime and binarySigningTime require <i>exactly</i> one value in the ASN.1 - e.g. not a set.
+        if (!validationResult.rejectIfFalse(signingTimeValues.length == 1, SIGNING_TIME_ATTR_ONE_VALUE)) {
+            return ImmutablePair.of(null, false);
+        }
+
+        return ImmutablePair.of(timeExtractor.apply(signingTimeValues[0]), true);
     }
 
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
