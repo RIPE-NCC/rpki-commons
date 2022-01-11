@@ -19,6 +19,7 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
 import org.joda.time.DateTime;
+import org.joda.time.Instant;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,8 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
@@ -338,8 +341,15 @@ public abstract class RpkiSignedObjectParser {
      * they MUST provide the same date and time."
      */
     private boolean extractSigningTime(SignerInformation signer) {
-        ImmutablePair<DateTime, Boolean> signingTime = extractTime(CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer);
-        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(CMSAttributes.binarySigningTime, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer);
+        ImmutablePair<DateTime, Boolean> signingTime = extractTime(
+                CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer,
+                attrValue -> UTC.dateTime(Time.getInstance(attrValue).getDate().getTime())
+                );
+        // Bouncy castle does not support https://datatracker.ietf.org/doc/html/rfc6019 binary signing time
+        // parsing, which is the number of seconds since the unix epoch.
+        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(
+                CMSAttributes.binarySigningTime, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer,
+                attrValue -> UTC.dateTime(Instant.ofEpochSecond(ASN1Integer.getInstance(attrValue).getValue().longValueExact())));
         boolean valid = signingTime.right && binarySigningTime.right;
 
         if (signingTime.left != null && binarySigningTime.left != null) {
@@ -352,23 +362,23 @@ public abstract class RpkiSignedObjectParser {
         return valid;
     }
 
-    private ImmutablePair<DateTime, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer) {
-        Attribute attr = signer.getSignedAttributes().get(identifier);
-        if (attr == null) {
+    private ImmutablePair<DateTime, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer, Function<ASN1Encodable, DateTime> timeExtractor) {
+        // Do not use AttributeSet, this would deduplicate.
+        ASN1EncodableVector attrValues = signer.getSignedAttributes().getAll(identifier);
+        if (attrValues.size() == 0) {
             return ImmutablePair.of(null, true);
         }
-        if (!validationResult.rejectIfFalse(attr.getAttrValues().size() == 1, onlyOneValidationKey)) {
+        if (!validationResult.rejectIfFalse(attrValues.size() == 1, onlyOneValidationKey)) {
             return ImmutablePair.of(null, false);
         }
-        DateTime value = UTC.dateTime(Time.getInstance(attr.getAttrValues().getObjectAt(0)).getDate().getTime());
-        return ImmutablePair.of(value, true);
+        return ImmutablePair.of(timeExtractor.apply(attrValues.get(0)), true);
     }
 
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
         String errorMessage = null;
         try {
             /*
-                         * Use the public key for the "verifier" not the certificate, because otherwise
+             * Use the public key for the "verifier" not the certificate, because otherwise
              * BC will reject the CMS if the signingTime is outside of the EE certificate validity
              * time. This happens occasionally and is no ground to reject according to standards:
              * http://tools.ietf.org/html/rfc6488#section-2.1.6.4.3
