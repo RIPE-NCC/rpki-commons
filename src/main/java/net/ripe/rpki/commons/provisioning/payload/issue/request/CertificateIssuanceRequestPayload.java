@@ -29,13 +29,17 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
 /**
  * See: http://tools.ietf.org/html/rfc6492#section-3.4.1
  */
-public class CertificateIssuanceRequestPayload extends AbstractProvisioningQueryPayload {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class CertificateIssuanceRequestPayload extends AbstractProvisioningQueryPayload {
 
     private CertificateIssuanceRequestElement requestElement;
 

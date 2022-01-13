@@ -29,9 +29,12 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation;
 
-import net.ripe.rpki.commons.util.EqualsSupport;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-public class CertificateRevocationKeyElement extends EqualsSupport {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class CertificateRevocationKeyElement {
 
     private String className;
 

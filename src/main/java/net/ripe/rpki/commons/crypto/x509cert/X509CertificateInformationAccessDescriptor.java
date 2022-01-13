@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import net.ripe.rpki.commons.util.EqualsSupport;
+import lombok.Value;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AccessDescription;
@@ -43,7 +43,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class X509CertificateInformationAccessDescriptor extends EqualsSupport implements Serializable {
+@Value
+public class X509CertificateInformationAccessDescriptor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,8 +60,8 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
 
     public static final ASN1ObjectIdentifier ID_AD_RPKI_NOTIFY = new ASN1ObjectIdentifier(X509ObjectIdentifiers.id_ad + ".13");
 
-    private String method;
-    private URI location;
+    String method;
+    URI location;
 
     private static final Map<ASN1ObjectIdentifier, String> METHOD_STRING_TABLE;
 
@@ -92,10 +93,6 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
 
     public ASN1ObjectIdentifier getMethod() {
         return new ASN1ObjectIdentifier(method);
-    }
-
-    public URI getLocation() {
-        return location;
     }
 
     public static AccessDescription[] convertAccessDescriptors(X509CertificateInformationAccessDescriptor... descriptors) {

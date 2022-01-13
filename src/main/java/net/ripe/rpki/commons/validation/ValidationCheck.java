@@ -29,17 +29,18 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import net.ripe.rpki.commons.util.EqualsSupport;
+import lombok.Value;
 
 import java.io.Serializable;
 
-public class ValidationCheck extends EqualsSupport implements Serializable {
+@Value
+public final class ValidationCheck implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private ValidationStatus status;
-    private String key;
-    private String[] params;
+    ValidationStatus status;
+    String key;
+    String[] params;
 
     public ValidationCheck(ValidationStatus status, String key, String... params) {
         this.status = status;
@@ -47,19 +48,7 @@ public class ValidationCheck extends EqualsSupport implements Serializable {
         this.params = params;
     }
 
-    public String getKey() {
-        return key;
-    }
-
     public boolean isOk() {
         return status != ValidationStatus.ERROR;
-    }
-
-    public ValidationStatus getStatus() {
-        return status;
-    }
-
-    public String[] getParams() {
-        return params;
     }
 }

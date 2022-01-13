@@ -29,17 +29,20 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 /**
  * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
  */
-public class CertificateIssuanceRequestElement extends EqualsSupport {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class CertificateIssuanceRequestElement {
 
     private String className;
     private IpResourceSet allocatedAsn;

@@ -29,6 +29,8 @@
  */
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.ipresource.IpRange;
 import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang3.Validate;
@@ -38,7 +40,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.annotation.CheckForNull;
 import java.io.Serializable;
 
-public class RoaPrefix extends EqualsSupport implements Serializable {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public class RoaPrefix implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final IpRange prefix;
@@ -76,10 +80,5 @@ public class RoaPrefix extends EqualsSupport implements Serializable {
 
     public int getEffectiveMaximumLength() {
         return maximumLength != null ? maximumLength : getPrefix().getPrefixLength();
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append("prefix", getPrefix()).append("maximumLength", maximumLength).toString();
     }
 }

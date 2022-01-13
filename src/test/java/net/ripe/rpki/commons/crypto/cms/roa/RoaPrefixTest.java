@@ -82,4 +82,18 @@ public class RoaPrefixTest {
         } catch (IllegalArgumentException expected) {
         }
     }
+
+    @Test
+    public void testEqualsHashCode() {
+        RoaPrefix a = new RoaPrefix(IpRange.parse("10.0.0.0/8"), 8);
+        RoaPrefix b = new RoaPrefix(IpRange.parse("10.0.0.0/8"), 8);
+        RoaPrefix c = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 8);
+        assertEquals(a, b);
+        assertNotEquals(a, c);
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals("RoaPrefix(prefix=10.0.0.0/8, maximumLength=8)", new RoaPrefix(IpRange.parse("10.0.0.0/8"), 8).toString());
+    }
 }

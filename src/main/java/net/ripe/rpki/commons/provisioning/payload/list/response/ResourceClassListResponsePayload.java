@@ -29,6 +29,8 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.response;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
@@ -38,7 +40,9 @@ import java.util.List;
 /**
  * See http://tools.ietf.org/html/rfc6492#section-3.3.2
  */
-public class ResourceClassListResponsePayload extends AbstractProvisioningResponsePayload {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class ResourceClassListResponsePayload extends AbstractProvisioningResponsePayload {
 
     private List<ResourceClassListResponseClassElement> classElements;
 

@@ -29,11 +29,15 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.revocation.response;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
 
-public class CertificateRevocationResponsePayload extends AbstractProvisioningResponsePayload {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class CertificateRevocationResponsePayload extends AbstractProvisioningResponsePayload {
 
     private CertificateRevocationKeyElement keyElement;
 

@@ -54,7 +54,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.sf.saxon</groupId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+        <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
             <version>10.5</version>
         </dependency>

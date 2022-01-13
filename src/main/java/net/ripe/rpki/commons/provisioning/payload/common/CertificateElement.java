@@ -29,17 +29,20 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.common;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.util.EqualsSupport;
 
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
-public class CertificateElement extends EqualsSupport {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class CertificateElement {
 
     private List<URI> issuerCertificatePublicationLocationUris;
 

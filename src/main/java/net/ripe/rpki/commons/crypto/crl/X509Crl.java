@@ -29,9 +29,10 @@
  */
 package net.ripe.rpki.commons.crypto.crl;
 
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
-import net.ripe.rpki.commons.util.EqualsSupport;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
@@ -60,14 +61,14 @@ import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
+@EqualsAndHashCode(doNotUseGetters = true)
 public class X509Crl implements CertificateRepositoryObject {
 
     private static final long serialVersionUID = 1L;
@@ -130,30 +131,6 @@ public class X509Crl implements CertificateRepositoryObject {
             throw new RuntimeException("Error managing CRL I/O stream", e);
         }
     }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(encoded);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final X509Crl other = (X509Crl) obj;
-        return Arrays.equals(encoded, other.encoded);
-    }
-
 
     public byte[] getAuthorityKeyIdentifier() {
         return X509CertificateUtil.getAuthorityKeyIdentifier(getCrl());
@@ -281,10 +258,11 @@ public class X509Crl implements CertificateRepositoryObject {
         }
     }
 
-    public static class Entry extends EqualsSupport implements Comparable<Entry>, Serializable {
+    @Value
+    public static class Entry implements Comparable<Entry>, Serializable {
         private static final long serialVersionUID = 1L;
-        private final BigInteger serialNumber;
-        private final Instant revocationDateTime;
+        BigInteger serialNumber;
+        Instant revocationDateTime;
 
         public Entry(BigInteger serial, Instant revocationDateTime) {
             Validate.notNull(serial, "serial is required");

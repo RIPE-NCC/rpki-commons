@@ -29,11 +29,11 @@
  */
 package net.ripe.rpki.commons.crypto;
 
-import net.ripe.rpki.commons.util.EqualsSupport;
+import lombok.Value;
 import org.apache.commons.lang3.Validate;
-import java.time.Instant;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -41,11 +41,12 @@ import java.util.Date;
  * have up-to second accuracy with validity fields, this class truncates not
  * before and not after to second accuracy.
  */
-public class ValidityPeriod extends EqualsSupport implements Serializable {
+@Value
+public final class ValidityPeriod implements Serializable {
     private static final long serialVersionUID = 2L;
 
-    private final Instant notValidBefore;
-    private final Instant notValidAfter;
+    Instant notValidBefore;
+    Instant notValidAfter;
 
     public ValidityPeriod() {
         this((Date) null, (Date) null);

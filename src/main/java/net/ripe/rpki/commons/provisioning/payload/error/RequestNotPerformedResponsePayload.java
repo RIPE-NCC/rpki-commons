@@ -29,10 +29,14 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.error;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
-public class RequestNotPerformedResponsePayload extends AbstractProvisioningResponsePayload {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class RequestNotPerformedResponsePayload extends AbstractProvisioningResponsePayload {
 
     private NotPerformedError status;
 

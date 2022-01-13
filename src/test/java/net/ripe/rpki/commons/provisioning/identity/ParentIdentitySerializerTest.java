@@ -172,7 +172,7 @@ public class ParentIdentitySerializerTest {
                     "</ns0:parent_response>" );
         });
 
-        assertEquals("Identity Certificate validation failed: [ValidationCheck[key=cert.parsed,params={},status=ERROR]]", exception.getMessage());
+        assertEquals("Identity Certificate validation failed: [ValidationCheck(status=ERROR, key=cert.parsed, params=[])]", exception.getMessage());
     }
 
 

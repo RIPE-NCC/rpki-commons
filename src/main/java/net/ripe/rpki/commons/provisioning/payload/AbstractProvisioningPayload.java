@@ -29,9 +29,12 @@
  */
 package net.ripe.rpki.commons.provisioning.payload;
 
-import net.ripe.rpki.commons.util.EqualsSupport;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-public abstract class AbstractProvisioningPayload extends EqualsSupport {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public abstract class AbstractProvisioningPayload {
 
     public static final String DEFAULT_SENDER = "sender";
     public static final String DEFAULT_RECIPIENT = "recipient";

@@ -29,11 +29,11 @@
  */
 package net.ripe.rpki.commons.validation.roa;
 
+import lombok.Value;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.rpki.commons.crypto.cms.roa.Roa;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
-import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
@@ -44,12 +44,13 @@ import java.util.List;
 /**
  * A route allowed by a ROA configuration.
  */
-public class AllowedRoute extends EqualsSupport implements Serializable {
+@Value
+public final class AllowedRoute implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Asn asn;
-    private final IpRange prefix;
-    private final int maximumLength;
+    Asn asn;
+    IpRange prefix;
+    int maximumLength;
 
     public AllowedRoute(Asn asn, IpRange prefix, int maximumLength) {
         Validate.notNull(asn, "asn is required");
@@ -68,18 +69,6 @@ public class AllowedRoute extends EqualsSupport implements Serializable {
             }
         }
         return result;
-    }
-
-    public Asn getAsn() {
-        return asn;
-    }
-
-    public IpRange getPrefix() {
-        return prefix;
-    }
-
-    public int getMaximumLength() {
-        return maximumLength;
     }
 
     public AnnouncedRoute getAnnouncedRoute() {

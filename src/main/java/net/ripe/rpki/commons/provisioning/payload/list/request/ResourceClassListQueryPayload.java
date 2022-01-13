@@ -29,10 +29,14 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.request;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
-public class ResourceClassListQueryPayload extends AbstractProvisioningQueryPayload {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class ResourceClassListQueryPayload extends AbstractProvisioningQueryPayload {
 
     protected ResourceClassListQueryPayload() {
         super(PayloadMessageType.list);

@@ -29,6 +29,8 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.list.response;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
@@ -40,7 +42,9 @@ import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
  * This type of class element contains a current certificate element for each key pair,
  * as opposed to just one in the CertificateIssuanceResponse.
  */
-public class ResourceClassListResponseClassElement extends GenericClassElement {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class ResourceClassListResponseClassElement extends GenericClassElement {
     public boolean containsResourceCertificate(X509ResourceCertificate resourceCertificate) {
         if (getCertificateElements() == null) {
             return false;

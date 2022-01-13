@@ -30,8 +30,10 @@
 package net.ripe.rpki.commons.ta.domain.response;
 
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.Value;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
-import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
@@ -42,12 +44,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class TrustAnchorResponse extends EqualsSupport implements Serializable {
+@Value
+public final class TrustAnchorResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final Long requestCreationTimestamp;
-    private List<TaResponse> taResponses;
+    private final List<TaResponse> taResponses;
     private final Map<URI, CertificateRepositoryObject> publishedObjects;
 
     public TrustAnchorResponse(final Long requestCreationTimestamp,
@@ -61,16 +64,8 @@ public class TrustAnchorResponse extends EqualsSupport implements Serializable {
         this.taResponses = (taResponses == null) ? new ArrayList<TaResponse>() : taResponses;
     }
 
-    public Long getRequestCreationTimestamp() {
-        return requestCreationTimestamp;
-    }
-
     public Map<URI, CertificateRepositoryObject> getPublishedObjects() {
         return Collections.unmodifiableMap(publishedObjects);
-    }
-
-    public List<TaResponse> getTaResponses() {
-        return taResponses;
     }
 
     public static Builder newBuilder(Long requestCreationTimestamp) {

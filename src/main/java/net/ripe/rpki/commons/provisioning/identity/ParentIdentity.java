@@ -29,12 +29,15 @@
  */
 package net.ripe.rpki.commons.provisioning.identity;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
-import net.ripe.rpki.commons.util.EqualsSupport;
 
 import java.net.URI;
 
-public class ParentIdentity extends EqualsSupport {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class ParentIdentity {
 
     public static final int VERSION = 1;
     private final String childHandle;

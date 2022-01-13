@@ -29,6 +29,8 @@
  */
 package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
 
@@ -40,7 +42,9 @@ import java.util.Arrays;
  * This type of class element contains the signed certificate for this request/response
  * as oposed to all current certificate elements as used in the list response.
  */
-public class CertificateIssuanceResponseClassElement extends GenericClassElement {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public final class CertificateIssuanceResponseClassElement extends GenericClassElement {
 
     public void setCertificateElement(CertificateElement certificateElement) {
         setCertificateElements(Arrays.asList(certificateElement));

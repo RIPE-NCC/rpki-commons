@@ -30,22 +30,23 @@
 package net.ripe.rpki.commons.ta.domain.request;
 
 
-import net.ripe.rpki.commons.util.EqualsSupport;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-public abstract class TaRequest extends EqualsSupport implements Serializable {
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public abstract class TaRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
+    @Getter
     private final UUID requestId;
 
     public TaRequest() {
         this.requestId = UUID.randomUUID();
-    }
-
-    public UUID getRequestId() {
-        return requestId;
     }
 }
