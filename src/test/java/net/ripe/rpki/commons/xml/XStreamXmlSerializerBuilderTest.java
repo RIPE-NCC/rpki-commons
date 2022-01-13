@@ -41,7 +41,6 @@ import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
 import net.ripe.rpki.commons.util.VersionedId;
-import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -124,18 +123,6 @@ public class XStreamXmlSerializerBuilderTest {
         String serializedData = serializer.serialize(timestamp);
         Assert.assertEquals("<sql-timestamp>2011-01-31T13:59:59.000Z</sql-timestamp>", serializedData);
         assertEquals(timestamp, serializer.deserialize(serializedData));
-    }
-
-    @Test
-    public void shouldConvertDateTimeFromReadablePeriod() {
-        XStreamXmlSerializerBuilder<Period> builder = new XStreamXmlSerializerBuilder<>(Period.class, NOT_STRICT);
-        XStreamXmlSerializer<Period> serializer = builder.build();
-        Instant now = Instant.now();
-        Period period = new Period(now.toEpochMilli(), now.plus(1, ChronoUnit.HOURS).toEpochMilli());
-
-        String serializedData = serializer.serialize(period);
-        Assert.assertEquals("<org.joda.time.Period>PT1H</org.joda.time.Period>", serializedData);
-        assertEquals(period, serializer.deserialize(serializedData));
     }
 
     @Test

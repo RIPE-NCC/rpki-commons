@@ -56,13 +56,11 @@ import net.ripe.rpki.commons.xml.converters.IpResourceConverter;
 import net.ripe.rpki.commons.xml.converters.IpResourceSetConverter;
 import net.ripe.rpki.commons.xml.converters.JavaUtilTimestampConverter;
 import net.ripe.rpki.commons.xml.converters.ManifestCmsConverter;
-import net.ripe.rpki.commons.xml.converters.ReadablePeriodConverter;
 import net.ripe.rpki.commons.xml.converters.RoaCmsConverter;
 import net.ripe.rpki.commons.xml.converters.VersionedIdConverter;
 import net.ripe.rpki.commons.xml.converters.X500PrincipalConverter;
 import net.ripe.rpki.commons.xml.converters.X509ResourceCertificateConverter;
 import java.time.Instant;
-import org.joda.time.Period;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -143,14 +141,11 @@ public class XStreamXmlSerializerBuilder<T> {
     }
 
     private void registerDateTimeRelated() {
-        // Explictly allow Period without aliasing.
-        withAllowedType(Period.class);
         // For backwards compatibility with old joda time `DateTime` class. We cannot use `withAliasType` here
         // since XStream automatically adds `Instant` as a class alias, which takes precedence. So we set a class
         // alias here as well, to override the XStream default alias of "instant".
         withAlias("datetime", Instant.class);
         withConverter(new JavaTimeInstantConverter());
-        withConverter(new ReadablePeriodConverter());
         withConverter(new JavaUtilTimestampConverter());
         withAliasType("ValidityPeriod", ValidityPeriod.class);
     }
