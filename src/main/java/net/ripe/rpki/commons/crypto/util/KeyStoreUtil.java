@@ -31,14 +31,12 @@ package net.ripe.rpki.commons.crypto.util;
 
 import com.google.common.io.ByteStreams;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
@@ -54,6 +52,9 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -180,12 +181,12 @@ public final class KeyStoreUtil {
     }
 
     public static X509Certificate generateCertificate(KeyPair keyPair, String signatureProvider) {
-        DateTime now = UTC.dateTime();
+        Instant now = Instant.now();
         X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
                 new X500Principal("CN=issuer"),
                 BigInteger.ONE,
-                now.minusYears(2).toDate(),
-                now.minusYears(1).toDate(),
+                new Date(now.atOffset(ZoneOffset.UTC).minusYears(2).toInstant().toEpochMilli()),
+                new Date(now.atOffset(ZoneOffset.UTC).minusYears(1).toInstant().toEpochMilli()),
                 new X500Principal("CN=subject"),
                 keyPair.getPublic());
         try {

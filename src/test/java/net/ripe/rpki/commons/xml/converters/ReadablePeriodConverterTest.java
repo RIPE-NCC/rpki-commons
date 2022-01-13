@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.xml.converters;
 
-import org.joda.time.DateTime;
+import java.time.Instant;
 import org.joda.time.MutablePeriod;
 import org.joda.time.Period;
 import org.joda.time.ReadablePeriod;
@@ -46,7 +46,7 @@ public class ReadablePeriodConverterTest {
         Assert.assertTrue(subject.canConvert(ReadablePeriod.class));
         Assert.assertTrue(subject.canConvert(Period.class));
         Assert.assertTrue(subject.canConvert(MutablePeriod.class));
-        Assert.assertFalse(subject.canConvert(DateTime.class));
+        Assert.assertFalse(subject.canConvert(Instant.class));
     }
 
     @Test

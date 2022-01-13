@@ -30,7 +30,6 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -39,7 +38,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -101,7 +100,7 @@ public class ProvisioningCmsObject {
      * href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2"
      * >http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2</a><br >
      */
-    public DateTime getSigningTime() {
+    public Instant getSigningTime() {
         try {
             CMSSignedData cmsSignedData = new CMSSignedData(encodedContent);
             SignerInformationStore sis = cmsSignedData.getSignerInfos();
@@ -118,7 +117,7 @@ public class ProvisioningCmsObject {
                     Object obj = en.nextElement();
                     if (obj instanceof DERUTCTime) {
                         DERUTCTime derTime = (DERUTCTime) obj;
-                        return UTC.dateTime(derTime.getDate());
+                        return derTime.getDate().toInstant();
                     }
                 }
             }

@@ -30,15 +30,13 @@
 package net.ripe.rpki.commons;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.Period;
-import org.joda.time.ReadableInstant;
-import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -51,15 +49,13 @@ import static org.junit.Assert.fail;
 
 public class ValidityPeriodTest {
 
-    @Rule
-    public FixedDateRule fixedDateRule = new FixedDateRule(new DateTime(2008, 04, 05, 0, 0, 0, 0, DateTimeZone.UTC));
-
+    private Clock clock = Clock.fixed(OffsetDateTime.of(2008, 04, 05, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(), ZoneOffset.UTC);
 
     @Test
     public void testWrongValidityPeriod() {
         try {
-            final DateTime now = UTC.dateTime();
-            new ValidityPeriod(now, now.minus(Period.millis(1)));
+            final Instant now = clock.instant();
+            new ValidityPeriod(now, now.minusMillis(1));
             fail("IllegalArgumentException expected");
         } catch (IllegalArgumentException expected) {
         }
@@ -67,7 +63,7 @@ public class ValidityPeriodTest {
 
     @Test
     public void singleInstantShouldBeOK() {
-        DateTime now = UTC.dateTime();
+        Instant now = Instant.now();
         new ValidityPeriod(now, now);
     }
 
@@ -116,17 +112,20 @@ public class ValidityPeriodTest {
 
     @Test
     public void shouldTruncateToOneSecondAccuracy() {
-        ValidityPeriod subject = new ValidityPeriod(new DateTime(2008, 3, 30, 15, 44, 58, 943, DateTimeZone.UTC), new DateTime(2008, 5, 30, 15, 44, 23, 123, DateTimeZone.UTC));
-        assertEquals(new DateTime(2008, 3, 30, 15, 44, 58, 0, DateTimeZone.UTC), subject.getNotValidBefore());
-        assertEquals(new DateTime(2008, 5, 30, 15, 44, 23, 0, DateTimeZone.UTC), subject.getNotValidAfter());
+        ValidityPeriod subject = new ValidityPeriod(
+            OffsetDateTime.of(2008, 3, 30, 15, 44, 58, 943, ZoneOffset.UTC).toInstant(),
+            OffsetDateTime.of(2008, 5, 30, 15, 44, 23, 123, ZoneOffset.UTC).toInstant()
+        );
+        assertEquals(OffsetDateTime.of(2008, 3, 30, 15, 44, 58, 0, ZoneOffset.UTC).toInstant(), subject.getNotValidBefore());
+        assertEquals(OffsetDateTime.of(2008, 5, 30, 15, 44, 23, 0, ZoneOffset.UTC).toInstant(), subject.getNotValidAfter());
     }
 
     @Test
     public void shouldSupportIntersection() {
-        DateTime t1 = new DateTime(2008, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        DateTime t2 = new DateTime(2008, 2, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        DateTime t3 = new DateTime(2008, 11, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        DateTime t4 = new DateTime(2008, 12, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+        Instant t1 = OffsetDateTime.of(2008, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
+        Instant t2 = OffsetDateTime.of(2008, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
+        Instant t3 = OffsetDateTime.of(2008, 11, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
+        Instant t4 = OffsetDateTime.of(2008, 12, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
 
         assertEquals(null, new ValidityPeriod(t1, t2).intersectedWith(new ValidityPeriod(t3, t4)));
         assertEquals(new ValidityPeriod(), new ValidityPeriod().intersectedWith(new ValidityPeriod()));
@@ -153,13 +152,13 @@ public class ValidityPeriodTest {
     @Test
     public void shouldBeValidWithinTheValidityPeriod() {
         ValidityPeriod validityPeriod = new ValidityPeriod(date(2008, 1, 1), date(2009, 1, 1));
-        assertTrue(validityPeriod.isValidNow());
+        assertTrue(validityPeriod.isValidAt(clock.instant()));
     }
 
     @Test
     public void shouldBeInvalidOutsideTheValidityPeriod() {
         ValidityPeriod validityPeriod = new ValidityPeriod(date(2007, 1, 1), date(2008, 1, 1));
-        assertTrue(validityPeriod.isExpiredNow());
+        assertTrue(validityPeriod.isExpiredAt(clock.instant()));
         assertTrue(validityPeriod.isExpiredAt(date(2020, 1, 1)));
     }
 
@@ -176,22 +175,22 @@ public class ValidityPeriodTest {
 
         final ValidityPeriod validityPeriod = new ValidityPeriod(new Date(instant), new Date(instant));
 
-         assertEquals(validityPeriod.getNotValidBefore().getMillisOfSecond(), 0);
-         assertEquals(validityPeriod.getNotValidAfter().getMillisOfSecond(), 0);
+         assertEquals(validityPeriod.getNotValidBefore().getLong(ChronoField.MILLI_OF_SECOND), 0);
+         assertEquals(validityPeriod.getNotValidAfter().getLong(ChronoField.MILLI_OF_SECOND), 0);
     }
 
     @Test
     public void truncatedMillisDateTimes() {
         long instant = 1502895557772L;
 
-        final ValidityPeriod validityPeriod = new ValidityPeriod(UTC.dateTime(instant), UTC.dateTime(instant));
+        final ValidityPeriod validityPeriod = new ValidityPeriod(Instant.ofEpochMilli(instant), Instant.ofEpochMilli(instant));
 
-         assertEquals(validityPeriod.getNotValidBefore().getMillisOfSecond(), 0);
-         assertEquals(validityPeriod.getNotValidAfter().getMillisOfSecond(), 0);
+         assertEquals(validityPeriod.getNotValidBefore().getLong(ChronoField.MILLI_OF_SECOND), 0);
+         assertEquals(validityPeriod.getNotValidAfter().getLong(ChronoField.MILLI_OF_SECOND), 0);
     }
 
 
-    private ReadableInstant date(int year, int month, int day) {
-        return new LocalDate(year, month, day).toDateTimeAtStartOfDay(DateTimeZone.UTC);
+    private Instant date(int year, int month, int day) {
+        return OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
     }
 }

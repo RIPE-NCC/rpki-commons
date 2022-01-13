@@ -47,7 +47,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -101,11 +101,11 @@ public class ManifestCms extends RpkiSignedObject {
         return manifestCmsGeneralInfo.getFileHashAlgorithm();
     }
 
-    public DateTime getThisUpdateTime() {
+    public Instant getThisUpdateTime() {
         return manifestCmsGeneralInfo.getThisUpdateTime();
     }
 
-    public DateTime getNextUpdateTime() {
+    public Instant getNextUpdateTime() {
         return manifestCmsGeneralInfo.getNextUpdateTime();
     }
 
@@ -179,21 +179,22 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     private void checkManifestValidityTimes(ValidationOptions options, ValidationResult result) {
-        DateTime thisUpdateTime = getThisUpdateTime();
-        DateTime nextUpdateTime = getNextUpdateTime();
+        Instant now = options.getClock().instant();
+        Instant thisUpdateTime = getThisUpdateTime();
+        Instant nextUpdateTime = getNextUpdateTime();
 
         result.rejectIfFalse(thisUpdateTime.isBefore(nextUpdateTime), ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME, thisUpdateTime.toString(), nextUpdateTime.toString());
-        result.rejectIfTrue(thisUpdateTime.isAfterNow(), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, thisUpdateTime.toString());
+        result.rejectIfTrue(thisUpdateTime.isAfter(now), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, thisUpdateTime.toString());
 
         if(options.isStrictManifestCRLValidityChecks()){
-            boolean postGracePeriod = nextUpdateTime.plus(options.getManifestMaxStalePeriod()).isBeforeNow();
+            boolean postGracePeriod = nextUpdateTime.plus(options.getManifestMaxStalePeriod()).isBefore(now);
             if (postGracePeriod) {
                 result.error(ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
             } else {
-                result.warnIfTrue(nextUpdateTime.isBeforeNow(), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+                result.warnIfTrue(nextUpdateTime.isBefore(now), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
             }
         } else {
-            result.warnIfTrue(nextUpdateTime.isBeforeNow(), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+            result.warnIfTrue(nextUpdateTime.isBefore(now), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
         }
 
     }

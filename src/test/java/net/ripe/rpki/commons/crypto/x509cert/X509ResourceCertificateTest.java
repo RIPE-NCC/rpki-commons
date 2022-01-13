@@ -36,14 +36,15 @@ import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
+
+import java.time.Clock;
+import java.time.Instant;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -57,6 +58,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 
 import static org.junit.Assert.*;
@@ -83,8 +87,8 @@ public class X509ResourceCertificateTest {
     private static final ValidityPeriod TEST_VALIDITY_PERIOD;
 
     static {
-        final DateTime now = UTC.dateTime();
-        TEST_VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1), now.plusYears(100));
+        final OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        TEST_VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1).toInstant(), now.plusYears(100).toInstant());
     }
 
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
@@ -321,7 +325,7 @@ public class X509ResourceCertificateTest {
                 .withSubjectDN(new X500Principal("CN=child"))
                 .withCrlDistributionPoints(TEST_TA_CRL)
                 .build();
-        X509Crl crl = X509CrlTest.createCrl();
+        X509Crl crl = X509CrlTest.createCrl(Clock.systemUTC());
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
 
         when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenReturn(crl);
@@ -346,7 +350,8 @@ public class X509ResourceCertificateTest {
     @Test
     public void shouldNotBePastValidityTime() {
         X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
-        assertEquals(cert.getValidityPeriod().isExpiredNow(), cert.isPastValidityTime());
+        Instant now = Instant.now();
+        assertEquals(cert.getValidityPeriod().isExpiredAt(now), cert.isPastValidityTimeAt(now));
     }
 
     @Test
@@ -363,9 +368,9 @@ public class X509ResourceCertificateTest {
                 .withSerial(serialNumber)
                 .build();
 
-        X509Crl crl = X509CrlTest.getCrlBuilder()
+        X509Crl crl = X509CrlTest.getCrlBuilder(Clock.systemUTC())
                 .withAuthorityKeyIdentifier(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic())
-                .addEntry(serialNumber, DateTime.now().minusDays(1))
+                .addEntry(serialNumber, Instant.now().minus(1, ChronoUnit.DAYS))
                 .build(KeyPairFactoryTest.TEST_KEY_PAIR.getPrivate());
 
         CrlLocator crlLocator = Mockito.mock(CrlLocator.class);

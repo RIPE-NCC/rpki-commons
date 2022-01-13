@@ -34,6 +34,7 @@ import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class RoaCmsBuilderTest {
         allPrefixes.add(TEST_IPV6_PREFIX);
 
         subject = new RoaCmsBuilder();
-        subject.withCertificate(createCertificate(allPrefixes));
+        subject.withCertificate(createCertificate(Clock.systemUTC(), allPrefixes));
         subject.withAsn(TEST_ASN);
         subject.withPrefixes(allPrefixes);
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

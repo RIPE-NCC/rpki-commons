@@ -33,7 +33,6 @@ import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -46,7 +45,7 @@ import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +78,7 @@ public abstract class RpkiSignedObjectParser {
 
     protected ASN1ObjectIdentifier contentType;
 
-    private DateTime signingTime;
+    private Instant signingTime;
 
     private ValidationResult validationResult;
 
@@ -113,7 +112,7 @@ public abstract class RpkiSignedObjectParser {
         return contentType;
     }
 
-    protected DateTime getSigningTime() {
+    protected Instant getSigningTime() {
         return signingTime;
     }
 
@@ -353,8 +352,8 @@ public abstract class RpkiSignedObjectParser {
      * they MUST provide the same date and time."
      */
     private boolean extractSigningTime(SignerInformation signer) {
-        ImmutablePair<DateTime, Boolean> signingTime = extractTime(CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer);
-        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(BINARY_SIGNING_TIME_OID, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer);
+        ImmutablePair<Instant, Boolean> signingTime = extractTime(CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer);
+        ImmutablePair<Instant, Boolean> binarySigningTime = extractTime(BINARY_SIGNING_TIME_OID, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer);
         boolean valid = signingTime.right && binarySigningTime.right;
 
         if (signingTime.left != null && binarySigningTime.left != null) {
@@ -367,7 +366,7 @@ public abstract class RpkiSignedObjectParser {
         return valid;
     }
 
-    private ImmutablePair<DateTime, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer) {
+    private ImmutablePair<Instant, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer) {
         Attribute attr = signer.getSignedAttributes().get(identifier);
         if (attr == null) {
             return ImmutablePair.of(null, true);
@@ -375,7 +374,7 @@ public abstract class RpkiSignedObjectParser {
         if (!validationResult.rejectIfFalse(attr.getAttrValues().size() == 1, onlyOneValidationKey)) {
             return ImmutablePair.of(null, false);
         }
-        DateTime value = UTC.dateTime(Time.getInstance(attr.getAttrValues().getObjectAt(0)).getDate().getTime());
+        Instant value = Instant.ofEpochMilli(Time.getInstance(attr.getAttrValues().getObjectAt(0)).getDate().getTime());
         return ImmutablePair.of(value, true);
     }
 

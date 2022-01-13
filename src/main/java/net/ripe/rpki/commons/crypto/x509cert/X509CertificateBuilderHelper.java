@@ -346,8 +346,8 @@ public final class X509CertificateBuilderHelper {
         return new X509v3CertificateBuilder(
             BouncyCastleUtil.principalToName(issuerDN),
             serial,
-            new Date(validityPeriod.getNotValidBefore().getMillis()),
-            new Date(validityPeriod.getNotValidAfter().getMillis()),
+            new Date(validityPeriod.getNotValidBefore().toEpochMilli()),
+            new Date(validityPeriod.getNotValidAfter().toEpochMilli()),
             BouncyCastleUtil.principalToName(subjectDN),
             BouncyCastleUtil.createSubjectPublicKeyInfo(publicKey));
     }

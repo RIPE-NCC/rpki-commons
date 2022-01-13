@@ -48,6 +48,7 @@ import org.apache.commons.lang3.Validate;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -169,8 +170,14 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
     }
 
     @Override
+    @Deprecated
     public boolean isPastValidityTime() {
         return getValidityPeriod().isExpiredNow();
+    }
+
+    @Override
+    public boolean isPastValidityTimeAt(Instant time) {
+        return getValidityPeriod().isExpiredAt(time);
     }
 
     @Override

@@ -42,13 +42,14 @@ import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.time.Instant;
+import java.util.Date;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -58,8 +59,8 @@ public class X509CrlBuilder {
     public static final int CRL_VERSION_2 = 2;
 
     private X500Principal issuerDN;
-    private DateTime thisUpdateTime;
-    private DateTime nextUpdateTime;
+    private Instant thisUpdateTime;
+    private Instant nextUpdateTime;
     private AuthorityKeyIdentifier authorityKeyIdentifier;
     private CRLNumber crlNumber;
     private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
@@ -77,21 +78,21 @@ public class X509CrlBuilder {
         return this;
     }
 
-    public X509CrlBuilder withThisUpdateTime(DateTime instant) {
+    public X509CrlBuilder withThisUpdateTime(Instant instant) {
         this.thisUpdateTime = instant;
         return this;
     }
 
-    public DateTime getThisUpdateTime() {
+    public Instant getThisUpdateTime() {
         return thisUpdateTime;
     }
 
-    public X509CrlBuilder withNextUpdateTime(DateTime instant) {
+    public X509CrlBuilder withNextUpdateTime(Instant instant) {
         this.nextUpdateTime = instant;
         return this;
     }
 
-    public DateTime getNextUpdateTime() {
+    public Instant getNextUpdateTime() {
         return nextUpdateTime;
     }
 
@@ -112,7 +113,7 @@ public class X509CrlBuilder {
         return this;
     }
 
-    public X509CrlBuilder addEntry(BigInteger serial, DateTime revocationTime) {
+    public X509CrlBuilder addEntry(BigInteger serial, Instant revocationTime) {
         Validate.isTrue(!entries.containsKey(serial), "duplicate CRL entry");
         entries.put(serial, new X509Crl.Entry(serial, revocationTime));
         return this;
@@ -149,12 +150,12 @@ public class X509CrlBuilder {
     }
 
     private X509v2CRLBuilder createCrlGenerator() throws CertIOException {
-        X509v2CRLBuilder generator = new X509v2CRLBuilder(X500Name.getInstance(issuerDN.getEncoded()), thisUpdateTime.toDate());
-        generator.setNextUpdate(nextUpdateTime.toDate());
+        X509v2CRLBuilder generator = new X509v2CRLBuilder(X500Name.getInstance(issuerDN.getEncoded()), new Date(thisUpdateTime.toEpochMilli()));
+        generator.setNextUpdate(new Date(nextUpdateTime.toEpochMilli()));
         generator.addExtension(Extension.authorityKeyIdentifier, false, authorityKeyIdentifier);
         generator.addExtension(Extension.cRLNumber, false, crlNumber);
         for (X509Crl.Entry entry : entries.values()) {
-            generator.addCRLEntry(entry.getSerialNumber(), entry.getRevocationDateTime().toDate(), 0);
+            generator.addCRLEntry(entry.getSerialNumber(), new Date(entry.getRevocationDateTime().toEpochMilli()), 0);
         }
         return generator;
     }

@@ -29,7 +29,7 @@
  */
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -40,11 +40,11 @@ public class ManifestCmsGeneralInfo implements Serializable {
 
     private int version;
     private BigInteger number;
-    private DateTime thisUpdateTime;
-    private DateTime nextUpdateTime;
+    private Instant thisUpdateTime;
+    private Instant nextUpdateTime;
     private String fileHashAlgorithm;
 
-    public ManifestCmsGeneralInfo(int version, BigInteger number, DateTime thisUpdateTime, DateTime nextUpdateTime, String fileHashAlgorithm) {
+    public ManifestCmsGeneralInfo(int version, BigInteger number, Instant thisUpdateTime, Instant nextUpdateTime, String fileHashAlgorithm) {
         this.version = version;
         this.number = number;
         this.thisUpdateTime = thisUpdateTime;
@@ -60,11 +60,11 @@ public class ManifestCmsGeneralInfo implements Serializable {
         return number;
     }
 
-    public DateTime getThisUpdateTime() {
+    public Instant getThisUpdateTime() {
         return thisUpdateTime;
     }
 
-    public DateTime getNextUpdateTime() {
+    public Instant getNextUpdateTime() {
         return nextUpdateTime;
     }
 

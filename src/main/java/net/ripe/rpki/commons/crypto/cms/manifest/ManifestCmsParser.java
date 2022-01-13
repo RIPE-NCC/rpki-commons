@@ -31,7 +31,6 @@ package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -41,7 +40,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.math.BigInteger;
 import java.text.ParseException;
@@ -61,9 +60,9 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 
     private BigInteger number;
 
-    private DateTime thisUpdateTime;
+    private Instant thisUpdateTime;
 
-    private DateTime nextUpdateTime;
+    private Instant nextUpdateTime;
 
     private String fileHashAlgorithm;
 
@@ -143,8 +142,8 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
                 return;
             }
             number = expect(seq.getObjectAt(offset++), ASN1Integer.class).getValue();
-            thisUpdateTime = UTC.dateTime(expect(seq.getObjectAt(offset++), ASN1GeneralizedTime.class).getDate().getTime());
-            nextUpdateTime = UTC.dateTime(expect(seq.getObjectAt(offset++), ASN1GeneralizedTime.class).getDate().getTime());
+            thisUpdateTime = Instant.ofEpochMilli(expect(seq.getObjectAt(offset++), ASN1GeneralizedTime.class).getDate().getTime());
+            nextUpdateTime = Instant.ofEpochMilli(expect(seq.getObjectAt(offset++), ASN1GeneralizedTime.class).getDate().getTime());
             fileHashAlgorithm = expect(seq.getObjectAt(offset++), ASN1ObjectIdentifier.class).getId();
             validationResult.rejectIfFalse(ManifestCms.FILE_HASH_ALGORITHM.equals(fileHashAlgorithm), MANIFEST_FILE_HASH_ALGORITHM, fileHashAlgorithm);
             files = new TreeMap<>();

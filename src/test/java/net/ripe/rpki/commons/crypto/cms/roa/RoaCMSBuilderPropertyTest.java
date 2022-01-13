@@ -36,6 +36,7 @@ import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import org.junit.runner.RunWith;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class RoaCMSBuilderPropertyTest {
     @Property public void buildEncodedParseCheck(
             @InRange(min="1", max="4294967295")  long asNum,
             @InRange(min="12", max="24") Integer maxLength
-    ){
+    ) {
 
             RoaPrefix TEST_IPV4_PREFIX_1 = new RoaPrefix(IpRange.parse("10.64.0.0/12"), maxLength);
             List<RoaPrefix> prefixes = new ArrayList<>();
@@ -58,7 +59,7 @@ public class RoaCMSBuilderPropertyTest {
 
             RoaCmsBuilder builder = new RoaCmsBuilder();
             builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-            builder.withCertificate(createCertificate(prefixes, TEST_KEY_PAIR));
+            builder.withCertificate(createCertificate(Clock.systemUTC(), prefixes, TEST_KEY_PAIR));
             Asn asn = new Asn(asNum);
             builder.withAsn(asn);
             builder.withPrefixes(prefixes);

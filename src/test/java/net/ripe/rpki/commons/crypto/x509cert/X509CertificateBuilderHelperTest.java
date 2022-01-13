@@ -32,19 +32,19 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.annotation.meta.TypeQualifier;
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
@@ -65,9 +65,13 @@ public class X509CertificateBuilderHelperTest {
         subject.withSerial(BigInteger.ONE);
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        Instant now = Instant.now();
+        subject.withValidityPeriod(new ValidityPeriod(now, startOfNextYear(now)));
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+    }
+
+    public static Instant startOfNextYear(Instant now) {
+        return OffsetDateTime.ofInstant(now, ZoneOffset.UTC).plusYears(1).withMonth(1).withDayOfMonth(1).truncatedTo(ChronoUnit.DAYS).toInstant();
     }
 
     @Test(expected = IllegalArgumentException.class)

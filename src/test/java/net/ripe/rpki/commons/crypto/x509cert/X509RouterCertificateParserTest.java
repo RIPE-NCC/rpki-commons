@@ -32,14 +32,12 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.time.Instant;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
@@ -51,8 +49,8 @@ import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.startOfNextYear;
 import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -95,8 +93,8 @@ public class X509RouterCertificateParserTest {
         builder.withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        Instant now = Instant.now();
+        builder.withValidityPeriod(new ValidityPeriod(now, startOfNextYear(now)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withSignatureAlgorithm("MD5withRSA");
         X509Certificate certificate = builder.generateCertificate();

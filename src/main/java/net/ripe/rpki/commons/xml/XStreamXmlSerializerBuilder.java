@@ -51,7 +51,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.VersionedId;
 import net.ripe.rpki.commons.validation.roa.AnnouncedRoute;
 import net.ripe.rpki.commons.validation.roa.RouteValidityState;
-import net.ripe.rpki.commons.xml.converters.DateTimeConverter;
+import net.ripe.rpki.commons.xml.converters.JavaTimeInstantConverter;
 import net.ripe.rpki.commons.xml.converters.IpResourceConverter;
 import net.ripe.rpki.commons.xml.converters.IpResourceSetConverter;
 import net.ripe.rpki.commons.xml.converters.JavaUtilTimestampConverter;
@@ -61,7 +61,7 @@ import net.ripe.rpki.commons.xml.converters.RoaCmsConverter;
 import net.ripe.rpki.commons.xml.converters.VersionedIdConverter;
 import net.ripe.rpki.commons.xml.converters.X500PrincipalConverter;
 import net.ripe.rpki.commons.xml.converters.X509ResourceCertificateConverter;
-import org.joda.time.DateTime;
+import java.time.Instant;
 import org.joda.time.Period;
 
 import javax.security.auth.x500.X500Principal;
@@ -145,8 +145,11 @@ public class XStreamXmlSerializerBuilder<T> {
     private void registerDateTimeRelated() {
         // Explictly allow Period without aliasing.
         withAllowedType(Period.class);
-        withAliasType("datetime", DateTime.class);
-        withConverter(new DateTimeConverter());
+        // For backwards compatibility with old joda time `DateTime` class. We cannot use `withAliasType` here
+        // since XStream automatically adds `Instant` as a class alias, which takes precedence. So we set a class
+        // alias here as well, to override the XStream default alias of "instant".
+        withAlias("datetime", Instant.class);
+        withConverter(new JavaTimeInstantConverter());
         withConverter(new ReadablePeriodConverter());
         withConverter(new JavaUtilTimestampConverter());
         withAliasType("ValidityPeriod", ValidityPeriod.class);
@@ -184,6 +187,11 @@ public class XStreamXmlSerializerBuilder<T> {
 
     public final XStreamXmlSerializerBuilder<T> withConverter(SingleValueConverter converter) {
         xStream.registerConverter(converter);
+        return this;
+    }
+
+    public final XStreamXmlSerializerBuilder<T> withAlias(String alias, Class<?> type) {
+        xStream.alias(alias, type);
         return this;
     }
 

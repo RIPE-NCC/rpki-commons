@@ -37,6 +37,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryOb
 
 import java.io.Serializable;
 import java.net.URI;
+import java.time.Instant;
 
 public interface CertificateRepositoryObject extends Serializable {
 
@@ -47,7 +48,10 @@ public interface CertificateRepositoryObject extends Serializable {
     void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result);
     void validate(String location, CertificateRepositoryObjectValidationContext context, X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result);
 
+    @Deprecated
     boolean isPastValidityTime();
+
+    boolean isPastValidityTimeAt(Instant time);
 
     boolean isRevoked();
 

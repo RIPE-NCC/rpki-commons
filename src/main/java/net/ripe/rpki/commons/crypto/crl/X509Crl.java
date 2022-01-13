@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.crypto.crl;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
@@ -41,7 +40,6 @@ import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
@@ -60,6 +58,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
@@ -159,12 +159,12 @@ public class X509Crl implements CertificateRepositoryObject {
         return X509CertificateUtil.getAuthorityKeyIdentifier(getCrl());
     }
 
-    public DateTime getThisUpdateTime() {
-        return UTC.dateTime(getCrl().getThisUpdate());
+    public Instant getThisUpdateTime() {
+        return getCrl().getThisUpdate().toInstant();
     }
 
-    public DateTime getNextUpdateTime() {
-        return UTC.dateTime(getCrl().getNextUpdate());
+    public Instant getNextUpdateTime() {
+        return getCrl().getNextUpdate().toInstant();
     }
 
     public X500Principal getIssuer() {
@@ -188,8 +188,14 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     @Override
+    @Deprecated
     public boolean isPastValidityTime() {
-        return getNextUpdateTime().isBeforeNow();
+        return getNextUpdateTime().isBefore(Instant.now());
+    }
+
+    @Override
+    public boolean isPastValidityTimeAt(Instant time) {
+        return getNextUpdateTime().isBefore(time);
     }
 
     @Override
@@ -278,25 +284,25 @@ public class X509Crl implements CertificateRepositoryObject {
     public static class Entry extends EqualsSupport implements Comparable<Entry>, Serializable {
         private static final long serialVersionUID = 1L;
         private final BigInteger serialNumber;
-        private final DateTime revocationDateTime;
+        private final Instant revocationDateTime;
 
-        public Entry(BigInteger serial, DateTime revocationDateTime) {
+        public Entry(BigInteger serial, Instant revocationDateTime) {
             Validate.notNull(serial, "serial is required");
             Validate.notNull(revocationDateTime, "revocationDateTime is required");
             this.serialNumber = serial;
-            this.revocationDateTime = revocationDateTime.withMillisOfSecond(0);
+            this.revocationDateTime = revocationDateTime.truncatedTo(ChronoUnit.SECONDS);
         }
 
         public Entry(X509CRLEntry entry) {
             this.serialNumber = entry.getSerialNumber();
-            this.revocationDateTime = UTC.dateTime(entry.getRevocationDate());
+            this.revocationDateTime = entry.getRevocationDate().toInstant();
         }
 
         public BigInteger getSerialNumber() {
             return serialNumber;
         }
 
-        public DateTime getRevocationDateTime() {
+        public Instant getRevocationDateTime() {
             return revocationDateTime;
         }
 

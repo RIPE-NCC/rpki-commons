@@ -29,14 +29,10 @@
  */
 package net.ripe.rpki.commons.validation;
 
-import net.ripe.rpki.commons.FixedDateRule;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -46,11 +42,6 @@ public class ValidationResultTest {
     private static final ValidationLocation SECOND_LOCATION = new ValidationLocation("secondValidatedObject");
 
     private static final ValidationLocation FIRST_LOCATION = new ValidationLocation("firstValidatedObject");
-
-    private static final DateTime NOW = new DateTime(2008, 4, 5, 0, 0, 0, 0, DateTimeZone.UTC);
-
-    @Rule
-    public FixedDateRule fixedDateRule = new FixedDateRule(NOW);
 
     private ValidationResult result;
 
@@ -115,7 +106,12 @@ public class ValidationResultTest {
         result = ValidationResult.withLocation(FIRST_LOCATION);
         result.addMetric("name", "value");
 
-        assertEquals(Arrays.asList(new ValidationMetric("name", "value", NOW.getMillis())), result.getMetrics(FIRST_LOCATION));
+        List<ValidationMetric> metrics = result.getMetrics(FIRST_LOCATION);
+        assertEquals(1, metrics.size());
+        ValidationMetric metric = metrics.get(0);
+        assertEquals("name", metric.getName());
+        assertEquals("value", metric.getValue());
+        assertTrue(metric.getMeasuredAt() <= System.currentTimeMillis());
         assertEquals(Collections.<ValidationMetric>emptyList(), result.getMetrics(SECOND_LOCATION));
     }
 

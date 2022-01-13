@@ -36,7 +36,6 @@ import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -55,7 +54,6 @@ import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
-import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,6 +62,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertStoreException;
 import java.security.cert.X509CRL;
+import java.time.Instant;
 import java.util.Collection;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.SHA256WITHRSA_ENCRYPTION_OID;
@@ -91,10 +90,8 @@ public class ProvisioningCmsObjectBuilderTest {
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         subject.withPayloadContent(payload);
 
-        signingTime = UTC.dateTime().getMillis() / 1000 * 1000; // truncate milliseconds
-        DateTimeUtils.setCurrentMillisFixed(signingTime);
+        signingTime = Instant.now().toEpochMilli() / 1000 * 1000; // truncate milliseconds
         cmsObject = subject.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate());
-        DateTimeUtils.setCurrentMillisSystem();
 
         signedDataParser = new CMSSignedDataParser(new BcDigestCalculatorProvider(), cmsObject.getEncoded());
         signedDataParser.getSignedContent().drain();

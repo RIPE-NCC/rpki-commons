@@ -40,6 +40,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Clock;
 
 import static org.junit.Assert.*;
 
@@ -52,7 +53,7 @@ public class RemoteCertificateFetcherTest {
     private static final String RSYNC_SOME_VALID_SOURCE_PATH_CRL = "rsync://some.valid/path.crl";
 
     private static final X509ResourceCertificate TEST_CERTIFICATE = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
-    private static final X509Crl TEST_CRL = X509CrlTest.createCrl();
+    private static final X509Crl TEST_CRL = X509CrlTest.createCrl(Clock.systemUTC());
 
 
     @Before

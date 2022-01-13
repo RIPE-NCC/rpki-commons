@@ -33,7 +33,7 @@ import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -56,15 +56,15 @@ public class GenericClassElement extends EqualsSupport {
 
     private X509ResourceCertificate issuer;
 
-    private DateTime validityNotAfter;
+    private Instant validityNotAfter;
 
     private String siaHeadUri;
 
-    public DateTime getValidityNotAfter() {
+    public Instant getValidityNotAfter() {
         return validityNotAfter;
     }
 
-    public void setValidityNotAfter(DateTime validityNotAfter) {
+    public void setValidityNotAfter(Instant validityNotAfter) {
         this.validityNotAfter = validityNotAfter;
     }
 

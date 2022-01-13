@@ -56,7 +56,6 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.joda.time.DateTimeUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -66,6 +65,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509Extension;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -87,6 +87,8 @@ public class ProvisioningCmsObjectBuilder {
 
     private String payloadContent;
 
+    private Clock clock = Clock.systemUTC();
+
     public ProvisioningCmsObjectBuilder withCmsCertificate(X509Certificate cmsCertificate) {
         this.cmsCertificate = cmsCertificate;
         return this;
@@ -104,6 +106,11 @@ public class ProvisioningCmsObjectBuilder {
 
     public ProvisioningCmsObjectBuilder withPayloadContent(AbstractProvisioningPayload payload) {
         this.payloadContent = PayloadParser.serialize(payload);
+        return this;
+    }
+
+    public ProvisioningCmsObjectBuilder withClock(Clock clock) {
+        this.clock = clock;
         return this;
     }
 
@@ -174,7 +181,7 @@ public class ProvisioningCmsObjectBuilder {
         Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<>();
         // -
         // ReplaceHashtableWithMap
-        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));
+        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(clock.millis()))));
         attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
         return new AttributeTable(attributes);
     }

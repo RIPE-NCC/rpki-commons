@@ -35,10 +35,8 @@ import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -47,6 +45,8 @@ import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD;
@@ -130,8 +130,8 @@ public class GhostbustersCmsParserTest {
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        final DateTime now = UTC.dateTime();
-        builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
+        final OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1).toInstant(), now.plusYears(1).toInstant()));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(CRL_DP);
         builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, TEST_ROA_LOCATION));

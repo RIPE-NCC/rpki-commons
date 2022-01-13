@@ -36,6 +36,7 @@ import org.bouncycastle.asn1.BERTags;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,6 +123,8 @@ public class RoaCmsParserTest {
     private List<RoaPrefix> ipv4Prefixes;
     private List<RoaPrefix> allPrefixes;
 
+    private Clock clock = Clock.systemUTC();
+
     @Before
     public void setUp() {
         String location = "test.roa";
@@ -131,7 +134,7 @@ public class RoaCmsParserTest {
         ipv4Prefixes.add(TEST_IPV4_PREFIX_2);
         allPrefixes = new ArrayList<RoaPrefix>(ipv4Prefixes);
         allPrefixes.add(TEST_IPV6_PREFIX);
-        parser.parse(location, RoaCmsTest.createRoaCms(allPrefixes).getEncoded());
+        parser.parse(location, RoaCmsTest.createRoaCms(clock, allPrefixes).getEncoded());
     }
 
     @Test

@@ -40,6 +40,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509RouterCertificateVa
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 
 public class X509RouterCertificate extends X509GenericCertificate implements X509CertificateObject {
 
@@ -91,8 +92,14 @@ public class X509RouterCertificate extends X509GenericCertificate implements X50
     }
 
     @Override
+    @Deprecated
     public boolean isPastValidityTime() {
         return getValidityPeriod().isExpiredNow();
+    }
+
+    @Override
+    public boolean isPastValidityTimeAt(Instant time) {
+        return getValidityPeriod().isExpiredAt(time);
     }
 
     @Override

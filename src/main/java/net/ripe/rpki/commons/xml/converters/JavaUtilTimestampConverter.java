@@ -30,16 +30,12 @@
 package net.ripe.rpki.commons.xml.converters;
 
 import com.thoughtworks.xstream.converters.SingleValueConverter;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.sql.Timestamp;
 
 public class JavaUtilTimestampConverter implements SingleValueConverter {
 
-    private static final DateTimeFormatter FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+    private static final JavaTimeInstantConverter FORMATTER = new JavaTimeInstantConverter(true);
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -48,12 +44,12 @@ public class JavaUtilTimestampConverter implements SingleValueConverter {
     }
 
     @Override
-    public Object fromString(String s) {
-        return new Timestamp(FORMATTER.parseDateTime(s).getMillis());
+    public Timestamp fromString(String s) {
+        return new Timestamp(FORMATTER.fromString(s).toEpochMilli());
     }
 
     @Override
     public String toString(Object datetime) {
-        return FORMATTER.print(UTC.dateTime(datetime));
+        return FORMATTER.toString(((Timestamp) datetime).toInstant());
     }
 }

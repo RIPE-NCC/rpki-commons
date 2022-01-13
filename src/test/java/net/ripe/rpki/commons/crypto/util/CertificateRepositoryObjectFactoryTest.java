@@ -45,6 +45,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import org.junit.Test;
 
+import java.time.Clock;
 import java.util.Arrays;
 
 import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.createCertificateRepositoryObject;
@@ -105,7 +106,7 @@ public class CertificateRepositoryObjectFactoryTest {
     @Test
     public void shouldParseRoaCms() {
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("roa.roa"));
-        RoaCms roaCms = RoaCmsTest.getRoaCms();
+        RoaCms roaCms = RoaCmsTest.getRoaCms(Clock.systemUTC());
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(roaCms.getEncoded(), validationResult);
 
@@ -161,7 +162,7 @@ public class CertificateRepositoryObjectFactoryTest {
     @Test
     public void shouldParseCrl() {
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("crl.crl"));
-        X509Crl crl = X509CrlTest.createCrl();
+        X509Crl crl = X509CrlTest.createCrl(Clock.systemUTC());
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(crl.getEncoded(), validationResult);
 

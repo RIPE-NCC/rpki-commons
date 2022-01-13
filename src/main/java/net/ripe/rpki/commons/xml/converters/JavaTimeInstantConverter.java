@@ -30,50 +30,61 @@
 package net.ripe.rpki.commons.xml.converters;
 
 import com.thoughtworks.xstream.converters.SingleValueConverter;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.Locale;
 
 
-public class DateTimeConverter implements SingleValueConverter {
+public class JavaTimeInstantConverter implements SingleValueConverter {
 
-    private static final DateTimeFormatter FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+    private static final DateTimeFormatter FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE = new DateTimeFormatterBuilder()
+        .parseCaseInsensitive()
+        .parseLenient()
+        .appendInstant(3)
+        .toFormatter(Locale.ENGLISH);
 
-    private static final DateTimeFormatter FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE = ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC);
+    private static final DateTimeFormatter FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE = new DateTimeFormatterBuilder()
+        .parseCaseInsensitive()
+        .parseLenient()
+        .appendInstant(0)
+        .toFormatter(Locale.ENGLISH);
 
     private boolean useMillis = false;
 
-    public DateTimeConverter() {
+    public JavaTimeInstantConverter() {
     }
 
-    public DateTimeConverter(boolean useMillis) {
+    public JavaTimeInstantConverter(boolean useMillis) {
         this.useMillis = useMillis;
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
-        return DateTime.class.equals(type);
+        return Instant.class.equals(type);
     }
 
     @Override
-    public Object fromString(String s) {
+    public Instant fromString(String s) {
         try {
-            return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.parseDateTime(s);
+            return Instant.from(FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.parse(s));
         } catch (IllegalArgumentException e) {
-            return FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.parseDateTime(s);
+            return Instant.from(FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.parse(s));
         }
     }
 
     @Override
     public String toString(Object datetime) {
         // TODO: Test this! Was failing for me when running unit tests from different time zone
-        DateTime dateTimeWithZone = ((DateTime) datetime).withZone(DateTimeZone.UTC);
+        OffsetDateTime utc = ((Instant) datetime).atOffset(ZoneOffset.UTC);
         if (useMillis) {
-            return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.print(dateTimeWithZone);
+            return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.format(utc);
         } else {
-            return FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.print(dateTimeWithZone);
+            return FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.format(utc);
         }
     }
 }

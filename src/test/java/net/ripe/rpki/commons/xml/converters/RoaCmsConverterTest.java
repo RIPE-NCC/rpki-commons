@@ -36,6 +36,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Clock;
 import java.util.regex.Pattern;
 
 public class RoaCmsConverterTest {
@@ -63,14 +64,14 @@ public class RoaCmsConverterTest {
 
     @Test
     public void shouldOnlyUseEncodedWhenSerializingRoa() {
-        RoaCms roa = RoaCmsTest.getRoaCms();
+        RoaCms roa = RoaCmsTest.getRoaCms(Clock.systemUTC());
         String xml = xStream.toXML(roa);
         Assert.assertTrue(Pattern.matches(expectedXmlRegEx, xml));
     }
 
     @Test
     public void shouldDoRoundTripSerializeAndDesirializeRoa() {
-        RoaCms roa = RoaCmsTest.getRoaCms();
+        RoaCms roa = RoaCmsTest.getRoaCms(Clock.systemUTC());
         String xml = xStream.toXML(roa);
 
         RoaCms processedRoa = (RoaCms) xStream.fromXML(xml);

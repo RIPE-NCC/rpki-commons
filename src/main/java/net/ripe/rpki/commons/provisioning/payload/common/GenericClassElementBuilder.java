@@ -34,10 +34,9 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponseClassElement;
 import net.ripe.rpki.commons.provisioning.payload.list.response.ResourceClassListResponseClassElement;
 import org.apache.commons.lang3.Validate;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,12 +45,12 @@ public class GenericClassElementBuilder {
     private String className;
     private List<URI> certificateAuthorityUri = new ArrayList<URI>();
     private IpResourceSet ipResourceSet;
-    private DateTime validityNotAfter;
+    private Instant validityNotAfter;
     private String siaHeadUri;
     private List<CertificateElement> certificateElements = new ArrayList<CertificateElement>();
     private X509ResourceCertificate issuer;
 
-    public GenericClassElementBuilder withValidityNotAfter(DateTime notAfter) {
+    public GenericClassElementBuilder withValidityNotAfter(Instant notAfter) {
         this.validityNotAfter = notAfter;
         return this;
     }
@@ -95,7 +94,6 @@ public class GenericClassElementBuilder {
         Validate.notNull(issuer, "issuer certificate is required");
 
         Validate.notNull(validityNotAfter, "Validity not after is required");
-        Validate.isTrue(validityNotAfter.getZone().equals(DateTimeZone.UTC), "Validity time must be in UTC timezone");
     }
 
     public ResourceClassListResponseClassElement buildResourceClassListResponseClassElement() {

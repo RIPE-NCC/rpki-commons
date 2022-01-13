@@ -38,10 +38,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.junit.After;
+import java.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,6 +46,8 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.TreeMap;
@@ -64,8 +63,8 @@ public class ManifestCmsParserTest {
     public static final X500Principal TEST_DN = new X500Principal("CN=Test");
     public static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
 
-    public static final DateTime THIS_UPDATE_TIME = new DateTime(2008, 9, 1, 22, 43, 29, 0, DateTimeZone.UTC);
-    public static final DateTime NEXT_UPDATE_TIME = new DateTime(2008, 9, 2, 6, 43, 29, 0, DateTimeZone.UTC);
+    public static final Instant THIS_UPDATE_TIME = OffsetDateTime.of(2008, 9, 1, 22, 43, 29, 0, ZoneOffset.UTC).toInstant();
+    public static final Instant NEXT_UPDATE_TIME = OffsetDateTime.of(2008, 9, 2, 6, 43, 29, 0, ZoneOffset.UTC).toInstant();
 
     public static final byte[] FOO_CONTENT = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32};
 
@@ -170,7 +169,6 @@ public class ManifestCmsParserTest {
         String location = "unknown.mft";
         parser = new ManifestCmsParser();
 
-        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
         builder.withCertificate(createValidManifestEECertificate()).withManifestNumber(BigInteger.valueOf(68));
         builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
@@ -179,11 +177,6 @@ public class ManifestCmsParserTest {
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
 
         parser.parse(location, builder.build(TEST_KEY_PAIR.getPrivate()).getEncoded());
-    }
-
-    @After
-    public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -225,7 +218,6 @@ public class ManifestCmsParserTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRejectManifestWithNonInheritEECert() {
-        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
 
         // Use 10/8 EE cert

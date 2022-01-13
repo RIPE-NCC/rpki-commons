@@ -39,7 +39,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryOb
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import javax.security.auth.x500.X500Principal;
 import java.net.URI;
@@ -79,7 +79,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     private String oid; // Storing oid as String  so that this class is serializable
 
-    private DateTime signingTime;
+    private Instant signingTime;
 
     private Boolean revoked;
 
@@ -87,7 +87,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         this(cmsObjectData.getEncoded(), cmsObjectData.getCertificate(), cmsObjectData.getContentType(), cmsObjectData.getSigningTime());
     }
 
-    protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, ASN1ObjectIdentifier oid, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
+    protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, ASN1ObjectIdentifier oid, Instant signingTime) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
         this.certificate = certificate;
         this.oid = oid.getId();
@@ -99,7 +99,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         return encoded;
     }
 
-    public DateTime getSigningTime() {
+    public Instant getSigningTime() {
         return signingTime;
     }
 
@@ -119,11 +119,11 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         return certificate.getValidityPeriod();
     }
 
-    public DateTime getNotValidBefore() {
+    public Instant getNotValidBefore() {
         return certificate.getValidityPeriod().getNotValidBefore();
     }
 
-    public DateTime getNotValidAfter() {
+    public Instant getNotValidAfter() {
         return certificate.getValidityPeriod().getNotValidAfter();
     }
 
@@ -178,8 +178,14 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     }
 
     @Override
+    @Deprecated
     public boolean isPastValidityTime() {
         return getCertificate().isPastValidityTime();
+    }
+
+    @Override
+    public boolean isPastValidityTimeAt(Instant time) {
+        return getCertificate().isPastValidityTimeAt(time);
     }
 
     @Override

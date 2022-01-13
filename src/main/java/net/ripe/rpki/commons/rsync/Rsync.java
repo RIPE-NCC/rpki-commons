@@ -29,7 +29,6 @@
  */
 package net.ripe.rpki.commons.rsync;
 
-import org.joda.time.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +173,7 @@ public class Rsync {
             rsync = new Command(args);
         }
 
-        startedAt = DateTimeUtils.currentTimeMillis();
+        startedAt = System.currentTimeMillis();
         try {
             rsync.execute();
             command = rsync;
@@ -188,7 +187,7 @@ public class Rsync {
 
             return exitStatus;
         } finally {
-            finishedAt = DateTimeUtils.currentTimeMillis();
+            finishedAt = System.currentTimeMillis();
         }
     }
 

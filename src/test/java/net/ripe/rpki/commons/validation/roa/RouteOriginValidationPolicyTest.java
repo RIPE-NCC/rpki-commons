@@ -39,6 +39,7 @@ import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ public class RouteOriginValidationPolicyTest {
     private RouteOriginValidationPolicy subject;
 
     static NestedIntervalMap<IpResource, List<AllowedRoute>> roa(RoaPrefix... roaPrefixes) {
-        RoaCms roa = RoaCmsTest.createRoaCms(Arrays.asList(roaPrefixes));
+        RoaCms roa = RoaCmsTest.createRoaCms(Clock.systemUTC(), Arrays.asList(roaPrefixes));
         List<AllowedRoute> allowed = AllowedRoute.fromRoas(Collections.singletonList(roa));
         return RouteOriginValidationPolicy.allowedRoutesToNestedIntervalMap(allowed);
     }

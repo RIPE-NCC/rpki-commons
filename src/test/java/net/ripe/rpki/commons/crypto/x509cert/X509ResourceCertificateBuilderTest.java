@@ -32,10 +32,8 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,6 +42,7 @@ import java.math.BigInteger;
 import java.net.URI;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.startOfNextYear;
 import static org.junit.Assert.*;
 
 public class X509ResourceCertificateBuilderTest {
@@ -58,8 +57,8 @@ public class X509ResourceCertificateBuilderTest {
         subject.withSerial(BigInteger.ONE);
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        Instant now = Instant.now();
+        subject.withValidityPeriod(new ValidityPeriod(now, startOfNextYear(now)));
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
 

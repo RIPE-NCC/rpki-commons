@@ -35,31 +35,30 @@ import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElementBuilder;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElementBuilder;
-import net.ripe.rpki.commons.util.EqualsSupport;
-import net.ripe.rpki.commons.xml.XStreamXmlSerializer;
 import net.ripe.rpki.commons.xml.XmlSerializer;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Test;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ResourceClassListResponsePayloadSerializerTest {
 
     private static final XmlSerializer<ResourceClassListResponsePayload> SERIALIZER = new ResourceClassListResponsePayloadSerializer();
 
 
-    private static DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 0).withZone(DateTimeZone.UTC);
+    private static Instant validityNotAfter = OffsetDateTime.of(2011, 1, 1, 23, 58, 23, 0, ZoneOffset.UTC).toInstant();
 
     public static ResourceClassListResponsePayload TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD = createResourceClassListResponsePayload();
 

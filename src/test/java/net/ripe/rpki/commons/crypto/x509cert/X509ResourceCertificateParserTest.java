@@ -32,14 +32,12 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.time.Instant;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
@@ -52,6 +50,7 @@ import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.CAB_BASELINE_REQUIREMENTS_POLICY;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.startOfNextYear;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -119,8 +118,8 @@ public class X509ResourceCertificateParserTest {
         builder.withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        Instant now = Instant.now();
+        builder.withValidityPeriod(new ValidityPeriod(now, startOfNextYear(now)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withSignatureAlgorithm("MD5withRSA");
         X509Certificate certificate = builder.generateCertificate();

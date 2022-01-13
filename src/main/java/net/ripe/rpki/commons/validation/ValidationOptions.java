@@ -30,7 +30,8 @@
 package net.ripe.rpki.commons.validation;
 
 
-import org.joda.time.Duration;
+import java.time.Clock;
+import java.time.Duration;
 
 /**
  * User controlled options to use when validating objects.
@@ -59,6 +60,12 @@ public class ValidationOptions {
      * This grace period is not applied to the EE certificate.
      */
     private Duration manifestMaxStalePeriod;
+
+    /**
+     * The clock to use whenever the time is needed. Set this for unit testing the library or to validate at a
+     * specific time.
+     */
+    private Clock clock = Clock.systemUTC();
 
     /**
      * Setting this will allow resources over claim on X509ResourceCertificateParentChildLooseValidator.
@@ -99,7 +106,7 @@ public class ValidationOptions {
      * @return
      */
     public static ValidationOptions paranoidTestValidations() {
-        return new ValidationOptions(true, Duration.standardHours(-7), Duration.standardHours(-7));
+        return new ValidationOptions(true, Duration.ofHours(-7), Duration.ofHours(-7));
     }
 
     public static ValidationOptions withStaleConfigurations(Duration maxCrlStalePeriod, Duration maxMftStalePeriod) {
@@ -128,5 +135,14 @@ public class ValidationOptions {
 
     public void setStrictManifestCRLValidityChecks(boolean strictManifestCRLValidityChecks) {
         this.strictManifestCRLValidityChecks = strictManifestCRLValidityChecks;
+    }
+
+    public ValidationOptions setClock(Clock clock) {
+        this.clock = clock;
+        return this;
+    }
+
+    public Clock getClock() {
+        return clock;
     }
 }

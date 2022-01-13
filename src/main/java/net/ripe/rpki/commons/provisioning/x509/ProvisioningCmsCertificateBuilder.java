@@ -31,14 +31,16 @@ package net.ripe.rpki.commons.provisioning.x509;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
+
+import java.time.Clock;
+import java.time.Instant;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.time.ZoneOffset;
 
 
 public class ProvisioningCmsCertificateBuilder {
@@ -46,6 +48,8 @@ public class ProvisioningCmsCertificateBuilder {
     private static final int DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW = 1;
 
     private X509CertificateBuilderHelper builderHelper;
+
+    private Clock clock = Clock.systemUTC();
 
     public ProvisioningCmsCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
@@ -81,6 +85,11 @@ public class ProvisioningCmsCertificateBuilder {
         return this;
     }
 
+    public ProvisioningCmsCertificateBuilder withClock(Clock clock) {
+        this.clock = clock;
+        return this;
+    }
+
     public ProvisioningCmsCertificate build() {
         setUpImplicitRequirementsForBuilderHelper();
         return new ProvisioningCmsCertificate(builderHelper.generateCertificate());
@@ -90,7 +99,7 @@ public class ProvisioningCmsCertificateBuilder {
         builderHelper.withCa(false);
         builderHelper.withKeyUsage(KeyUsage.digitalSignature);
         builderHelper.withAuthorityKeyIdentifier(true);
-        final DateTime now = UTC.dateTime();
-        builderHelper.withValidityPeriod(new ValidityPeriod(now, now.plusDays(DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW)));
+        final Instant now = clock.instant();
+        builderHelper.withValidityPeriod(new ValidityPeriod(now, now.atOffset(ZoneOffset.UTC).plusDays(DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW).toInstant()));
     }
 }

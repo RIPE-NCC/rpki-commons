@@ -31,19 +31,21 @@ package net.ripe.rpki.commons.crypto.crl;
 
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import org.joda.time.DateTime;
+
+import java.time.Clock;
+import java.time.Instant;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.temporal.ChronoUnit;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -58,39 +60,39 @@ public class X509CrlTest {
     private static final ValidationOptions VALIDATION_OPTIONS = ValidationOptions.strictValidation();
 
 
-    public static X509Crl createCrl() {
-        X509CrlBuilder builder = getCrlBuilder();
+    public static X509Crl createCrl(Clock clock) {
+        X509CrlBuilder builder = getCrlBuilder(clock);
         return builder.build(TEST_KEY_PAIR.getPrivate());
     }
 
-    public static X509CrlBuilder getCrlBuilder() {
+    public static X509CrlBuilder getCrlBuilder(Clock clock) {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(new X500Principal("CN=issuer"));
-        final DateTime now = UTC.dateTime();
+        final Instant now = clock.instant();
         builder.withThisUpdateTime(now);
-        builder.withNextUpdateTime(now.plusHours(8));
+        builder.withNextUpdateTime(now.plus(8, ChronoUnit.HOURS));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         return builder;
     }
 
-    private X509Crl getCrlWithKeyPair(KeyPair keyPair) {
-        X509CrlBuilder builder = getCrlBuilder();
+    private X509Crl getCrlWithKeyPair(Clock clock, KeyPair keyPair) {
+        X509CrlBuilder builder = getCrlBuilder(clock);
         builder.withAuthorityKeyIdentifier(keyPair.getPublic());
         return builder.build(keyPair.getPrivate());
     }
 
     @Test
     public void shouldHaveAuthorityKeyIdentifier() {
-        X509Crl crl = createCrl();
+        X509Crl crl = createCrl(Clock.systemUTC());
         assertArrayEquals(KeyPairUtil.getKeyIdentifier(TEST_KEY_PAIR.getPublic()), crl.getAuthorityKeyIdentifier());
     }
 
 
     @Test
     public void shouldValidateCrl() {
-        X509Crl subject = createCrl();
+        X509Crl subject = createCrl(Clock.systemUTC());
         ValidationResult result = ValidationResult.withLocation(ROOT_MANIFEST_CRL_LOCATION);
         CrlLocator crlLocator = mock(CrlLocator.class);
 
@@ -104,7 +106,7 @@ public class X509CrlTest {
 
     @Test
     public void shouldNotValidateInvalidCrl() {
-        X509Crl subject = getCrlWithKeyPair(SECOND_TEST_KEY_PAIR);
+        X509Crl subject = getCrlWithKeyPair(Clock.systemUTC(), SECOND_TEST_KEY_PAIR);
         ValidationResult result = ValidationResult.withLocation(ROOT_MANIFEST_CRL_LOCATION);
         CrlLocator crlLocator = mock(CrlLocator.class);
 
@@ -122,7 +124,7 @@ public class X509CrlTest {
 
     @Test
     public void shouldBePastValidityTime() {
-        X509Crl subject = createCrl();
+        X509Crl subject = createCrl(Clock.systemUTC());
         assertFalse(subject.isPastValidityTime());
     }
 }

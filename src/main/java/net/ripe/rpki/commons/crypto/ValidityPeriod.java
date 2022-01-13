@@ -30,11 +30,8 @@
 package net.ripe.rpki.commons.crypto;
 
 import net.ripe.rpki.commons.util.EqualsSupport;
-import net.ripe.rpki.commons.util.UTC;
 import org.apache.commons.lang3.Validate;
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
-import org.joda.time.ReadableInstant;
+import java.time.Instant;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -47,47 +44,47 @@ import java.util.Date;
 public class ValidityPeriod extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 2L;
 
-    private final DateTime notValidBefore;
-    private final DateTime notValidAfter;
+    private final Instant notValidBefore;
+    private final Instant notValidAfter;
 
     public ValidityPeriod() {
         this((Date) null, (Date) null);
     }
 
-    public ValidityPeriod(ReadableInstant notValidBefore, ReadableInstant notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(UTC.dateTime(notValidBefore));
-        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(UTC.dateTime(notValidAfter));
+    public ValidityPeriod(Instant notValidBefore, Instant notValidAfter) {
+        this.notValidBefore = notValidBefore == null ? null : truncatedMillis(notValidBefore.toEpochMilli());
+        this.notValidAfter = notValidAfter == null ? null : truncatedMillis(notValidAfter.toEpochMilli());
         Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
     public ValidityPeriod(Date notValidBefore, Date notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(UTC.dateTime(notValidBefore));
-        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(UTC.dateTime(notValidAfter));
+        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(notValidBefore.getTime());
+        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(notValidAfter.getTime());
         Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
-    private static boolean isDateOrderingValid(DateTime notValidBefore, DateTime notValidAfter) {
-        return (notValidBefore == null || notValidAfter == null || notValidBefore.isEqual(notValidAfter) || notValidBefore.isBefore(notValidAfter));
+    private static boolean isDateOrderingValid(Instant notValidBefore, Instant notValidAfter) {
+        return (notValidBefore == null || notValidAfter == null || notValidBefore.equals(notValidAfter) || notValidBefore.isBefore(notValidAfter));
     }
 
     // Match resolution of certificate validity period (seconds)
-    private DateTime truncatedMillis(DateTime dateTime) {
-        return dateTime.withMillisOfSecond(0);
+    private Instant truncatedMillis(long millisSinceEpoch) {
+        return Instant.ofEpochSecond(millisSinceEpoch / 1000);
     }
 
-    public DateTime getNotValidAfter() {
+    public Instant getNotValidAfter() {
         return notValidAfter;
     }
 
-    public DateTime getNotValidBefore() {
+    public Instant getNotValidBefore() {
         return notValidBefore;
     }
 
-    public ValidityPeriod withNotValidBefore(ReadableInstant notValidBefore) {
+    public ValidityPeriod withNotValidBefore(Instant notValidBefore) {
         return new ValidityPeriod(notValidBefore, getNotValidAfter());
     }
 
-    public ValidityPeriod withNotValidAfter(ReadableInstant notValidAfter) {
+    public ValidityPeriod withNotValidAfter(Instant notValidAfter) {
         return new ValidityPeriod(getNotValidBefore(), notValidAfter);
     }
 
@@ -95,19 +92,21 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
         return isValidAt(other.getNotValidBefore()) && isValidAt(other.getNotValidAfter());
     }
 
+    @Deprecated
     public boolean isExpiredNow() {
-        return isExpiredAt(new Instant());
+        return isExpiredAt(Instant.now());
     }
 
-    public boolean isExpiredAt(ReadableInstant instant) {
+    public boolean isExpiredAt(Instant instant) {
         return notValidAfter != null && instant.isAfter(getNotValidAfter());
     }
 
+    @Deprecated
     public boolean isValidNow() {
-        return isValidAt(new Instant());
+        return isValidAt(Instant.now());
     }
 
-    public boolean isValidAt(ReadableInstant instant) {
+    public boolean isValidAt(Instant instant) {
         if (instant == null) {
             return !isClosed();
         } else {
@@ -133,8 +132,8 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
      *         if there is no overlap.
      */
     public ValidityPeriod intersectedWith(ValidityPeriod other) {
-        DateTime latestNotValidBefore = latestDateTimeOf(notValidBefore, other.notValidBefore);
-        DateTime earliestNotValidAfter = earliestDateTimeOf(notValidAfter, other.notValidAfter);
+        Instant latestNotValidBefore = latestDateTimeOf(notValidBefore, other.notValidBefore);
+        Instant earliestNotValidAfter = earliestDateTimeOf(notValidAfter, other.notValidAfter);
         if (isDateOrderingValid(latestNotValidBefore, earliestNotValidAfter)) {
             return new ValidityPeriod(latestNotValidBefore, earliestNotValidAfter);
         } else {
@@ -143,7 +142,7 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
         }
     }
 
-    private DateTime earliestDateTimeOf(DateTime date1, DateTime date2) {
+    private Instant earliestDateTimeOf(Instant date1, Instant date2) {
         if (date1 == null) {
             return date2;
         }
@@ -153,7 +152,7 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
         return date1.isBefore(date2) ? date1 : date2;
     }
 
-    private DateTime latestDateTimeOf(DateTime date1, DateTime date2) {
+    private Instant latestDateTimeOf(Instant date1, Instant date2) {
         if (date1 == null) {
             return date2;
         }

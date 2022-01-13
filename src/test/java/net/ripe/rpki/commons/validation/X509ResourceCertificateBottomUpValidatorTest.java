@@ -39,7 +39,6 @@ import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceCertificateLocator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
 import org.apache.commons.lang3.Validate;
@@ -52,12 +51,17 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.cert.CRLException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class X509ResourceCertificateBottomUpValidatorTest {
@@ -65,7 +69,10 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only - RIPE NCC - NL");
     private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
-    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(UTC.dateTime().minusMinutes(1), UTC.dateTime().plusYears(1));
+    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(
+        OffsetDateTime.now(ZoneOffset.UTC).minusMinutes(1).toInstant(),
+        OffsetDateTime.now(ZoneOffset.UTC).plusYears(1).toInstant()
+    );
 
     private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only - First Child - NL");
     private static final BigInteger FIRST_CHILD_SERIAL_NUMBER = ROOT_SERIAL_NUMBER.add(BigInteger.valueOf(1));
@@ -73,7 +80,10 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final BigInteger SECOND_CHILD_SERIAL_NUMBER = FIRST_CHILD_SERIAL_NUMBER.add(BigInteger.valueOf(1));
     private static final IpResourceSet CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/17, ffce::/16, AS21212");
     private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
-    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(UTC.dateTime().minusMonths(2), UTC.dateTime().minusMonths(1));
+    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(
+        OffsetDateTime.now(ZoneOffset.UTC).minusMonths(2).toInstant(),
+        OffsetDateTime.now(ZoneOffset.UTC).minusMonths(1).toInstant()
+    );
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
     private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -226,7 +236,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         child = createChildBuilder().build();
         grandchild = createSecondChildBuilder().build();
 
-        rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plusDays(2)).build(ROOT_KEY_PAIR.getPrivate());
+        rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plus(2, ChronoUnit.DAYS)).build(ROOT_KEY_PAIR.getPrivate());
         X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
         validator.validate("child", child);
 
@@ -314,8 +324,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plus(1, ChronoUnit.DAYS));
+        builder.withNextUpdateTime(OffsetDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -326,8 +336,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(FIRST_CHILD_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plus(1, ChronoUnit.DAYS));
+        builder.withNextUpdateTime(OffsetDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(FIRST_CHILD_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

@@ -32,7 +32,6 @@ package net.ripe.rpki.commons.validation;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.joda.time.DateTimeUtils;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -227,7 +226,7 @@ public final class ValidationResult implements Serializable {
         if (!metrics.containsKey(currentLocation)) {
             metrics.put(currentLocation, new ArrayList<>());
         }
-        metrics.get(currentLocation).add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+        metrics.get(currentLocation).add(new ValidationMetric(name, value, System.currentTimeMillis()));
         return this;
     }
 

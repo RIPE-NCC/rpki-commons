@@ -36,6 +36,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 
 import java.net.URI;
+import java.time.Instant;
 
 import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPO_EXECUTION;
 
@@ -65,7 +66,13 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
     }
 
     @Override
+    @Deprecated
     public boolean isPastValidityTime() {
+        throw new UnsupportedOperationException("Unknown object type");
+    }
+
+    @Override
+    public boolean isPastValidityTimeAt(Instant time) {
         throw new UnsupportedOperationException("Unknown object type");
     }
 
