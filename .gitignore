@@ -16,3 +16,4 @@ target/
 .pregenerated-test-key-pairs.keystore
 .vscode/settings.jsonbuilds
 builds
+.factorypath
