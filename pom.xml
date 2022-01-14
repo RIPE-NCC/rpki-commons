@@ -45,18 +45,19 @@
         <java.language.version>1.8</java.language.version>
         <java.runtime.version>1.8</java.runtime.version>
 
-        <net.ripe.ipresource.version>1.47</net.ripe.ipresource.version>
         <bouncycastle.version>1.69</bouncycastle.version>
-        <guava.version>30.1.1-jre</guava.version>
-        <xstream.version>1.4.18</xstream.version>
         <commons-io.version>2.11.0</commons-io.version>
+        <guava.version>30.1.1-jre</guava.version>
+        <lombok.version>1.18.22</lombok.version>
+        <net.ripe.ipresource.version>1.47</net.ripe.ipresource.version>
+        <xstream.version>1.4.18</xstream.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -296,6 +297,13 @@
                 <configuration>
                     <source>${java.language.version}</source>
                     <target>${java.runtime.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <encoding>UTF-8</encoding>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
