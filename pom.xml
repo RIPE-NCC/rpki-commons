@@ -324,37 +324,6 @@
             </plugin>
 
             <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.9.0</version>
-                <configuration>
-                    <strictCheck>true</strictCheck>
-                    <header>LICENSE.txt</header>
-                    <excludes>
-                        <exclude>ci_settings.xml</exclude>
-                        <exclude>README.md</exclude>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>src/test/resources/**</exclude>
-                        <exclude>.idea/**</exclude>
-                        <exclude>.gitignore</exclude>
-                        <exclude>.gitlab-ci.yml</exclude>
-                        <exclude>.github/**</exclude>
-                        <exclude>.m2/**</exclude>
-                        <exclude>.pregenerated-test-key-pairs.keystore</exclude>
-                        <exclude>builds/**</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <extensions>true</extensions>
