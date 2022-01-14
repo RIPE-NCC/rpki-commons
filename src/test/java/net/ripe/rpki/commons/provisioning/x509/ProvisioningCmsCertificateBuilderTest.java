@@ -29,14 +29,19 @@
  */
 package net.ripe.rpki.commons.provisioning.x509;
 
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
+import net.ripe.rpki.commons.util.UTC;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Arrays;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -135,6 +140,24 @@ public class ProvisioningCmsCertificateBuilderTest {
     public void shouldHaveNoSiaPointer() {
         X509CertificateInformationAccessDescriptor[] subjectInformationAccess = TEST_CMS_CERT.getSubjectInformationAccess();
         assertNull(subjectInformationAccess);
+    }
+
+    @Test
+    public void shouldSetDefaultValidityPeriod() {
+        final X509Certificate certificate = getTestProvisioningCmsCertificate().getCertificate();
+        final Duration validityDuration = Duration.between(certificate.getNotBefore().toInstant(), certificate.getNotAfter().toInstant());
+        assertTrue(validityDuration.compareTo(Duration.ofDays(1)) == -1);
+    }
+
+    @Test
+    public void shouldSetValidityPeriod() {
+        final DateTime now = UTC.dateTime();
+        final ValidityPeriod yearInDays = new ValidityPeriod(now, now.plusDays(365));
+
+        final X509Certificate certificate = subject.withValidityPeriod(yearInDays).build().getCertificate();
+
+        final Duration validityDuration = Duration.between(certificate.getNotBefore().toInstant(), certificate.getNotAfter().toInstant());
+        assertTrue(validityDuration.compareTo(Duration.ofDays(365)) == 0);
     }
 
     @Test
