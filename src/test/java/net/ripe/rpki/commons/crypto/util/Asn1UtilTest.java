@@ -22,8 +22,9 @@ public class Asn1UtilTest {
         parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void shouldFailIPv4ParsingWhenNoValidDerBitStringFoundP() {
+        // bouncy castle 1.70 catches this invalid case when decoding
         byte[] WRONG_ENCODED_IPV4_10_5_0_0_23 = {0x05, 0x04, 0x01, 0x0a, 0x05, 0x01};
         parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23));
     }
