@@ -43,12 +43,17 @@ import java.security.PublicKey;
 
 public class ProvisioningCmsCertificateBuilder {
 
-    private static final int DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW = 1;
+    private static final int DEFAULT_VALIDITY_TIME_MINUTES_FROM_NOW = 15;
+    /** default validity before now - to compensate for clock drift */
+    private static final int DEFAULT_VALIDITY_TIME_MINUTES_BEFORE_NOW = 1;
 
     private X509CertificateBuilderHelper builderHelper;
 
     public ProvisioningCmsCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
+
+        final DateTime now = UTC.dateTime();
+        builderHelper.withValidityPeriod(new ValidityPeriod(now.minusMinutes(DEFAULT_VALIDITY_TIME_MINUTES_BEFORE_NOW), now.plusMinutes(DEFAULT_VALIDITY_TIME_MINUTES_FROM_NOW)));
     }
 
     public ProvisioningCmsCertificateBuilder withSignatureProvider(String signatureProvider) {
@@ -81,6 +86,14 @@ public class ProvisioningCmsCertificateBuilder {
         return this;
     }
 
+    /**
+     * Override the <emph>default</emph> validity period of this EE certificate.
+     */
+    public ProvisioningCmsCertificateBuilder withValidityPeriod(ValidityPeriod validityPeriod) {
+        builderHelper.withValidityPeriod(validityPeriod);
+        return this;
+    }
+
     public ProvisioningCmsCertificate build() {
         setUpImplicitRequirementsForBuilderHelper();
         return new ProvisioningCmsCertificate(builderHelper.generateCertificate());
@@ -90,7 +103,5 @@ public class ProvisioningCmsCertificateBuilder {
         builderHelper.withCa(false);
         builderHelper.withKeyUsage(KeyUsage.digitalSignature);
         builderHelper.withAuthorityKeyIdentifier(true);
-        final DateTime now = UTC.dateTime();
-        builderHelper.withValidityPeriod(new ValidityPeriod(now, now.plusDays(DEFAULT_VALIDITY_TIME_DAYS_FROM_NOW)));
     }
 }
