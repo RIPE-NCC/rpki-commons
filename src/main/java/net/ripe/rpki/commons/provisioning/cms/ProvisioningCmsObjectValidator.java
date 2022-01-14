@@ -37,6 +37,12 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
+/**
+ *  Validating implies the checks for https://datatracker.ietf.org/doc/html/rfc6492#section-3.2
+ *         5.  Validate the CMS-provided certificate using the PKI that has been
+ *         determined by prior arrangement between the client and server
+ *                 (see test 3 of Section 3.1.2).
+ */
 public class ProvisioningCmsObjectValidator {
 
     private ValidationOptions options;
