@@ -59,7 +59,7 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
-### 2022-01-19 version 1.26
+### 2022-01-20 version 1.26
 
   * LICENSE is now in README and repository and not explicitly part of each file.
   * Copyright year updated to 2022
