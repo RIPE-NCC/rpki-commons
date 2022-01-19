@@ -59,7 +59,7 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
-### 2022-xx-xx version 1.26
+### 2022-01-19 version 1.26
 
   * LICENSE is now in README and repository and not explicitly part of each file.
   * Copyright year updated to 2022
@@ -67,6 +67,7 @@ POM version to `1.0` and then builds and releases the artifacts.
   * Added multiple BBN compliance test certificates as unit-tests
   * Simplified Base64 encoding
   * Use and support bouncy castle 1.70
+  * ipresource 1.48 (removes test dependencies from non-test scopes)
 
 ### 2021-08-31 version 1.24,1.25
 
