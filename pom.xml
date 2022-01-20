@@ -47,8 +47,8 @@
 
         <net.ripe.ipresource.version>1.48</net.ripe.ipresource.version>
         <bouncycastle.version>1.70</bouncycastle.version>
-        <guava.version>30.1.1-jre</guava.version>
-        <joda-time.version>2.10.10</joda-time.version>
+        <guava.version>31.0.1-jre</guava.version>
+        <joda-time.version>2.10.13</joda-time.version>
         <xstream.version>1.4.18</xstream.version>
         <commons-io.version>2.11.0</commons-io.version>
     </properties>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
-            <version>10.5</version>
+            <version>10.6</version>
         </dependency>
 
         <dependency>
