@@ -59,6 +59,9 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
+### 2022-xx-xx version 1.27
+  * Daxon-HE, joda-time, guava dependencies updated to newer versions.
+
 ### 2022-01-20 version 1.26
 
   * LICENSE is now in README and repository and not explicitly part of each file.
