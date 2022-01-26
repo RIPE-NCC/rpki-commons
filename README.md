@@ -59,8 +59,9 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
-### 2022-xx-xx version 1.27
+### 2022-01-26 version 1.27
   * Daxon-HE, joda-time, guava dependencies updated to newer versions.
+  * Depend on ipresource-1.49 fixing parsing some "IPv4 mapped to IPv6" addresses.
 
 ### 2022-01-20 version 1.26
 
