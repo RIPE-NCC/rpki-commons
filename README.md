@@ -58,8 +58,9 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 
 ## Changelog
+### 2022-xx-yy 1.29-SNAPSHOT
 
-### 2022-02-01 version 1.28-SNAPSHOT
+### 2022-02-01 version 1.28
   * xstream 1.4.18
 
 ### 2022-01-26 version 1.27
