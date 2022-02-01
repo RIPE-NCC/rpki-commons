@@ -59,6 +59,9 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
+### 2022-02-01 version 1.28-SNAPSHOT
+  * xstream 1.4.18
+
 ### 2022-01-26 version 1.27
   * Daxon-HE, joda-time, guava dependencies updated to newer versions.
   * Depend on ipresource-1.49 fixing parsing some "IPv4 mapped to IPv6" addresses.
