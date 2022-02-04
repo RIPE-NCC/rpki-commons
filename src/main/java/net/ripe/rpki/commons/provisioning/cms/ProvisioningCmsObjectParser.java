@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 import com.google.common.io.ByteSource;
+import net.ripe.rpki.commons.crypto.cms.SigningInformationUtil;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
@@ -34,6 +35,7 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.StoreException;
+import org.joda.time.DateTime;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -46,11 +48,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -78,6 +76,7 @@ public class ProvisioningCmsObjectParser {
     private String location;
     private AbstractProvisioningPayload payload;
 
+    private Optional<DateTime> signingTime;
 
     public ProvisioningCmsObjectParser() {
         this(ValidationResult.withLocation("n/a"));
@@ -128,7 +127,7 @@ public class ProvisioningCmsObjectParser {
         if (validationResult.hasFailures()) {
             throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed: " + validationResult.getFailuresForCurrentLocation());
         }
-        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl, payload);
+        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl, payload, signingTime);
     }
 
     /**
@@ -308,6 +307,8 @@ public class ProvisioningCmsObjectParser {
         verifyEncryptionAlgorithm(signer);
         verifySignature(signer);
         verifyUnsignedAttributes(signer);
+
+        signingTime = SigningInformationUtil.extractSigningTime(validationResult, signer).signingTime;
     }
 
     private SignerInformationStore getSignerStore() {

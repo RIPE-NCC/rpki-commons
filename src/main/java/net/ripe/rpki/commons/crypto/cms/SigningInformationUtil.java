@@ -22,6 +22,12 @@ import java.util.function.Function;
 
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
+/**
+ * Extract signing time or binary signing time.
+ *
+ * Extensively tested via the test cases in BBNCMSConformanceTest that test this with CMS that is parsed using this
+ * utility.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SigningInformationUtil {
     /**

@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Optional;
 
 
 public class ProvisioningCmsObject {
@@ -27,7 +28,10 @@ public class ProvisioningCmsObject {
     private final Collection<X509Certificate> caCertificates;
     private final X509CRL crl;
     private AbstractProvisioningPayload payload;
+    private final Optional<DateTime> signingTime;
 
+    // No support for signingTime.
+    @Deprecated
     public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload) {
         // -
         // ArrayIsStoredDirectly
@@ -36,6 +40,18 @@ public class ProvisioningCmsObject {
         this.caCertificates = caCertificates;
         this.crl = crl;
         this.payload = payload;
+        this.signingTime = Optional.empty();
+    }
+
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload, Optional<DateTime> signingTime) {
+        // -
+        // ArrayIsStoredDirectly
+        this.encodedContent = encodedContent;
+        this.cmsCertificate = cmsCertificate;
+        this.caCertificates = caCertificates;
+        this.crl = crl;
+        this.payload = payload;
+        this.signingTime = signingTime;
     }
 
     public byte[] getEncoded() {
@@ -73,30 +89,7 @@ public class ProvisioningCmsObject {
      * >http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2</a><br >
      */
     public DateTime getSigningTime() {
-        try {
-            CMSSignedData cmsSignedData = new CMSSignedData(encodedContent);
-            SignerInformationStore sis = cmsSignedData.getSignerInfos();
-
-            @SuppressWarnings("unchecked")
-            Collection<SignerInformation> signers = sis.getSigners();
-            for (SignerInformation signerInformation : signers) {
-                AttributeTable signedAttributes = signerInformation.getSignedAttributes();
-                Attribute signingTime = signedAttributes.get(CMSAttributes.signingTime);
-
-                @SuppressWarnings("unchecked")
-                Enumeration<Object> en = signingTime.getAttrValues().getObjects();
-                while (en.hasMoreElements()) {
-                    Object obj = en.nextElement();
-                    if (obj instanceof DERUTCTime) {
-                        DERUTCTime derTime = (DERUTCTime) obj;
-                        return UTC.dateTime(derTime.getDate());
-                    }
-                }
-            }
-            throw new IllegalArgumentException("Malformed encoded cms content");
-        } catch (CMSException | ParseException e) {
-            throw new IllegalArgumentException("Malformed encoded cms content", e);
-        }
+        return signingTime.orElse(null);
     }
 
     @Override
