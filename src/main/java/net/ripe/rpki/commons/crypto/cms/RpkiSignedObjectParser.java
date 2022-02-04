@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms;
 
+import lombok.Data;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -32,6 +33,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
@@ -48,7 +50,7 @@ public abstract class RpkiSignedObjectParser {
 
     protected ASN1ObjectIdentifier contentType;
 
-    private DateTime signingTime;
+    private Optional<DateTime> signingTime;
 
     private ValidationResult validationResult;
 
@@ -83,7 +85,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     protected DateTime getSigningTime() {
-        return signingTime;
+        return signingTime.orElse(null);
     }
 
     public void decodeRawContent(InputStream content) throws IOException {
@@ -232,9 +234,11 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        if (!extractSigningTime(signer)) {
+        final SigningTimeResult st = extractSigningTime(signer);
+        if (!st.valid) {
             return;
         }
+        this.signingTime = st.signingTime;
 
         verifySignature(certificate, signer);
     }
@@ -339,7 +343,7 @@ public abstract class RpkiSignedObjectParser {
      * of these attributes SHOULD be present". [..] "However, if both of these attributes are present,
      * they MUST provide the same date and time."
      */
-    private boolean extractSigningTime(SignerInformation signer) {
+    private SigningTimeResult extractSigningTime(SignerInformation signer) {
         ImmutablePair<DateTime, Boolean> signingTime = extractTime(
                 CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer,
                 attrValue -> UTC.dateTime(Time.getInstance(attrValue).getDate().getTime())
@@ -356,9 +360,30 @@ public abstract class RpkiSignedObjectParser {
         }
 
         if (valid) {
-            this.signingTime = signingTime.left != null ? signingTime.left : binarySigningTime.left;
+            return new SigningTimeResult(signingTime.left != null ? signingTime.left : binarySigningTime.left);
         }
-        return valid;
+        return new SigningTimeResult(valid);
+    }
+
+    @Data
+    public static class SigningTimeResult {
+        /** The value of the signing time. */
+        public final Optional<DateTime> signingTime;
+        /**
+         * Whether the signing time attribute was valid.
+         * A SigningTime can not be invalid <b>and</b> have a value.
+         */
+        public final boolean valid;
+
+        public SigningTimeResult(boolean valid) {
+            this.valid = valid;
+            this.signingTime = Optional.empty();
+        }
+
+        public SigningTimeResult(DateTime signingTime) {
+            this.signingTime = Optional.ofNullable(signingTime);
+            this.valid = true;
+        }
     }
 
     private ImmutablePair<DateTime, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer, Function<ASN1Encodable, DateTime> timeExtractor) {
