@@ -44,6 +44,7 @@
 
         <java.language.version>1.8</java.language.version>
         <java.runtime.version>1.8</java.runtime.version>
+        <lombok.version>1.18.22</lombok.version>
 
         <net.ripe.ipresource.version>1.49</net.ripe.ipresource.version>
         <bouncycastle.version>1.70</bouncycastle.version>
@@ -115,6 +116,13 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- DEPENDENCIES FOR TESTING -->
@@ -340,6 +348,13 @@
                         <arg>-Xlint:-processing</arg>
                         <arg>-Xlint:-serial</arg>
                     </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
