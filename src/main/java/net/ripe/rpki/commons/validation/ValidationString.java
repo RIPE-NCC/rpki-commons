@@ -145,6 +145,7 @@ public final class ValidationString {
     public static final String VALID_PAYLOAD_TYPE = "provisioning.valid.payloadtype";
     public static final String FOUND_PAYLOAD_TYPE = "provisioning.found.payloadtype";
     public static final String VALID_PAYLOAD_VERSION = "provisioning.valid.payloadversion";
+    public static final String SIGNING_TIME_GREATER_OR_EQUAL = "provisioning.signing.time.greater.equal";
 
     //roacms
     public static final String ROA_CONTENT_TYPE = "roa.content.type";

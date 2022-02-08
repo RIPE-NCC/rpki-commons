@@ -7,6 +7,11 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.joda.time.DateTime;
+
+import java.util.Optional;
+
+import static net.ripe.rpki.commons.validation.ValidationString.SIGNING_TIME_GREATER_OR_EQUAL;
 
 /**
  *  Validating implies the checks for https://datatracker.ietf.org/doc/html/rfc6492#section-3.2
@@ -25,10 +30,28 @@ public class ProvisioningCmsObjectValidator {
 
     private X509Crl crl;
 
+    /**
+     * The signing-time from the last message - if that message had one set.
+     *
+     * rfc6492#3.1.1.6.4 implies that signing time attributes are optional - so we may have never gotten one, and future
+     * objects may be lacking the value.
+     */
+    private final Optional<DateTime> optionalLastSigningTime;
+
+    // Prefer the constructor that moves the singning time check into this validator.
+    @Deprecated
     public ProvisioningCmsObjectValidator(ValidationOptions options, ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate identityCertificate) {
         this.options = options;
         this.cmsObject = cmsObject;
         this.identityCertificate = identityCertificate;
+        this.optionalLastSigningTime = Optional.empty();
+    }
+
+    public ProvisioningCmsObjectValidator(ValidationOptions options, Optional<DateTime> lastSigningTime, ProvisioningCmsObject cmsObject,ProvisioningIdentityCertificate identityCertificate) {
+        this.options = options;
+        this.cmsObject = cmsObject;
+        this.identityCertificate = identityCertificate;
+        this.optionalLastSigningTime = lastSigningTime;
     }
 
     public void validate(ValidationResult validationResult) {
@@ -45,6 +68,7 @@ public class ProvisioningCmsObjectValidator {
 
         validateCrl();
         validateCertificateChain();
+        validateSigningTime();
     }
 
     private void validateCrl() {
@@ -55,6 +79,21 @@ public class ProvisioningCmsObjectValidator {
     private void validateCertificateChain() {
         validateCmsCertificate();
         validateIdentityCertificate();
+    }
+
+    private void validateSigningTime() {
+        // rfc6492#3.1.2
+        // 5.  The time represented by the signing-time attribute or the binary-
+        //     signing-time attribute is greater than or equal to the time value
+        //     passed in previously valid CMS objects that were passed from the
+        //     same originator to this recipient. [...]
+        final DateTime thisSigningTime = cmsObject.getSigningTime();
+
+        if (thisSigningTime != null) {
+            optionalLastSigningTime.ifPresent(lastSigningTime ->
+                validationResult.rejectIfTrue(lastSigningTime.isAfter(thisSigningTime), SIGNING_TIME_GREATER_OR_EQUAL, lastSigningTime.toString(), thisSigningTime.toString())
+            );
+        }
     }
 
     private void validateCmsCertificate() {

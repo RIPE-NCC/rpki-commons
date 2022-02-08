@@ -20,12 +20,15 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -91,7 +94,7 @@ public class ProcessIscUpdownPdusTest {
         ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
 
         ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(
-            ValidationOptions.backCompatibleRipeNccValidator(), provisioningCmsObject, childCert);
+            ValidationOptions.backCompatibleRipeNccValidator(), Optional.empty(), provisioningCmsObject, childCert);
         ValidationResult result = ValidationResult.withLocation("unknown.der");
         validator.validate(result);
 
@@ -103,16 +106,14 @@ public class ProcessIscUpdownPdusTest {
         assertTrue(failures.contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, "2012-06-30T04:07:24.000Z")));
     }
 
-    @Test
-    public void shouldParseAllIscUpDownMessages() throws IOException {
-        String[] files = new String[]{"pdu.170.der", "pdu.171.der", "pdu.172.der", "pdu.173.der", "pdu.180.der", "pdu.183.der", "pdu.184.der",
-                "pdu.189.der", "pdu.196.der", "pdu.199.der", "pdu.200.der", "pdu.205.der"};
-        for (String fileName : files) {
-            byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/" + fileName));
-            ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
-            parser.parseCms("cms", encoded);
-            assertFalse(parser.getValidationResult().hasFailures());
-        }
+    @ValueSource(strings = {"pdu.170.der", "pdu.171.der", "pdu.172.der", "pdu.173.der", "pdu.180.der", "pdu.183.der", "pdu.184.der",
+            "pdu.189.der", "pdu.196.der", "pdu.199.der", "pdu.200.der", "pdu.205.der"})
+    @ParameterizedTest(name = "{displayName} - {0}")
+    public void shouldParseIscUpDownMessages(String testCaseFile) throws IOException {
+        byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/" + testCaseFile));
+        ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
+        parser.parseCms("cms", encoded);
+        assertFalse(parser.getValidationResult().hasFailures());
     }
 
     @Test
