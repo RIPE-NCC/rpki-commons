@@ -37,9 +37,11 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
             final Element root = getElement(doc, "publisher_request")
                     .orElseThrow(() -> new IdentitySerializerException("publisher_request element not found"));
 
-            final String handle = getRequiredAttributeValue(root, "publisher_handle");
+            final Optional<String> tag = getAttributeValue(root, "tag");
 
-            final ProvisioningIdentityCertificate provisioningIdentityCertificate =
+            final String publisherHandle = getRequiredAttributeValue(root, "publisher_handle");
+
+            final ProvisioningIdentityCertificate publisherBpkiTa =
                 getBpkiElementContent(doc, "publisher_bpki_ta")
                     .map(bpkiTa -> getProvisioningIdentityCertificate(bpkiTa))
                     .orElseThrow(() -> new IdentitySerializerException("publisher_bpki_ta element not found"));
@@ -52,7 +54,7 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
                         )
                     );
 
-            return new PublisherRequest(handle, provisioningIdentityCertificate, referral);
+            return new PublisherRequest(tag, publisherHandle, publisherBpkiTa, referral);
         } catch (IllegalArgumentException | SAXException | IOException | ParserConfigurationException e) {
             throw new IdentitySerializerException("Failed to parse publisher request", e);
         }
@@ -65,11 +67,12 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
             final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
 
             final Element requestElement = document.createElementNS(XMLNS, "publisher_request");
-            requestElement.setAttribute("publisher_handle", publisherRequest.getHandle());
+            requestElement.setAttribute("publisher_handle", publisherRequest.getPublisherHandle());
+            publisherRequest.getTag().ifPresent(tag -> requestElement.setAttribute("tag", tag));
             requestElement.setAttribute("version", Integer.toString(publisherRequest.getVersion()));
 
             final Element bpkiTaElement = document.createElementNS(XMLNS, "publisher_bpki_ta");
-            bpkiTaElement.setTextContent(publisherRequest.getIdentityCertificate().getBase64String());
+            bpkiTaElement.setTextContent(publisherRequest.getPublisherBpkiTa().getBase64String());
 
             final Optional<Element> referralElement = publisherRequest.getReferral()
                 .map(referral -> {
