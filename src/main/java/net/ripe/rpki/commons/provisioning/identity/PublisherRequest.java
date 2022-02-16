@@ -26,14 +26,14 @@ public class PublisherRequest {
     Optional<Referral> referral;
 
     /**
-     * Create a publisher identity to offer to your parent with a random UUID based handle.
+     * Create a publisher identity to offer to a repository with a random UUID based handle.
      */
     public PublisherRequest(ProvisioningIdentityCertificate publisherBpkiTa) {
         this(Optional.empty(), UUID.randomUUID().toString(), publisherBpkiTa, Optional.empty());
     }
 
     /**
-     * Create a child identity to offer to your parent, including a suggested handle. Note that
+     * Create a publisher request to offer to a repository, including a suggested handle. Note that
      * your parent may ignore this handle!
      */
     public PublisherRequest(Optional<String> tag, String publisherHandle, ProvisioningIdentityCertificate publisherBpkiTa, Optional<Referral> referral) {

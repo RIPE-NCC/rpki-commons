@@ -50,7 +50,7 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
                 getOptionalSingleChildElement(root, "referral")
                     .map(element -> new PublisherRequest.Referral(
                             getRequiredAttributeValue(element, "referrer"),
-                            Base64.getDecoder().decode(getElementTextContent(element))
+                            AUTHORIZATION_TOKEN_DECODER.decode(getElementTextContent(element))
                         )
                     );
 
@@ -67,9 +67,9 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
             final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
 
             final Element requestElement = document.createElementNS(XMLNS, "publisher_request");
-            requestElement.setAttribute("publisher_handle", publisherRequest.getPublisherHandle());
-            publisherRequest.getTag().ifPresent(tag -> requestElement.setAttribute("tag", tag));
             requestElement.setAttribute("version", Integer.toString(publisherRequest.getVersion()));
+            publisherRequest.getTag().ifPresent(tag -> requestElement.setAttribute("tag", tag));
+            requestElement.setAttribute("publisher_handle", publisherRequest.getPublisherHandle());
 
             final Element bpkiTaElement = document.createElementNS(XMLNS, "publisher_bpki_ta");
             bpkiTaElement.setTextContent(publisherRequest.getPublisherBpkiTa().getBase64String());
