@@ -36,6 +36,7 @@ public class PublisherRequestSerializerTest {
         PublisherRequest publisherRequest = serializer.deserialize(examplePublishRequest);
 
         assertEquals("krill-testbed-prepdev", publisherRequest.getPublisherHandle());
+        assertEquals("CN=C7D7CCBDBC4A9675174E90F8E7C89DFB12AFAC03", publisherRequest.getPublisherBpkiTa().getSubject().getName());
     }
 
     @Test
