@@ -22,6 +22,7 @@ public class PublisherRequest {
     String handle;
     ProvisioningIdentityCertificate identityCertificate;
     Optional<Referral> referral;
+
     /**
      * Create a publisher identity to offer to your parent with a random UUID based handle.
      */
