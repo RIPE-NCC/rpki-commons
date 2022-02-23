@@ -37,6 +37,8 @@ public class SigningInformationUtil {
      * attribute, or neither. As stated in RFC 6019 Section 4 [Security Considerations] "only one
      * of these attributes SHOULD be present". [..] "However, if both of these attributes are present,
      * they MUST provide the same date and time."
+     *
+     * @ensures res.valid && all signing time attributes have a single value && all signing time values have the same value
      */
     public static SigningTimeResult extractSigningTime(ValidationResult validationResult, SignerInformation signer) {
         ImmutablePair<DateTime, Boolean> signingTime = extractTime(
@@ -85,20 +87,22 @@ public class SigningInformationUtil {
     @Data
     public static class SigningTimeResult {
         /** The value of the signing time. */
-        public final Optional<DateTime> signingTime;
+        public final Optional<DateTime> optionalSigningTime;
         /**
          * Whether the signing time attribute was valid.
          * A SigningTime can not be invalid <b>and</b> have a value.
+         *
+         * However, the signing time of a CMS object <i>is</i> valid if the value is missing.
          */
         public final boolean valid;
 
         public SigningTimeResult(boolean valid) {
             this.valid = valid;
-            this.signingTime = Optional.empty();
+            this.optionalSigningTime = Optional.empty();
         }
 
         public SigningTimeResult(DateTime signingTime) {
-            this.signingTime = Optional.ofNullable(signingTime);
+            this.optionalSigningTime = Optional.ofNullable(signingTime);
             this.valid = true;
         }
     }

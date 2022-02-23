@@ -140,8 +140,6 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
 
     //
     // Test cases for signing ime
-    // - no current signing time.
-    // - no current signing time, no last
     //
     // - no previous signing-time: all previous cases had no signing time.
     // - signing time after last
@@ -149,31 +147,6 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
     // - signing time before last
     // Same CMS and ID cert as above, valid at the point in time set in the test.
     //
-    @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_no_current() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
-
-        final ProvisioningCmsObject cmsObjectWithoutSigningTime = new ProvisioningCmsObject(
-                ca1CmsObject.getEncoded(), ca1CmsObject.getCmsCertificate(), ca1CmsObject.getCaCertificates(),
-                ca1CmsObject.getCrl(), ca1CmsObject.getPayload(), Optional.empty()
-        );
-
-        validateObjectsWithLastSigningTime(validationResult, DateTime.parse("2022-01-11T11:00:00.000Z"), cmsObjectWithoutSigningTime, ca1IdCert);
-        assertThat(validationResult.hasFailures()).isFalse();
-    }
-
-    @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_no_current_no_last() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
-
-        final ProvisioningCmsObject cmsObjectWithoutSigningTime = new ProvisioningCmsObject(
-                ca1CmsObject.getEncoded(), ca1CmsObject.getCmsCertificate(), ca1CmsObject.getCaCertificates(),
-                ca1CmsObject.getCrl(), ca1CmsObject.getPayload(), Optional.empty()
-        );
-
-        validateObjectsWithLastSigningTime(validationResult, null, cmsObjectWithoutSigningTime, ca1IdCert);
-        assertThat(validationResult.hasFailures()).isFalse();
-    }
 
     @Test
     public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_no_last() throws IOException {

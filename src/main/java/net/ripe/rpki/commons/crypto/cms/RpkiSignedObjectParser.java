@@ -232,7 +232,7 @@ public abstract class RpkiSignedObjectParser {
         if (!st.valid) {
             return;
         }
-        this.signingTime = st.signingTime;
+        this.signingTime = st.optionalSigningTime;
 
         verifySignature(certificate, signer);
     }

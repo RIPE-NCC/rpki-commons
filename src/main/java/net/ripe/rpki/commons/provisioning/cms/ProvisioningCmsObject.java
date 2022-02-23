@@ -1,25 +1,14 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import lombok.NonNull;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
-import net.ripe.rpki.commons.util.UTC;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
 import org.joda.time.DateTime;
 
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Optional;
 
 
 public class ProvisioningCmsObject {
@@ -29,9 +18,10 @@ public class ProvisioningCmsObject {
     private final Collection<X509Certificate> caCertificates;
     private final X509CRL crl;
     private AbstractProvisioningPayload payload;
-    private final Optional<DateTime> signingTime;
+    /** Signing time MUST be present https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.3 */
+    private final DateTime signingTime;
 
-    // No support for signingTime.
+    // No support for signingTime, which is a required attribute for valid objects.
     @Deprecated
     public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload) {
         // -
@@ -41,10 +31,10 @@ public class ProvisioningCmsObject {
         this.caCertificates = caCertificates;
         this.crl = crl;
         this.payload = payload;
-        this.signingTime = Optional.empty();
+        this.signingTime = null;
     }
 
-    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload, Optional<DateTime> signingTime) {
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload, @NonNull DateTime signingTime) {
         // -
         // ArrayIsStoredDirectly
         this.encodedContent = encodedContent;
@@ -90,7 +80,7 @@ public class ProvisioningCmsObject {
      * >http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2</a><br >
      */
     public DateTime getSigningTime() {
-        return signingTime.orElse(null);
+        return signingTime;
     }
 
     @Override

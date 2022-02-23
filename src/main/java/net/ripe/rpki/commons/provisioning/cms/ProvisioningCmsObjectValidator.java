@@ -18,6 +18,10 @@ import static net.ripe.rpki.commons.validation.ValidationString.SIGNING_TIME_GRE
  *         5.  Validate the CMS-provided certificate using the PKI that has been
  *         determined by prior arrangement between the client and server
  *                 (see test 3 of Section 3.1.2).
+ *
+ * This includes validating the two provisioning cms objects in isolation, followed
+ * by the validation steps that consider the identity certificate, CMS object, and
+ * the signing time of previous messages.
  */
 public class ProvisioningCmsObjectValidator {
 
@@ -31,10 +35,10 @@ public class ProvisioningCmsObjectValidator {
     private X509Crl crl;
 
     /**
-     * The signing-time from the last message - if that message had one set.
+     * The signing-time from the last message - if we have a previous message.
      *
-     * rfc6492#3.1.1.6.4 implies that signing time attributes are optional - so we may have never gotten one, and future
-     * objects may be lacking the value.
+     * rfc6492#3.1.1.6.4.3 requires that either one of the signing-time attribute or the binary-signing-time
+     * attribute, or both attributes, MUST be present.
      */
     private final Optional<DateTime> optionalLastSigningTime;
 
