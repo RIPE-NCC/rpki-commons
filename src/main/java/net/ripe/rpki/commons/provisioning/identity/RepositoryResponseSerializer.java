@@ -32,6 +32,10 @@ public class RepositoryResponseSerializer extends IdentitySerializer<RepositoryR
             final Element root = getElement(doc, "repository_response")
                     .orElseThrow(() -> new IdentitySerializerException("repository_response element not found"));
 
+            getAttributeValue(root, "version")
+                .filter(v -> "1".equals(v))
+                .orElseThrow(() -> new IdentitySerializerException("version is not supported"));
+
             final Optional<String> tag = getAttributeValue(root, "tag");
 
             final URI serviceUri = URI.create(getRequiredAttributeValue(root, "service_uri"));

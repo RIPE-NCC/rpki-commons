@@ -37,6 +37,10 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
             final Element root = getElement(doc, "publisher_request")
                     .orElseThrow(() -> new IdentitySerializerException("publisher_request element not found"));
 
+            getAttributeValue(root, "version")
+                    .filter(v -> "1".equals(v))
+                    .orElseThrow(() -> new IdentitySerializerException("version is not supported"));
+
             final Optional<String> tag = getAttributeValue(root, "tag");
 
             final String publisherHandle = getRequiredAttributeValue(root, "publisher_handle");
