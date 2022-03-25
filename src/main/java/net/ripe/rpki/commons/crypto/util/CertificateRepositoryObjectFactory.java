@@ -2,6 +2,8 @@ package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCms;
+import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCmsParser;
 import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCms;
 import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
@@ -44,11 +46,12 @@ public final class CertificateRepositoryObjectFactory {
                 return parseCrl(encoded, validationResult);
             case Gbr:
                 return parseGbr(encoded, validationResult);
+            case Aspa:
+                return parseAspa(encoded, validationResult);
             case Unknown:
                 return new UnknownCertificateRepositoryObject(encoded);
-            default:
-                throw new IllegalArgumentException("Unrecognized repository object type");
         }
+        throw new IllegalArgumentException("Unrecognized repository object type: " + objectType);
     }
 
     private static X509Crl parseCrl(byte[] encoded, ValidationResult validationResult) {
@@ -78,11 +81,10 @@ public final class CertificateRepositoryObjectFactory {
         final ManifestCmsParser parser = new ManifestCmsParser();
         final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
+        validationResult.addAll(temp);
         if (parser.isSuccess()) {
-            validationResult.addAll(temp);
             return parser.getManifestCms();
         } else {
-            validationResult.addAll(temp);
             return null;
         }
     }
@@ -91,11 +93,22 @@ public final class CertificateRepositoryObjectFactory {
         final GhostbustersCmsParser parser = new GhostbustersCmsParser();
         final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
+        validationResult.addAll(temp);
         if (parser.isSuccess()) {
-            validationResult.addAll(temp);
             return parser.getGhostbustersCms();
         } else {
-            validationResult.addAll(temp);
+            return null;
+        }
+    }
+
+    private static ASProviderAttestationCms parseAspa(byte[] encoded, ValidationResult validationResult) {
+        final ASProviderAttestationCmsParser parser = new ASProviderAttestationCmsParser();
+        final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
+        parser.parse(temp, encoded);
+        validationResult.addAll(temp);
+        if (parser.isSuccess()) {
+            return parser.getASProviderAttestationCms();
+        } else {
             return null;
         }
     }

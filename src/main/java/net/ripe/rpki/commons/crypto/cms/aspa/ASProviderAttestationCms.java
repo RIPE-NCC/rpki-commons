@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
@@ -24,8 +25,12 @@ import java.util.Optional;
  * See https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-07.
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class ASProviderAttestationCms extends RpkiSignedObject {
 
+    /**
+     * https://www.iana.org/assignments/rpki/rpki.xhtml
+     */
     public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.49");
 
     /**
