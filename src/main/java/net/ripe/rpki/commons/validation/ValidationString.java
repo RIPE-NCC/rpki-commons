@@ -183,6 +183,7 @@ public final class ValidationString {
     public static final String ASPA_ADDR_FAMILY = "aspa.address.family";
     public static final String ASPA_CUSTOMER_ASN_PRESENT = "aspa.customer.asn.present";
     public static final String ASPA_PROVIDER_AS_SEQUENCE_SIZE = "aspa.provider.as.sequence.size";
+    public static final String ASPA_CUSTOMER_ASN_CERTIFIED = "aspa.customer.asn.certified";
 
     //validator
     public static final String VALIDATOR_URI_SAFETY = "validator.uri.safety";

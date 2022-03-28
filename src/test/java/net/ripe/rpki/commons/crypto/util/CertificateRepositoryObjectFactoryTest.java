@@ -180,9 +180,10 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertTrue(object instanceof ASProviderAttestationCms);
         assertEquals(aspa, object);
-        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 56, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 57, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue("" + validationResult.getAllValidationChecksForCurrentLocation(), validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+        assertTrue(validationResult.getResultForCurrentLocation(ASPA_CUSTOMER_ASN_CERTIFIED).isOk());
     }
 
     @Test

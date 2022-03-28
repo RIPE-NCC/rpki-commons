@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
@@ -29,6 +30,21 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
     @Override
     public void parse(ValidationResult result, byte[] encoded) {
         super.parse(result, encoded);
+        validateAspa();
+    }
+
+    /**
+     * See https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-07#section-4.
+     */
+    private void validateAspa() {
+        ValidationResult validationResult = getValidationResult();
+
+        if (customerAsn != null) {
+            validationResult.rejectIfFalse(
+                getCertificate().containsResources(new IpResourceSet(customerAsn)),
+                ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
+            );
+        }
     }
 
     @Override
