@@ -1,6 +1,8 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -15,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.File;
@@ -22,11 +25,14 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.junit.Assert.*;
 
+@RunWith(JUnitQuickcheck.class)
 public class ASProviderAttestationCmsTest {
 
 
@@ -63,20 +69,27 @@ public class ASProviderAttestationCmsTest {
         );
     }
 
-    @Test
-    public void should_generate_aspa() {
-        ASProviderAttestationCms cms = createAspa();
+    @Property(trials = 100)
+    public void should_generate_aspa(int customerAsId, List<ProviderAS> providerAsIdSet) {
+        Asn customerAsn = new Asn(Integer.toUnsignedLong(customerAsId));
+        ImmutableSortedSet<ProviderAS> providerAsSet = providerAsIdSet.stream()
+            .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
+        ASProviderAttestationCms cms = createAspa(customerAsn, providerAsSet);
         assertEquals(0, cms.getVersion());
-        assertEquals(CUSTOMER_ASN, cms.getCustomerAsn());
-        assertEquals(PROVIDER_AS_SET, cms.getProviderASSet());
+        assertEquals(customerAsn, cms.getCustomerAsn());
+        assertEquals(providerAsSet, cms.getProviderASSet());
     }
 
     public static ASProviderAttestationCms createAspa() {
+        return createAspa(CUSTOMER_ASN, PROVIDER_AS_SET);
+    }
+
+    public static ASProviderAttestationCms createAspa(Asn customerAsn, ImmutableSortedSet<ProviderAS> providerAsSet) {
         ASProviderAttestationCmsBuilder builder = new ASProviderAttestationCmsBuilder();
-        builder.withCertificate(createCertificate(new IpResourceSet(CUSTOMER_ASN)));
-        builder.withCustomerAsn(CUSTOMER_ASN);
+        builder.withCertificate(createCertificate(new IpResourceSet(customerAsn)));
+        builder.withCustomerAsn(customerAsn);
         builder.withProviderASSet(
-            PROVIDER_AS_SET
+            providerAsSet
         );
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         return builder.build(TEST_KEY_PAIR.getPrivate());
