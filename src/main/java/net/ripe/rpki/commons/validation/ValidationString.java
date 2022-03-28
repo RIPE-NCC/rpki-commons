@@ -177,6 +177,13 @@ public final class ValidationString {
     public static final String GHOSTBUSTERS_RECORD_ADR_TEL_OR_EMAIL_PRESENT = "ghostbusters.record.adr.tel.or.email.present";
     public static final String GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY = "ghostbusters.record.supported.property";
 
+    // ASPA
+    public static final String ASPA_CONTENT_STRUCTURE = "aspa.content.structure";
+    public static final String ASPA_VERSION = "aspa.version";
+    public static final String ASPA_ADDR_FAMILY = "aspa.address.family";
+    public static final String ASPA_CUSTOMER_ASN_PRESENT = "aspa.customer.asn.present";
+    public static final String ASPA_PROVIDER_AS_SEQUENCE_SIZE = "aspa.provider.as.sequence.size";
+
     //validator
     public static final String VALIDATOR_URI_SAFETY = "validator.uri.safety";
     public static final String VALIDATOR_URI_RSYNC_SCHEME = "validator.uri.rsync.scheme";

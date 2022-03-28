@@ -7,10 +7,10 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import net.ripe.rpki.commons.validation.ValidationString;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERTaggedObject;
 
 import java.util.Comparator;
@@ -20,14 +20,6 @@ import java.util.stream.StreamSupport;
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
 
 public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
-
-    private static final String ASPA_CONTENT_SEQUENCE = "aspa.content.sequence";
-    private static final String ASPA_CONTENT_STRUCTURE = "aspa.content.structure";
-    private static final String ASPA_VERSION = "aspa.version";
-    private static final String ASPA_ADDR_FAMILY = "aspa.address.family";
-    private static final String ASPA_CUSTOMER_ASN_PRESENT = "aspa.customer.asn";
-    private static final String ASPA_PROVIDER_ASNS_NOT_EMPTY = "aspa.provider.asns";
-    private static final String ASPA_PROVIDER_AS_SEQUENCE = "aspa.provider.as.sequence";
 
     private int version;
     private AddressFamily afi;
@@ -48,7 +40,7 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
 
             final int itemCount = seq.size();
             if (itemCount < 2) {
-                validationResult.rejectIfFalse(false, ASPA_CONTENT_SEQUENCE);
+                validationResult.rejectIfFalse(false, ValidationString.ASPA_CONTENT_STRUCTURE);
                 return;
             }
 
@@ -56,9 +48,9 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
             ASN1Encodable maybeVersion = seq.getObjectAt(index);
             if (maybeVersion instanceof DERTaggedObject) {
                 DERTaggedObject tagged = (DERTaggedObject) maybeVersion;
-                validationResult.rejectIfFalse(tagged.getTagNo() == 0, ASPA_VERSION, String.valueOf(tagged.getTagNo()));
+                validationResult.rejectIfFalse(tagged.getTagNo() == 0, ValidationString.ASPA_CONTENT_STRUCTURE);
                 ASN1Integer version = expect(tagged.getBaseObject(), ASN1Integer.class);
-                validationResult.rejectIfFalse(version.intValueExact() == 0, ASPA_VERSION, "attestation version must be 0, but is " + this.version);
+                validationResult.rejectIfFalse(version.intValueExact() == 0, ValidationString.ASPA_VERSION, String.valueOf(version.intValueExact()));
                 this.version = version.intValueExact();
 
                 ++index;
@@ -66,7 +58,7 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
                 this.version = 0;
             }
 
-            validationResult.rejectIfFalse(index < itemCount && seq.getObjectAt(index) instanceof ASN1Integer, ASPA_CUSTOMER_ASN_PRESENT);
+            validationResult.rejectIfFalse(index < itemCount && seq.getObjectAt(index) instanceof ASN1Integer, ValidationString.ASPA_CUSTOMER_ASN_PRESENT);
             if (validationResult.hasFailureForCurrentLocation()) {
                 return;
             }
@@ -83,15 +75,15 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
                 .map(this::parseProviderAS)
                 .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
         } catch (IllegalArgumentException ex) {
-            validationResult.error(ASPA_CONTENT_STRUCTURE);
+            validationResult.error(ValidationString.ASPA_CONTENT_STRUCTURE);
         }
     }
 
     private ProviderAS parseProviderAS(ASN1Encodable asn1Encodable) {
         ValidationResult validationResult = getValidationResult();
         ASN1Sequence sequence = expect(asn1Encodable, ASN1Sequence.class);
-    
-        validationResult.rejectIfTrue(sequence.size() < 1 || sequence.size() > 2, ASPA_PROVIDER_AS_SEQUENCE);
+
+        validationResult.rejectIfTrue(sequence.size() < 1 || sequence.size() > 2, ValidationString.ASPA_PROVIDER_AS_SEQUENCE_SIZE);
         if (validationResult.hasFailureForCurrentLocation()) {
             throw new IllegalArgumentException("invalid sequence length");
         }
@@ -100,7 +92,7 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
         AddressFamily afiLimit = null;
         if (sequence.size() > 1) {
            afiLimit = AddressFamily.fromDer(sequence.getObjectAt(1));
-           validationResult.rejectIfFalse(afiLimit.equals(AddressFamily.IPV4) || afiLimit.equals(AddressFamily.IPV6), ASPA_ADDR_FAMILY);
+           validationResult.rejectIfFalse(afiLimit.equals(AddressFamily.IPV4) || afiLimit.equals(AddressFamily.IPV6), ValidationString.ASPA_ADDR_FAMILY);
         }
 
         return new ProviderAS(providerAsn, Optional.ofNullable(afiLimit));
