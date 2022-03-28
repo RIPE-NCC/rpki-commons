@@ -2,6 +2,8 @@ package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
+import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCms;
+import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCmsTest;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsTest;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
@@ -158,7 +160,7 @@ public class CertificateRepositoryObjectFactoryTest {
     }
 
     @Test
-    public void shouldParsemalformedGhostbustersRecord() {
+    public void shouldParseMalformedGhostbustersRecord() {
         byte[] encoded = {0, 1};
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("ghostbusters.gbr"));
 
@@ -166,6 +168,33 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertNull(object);
         assertEquals(3, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+    }
+
+    @Test
+    public void shouldParseAspa() {
+        ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("aspa.asa"));
+        ASProviderAttestationCms aspa = ASProviderAttestationCmsTest.createAspa();
+
+        CertificateRepositoryObject object = createCertificateRepositoryObject(aspa.getEncoded(), validationResult);
+
+        assertTrue(object instanceof ASProviderAttestationCms);
+        assertEquals(aspa, object);
+        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 56, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertTrue("" + validationResult.getAllValidationChecksForCurrentLocation(), validationResult.hasNoFailuresOrWarnings());
+        assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
+    }
+
+    @Test
+    public void shouldParseMalformedAspa() {
+        byte[] encoded = { 0, 1 };
+        ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("aspa.asa"));
+
+        CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
+
+        assertNull(object);
+        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 2, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertFalse("" + validationResult.getAllValidationChecksForCurrentLocation(), validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }
 }

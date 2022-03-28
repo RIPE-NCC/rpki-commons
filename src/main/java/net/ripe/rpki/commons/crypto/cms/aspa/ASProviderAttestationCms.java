@@ -6,20 +6,10 @@ import lombok.Value;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
-import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
-import net.ripe.rpki.commons.validation.ValidationOptions;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
-import java.net.URI;
-import java.security.Provider;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * See https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-07.
@@ -59,16 +49,5 @@ public class ASProviderAttestationCms extends RpkiSignedObject {
         this.version = version;
         this.customerAsn = Objects.requireNonNull(customerAsn);
         this.providerASSet = Objects.requireNonNull(providerASSet);
-    }
-
-    @Override
-    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
-        X509ResourceCertificateValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
-        validator.validate(location, getCertificate());
-    }
-
-    @Override
-    public URI getParentCertificateUri() {
-        return getCertificate().getParentCertificateUri();
     }
 }

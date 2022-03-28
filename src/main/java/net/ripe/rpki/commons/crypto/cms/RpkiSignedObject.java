@@ -7,6 +7,8 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.*;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
+import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
@@ -137,7 +139,15 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
     }
 
-    abstract protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl);
+    @Override
+    public URI getParentCertificateUri() {
+        return getCertificate().getParentCertificateUri();
+    }
+
+    protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
+        X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
+        validator.validate(location, getCertificate());
+    }
 
     private boolean hasErrorInRevocationCheck(List<ValidationCheck> failures) {
         for (ValidationCheck validationCheck : failures) {
