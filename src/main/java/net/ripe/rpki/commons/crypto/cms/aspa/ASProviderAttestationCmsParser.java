@@ -29,7 +29,6 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
     @Override
     public void parse(ValidationResult result, byte[] encoded) {
         super.parse(result, encoded);
-        //validateGhostbusters();
     }
 
     @Override
