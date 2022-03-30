@@ -138,7 +138,7 @@ public abstract class RpkiSignedObjectParser {
      */
     private void verifyContentType() {
         // CMSSignedDataParser does not check that the contentType of the ContentInfo is id-signeddata.
-        // and does not allow you to access it => use the CMS Signed Data implementation that is in BC.
+        // and does not allow you to access it => use the other CMS Signed Data implementation that is in BC.
         try {
             final CMSSignedData signedData = new CMSSignedData(encoded);
             validationResult.rejectIfFalse(CMSObjectIdentifiers.signedData.equals(signedData.toASN1Structure().getContentType()), CMS_CONTENT_TYPE);
