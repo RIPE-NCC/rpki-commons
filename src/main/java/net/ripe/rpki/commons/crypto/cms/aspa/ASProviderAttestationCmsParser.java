@@ -67,6 +67,9 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
             int index = 0;
             ASN1Encodable maybeVersion = seq.getObjectAt(index);
             if (maybeVersion instanceof DERTaggedObject) {
+                // Version is optional and defaults to 0, so should not be explicitly encoded when using DER encoding
+                // If it is present and correct, we still accept the object. If the version is different, reject the
+                // object.
                 DERTaggedObject tagged = (DERTaggedObject) maybeVersion;
                 validationResult.rejectIfFalse(tagged.getTagNo() == 0, ValidationString.ASPA_CONTENT_STRUCTURE);
                 ASN1Integer version = expect(tagged.getBaseObject(), ASN1Integer.class);
