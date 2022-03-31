@@ -49,16 +49,11 @@ public class ASProviderAttestationCmsTest {
 
     private static final Asn CUSTOMER_ASN = Asn.parse("AS65000");
 
-    @Test
-    public void should_parse_aspa() throws IOException {
-        String path = "src/test/resources/conformance/root/aspa-bm.asa";
-        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
-        ValidationResult result = ValidationResult.withLocation("aspa-bm.asa");
-        ASProviderAttestationCmsParser parser = new ASProviderAttestationCmsParser();
-        parser.parse(result, bytes);
 
-        assertFalse("" + result.getFailuresForAllLocations(), result.hasFailures());
-        ASProviderAttestationCms aspa = parser.getASProviderAttestationCms();
+    @Test
+    public void should_parse_aspa_1() throws IOException {
+        String path = "src/test/resources/conformance/root/aspa-bm.asa";
+        ASProviderAttestationCms aspa = parseValidAspa(path);
         assertEquals(Asn.parse("AS65000"), aspa.getCustomerAsn());
         assertEquals(
             ImmutableSortedSet.<ProviderAS>naturalOrder()
@@ -67,6 +62,32 @@ public class ASProviderAttestationCmsTest {
                 .build(),
             aspa.getProviderASSet()
         );
+    }
+
+    @Test
+    public void should_parse_aspa_2() throws IOException {
+        String path = "src/test/resources/conformance/root/AS211321.asa";
+        ASProviderAttestationCms aspa = parseValidAspa(path);
+        assertEquals(Asn.parse("AS211321"), aspa.getCustomerAsn());
+        assertEquals(
+            ImmutableSortedSet.<ProviderAS>naturalOrder()
+                .add(new ProviderAS(Asn.parse("AS65000"), Optional.empty()))
+                .add(new ProviderAS(Asn.parse("AS65001"), Optional.of(AddressFamily.IPV4)))
+                .add(new ProviderAS(Asn.parse("AS65002"), Optional.of(AddressFamily.IPV6)))
+                .build(),
+            aspa.getProviderASSet()
+        );
+    }
+
+    private ASProviderAttestationCms parseValidAspa(String path) throws IOException {
+        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        ValidationResult result = ValidationResult.withLocation(path);
+        ASProviderAttestationCmsParser parser = new ASProviderAttestationCmsParser();
+        parser.parse(result, bytes);
+
+        assertFalse("" + result.getFailuresForAllLocations(), result.hasFailures());
+        ASProviderAttestationCms aspa = parser.getASProviderAttestationCms();
+        return aspa;
     }
 
     @Property(trials = 100)
