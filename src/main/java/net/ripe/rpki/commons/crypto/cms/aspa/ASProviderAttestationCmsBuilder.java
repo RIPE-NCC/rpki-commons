@@ -51,7 +51,7 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     public ASProviderAttestationCms build(PrivateKey privateKey) {
-        String location = "unknown.gbr";
+        String location = "unknown.asa";
         ASProviderAttestationCmsParser parser = new ASProviderAttestationCmsParser();
         parser.parse(ValidationResult.withLocation(location), getEncoded(privateKey));
         return parser.getASProviderAttestationCms();
