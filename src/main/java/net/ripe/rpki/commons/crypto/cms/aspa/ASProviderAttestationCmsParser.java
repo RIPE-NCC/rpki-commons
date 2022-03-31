@@ -39,12 +39,17 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
     private void validateAspa() {
         ValidationResult validationResult = getValidationResult();
 
-        if (customerAsn != null) {
-            validationResult.rejectIfFalse(
+        validationResult.rejectIfFalse(
+            ASProviderAttestationCms.CONTENT_TYPE.equals(getContentType()),
+            ValidationString.ASPA_CONTENT_TYPE,
+            String.valueOf(getContentType())
+        );
+
+        validationResult.rejectIfFalse(
+            customerAsn != null &&
                 getCertificate().containsResources(new IpResourceSet(customerAsn)),
-                ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
-            );
-        }
+            ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
+        );
     }
 
     @Override

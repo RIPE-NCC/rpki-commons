@@ -178,6 +178,7 @@ public final class ValidationString {
     public static final String GHOSTBUSTERS_RECORD_SUPPORTED_PROPERTY = "ghostbusters.record.supported.property";
 
     // ASPA
+    public static final String ASPA_CONTENT_TYPE = "aspa.content.type";
     public static final String ASPA_CONTENT_STRUCTURE = "aspa.content.structure";
     public static final String ASPA_VERSION = "aspa.version";
     public static final String ASPA_ADDR_FAMILY = "aspa.address.family";
