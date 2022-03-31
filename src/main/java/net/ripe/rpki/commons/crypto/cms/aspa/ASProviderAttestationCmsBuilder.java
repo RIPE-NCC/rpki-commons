@@ -42,10 +42,7 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     public ASProviderAttestationCmsBuilder withProviderASSet(Iterable<? extends ProviderAS> providerASSet) {
-        this.providerASSet = Validate.notEmpty(
-            ImmutableSortedSet.<ProviderAS>naturalOrder().addAll(providerASSet).build(),
-            "ProviderASSet must not be empty"
-        );
+        this.providerASSet = ImmutableSortedSet.<ProviderAS>naturalOrder().addAll(providerASSet).build();
         return this;
     }
 
@@ -83,6 +80,7 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
      * </pre>
      */
     private byte[] encodeASProviderAttestation() {
+        Validate.notEmpty(providerASSet, "ProviderASSet must not be empty");
         ASN1Encodable[] encodables = {
             // Version is default value, so must not be encoded
             new ASN1Integer(customerAsn.getValue()),
