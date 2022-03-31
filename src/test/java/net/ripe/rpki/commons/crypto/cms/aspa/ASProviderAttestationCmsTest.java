@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.When;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceSet;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitQuickcheck.class)
@@ -90,8 +93,17 @@ public class ASProviderAttestationCmsTest {
         return aspa;
     }
 
+    @Test
+    public void should_reject_creating_aspa_with_empty_provider_as_set() {
+        assertThatThrownBy(() -> createAspa(CUSTOMER_ASN, ImmutableSortedSet.of()))
+            .isInstanceOfSatisfying(
+                IllegalArgumentException.class,
+                (e) -> assertThat(e.getMessage()).isEqualTo("ProviderASSet must not be empty")
+            );
+    }
+
     @Property(trials = 100)
-    public void should_generate_aspa(int customerAsId, List<ProviderAS> providerAsIdSet) {
+    public void should_generate_aspa(int customerAsId, @When(satisfies = "!#_.isEmpty") List<ProviderAS> providerAsIdSet) {
         Asn customerAsn = new Asn(Integer.toUnsignedLong(customerAsId));
         ImmutableSortedSet<ProviderAS> providerAsSet = providerAsIdSet.stream()
             .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));

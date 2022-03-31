@@ -89,6 +89,7 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
             this.providerASSet = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
                 .map(this::parseProviderAS)
                 .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
+            validationResult.rejectIfTrue(providerASSet.isEmpty(), ValidationString.ASPA_PROVIDER_AS_SET_NOT_EMPTY);
         } catch (IllegalArgumentException ex) {
             validationResult.error(ValidationString.ASPA_CONTENT_STRUCTURE);
         }

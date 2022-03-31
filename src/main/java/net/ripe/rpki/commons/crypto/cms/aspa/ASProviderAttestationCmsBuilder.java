@@ -3,7 +3,6 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
-import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -13,9 +12,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERSequence;
 
 import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Creates a {@link ASProviderAttestationCms} using the DER encoding.
@@ -46,7 +42,10 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     public ASProviderAttestationCmsBuilder withProviderASSet(Iterable<? extends ProviderAS> providerASSet) {
-        this.providerASSet = ImmutableSortedSet.<ProviderAS>naturalOrder().addAll(providerASSet).build();
+        this.providerASSet = Validate.notEmpty(
+            ImmutableSortedSet.<ProviderAS>naturalOrder().addAll(providerASSet).build(),
+            "ProviderASSet must not be empty"
+        );
         return this;
     }
 
