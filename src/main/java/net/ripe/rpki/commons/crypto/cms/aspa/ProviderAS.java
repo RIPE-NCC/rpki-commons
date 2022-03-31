@@ -13,6 +13,11 @@ public class ProviderAS implements Comparable<ProviderAS> {
     Asn providerAsn;
     Optional<AddressFamily> afiLimit;
 
+    public ProviderAS(Asn providerAsn, Optional<AddressFamily> afiLimit) {
+        this.providerAsn = Objects.requireNonNull(providerAsn, "Provider ASN is required");
+        this.afiLimit = Objects.requireNonNull(afiLimit, "Optional AFI limit must not be null");
+    }
+
     @Override
     public int compareTo(ProviderAS that) {
         int rc = this.providerAsn.compareTo(that.providerAsn);

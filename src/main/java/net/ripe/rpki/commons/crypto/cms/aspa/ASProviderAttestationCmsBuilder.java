@@ -80,6 +80,7 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
      * </pre>
      */
     private byte[] encodeASProviderAttestation() {
+        Validate.notNull(customerAsn, "Customer AS ID must not be null");
         Validate.notEmpty(providerASSet, "ProviderASSet must not be empty");
         ASN1Encodable[] encodables = {
             // Version is default value, so must not be encoded
