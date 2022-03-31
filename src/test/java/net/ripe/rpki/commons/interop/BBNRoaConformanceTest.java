@@ -28,7 +28,6 @@ public class BBNRoaConformanceTest {
         assertTrue(hasFailure);
     }
 
-
     private boolean parseRoa(String roa) throws IOException {
         File file = new File(PATH_TO_BBN_OBJECTS, roa);
         byte[] encoded = Files.toByteArray(file);

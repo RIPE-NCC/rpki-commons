@@ -1,6 +1,9 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
 import com.google.common.io.ByteSource;
+import lombok.AccessLevel;
+import lombok.Setter;
+import net.ripe.rpki.commons.crypto.cms.SigningInformationUtil;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
@@ -34,6 +37,7 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.StoreException;
+import org.joda.time.DateTime;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -46,11 +50,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -78,6 +78,8 @@ public class ProvisioningCmsObjectParser {
     private String location;
     private AbstractProvisioningPayload payload;
 
+    @Setter(AccessLevel.PRIVATE)
+    private DateTime signingTime;
 
     public ProvisioningCmsObjectParser() {
         this(ValidationResult.withLocation("n/a"));
@@ -96,7 +98,7 @@ public class ProvisioningCmsObjectParser {
         this.encoded = encoded;
         validationResult.setLocation(new ValidationLocation(location));
 
-        try {
+        try{
             sp = new CMSSignedDataParser(DIGEST_CALCULATOR_PROVIDER, encoded);
         } catch (CMSException e) {
             validationResult.rejectIfFalse(false, CMS_DATA_PARSING, extractMessages(e));
@@ -128,7 +130,7 @@ public class ProvisioningCmsObjectParser {
         if (validationResult.hasFailures()) {
             throw new ProvisioningCmsObjectParserException("provisioning cms object validation failed: " + validationResult.getFailuresForCurrentLocation());
         }
-        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl, payload);
+        return new ProvisioningCmsObject(encoded, cmsCertificate, caCertificates, crl, payload, signingTime);
     }
 
     /**
@@ -354,7 +356,7 @@ public class ProvisioningCmsObjectParser {
 
         verifyContentType(attributeTable);
         verifyMessageDigest(attributeTable);
-        verifySigningTime(attributeTable);
+        verifySigningTime(signer);
     }
 
     /**
@@ -385,16 +387,20 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.3
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4 and
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.4
+     *
+     * Either one of the signing-time or the binary-signing-time attributes,
+     * or both attributes, MUST be present.
+     * => implemented here. Other checks are in {@link SigningInformationUtil#extractSigningTime(net.ripe.rpki.commons.validation.ValidationResult, org.bouncycastle.cms.SignerInformation)}
      */
-    private void verifySigningTime(AttributeTable attributeTable) {
-        Attribute signingTime = attributeTable.get(CMSAttributes.signingTime);
-        if (!validationResult.rejectIfNull(signingTime, SIGNING_TIME_ATTR_PRESENT)) {
+    private void verifySigningTime(SignerInformation signer) {
+        final SigningInformationUtil.SigningTimeResult signingTimeResult = SigningInformationUtil.extractSigningTime(validationResult, signer);
+
+        if (!validationResult.rejectIfFalse(signingTimeResult.optionalSigningTime.isPresent(), SIGNING_TIME_ATTR_PRESENT)) {
             return;
         }
-        if (!validationResult.rejectIfFalse(signingTime.getAttrValues().size() == 1, ONLY_ONE_SIGNING_TIME_ATTR)) {
-            return;
-        }
+        this.signingTime = signingTimeResult.getOptionalSigningTime().get();
     }
 
     /**

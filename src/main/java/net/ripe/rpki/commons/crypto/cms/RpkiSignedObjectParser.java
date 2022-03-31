@@ -4,14 +4,12 @@ import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.asn1.cms.Time;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
@@ -30,6 +28,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
@@ -45,7 +44,7 @@ public abstract class RpkiSignedObjectParser {
 
     protected ASN1ObjectIdentifier contentType;
 
-    private DateTime signingTime;
+    private Optional<DateTime> signingTime;
 
     private ValidationResult validationResult;
 
@@ -80,7 +79,7 @@ public abstract class RpkiSignedObjectParser {
     }
 
     protected DateTime getSigningTime() {
-        return signingTime;
+        return signingTime.orElse(null);
     }
 
     public void decodeRawContent(InputStream content) throws IOException {
@@ -110,6 +109,8 @@ public abstract class RpkiSignedObjectParser {
         parseContent(sp);
         parseCmsCertificate(sp);
 
+        //https://datatracker.ietf.org/doc/html/rfc6488#section-3
+        verifyContentType();
         verifyVersion(sp);
         verifyCrl(sp);
 
@@ -131,6 +132,21 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
     }
+
+    /**
+     * https://datatracker.ietf.org/doc/html/rfc6488#section-2
+     */
+    private void verifyContentType() {
+        // CMSSignedDataParser does not check that the contentType of the ContentInfo is id-signeddata.
+        // and does not allow you to access it => use the other CMS Signed Data implementation that is in BC.
+        try {
+            final CMSSignedData signedData = new CMSSignedData(encoded);
+            validationResult.rejectIfFalse(CMSObjectIdentifiers.signedData.equals(signedData.toASN1Structure().getContentType()), CMS_CONTENT_TYPE);
+        } catch (CMSException e) {
+            validationResult.error(CMS_DATA_PARSING);
+        }
+    }
+
 
     /**
      * https://tools.ietf.org/html/rfc6488#section-2.1.1
@@ -212,9 +228,11 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        if (!extractSigningTime(signer)) {
+        final SigningInformationUtil.SigningTimeResult st = SigningInformationUtil.extractSigningTime(validationResult, signer);
+        if (!st.valid) {
             return;
         }
+        this.signingTime = st.optionalSigningTime;
 
         verifySignature(certificate, signer);
     }
@@ -276,6 +294,7 @@ public abstract class RpkiSignedObjectParser {
 
     private boolean verifySigner(SignerInformation signer, X509Certificate certificate) {
         verifySignerVersion(signer);
+
         validationResult.rejectIfFalse(DIGEST_ALGORITHM_OID.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
         validationResult.rejectIfFalse(ALLOWED_SIGNATURE_ALGORITHM_OIDS.contains(signer.getEncryptionAlgOID()), ENCRYPTION_ALGORITHM);
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
@@ -310,46 +329,11 @@ public abstract class RpkiSignedObjectParser {
         validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
     }
 
-    /**
-     * Extract signing time from the signer information.
-     *
-     * Signing time is either provided in the signing-time [RFC5652] or binary-signing-time [RFC6019]
-     * attribute, or neither. As stated in RFC 6019 Section 4 [Security Considerations] "only one
-     * of these attributes SHOULD be present". [..] "However, if both of these attributes are present,
-     * they MUST provide the same date and time."
-     */
-    private boolean extractSigningTime(SignerInformation signer) {
-        ImmutablePair<DateTime, Boolean> signingTime = extractTime(CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer);
-        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(CMSAttributes.binarySigningTime, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer);
-        boolean valid = signingTime.right && binarySigningTime.right;
-
-        if (signingTime.left != null && binarySigningTime.left != null) {
-            valid = validationResult.rejectIfFalse(signingTime.left.equals(binarySigningTime.left), SIGNING_TIME_MUST_EQUAL_BINARY_SIGNING_TIME) && valid;
-        }
-
-        if (valid) {
-            this.signingTime = signingTime.left != null ? signingTime.left : binarySigningTime.left;
-        }
-        return valid;
-    }
-
-    private ImmutablePair<DateTime, Boolean> extractTime(ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer) {
-        Attribute attr = signer.getSignedAttributes().get(identifier);
-        if (attr == null) {
-            return ImmutablePair.of(null, true);
-        }
-        if (!validationResult.rejectIfFalse(attr.getAttrValues().size() == 1, onlyOneValidationKey)) {
-            return ImmutablePair.of(null, false);
-        }
-        DateTime value = UTC.dateTime(Time.getInstance(attr.getAttrValues().getObjectAt(0)).getDate().getTime());
-        return ImmutablePair.of(value, true);
-    }
-
     private void verifySignature(X509Certificate certificate, SignerInformation signer) {
         String errorMessage = null;
         try {
             /*
-                         * Use the public key for the "verifier" not the certificate, because otherwise
+             * Use the public key for the "verifier" not the certificate, because otherwise
              * BC will reject the CMS if the signingTime is outside of the EE certificate validity
              * time. This happens occasionally and is no ground to reject according to standards:
              * http://tools.ietf.org/html/rfc6488#section-2.1.6.4.3
