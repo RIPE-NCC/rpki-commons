@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
+import lombok.NonNull;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
@@ -36,7 +37,7 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
         return this;
     }
 
-    public ASProviderAttestationCmsBuilder withCustomerAsn(Asn customerAsn) {
+    public ASProviderAttestationCmsBuilder withCustomerAsn(@NonNull Asn customerAsn) {
         this.customerAsn = customerAsn;
         return this;
     }

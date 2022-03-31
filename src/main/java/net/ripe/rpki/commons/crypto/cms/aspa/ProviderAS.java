@@ -1,22 +1,17 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
+import lombok.NonNull;
 import lombok.Value;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 
-import javax.swing.text.html.Option;
 import java.util.Objects;
 import java.util.Optional;
 
 @Value
 public class ProviderAS implements Comparable<ProviderAS> {
-    Asn providerAsn;
-    Optional<AddressFamily> afiLimit;
-
-    public ProviderAS(Asn providerAsn, Optional<AddressFamily> afiLimit) {
-        this.providerAsn = Objects.requireNonNull(providerAsn, "Provider ASN is required");
-        this.afiLimit = Objects.requireNonNull(afiLimit, "Optional AFI limit must not be null");
-    }
+    @NonNull Asn providerAsn;
+    @NonNull Optional<AddressFamily> afiLimit;
 
     @Override
     public int compareTo(ProviderAS that) {

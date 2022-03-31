@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.Value;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
@@ -34,6 +35,7 @@ public class ASProviderAttestationCms extends RpkiSignedObject {
      * providerASSET) to propagate prefixes in the specified address family
      * other ASes.
      */
+    @NonNull
     Asn customerAsn;
 
     /**
@@ -41,13 +43,14 @@ public class ASProviderAttestationCms extends RpkiSignedObject {
      * authorized to further propagate announcements in the specified
      * address family received from the customer.
      */
+    @NonNull
     ImmutableSortedSet<ProviderAS> providerASSet;
 
     public ASProviderAttestationCms(RpkiSignedObjectInfo cmsObjectData, int version, Asn customerAsn, ImmutableSortedSet<ProviderAS> providerASSet) {
         super(cmsObjectData);
         Validate.isTrue(version == 0, "version must be 0");
         this.version = version;
-        this.customerAsn = Objects.requireNonNull(customerAsn);
-        this.providerASSet = Objects.requireNonNull(providerASSet);
+        this.customerAsn = customerAsn;
+        this.providerASSet = providerASSet;
     }
 }
