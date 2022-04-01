@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class ASProviderAttestationCms extends RpkiSignedObject {
+public class AspaCms extends RpkiSignedObject {
 
     /**
      * https://www.iana.org/assignments/rpki/rpki.xhtml
@@ -46,7 +46,7 @@ public class ASProviderAttestationCms extends RpkiSignedObject {
     @NonNull
     ImmutableSortedSet<ProviderAS> providerASSet;
 
-    public ASProviderAttestationCms(RpkiSignedObjectInfo cmsObjectData, int version, Asn customerAsn, ImmutableSortedSet<ProviderAS> providerASSet) {
+    public AspaCms(RpkiSignedObjectInfo cmsObjectData, int version, Asn customerAsn, ImmutableSortedSet<ProviderAS> providerASSet) {
         super(cmsObjectData);
         Validate.isTrue(version == 0, "version must be 0");
         this.version = version;

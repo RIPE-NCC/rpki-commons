@@ -15,9 +15,9 @@ import org.bouncycastle.asn1.DERSequence;
 import java.security.PrivateKey;
 
 /**
- * Creates a {@link ASProviderAttestationCms} using the DER encoding.
+ * Creates a {@link AspaCms} using the DER encoding.
  */
-public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
+public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
 
     private X509ResourceCertificate certificate;
 
@@ -27,35 +27,35 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
 
     private ImmutableSortedSet<ProviderAS> providerASSet;
 
-    public ASProviderAttestationCmsBuilder withCertificate(X509ResourceCertificate certificate) {
+    public AspaCmsBuilder withCertificate(X509ResourceCertificate certificate) {
         this.certificate = certificate;
         return this;
     }
 
-    public ASProviderAttestationCmsBuilder withSignatureProvider(String signatureProvider) {
+    public AspaCmsBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
         return this;
     }
 
-    public ASProviderAttestationCmsBuilder withCustomerAsn(@NonNull Asn customerAsn) {
+    public AspaCmsBuilder withCustomerAsn(@NonNull Asn customerAsn) {
         this.customerAsn = customerAsn;
         return this;
     }
 
-    public ASProviderAttestationCmsBuilder withProviderASSet(Iterable<? extends ProviderAS> providerASSet) {
+    public AspaCmsBuilder withProviderASSet(Iterable<? extends ProviderAS> providerASSet) {
         this.providerASSet = ImmutableSortedSet.<ProviderAS>naturalOrder().addAll(providerASSet).build();
         return this;
     }
 
-    public ASProviderAttestationCms build(PrivateKey privateKey) {
+    public AspaCms build(PrivateKey privateKey) {
         String location = "unknown.asa";
-        ASProviderAttestationCmsParser parser = new ASProviderAttestationCmsParser();
+        AspaCmsParser parser = new AspaCmsParser();
         parser.parse(ValidationResult.withLocation(location), getEncoded(privateKey));
-        return parser.getASProviderAttestationCms();
+        return parser.getAspa();
     }
 
     public byte[] getEncoded(PrivateKey privateKey) {
-        return generateCms(certificate.getCertificate(), privateKey, signatureProvider, ASProviderAttestationCms.CONTENT_TYPE, encodeASProviderAttestation());
+        return generateCms(certificate.getCertificate(), privateKey, signatureProvider, AspaCms.CONTENT_TYPE, encodeAspa());
     }
 
     /**
@@ -80,7 +80,7 @@ public class ASProviderAttestationCmsBuilder extends RpkiSignedObjectBuilder {
      * AddressFamilyIdentifier ::= OCTET STRING (SIZE (2))
      * </pre>
      */
-    private byte[] encodeASProviderAttestation() {
+    private byte[] encodeAspa() {
         Validate.notNull(customerAsn, "Customer AS ID must not be null");
         Validate.notEmpty(providerASSet, "ProviderASSet must not be empty");
         ASN1Encodable[] encodables = {

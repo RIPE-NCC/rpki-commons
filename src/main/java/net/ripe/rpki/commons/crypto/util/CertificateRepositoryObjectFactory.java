@@ -2,8 +2,8 @@ package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
-import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCms;
-import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCmsParser;
+import net.ripe.rpki.commons.crypto.cms.aspa.AspaCms;
+import net.ripe.rpki.commons.crypto.cms.aspa.AspaCmsParser;
 import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCms;
 import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
@@ -101,13 +101,13 @@ public final class CertificateRepositoryObjectFactory {
         }
     }
 
-    private static ASProviderAttestationCms parseAspa(byte[] encoded, ValidationResult validationResult) {
-        final ASProviderAttestationCmsParser parser = new ASProviderAttestationCmsParser();
+    private static AspaCms parseAspa(byte[] encoded, ValidationResult validationResult) {
+        final AspaCmsParser parser = new AspaCmsParser();
         final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
         parser.parse(temp, encoded);
         validationResult.addAll(temp);
         if (parser.isSuccess()) {
-            return parser.getASProviderAttestationCms();
+            return parser.getAspa();
         } else {
             return null;
         }

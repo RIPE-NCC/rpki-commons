@@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
 
-public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
+public class AspaCmsParser extends RpkiSignedObjectParser {
 
     private int version;
     private AddressFamily afi;
@@ -33,6 +33,18 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
         validateAspa();
     }
 
+    public AspaCms getAspa() {
+        if (!isSuccess()) {
+            throw new IllegalArgumentException("ASPA record validation failed: " + getValidationResult().getFailuresForCurrentLocation());
+        }
+        RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
+        return new AspaCms(cmsObjectData, version, customerAsn, providerASSet);
+    }
+
+    public boolean isSuccess() {
+        return !getValidationResult().hasFailureForCurrentLocation();
+    }
+
     /**
      * See https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-07#section-4.
      */
@@ -40,7 +52,7 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
         ValidationResult validationResult = getValidationResult();
 
         validationResult.rejectIfFalse(
-            ASProviderAttestationCms.CONTENT_TYPE.equals(getContentType()),
+            AspaCms.CONTENT_TYPE.equals(getContentType()),
             ValidationString.ASPA_CONTENT_TYPE,
             String.valueOf(getContentType())
         );
@@ -120,18 +132,6 @@ public class ASProviderAttestationCmsParser extends RpkiSignedObjectParser {
         }
 
         return new ProviderAS(providerAsn, Optional.ofNullable(afiLimit));
-    }
-
-    public ASProviderAttestationCms getASProviderAttestationCms() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("ASPA record validation failed: " + getValidationResult().getFailuresForCurrentLocation());
-        }
-        RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
-        return new ASProviderAttestationCms(cmsObjectData, version, customerAsn, providerASSet);
-    }
-
-    public boolean isSuccess() {
-        return !getValidationResult().hasFailureForCurrentLocation();
     }
 
 }

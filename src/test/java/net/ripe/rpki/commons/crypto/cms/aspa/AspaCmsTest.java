@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitQuickcheck.class)
-public class ASProviderAttestationCmsTest {
+public class AspaCmsTest {
 
 
     private static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
@@ -56,7 +56,7 @@ public class ASProviderAttestationCmsTest {
     @Test
     public void should_parse_aspa_1() throws IOException {
         String path = "src/test/resources/conformance/root/aspa-bm.asa";
-        ASProviderAttestationCms aspa = parseValidAspa(path);
+        AspaCms aspa = parseValidAspa(path);
         assertEquals(Asn.parse("AS65000"), aspa.getCustomerAsn());
         assertEquals(
             ImmutableSortedSet.<ProviderAS>naturalOrder()
@@ -70,7 +70,7 @@ public class ASProviderAttestationCmsTest {
     @Test
     public void should_parse_aspa_2() throws IOException {
         String path = "src/test/resources/conformance/root/AS211321.asa";
-        ASProviderAttestationCms aspa = parseValidAspa(path);
+        AspaCms aspa = parseValidAspa(path);
         assertEquals(Asn.parse("AS211321"), aspa.getCustomerAsn());
         assertEquals(
             ImmutableSortedSet.<ProviderAS>naturalOrder()
@@ -82,14 +82,14 @@ public class ASProviderAttestationCmsTest {
         );
     }
 
-    private ASProviderAttestationCms parseValidAspa(String path) throws IOException {
+    private AspaCms parseValidAspa(String path) throws IOException {
         byte[] bytes = FileUtils.readFileToByteArray(new File(path));
         ValidationResult result = ValidationResult.withLocation(path);
-        ASProviderAttestationCmsParser parser = new ASProviderAttestationCmsParser();
+        AspaCmsParser parser = new AspaCmsParser();
         parser.parse(result, bytes);
 
         assertFalse("" + result.getFailuresForAllLocations(), result.hasFailures());
-        ASProviderAttestationCms aspa = parser.getASProviderAttestationCms();
+        AspaCms aspa = parser.getAspa();
         return aspa;
     }
 
@@ -107,18 +107,18 @@ public class ASProviderAttestationCmsTest {
         Asn customerAsn = new Asn(Integer.toUnsignedLong(customerAsId));
         ImmutableSortedSet<ProviderAS> providerAsSet = providerAsIdSet.stream()
             .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
-        ASProviderAttestationCms cms = createAspa(customerAsn, providerAsSet);
+        AspaCms cms = createAspa(customerAsn, providerAsSet);
         assertEquals(0, cms.getVersion());
         assertEquals(customerAsn, cms.getCustomerAsn());
         assertEquals(providerAsSet, cms.getProviderASSet());
     }
 
-    public static ASProviderAttestationCms createAspa() {
+    public static AspaCms createAspa() {
         return createAspa(CUSTOMER_ASN, PROVIDER_AS_SET);
     }
 
-    public static ASProviderAttestationCms createAspa(Asn customerAsn, ImmutableSortedSet<ProviderAS> providerAsSet) {
-        ASProviderAttestationCmsBuilder builder = new ASProviderAttestationCmsBuilder();
+    public static AspaCms createAspa(Asn customerAsn, ImmutableSortedSet<ProviderAS> providerAsSet) {
+        AspaCmsBuilder builder = new AspaCmsBuilder();
         builder.withCertificate(createCertificate(new IpResourceSet(customerAsn)));
         builder.withCustomerAsn(customerAsn);
         builder.withProviderASSet(

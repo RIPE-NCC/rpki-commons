@@ -2,8 +2,8 @@ package net.ripe.rpki.commons.crypto.util;
 
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
-import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCms;
-import net.ripe.rpki.commons.crypto.cms.aspa.ASProviderAttestationCmsTest;
+import net.ripe.rpki.commons.crypto.cms.aspa.AspaCms;
+import net.ripe.rpki.commons.crypto.cms.aspa.AspaCmsTest;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsTest;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
@@ -174,11 +174,11 @@ public class CertificateRepositoryObjectFactoryTest {
     @Test
     public void shouldParseAspa() {
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("aspa.asa"));
-        ASProviderAttestationCms aspa = ASProviderAttestationCmsTest.createAspa();
+        AspaCms aspa = AspaCmsTest.createAspa();
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(aspa.getEncoded(), validationResult);
 
-        assertTrue(object instanceof ASProviderAttestationCms);
+        assertTrue(object instanceof AspaCms);
         assertEquals(aspa, object);
         assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 59, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue("" + validationResult.getAllValidationChecksForCurrentLocation(), validationResult.hasNoFailuresOrWarnings());
