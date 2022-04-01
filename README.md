@@ -58,6 +58,8 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 
 ## Changelog
+### 2022-xx-yy 1.30-SNAPSHOT
+  * Improve binary signing time support for CMS
 
 ### TBD 1.30
   * Support ASPA CMS objects based on draft standard and sidrops mailing list

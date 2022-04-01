@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import static net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilderTest.*;
 import static net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayloadSerializerTest.*;
@@ -53,7 +54,7 @@ public class CreateObjectsForInteropTesting {
     }
 
     public void validateCmsObject(ProvisioningCmsObject resourceClassListQueryCms) {
-        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(ValidationOptions.strictValidation(), resourceClassListQueryCms, ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+        ProvisioningCmsObjectValidator validator = new ProvisioningCmsObjectValidator(ValidationOptions.strictValidation(), Optional.empty(), resourceClassListQueryCms, ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
         ValidationResult result = ValidationResult.withLocation("n/a");
         validator.validate(result);
         assertTrue(!result.hasFailures());

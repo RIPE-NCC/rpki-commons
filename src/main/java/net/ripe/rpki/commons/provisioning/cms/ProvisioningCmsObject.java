@@ -1,23 +1,14 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
+import com.google.common.base.Preconditions;
+import lombok.NonNull;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
-import net.ripe.rpki.commons.util.UTC;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSAttributes;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
 import org.joda.time.DateTime;
 
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 
 
 public class ProvisioningCmsObject {
@@ -27,7 +18,11 @@ public class ProvisioningCmsObject {
     private final Collection<X509Certificate> caCertificates;
     private final X509CRL crl;
     private AbstractProvisioningPayload payload;
+    /** Signing time MUST be present https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.3 */
+    private final DateTime signingTime;
 
+    // No support for signingTime, which is a required attribute for valid objects.
+    @Deprecated
     public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload) {
         // -
         // ArrayIsStoredDirectly
@@ -36,6 +31,18 @@ public class ProvisioningCmsObject {
         this.caCertificates = caCertificates;
         this.crl = crl;
         this.payload = payload;
+        this.signingTime = null;
+    }
+
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload, @NonNull DateTime signingTime) {
+        // -
+        // ArrayIsStoredDirectly
+        this.encodedContent = encodedContent;
+        this.cmsCertificate = cmsCertificate;
+        this.caCertificates = caCertificates;
+        this.crl = crl;
+        this.payload = payload;
+        this.signingTime = signingTime;
     }
 
     public byte[] getEncoded() {
@@ -73,30 +80,7 @@ public class ProvisioningCmsObject {
      * >http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2</a><br >
      */
     public DateTime getSigningTime() {
-        try {
-            CMSSignedData cmsSignedData = new CMSSignedData(encodedContent);
-            SignerInformationStore sis = cmsSignedData.getSignerInfos();
-
-            @SuppressWarnings("unchecked")
-            Collection<SignerInformation> signers = sis.getSigners();
-            for (SignerInformation signerInformation : signers) {
-                AttributeTable signedAttributes = signerInformation.getSignedAttributes();
-                Attribute signingTime = signedAttributes.get(CMSAttributes.signingTime);
-
-                @SuppressWarnings("unchecked")
-                Enumeration<Object> en = signingTime.getAttrValues().getObjects();
-                while (en.hasMoreElements()) {
-                    Object obj = en.nextElement();
-                    if (obj instanceof DERUTCTime) {
-                        DERUTCTime derTime = (DERUTCTime) obj;
-                        return UTC.dateTime(derTime.getDate());
-                    }
-                }
-            }
-            throw new IllegalArgumentException("Malformed encoded cms content");
-        } catch (CMSException | ParseException e) {
-            throw new IllegalArgumentException("Malformed encoded cms content", e);
-        }
+        return signingTime;
     }
 
     @Override
