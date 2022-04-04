@@ -125,17 +125,11 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     @Override
-    public URI getParentCertificateUri() {
-        return getCertificate().getParentCertificateUri();
-    }
-
-    @Override
     protected void validateWithCrl(String location, CertificateRepositoryObjectValidationContext context, ValidationOptions options, ValidationResult result, X509Crl crl) {
         result.setLocation(new ValidationLocation(location));
         checkManifestValidityTimes(options, result);
         checkEntries(result);
-        X509ResourceCertificateParentChildValidator validator = ResourceValidatorFactory.getX509ResourceCertificateStrictValidator(context, options, result, crl);
-        validator.validate(location, getCertificate());
+        super.validateWithCrl(location, context, options, result, crl);
     }
 
     private void checkEntries(ValidationResult result) {

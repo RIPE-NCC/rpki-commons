@@ -61,6 +61,10 @@ POM version to `1.0` and then builds and releases the artifacts.
 ### 2022-xx-yy 1.30-SNAPSHOT
   * Improve binary signing time support for CMS
 
+### TBD 1.30
+  * Support ASPA CMS objects based on draft standard and sidrops mailing list
+    ASN.1 schema.
+
 ### 2022-03-01 1.29
   * Support RFC8183 `publisher_request` and `repository_response` XML messages.
   * Validate that provisioning identity certificates are self-signed.
