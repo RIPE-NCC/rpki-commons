@@ -71,7 +71,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             ASN1Sequence seq = expect(content, ASN1Sequence.class);
 
             final int itemCount = seq.size();
-            if (itemCount < 2) {
+            if (itemCount < 2 || itemCount > 3) {
                 validationResult.rejectIfFalse(false, ValidationString.ASPA_CONTENT_STRUCTURE);
                 return;
             }
@@ -102,6 +102,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             ++index;
 
             if (index >= itemCount) {
+                validationResult.error(ValidationString.ASPA_CONTENT_STRUCTURE);
                 return;
             }
 
