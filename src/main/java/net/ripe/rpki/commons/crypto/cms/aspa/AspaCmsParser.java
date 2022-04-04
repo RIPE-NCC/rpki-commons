@@ -23,7 +23,6 @@ import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
 public class AspaCmsParser extends RpkiSignedObjectParser {
 
     private int version;
-    private AddressFamily afi;
     private Asn customerAsn;
     private ImmutableSortedSet<ProviderAS> providerASSet;
 
@@ -72,7 +71,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
             final int itemCount = seq.size();
             if (itemCount < 2 || itemCount > 3) {
-                validationResult.rejectIfFalse(false, ValidationString.ASPA_CONTENT_STRUCTURE);
+                validationResult.error(ValidationString.ASPA_CONTENT_STRUCTURE);
                 return;
             }
 
@@ -82,11 +81,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
                 // Version is optional and defaults to 0, so should not be explicitly encoded when using DER encoding
                 // If it is present and correct, we still accept the object. If the version is different, reject the
                 // object.
-                DERTaggedObject tagged = (DERTaggedObject) maybeVersion;
-                validationResult.rejectIfFalse(tagged.getTagNo() == 0, ValidationString.ASPA_CONTENT_STRUCTURE);
-                ASN1Integer version = expect(tagged.getBaseObject(), ASN1Integer.class);
-                validationResult.rejectIfFalse(version.intValueExact() == 0, ValidationString.ASPA_VERSION, String.valueOf(version.intValueExact()));
-                this.version = version.intValueExact();
+                decodeVersion(validationResult, (DERTaggedObject) maybeVersion);
 
                 ++index;
             } else {
@@ -113,6 +108,16 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             validationResult.rejectIfTrue(providerASSet.isEmpty(), ValidationString.ASPA_PROVIDER_AS_SET_NOT_EMPTY);
         } catch (IllegalArgumentException ex) {
             validationResult.error(ValidationString.ASPA_CONTENT_STRUCTURE);
+        }
+    }
+
+    private void decodeVersion(ValidationResult validationResult, DERTaggedObject tagged) {
+        validationResult.rejectIfFalse(tagged.getTagNo() == 0, ValidationString.ASPA_CONTENT_STRUCTURE);
+        try {
+            this.version = expect(tagged.getBaseObject(), ASN1Integer.class).intValueExact();
+            validationResult.rejectIfFalse(this.version == 0, ValidationString.ASPA_VERSION, String.valueOf(this.version));
+        } catch (ArithmeticException e) {
+            validationResult.error(ValidationString.ASPA_VERSION, "out-of-bounds");
         }
     }
 
