@@ -147,7 +147,7 @@ public class CsvFormatter {
     }
 
 
-    class CsvColumn {
+    static class CsvColumn {
         private String heading;
         private boolean quoteValues;
 

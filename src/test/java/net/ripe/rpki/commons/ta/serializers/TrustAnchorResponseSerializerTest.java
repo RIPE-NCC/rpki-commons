@@ -59,7 +59,7 @@ public class TrustAnchorResponseSerializerTest {
     }
 
     @Test
-    public void shouldMatchSimpleFields() throws XPathExpressionException {
+    public void shouldMatchSimpleFields() throws XPathExpressionException, NumberFormatException {
         assertEquals(Long.valueOf(xpath.evaluate("/TrustAnchorResponse/requestCreationTimestamp", document)),
             response.getRequestCreationTimestamp());
     }

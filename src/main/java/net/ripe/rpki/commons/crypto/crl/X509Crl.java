@@ -1,8 +1,8 @@
 package net.ripe.rpki.commons.crypto.crl;
 
+import lombok.EqualsAndHashCode;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
-import net.ripe.rpki.commons.util.EqualsSupport;
 import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -246,8 +246,9 @@ public class X509Crl implements CertificateRepositoryObject {
         }
     }
 
-    public static class Entry extends EqualsSupport implements Comparable<Entry>, Serializable {
-        private static final long serialVersionUID = 1L;
+    @EqualsAndHashCode
+    public static class Entry implements Comparable<Entry>, Serializable {
+        private static final long serialVersionUID = 2L;
         private final BigInteger serialNumber;
         private final DateTime revocationDateTime;
 
