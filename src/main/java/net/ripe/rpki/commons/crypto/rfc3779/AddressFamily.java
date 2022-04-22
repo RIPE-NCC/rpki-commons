@@ -1,6 +1,6 @@
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import lombok.EqualsAndHashCode;
+import lombok.Value;
 import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -14,7 +14,7 @@ import java.util.Objects;
  * {@link http://www.iana.org/assignments/address-family-numbers} and
  * {@link http://www.iana.org/assignments/safi-namespace}.
  */
-@EqualsAndHashCode
+@Value
 public class AddressFamily implements Comparable<AddressFamily>, Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -38,7 +38,6 @@ public class AddressFamily implements Comparable<AddressFamily>, Serializable {
     private int addressFamilyIdentifier;
     private Integer subsequentAddressFamilyIdentifier;
 
-
     public AddressFamily(int addressFamilyIdentifier) {
         this(addressFamilyIdentifier, null);
     }
@@ -51,14 +50,6 @@ public class AddressFamily implements Comparable<AddressFamily>, Serializable {
                 "subsequentAddressFamilyIdentifier out of bounds: " + subsequentAddressFamilyIdentifier);
         this.addressFamilyIdentifier = addressFamilyIdentifier;
         this.subsequentAddressFamilyIdentifier = subsequentAddressFamilyIdentifier;
-    }
-
-    public int getAddressFamilyIdentifier() {
-        return addressFamilyIdentifier;
-    }
-
-    public Integer getSubsequentAddressFamilyIdentifier() {
-        return subsequentAddressFamilyIdentifier;
     }
 
     public AddressFamily withoutSubsequentAddressFamilyIdentifier() {
