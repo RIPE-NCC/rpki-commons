@@ -63,6 +63,20 @@ public class BBNCMSConformanceTest {
         assertTrue("Should reject certificate with " + testCaseDescription + " from " + fileName, parseCertificate(fileName));
     }
 
+    @CsvSource({
+            "572, badEEHasBasicConstraints,      basic constraints extension present 6487#4.8.1",
+            "575, badEEHasCABasicConstraint,     basic constraints extension present with CA bool set to true 6487#4.8.1",
+            "574, badEEKeyUsageHasKeyCertSign,   KU has digitalSignature and keyCertSign but no CA basic constraint 6487#4.8.4",
+            "576, badEEKeyUsageHasKeyCertSignCABool,   KU has digitalSignature and keyCertSign and CA basic constraint 6487#4.8.4"
+    })
+    @ParameterizedTest(name = "{displayName} - {0} {1} {2}")
+    public void shouldRejectCMSWithIncorrectBasicConstrainsOrKU(String testCasenumber, String testCaseFile, String testCaseDescription) throws IOException {
+        final String fileName = String.format("root/%s.roa", testCaseFile);
+
+        assertTrue("Should reject EE certificate with " + testCaseDescription + " from " + fileName, parseCertificate(fileName));
+    }
+
+
     @Disabled("These checks are not implemented yet.")
     @CsvSource({
             "518, 2DigestAlgs,              # two digest algorithms 6488#2.1.2",

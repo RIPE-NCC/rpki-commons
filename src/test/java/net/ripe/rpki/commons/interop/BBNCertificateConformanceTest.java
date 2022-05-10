@@ -54,6 +54,17 @@ public class BBNCertificateConformanceTest {
     }
 
     @CsvSource({
+            "173, badCertNoBasicConstr,       no basic constraints extension 6487#4.8,4.8.1",
+            "174, badCert2BasicConstrr,        two basic constraints extensions 5280#4.2",
+    })
+    @ParameterizedTest(name = "{displayName} - {0} {1} {2}")
+    public void shouldRejectCertificateWithIncorrectBasicConstrainsOrKU(String testCasenumber, String testCaseFile, String testCaseDescription) throws IOException {
+        final String fileName = String.format("root/%s.cer", testCaseFile);
+
+        assertTrue("Should reject certificate with " + testCaseDescription + " from " + fileName, parseCertificate(fileName));
+    }
+
+    @CsvSource({
             "127, KUsageExtra,          has disallowed key usage bit (nonRepudiation) 6487#4.8.4",
             "217, KUsageDigitalSig,     has disallowed key usage bit (digitalSignature) 6487#4.8.4",
             "128, KUsageNoCertSign,     lacks bit for signing certificates 6487#4.8.4",
