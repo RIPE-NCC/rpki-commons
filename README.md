@@ -58,11 +58,13 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 
 ## Changelog
-### 2022-xx-yy 1.30-SNAPSHOT
+### 2022-xx-yy 1.31-SNAPSHOT
+### 2022-5-11 1.30
   * Improve binary signing time support for CMS
   * Support ASPA CMS objects based on draft standard and sidrops mailing list
     ASN.1 schema.
   * Add JDK 17 to build matrix in Github actions
+  * Add ASPA support
 
 ### 2022-03-01 1.29
   * Support RFC8183 `publisher_request` and `repository_response` XML messages.
