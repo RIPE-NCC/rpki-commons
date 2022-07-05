@@ -101,6 +101,9 @@ public final class ValidationString {
 
     // router certificate
     public static final String BGPSEC_EXT_PRESENT = "cert.bgpsec.ext.present";
+    public static final String BGPSEC_EXT_CRITICAL = "cert.bgpsec.ext.critical";
+    public static final String BGPSEC_INHERITS_RESOURCES = "cert.bgpsec.resource.uses.inherit";
+    public static final String BGPSEC_RESOURCES_EMPTY = "cert.bgpsec.resource.empty";
 
     //cms object
     public static final String CMS_DATA_PARSING = "cms.signed.data.parsing";

@@ -25,10 +25,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Set;
 
-import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
-import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM;
-import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_ALGORITHM;
-import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_SIZE;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class X509CertificateParser<T extends AbstractX509CertificateWrapper> {
 
@@ -46,8 +43,8 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     public void parse(ValidationResult validationResult, byte[] encoded) {
         this.result = validationResult;
-        final X509Certificate certificate = parseEncoded(encoded, result);
-        validateX509Certificate(validationResult, certificate);
+        final X509Certificate parsedEncodedCertificate = parseEncoded(encoded, result);
+        validateX509Certificate(validationResult, parsedEncodedCertificate);
     }
 
     public void validateX509Certificate(ValidationResult validationResult, X509Certificate certificate) {
@@ -180,18 +177,21 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     /**
-     * BGP sec Extended Key Usage extension is present and MUST NOT [rfc6547] be marked as critical.
+     * BGP sec Extended Key Usage extension MUST be present and must not (non-rfc2119 case since draft 19) be marked as
+     * critical.
      * @return whether BgpSec extension is present and non-critical.
      */
     protected boolean isBgpSecExtensionPresent() {
         try {
             final List<String> extendedKeyUsage = certificate.getExtendedKeyUsage();
-            return extendedKeyUsage != null
-                    && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId())
-                    && !certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+            final boolean present = extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+
+            if (present) {
+                result.warnIfTrue(certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId()), BGPSEC_EXT_CRITICAL);
+            }
+            return present;
         } catch (CertificateParsingException e) {
             return false;
         }
     }
-
 }
