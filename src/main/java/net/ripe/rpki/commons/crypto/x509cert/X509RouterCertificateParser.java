@@ -21,9 +21,7 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
     @Override
     protected void validatePublicKey() {
         PublicKey publicKey = this.certificate.getPublicKey();
-        if (isRsaPk(publicKey)) {
-            super.validateRsaPk();
-        } else if (isEcPk(publicKey)) {
+        if (isEcPk(publicKey)) {
             // 3.1.2.  Subject Public Key Info
             //   Refer to Section 3.1 of [RFC8208].
             validateEcSecp256r1Pk();
@@ -65,7 +63,7 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
         final IpResourceSet parsedAsExtension = parser.parseAsIdentifiers(certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId()));
 
         if(result.rejectIfFalse(parsedAsExtension != null, BGPSEC_INHERITS_RESOURCES)) {
-            result.rejectIfFalse(parsedAsExtension.isEmpty(), BGPSEC_RESOURCES_EMPTY);
+            result.rejectIfTrue(parsedAsExtension.isEmpty(), BGPSEC_RESOURCES_EMPTY);
         }
     }
 }

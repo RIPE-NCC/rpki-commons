@@ -46,7 +46,7 @@ public class X509RouterCertificateTest {
         builder.withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
         builder.withSerial(TEST_SERIAL_NUMBER);
         builder.withValidityPeriod(TEST_VALIDITY_PERIOD);
-        builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
+        builder.withPublicKey(KeyPairFactoryTest.EC256R1_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         builder.withAuthorityKeyIdentifier(true);
         builder.withAsns(new int[] {1, 22, 333});

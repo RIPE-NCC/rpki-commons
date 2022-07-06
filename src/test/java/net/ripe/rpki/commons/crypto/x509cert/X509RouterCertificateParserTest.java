@@ -3,6 +3,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import com.google.common.io.Files;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
@@ -17,6 +18,7 @@ import javax.security.auth.x500.X500Principal;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -79,14 +81,13 @@ public class X509RouterCertificateParserTest {
     }
 
     @Test
-    public void should_validate_key_algorithm_and_size() {
-        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-        X509ResourceCertificate certificate = builder.build();
+    public void should_validate_key_algorithm_and_size() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        X509RouterCertificateBuilder builder = X509RouterCertificateBuilderTest.createSelfSignedRouterCertificateBuilder();
+        X509RouterCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());
 
         assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
-        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
     }
 
     @Test
