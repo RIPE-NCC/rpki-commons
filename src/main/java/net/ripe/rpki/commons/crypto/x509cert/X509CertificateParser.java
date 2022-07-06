@@ -10,7 +10,10 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.math.ec.ECCurve;
+import org.bouncycastle.math.ec.ECPoint;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,6 +35,8 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     private static final String[] ALLOWED_SIGNATURE_ALGORITHM_OIDS = {
             PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
     };
+
+    private static final ECCurve EC_256R1_CURVE = ECNamedCurveTable.getByOID(SECObjectIdentifiers.secp256r1).getCurve();
 
     protected X509Certificate certificate;
 
@@ -98,6 +103,11 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     void validateEcSecp256r1Pk() {
+        // rfc8209#3.3:
+        // o  BGPsec Router Certificates MUST include the subjectPublicKeyInfo
+        // field described in [RFC8208].
+        //
+        // PublicKey.getAlgorithm() would return "EC", more validation is required.
         final byte[] enc = certificate.getPublicKey().getEncoded();
         final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(enc));
         final AlgorithmIdentifier algorithm = subjectPublicKeyInfo.getAlgorithm();
@@ -111,7 +121,20 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
             // The value for the associated parameters MUST be
             // secp256r1, as specified in Section 2.1.1.1 of [RFC5480].
             ASN1ObjectIdentifier curveOid = (ASN1ObjectIdentifier) algorithm.getParameters();
-            result.rejectIfFalse(SECObjectIdentifiers.secp256r1.equals(curveOid), PUBLIC_KEY_CERT_ALGORITHM, curveOid.getId());
+            if(result.rejectIfFalse(SECObjectIdentifiers.secp256r1.equals(curveOid), PUBLIC_KEY_CERT_ALGORITHM, curveOid.getId())) {
+                // rfc8208#3.1:
+                //    o  subjectPublicKey: ECPoint MUST be used to encode the certificate's
+                //      subjectPublicKey field, as specified in Section 2.2 of [RFC5480].
+                //
+                // To ensure this, parse the public key on the curve.
+                ECPoint ecPoint = null;
+                try {
+                    ecPoint = EC_256R1_CURVE.decodePoint(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+                } catch (IllegalArgumentException | NullPointerException e) {
+                    // Passed in public key not valid on curve
+                }
+                result.rejectIfNull(ecPoint, PUBLIC_KEY_CERT_VALUE);
+            }
         }
     }
 

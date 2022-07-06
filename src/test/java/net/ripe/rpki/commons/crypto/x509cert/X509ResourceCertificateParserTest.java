@@ -165,7 +165,7 @@ public class X509ResourceCertificateParserTest {
 
     @Test
     public void should_parse_router_certificate_when_its_unknown() {
-        X509RouterCertificateBuilder builder = X509RouterCertificateTest.createSelfSignedRouterCertificateBuilder().withAsns(new int[]{1, 2, 3});
+        X509RouterCertificateBuilder builder = X509RouterCertificateTest.createSelfSignedRouterCertificateBuilder();
         X509RouterCertificate certificate = builder.build();
 
         ValidationResult result = ValidationResult.withLocation("test");
