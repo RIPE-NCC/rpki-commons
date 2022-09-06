@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
@@ -64,7 +65,7 @@ public class CertificateIssuanceResponsePayloadSerializerTest {
 
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2
     @Test
-    public void shouldHavePayloadXmlConformStandard() {
+    public void shouldHavePayloadXmlConformStandard() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);
 
         Pattern expectedXmlRegex = Pattern.compile("<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n"
@@ -81,7 +82,7 @@ public class CertificateIssuanceResponsePayloadSerializerTest {
     }
 
     @Test
-    public void shouldDeserializeXml() {
+    public void shouldDeserializeXml() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);
         CertificateIssuanceResponsePayload deserialized = SERIALIZER.deserialize(actualXml);
         // Deal with one-way comma encoding in URIs.
@@ -89,7 +90,7 @@ public class CertificateIssuanceResponsePayloadSerializerTest {
     }
 
     @Test
-    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException, IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));

@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.provisioning.cms;
 
 
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
@@ -64,7 +65,7 @@ public class ProvisioningCmsObjectValidatorTest {
 
     @Disabled("Test content does not appear to match test name")
     @Test
-    public void shouldFailIfCmsObjectDoesNotContainAnyCACertificate() {
+    public void shouldFailIfCmsObjectDoesNotContainAnyCACertificate() throws IdentitySerializerException {
         ValidationResult validationResult = ValidationResult.withLocation("n/a");
 
         ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder()
@@ -80,7 +81,7 @@ public class ProvisioningCmsObjectValidatorTest {
 
     @Disabled("Test content does not appear to match test name")
     @Test
-    public void shouldFaiIfCmsObjectContainsMultipleCACertificate() {
+    public void shouldFaiIfCmsObjectContainsMultipleCACertificate() throws IdentitySerializerException {
         ValidationResult validationResult = ValidationResult.withLocation("n/a");
 
         ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder()

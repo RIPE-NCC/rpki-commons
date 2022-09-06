@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.provisioning.payload.list.request;
 
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.xml.XmlSerializer;
@@ -29,7 +30,7 @@ public class ResourceClassListQueryPayloadSerializerTest {
     }
 
     @Test
-    public void shouldParseXml() {
+    public void shouldParseXml() throws IdentitySerializerException {
         ResourceClassListQueryPayload payload = SERIALIZER.deserialize(XML);
 
         assertEquals(Integer.valueOf(1), payload.getVersion());
@@ -40,7 +41,7 @@ public class ResourceClassListQueryPayloadSerializerTest {
 
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.1
     @Test
-    public void shouldCreateXmlConformDraft() {
+    public void shouldCreateXmlConformDraft() throws IdentitySerializerException {
         ResourceClassListQueryPayload payload = new ResourceClassListQueryPayload();
         payload.setSender("sender attribute");
         payload.setRecipient("recipient attribute");
@@ -49,7 +50,7 @@ public class ResourceClassListQueryPayloadSerializerTest {
     }
 
     @Test
-    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException, IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD);
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

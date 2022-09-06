@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.provisioning.payload.error;
 
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
 import net.ripe.rpki.commons.xml.XmlSerializer;
@@ -39,7 +40,7 @@ public class RequestNotPerformedResponsePayloadSerializerTest {
     }
 
     @Test
-    public void shouldProduceXmlConformDraft() {
+    public void shouldProduceXmlConformDraft() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
 
         Pattern expectedXml = Pattern.compile(
@@ -55,14 +56,14 @@ public class RequestNotPerformedResponsePayloadSerializerTest {
     }
 
     @Test
-    public void shouldDeserializeXml() {
+    public void shouldDeserializeXml() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
         RequestNotPerformedResponsePayload deserialized = SERIALIZER.deserialize(actualXml);
         assertEquals(NOT_PERFORMED_PAYLOAD, deserialized);
     }
 
     @Test
-    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException, IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(NOT_PERFORMED_PAYLOAD);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));

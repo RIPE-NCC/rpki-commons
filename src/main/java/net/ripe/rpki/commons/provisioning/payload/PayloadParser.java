@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializer;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
@@ -54,7 +55,7 @@ public final class PayloadParser {
     private PayloadParser() {
     }
 
-    public static AbstractProvisioningPayload parse(String payloadXml, ValidationResult validationResult) {
+    public static AbstractProvisioningPayload parse(String payloadXml, ValidationResult validationResult) throws IdentitySerializerException {
         Matcher matcher = TYPE_PATTERN.matcher(payloadXml);
         validationResult.rejectIfFalse(matcher.matches(), ValidationString.FOUND_PAYLOAD_TYPE);
         if (validationResult.hasFailures()) {
@@ -78,7 +79,7 @@ public final class PayloadParser {
         return payload;
     }
 
-    public static String serialize(AbstractProvisioningPayload payload) {
+    public static String serialize(AbstractProvisioningPayload payload) throws IdentitySerializerException {
         PayloadMessageType type = payload.getType();
         switch (type) {
             case list:

@@ -31,7 +31,7 @@ public class PublisherRequestSerializerTest {
             "</publisher_request>";
 
     @Test
-    public void testDeserializeXML() {
+    public void testDeserializeXML() throws IdentitySerializerException {
         PublisherRequestSerializer serializer = new PublisherRequestSerializer();
         PublisherRequest publisherRequest = serializer.deserialize(examplePublishRequest);
 
@@ -40,7 +40,7 @@ public class PublisherRequestSerializerTest {
     }
 
     @Test
-    public void shouldDoRoundTripDezerializeSerialize() {
+    public void shouldDoRoundTripDezerializeSerialize() throws IdentitySerializerException {
         PublisherRequestSerializer serializer = new PublisherRequestSerializer();
         PublisherRequest publisherRequest = serializer.deserialize(examplePublishRequest);
 
@@ -53,7 +53,7 @@ public class PublisherRequestSerializerTest {
     @Test
     public void shouldFailToParseCorruptedXML() {
         PublisherRequestSerializer serializer = new PublisherRequestSerializer();
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize(examplePublishRequest.replaceAll("publisher_request", "publisher_response") );
         });
 

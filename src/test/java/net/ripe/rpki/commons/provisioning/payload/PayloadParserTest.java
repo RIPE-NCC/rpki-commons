@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.issue.response.CertificateIssuanceResponsePayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.rpki.commons.validation.ValidationCheck;
@@ -14,7 +15,7 @@ public class PayloadParserTest {
 
     @Ignore
     @Test
-    public void shouldParseIssueResponse() {
+    public void shouldParseIssueResponse() throws IdentitySerializerException {
         String message = createIssueResponseMessage(1);
 
         ValidationResult result = ValidationResult.withLocation("n/a");
@@ -26,7 +27,7 @@ public class PayloadParserTest {
 
     @Ignore
     @Test
-    public void shouldRejectWrongVersion() {
+    public void shouldRejectWrongVersion() throws IdentitySerializerException {
         String message = createIssueResponseMessage(2);
 
         ValidationResult result = ValidationResult.withLocation("a");
@@ -38,7 +39,7 @@ public class PayloadParserTest {
     }
 
     @Test
-    public void shouldParseTypeFromMultilineMessageElement() {
+    public void shouldParseTypeFromMultilineMessageElement() throws IdentitySerializerException {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\n" +
                 "         recipient=\"recipient\"\n" +
@@ -53,7 +54,7 @@ public class PayloadParserTest {
     }
 
     @Test
-    public void shouldNotParseUnknownType() {
+    public void shouldNotParseUnknownType() throws IdentitySerializerException {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\" type=\"unknown\" />";
 
         ValidationResult result = ValidationResult.withLocation("a");
@@ -67,7 +68,7 @@ public class PayloadParserTest {
 
 
     @Test
-    public void shouldNotParseWithoutType() {
+    public void shouldNotParseWithoutType() throws IdentitySerializerException {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\" version=\"1\" sender=\"sender\" recipient=\"recipient\"  />";
 
         ValidationResult result = ValidationResult.withLocation("a");

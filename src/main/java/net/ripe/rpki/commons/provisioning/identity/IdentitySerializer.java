@@ -28,18 +28,4 @@ public abstract class IdentitySerializer<T> extends DomXmlSerializer<T> {
         parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getMimeDecoder().decode(bpkiTa));
         return parser.getCertificate();
     }
-
-    public static class IdentitySerializerException extends DomXmlSerializerException {
-        public IdentitySerializerException(Exception e) {
-            super(e);
-        }
-
-        public IdentitySerializerException(final String message) {
-            super(message);
-        }
-
-        public IdentitySerializerException(final String message, final Exception e) {
-            super(message, e);
-        }
-    }
 }

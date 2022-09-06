@@ -37,7 +37,7 @@ public class ParentIdentitySerializerTest {
 
 
     @Test
-    public void shouldDeserializeXml() {
+    public void shouldDeserializeXml() throws IdentitySerializerException {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
         ParentIdentity parentId = serializer.deserialize(exampleXml);
@@ -51,7 +51,7 @@ public class ParentIdentitySerializerTest {
     }
 
     @Test
-    public void shouldDoRoundTripSerializeDeserialize() {
+    public void shouldDoRoundTripSerializeDeserialize() throws IdentitySerializerException {
         URI upDownUrl = URI.create("http://host/updown");
         String parentHandle = "parent";
         String childHandle = "child";
@@ -71,7 +71,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeInvalidXml() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize("NOT VALID");
         });
 
@@ -82,7 +82,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfParentResponseIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize("<xml></xml>");
         });
 
@@ -126,7 +126,7 @@ public class ParentIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfParentBpkiTaIsNotPresent() {
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:parent_response child_handle=\"Bob\" parent_handle=\"Alice\" service_uri=\"http://localhost:4401/up-down/Alice/Bob\" xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:parent_response>" );
         });
 

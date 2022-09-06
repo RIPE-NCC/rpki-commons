@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -46,7 +47,7 @@ public class CertificateIssuanceRequestPayloadSerializerTest {
 
     // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1
     @Test
-    public void shouldUsePayloadXmlConformDraft() {
+    public void shouldUsePayloadXmlConformDraft() throws IdentitySerializerException {
 
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD);
 
@@ -60,14 +61,14 @@ public class CertificateIssuanceRequestPayloadSerializerTest {
     }
 
     @Test
-    public void shouldDeserializeXml() {
+    public void shouldDeserializeXml() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD);
         CertificateIssuanceRequestPayload deserialized = SERIALIZER.deserialize(actualXml);
         assertEquals(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD, deserialized);
     }
 
     @Test
-    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException, IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));

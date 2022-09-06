@@ -7,6 +7,7 @@ import net.ripe.rpki.commons.crypto.cms.SigningInformationUtil;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateParser;
@@ -183,6 +184,8 @@ public class ProvisioningCmsObjectParser {
             payload = PayloadParser.parse(payloadXml, validationResult);
 
             validationResult.rejectIfFalse(true, CMS_CONTENT_PARSING);
+        } catch (IdentitySerializerException e) {
+            validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
         } catch (IOException e) {
             validationResult.rejectIfFalse(false, CMS_CONTENT_PARSING);
         }

@@ -4,6 +4,7 @@ import net.ripe.rpki.commons.crypto.cms.RPKISignedDataGenerator;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.validation.ValidationCheck;
@@ -73,7 +74,7 @@ public class ProvisioningCmsObjectBuilder {
         return this;
     }
 
-    public ProvisioningCmsObjectBuilder withPayloadContent(AbstractProvisioningPayload payload) {
+    public ProvisioningCmsObjectBuilder withPayloadContent(AbstractProvisioningPayload payload) throws IdentitySerializerException {
         this.payloadContent = PayloadParser.serialize(payload);
         return this;
     }

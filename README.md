@@ -59,6 +59,8 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 ### 2022-xx-yy 1.31-SNAPSHOT
+  * **breaking change:** Changes `IdentitySerializerException` into a checked exception.
+
 ### 2022-5-11 1.30
   * Improve binary signing time support for CMS
   * Support ASPA CMS objects based on draft standard and sidrops mailing list

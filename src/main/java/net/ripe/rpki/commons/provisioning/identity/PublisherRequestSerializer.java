@@ -30,7 +30,7 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
     }
 
     @Override
-    public PublisherRequest deserialize(String xml) {
+    public PublisherRequest deserialize(String xml) throws IdentitySerializerException {
         try (final StringReader characterStream = new StringReader(xml)) {
             final Document doc = XML.newNamespaceAwareDocumentBuilder().parse(new InputSource(characterStream));
 
@@ -66,7 +66,7 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
 
 
     @Override
-    public String serialize(PublisherRequest publisherRequest) {
+    public String serialize(PublisherRequest publisherRequest) throws IdentitySerializerException {
         try {
             final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
 

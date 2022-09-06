@@ -5,10 +5,7 @@ import com.google.common.io.Files;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectParser;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectValidator;
-import net.ripe.rpki.commons.provisioning.identity.ChildIdentity;
-import net.ripe.rpki.commons.provisioning.identity.ChildIdentitySerializer;
-import net.ripe.rpki.commons.provisioning.identity.ParentIdentity;
-import net.ripe.rpki.commons.provisioning.identity.ParentIdentitySerializer;
+import net.ripe.rpki.commons.provisioning.identity.*;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestParser;
@@ -62,20 +59,20 @@ public class ProcessIscUpdownPdusTest {
     }
 
     @Test
-    public void shouldReadIscChildIdentityXml() throws IOException {
+    public void shouldReadIscChildIdentityXml() throws IOException, IdentitySerializerException {
         ProvisioningIdentityCertificate childCert = extractCarolIdentityCert();
         assertNotNull(childCert);
     }
 
     @Test
-    public void shouldReadIscIssuerXml() throws IOException {
+    public void shouldReadIscIssuerXml() throws IOException, IdentitySerializerException {
         String parentXml = Files.asCharSource(new File(PATH_TO_TEST_PDUS + "/issuer-alice-child-bob-parent.xml"), StandardCharsets.UTF_8).read();
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
         ParentIdentity parentId = serializer.deserialize(parentXml);
         assertNotNull(parentId);
     }
 
-    public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException {
+    public ProvisioningIdentityCertificate extractCarolIdentityCert() throws IOException, IdentitySerializerException {
         String childIdXml = Files.asCharSource(new File(PATH_TO_TEST_PDUS + "/carol-child-id.xml"), StandardCharsets.UTF_8).read();
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
         ChildIdentity childId = serializer.deserialize(childIdXml);
@@ -83,7 +80,7 @@ public class ProcessIscUpdownPdusTest {
     }
 
     @Test
-    public void shouldValidateRequest() throws IOException {
+    public void shouldValidateRequest() throws IOException, IdentitySerializerException {
 
         // Note this object expired 30 June 2012. Maybe get a new one sometime?
         byte[] encoded = Files.toByteArray(new File(PATH_TO_TEST_PDUS + "/pdu.200.der"));
@@ -117,7 +114,7 @@ public class ProcessIscUpdownPdusTest {
     }
 
     @Test
-    public void shouldParseRpkidParentResponseXml() throws IOException {
+    public void shouldParseRpkidParentResponseXml() throws IOException, IdentitySerializerException {
         String xml = Files.asCharSource(new File(PATH_TO_TEST_PDUS + "/rpkid-parent-response.xml"), StandardCharsets.UTF_8).read();
         ParentIdentitySerializer serializer = new ParentIdentitySerializer();
 

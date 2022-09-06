@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.provisioning;
 
+import lombok.SneakyThrows;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
@@ -9,6 +10,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObject;
 import net.ripe.rpki.commons.provisioning.cms.ProvisioningCmsObjectBuilder;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.error.RequestNotPerformedResponsePayloadSerializerTest;
 import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
@@ -88,14 +90,17 @@ public class ProvisioningObjectMother {
         return builder.build(TEST_KEY_PAIR.getPrivate()).getCrl();
     }
 
+    @SneakyThrows
     public static ProvisioningCmsObject createResourceClassListQueryProvisioningCmsObject() {
         return createCmsForPayload(createResourceListQueryPayload());
     }
 
+    @SneakyThrows
     public static ProvisioningCmsObject createResourceCertificateSignRequestProvisioningCmsObject() {
         return createCmsForPayload(RPKI_CA_CERT_REQUEST_PAYLOAD);
     }
 
+    @SneakyThrows
     public static ProvisioningCmsObject createRequestNotPerformedResponseObject() {
         return createCmsForPayload(RequestNotPerformedResponsePayloadSerializerTest.NOT_PERFORMED_PAYLOAD);
     }
@@ -108,7 +113,7 @@ public class ProvisioningObjectMother {
         return createCmsForPayload(revokePayloadBuilder.build());
     }
 
-    private static ProvisioningCmsObject createCmsForPayload(AbstractProvisioningPayload payloadXml) {
+    private static ProvisioningCmsObject createCmsForPayload(AbstractProvisioningPayload payloadXml) throws IdentitySerializerException {
         payloadXml.setSender(CHILD_HANDLE);
         payloadXml.setRecipient(PARENT_HANDLE);
         ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder()
