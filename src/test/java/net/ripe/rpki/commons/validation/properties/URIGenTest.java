@@ -18,7 +18,7 @@ class URIGenTest {
         Random random = new Random();
         SourceOfRandomness r = new SourceOfRandomness(random);
 
-        for (int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 1000; i++) {
             URI uri = uriGen.generate(r, null);
             assertNotNull(uri);
         }
