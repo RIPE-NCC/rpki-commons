@@ -6,7 +6,7 @@ import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import java.net.URI;
 
 public class URIGen extends Generator<URI> {
-    public final int HIER_AUTHORITY = 0;
+    public final int HIER_AUTHORITY_PATH = 0;
     public final int HIER_PATH_ABSOLUTE = 1;
     public final int HIER_PATH_ROOTLESS = 2;
     public final int HIER_PATH_EMPTY = 3;
@@ -14,6 +14,10 @@ public class URIGen extends Generator<URI> {
     public final int HOST_REG_NAME = 0;
     public final int HOST_IPV4 = 1;
     public final int HOST_IPV6 = 2;
+
+    private final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+    private final String NUMERIC = "0123456789";
 
     private SourceOfRandomness r;
 
@@ -30,36 +34,42 @@ public class URIGen extends Generator<URI> {
         } catch (Exception exception) {
             // bad uri, interesting but ok or invalid options for uri generation
             System.err.println(exception.getMessage());
+            exception.printStackTrace();
         }
 
         return null;
     }
 
     private URI buildURI() throws Exception {
-        String uri = hierPart() + query() + fragment();
+        String uri = hierPart(scheme()) + query() + fragment();
         return new URI(uri);
     }
 
-    private String scheme() {
-        return randomString(1, 10) + "://";
-    }
-
-    private String hierPart() throws Exception {
+    private String hierPart(String scheme) throws Exception {
         switch (r.nextInt(0, 3)) {
-            case HIER_AUTHORITY: return scheme() + userinfo() + host() + port() + path();
-            case HIER_PATH_ABSOLUTE: return "/" + randomString();
-            case HIER_PATH_ROOTLESS: return randomString();
+            case HIER_AUTHORITY_PATH: return scheme + authority() + path();
+            case HIER_PATH_ABSOLUTE: return scheme + path();
+            case HIER_PATH_ROOTLESS: return scheme + path("");
             case HIER_PATH_EMPTY: return "";
             default: throw new Exception("Invalid option for hierPart");
         }
     }
 
-    private String path() {
-        if (r.nextBoolean()) {
-            return "";
+    private String scheme() {
+        String[] commonScheme = { "http", "https", "ftp", "ftps", "mailto", "file", "data", "irc", "blob", "sftp" };
+        int pickScheme = r.nextInt(0, commonScheme.length);
+
+        if (pickScheme == commonScheme.length) {
+            String SCHEME = UPPERCASE + LOWERCASE + NUMERIC + "+.-";
+            return randomString(1, 1, UPPERCASE + LOWERCASE, false)
+                     + randomString(2, 100, SCHEME, false) + ":";
         }
 
-        return "/" + randomString(1,100);
+        return commonScheme[pickScheme] + ":";
+    }
+
+    private String authority() throws Exception {
+        return "//" + userinfo() + host() + port();
     }
 
     private String userinfo() {
@@ -67,7 +77,7 @@ public class URIGen extends Generator<URI> {
             return "";
         }
 
-        return randomString() + ":" + randomString() + "@";
+        return randomString(1, 100) + ":" + randomString(0, 100) + "@";
     }
 
     private String host() throws Exception {
@@ -80,7 +90,8 @@ public class URIGen extends Generator<URI> {
     }
 
     private String regName() {
-        return randomString(1, 100);
+        String REG = UPPERCASE + LOWERCASE + NUMERIC + ".-";
+        return randomString(1, 255, REG);
     }
 
     private String ip4() {
@@ -101,12 +112,24 @@ public class URIGen extends Generator<URI> {
         return ":" + r.nextInt(0, 65535);
     }
 
+    private String path() {
+        return path("/");
+    }
+
+    private String path(String append) {
+        String PATH = LOWERCASE + UPPERCASE + NUMERIC + ".+;=";
+        return append +
+                randomString(1, 1, PATH) +
+                randomString(1, 255, PATH + "/");
+    }
+
     private String query() {
         if (r.nextBoolean()) {
             return "";
         }
 
-        return "?" + randomString();
+        String QUERY = LOWERCASE + UPPERCASE + NUMERIC + "/?=";
+        return "?" + randomString(1, 255, QUERY);
     }
 
     private String fragment() {
@@ -114,21 +137,36 @@ public class URIGen extends Generator<URI> {
             return "";
         }
 
-        return "#" + randomString();
-    }
-
-    private String randomString() {
-        return randomString( 0, 100);
+        String FRAGMENT = LOWERCASE + UPPERCASE + NUMERIC + "/?=";
+        return "#" + randomString(1, 255, FRAGMENT);
     }
 
     private String randomString(int minLength, int maxLength) {
-        StringBuilder sb = new StringBuilder();
+        return randomString(minLength, maxLength, LOWERCASE + UPPERCASE + NUMERIC);
+    }
 
-        for (int i = 0; i < r.nextInt(minLength, maxLength); i++) {
-            sb.append(r.nextChar('A', 'Z'));
+    private String randomString(int minLength, int maxLength, String possibleCharacters) {
+        return randomString(minLength, maxLength, possibleCharacters, true);
+    }
+
+    private String randomString(int minLength, int maxLength, String possibleCharacters, boolean genEncodedChars) {
+        String HEX_DIGIT = "0123456789ABCDEF";
+        StringBuilder sb = new StringBuilder();
+        int len = r.nextInt(minLength, maxLength);
+
+        for (int i = 0; i < len; i++) {
+            if (genEncodedChars) {
+                int charIdx = r.nextInt(0, possibleCharacters.length());
+                if (charIdx == possibleCharacters.length()) {
+                    sb.append("%").append(randomString(2, 2, HEX_DIGIT, false));
+                } else {
+                    sb.append(possibleCharacters.charAt(charIdx));
+                }
+            } else {
+                sb.append(possibleCharacters.charAt(r.nextInt(0, possibleCharacters.length() - 1)));
+            }
         }
 
         return sb.toString();
     }
-
 }

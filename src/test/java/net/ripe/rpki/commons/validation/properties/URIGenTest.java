@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class URIGenTest {
 
     @Test
-    void generate() {
+    void generateTest() {
         URIGen uriGen = new URIGen();
         Random random = new Random();
         SourceOfRandomness r = new SourceOfRandomness(random);
-        random.setSeed(1);
 
-        System.out.println(uriGen.generate(r, null).toString());
-        System.out.println(uriGen.generate(r, null).toString());
-        System.out.println(uriGen.generate(r, null).toString());
+        for (int i = 0; i < 100_000; i++) {
+            URI uri = uriGen.generate(r, null);
+            assertNotNull(uri);
+        }
     }
 }
