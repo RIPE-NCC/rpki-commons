@@ -230,7 +230,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     }
 
     @Property
-    public void validParentChildSubResources(List<@From(IpResourceGen.class) IpResource> parentResources, int childResourceCount, @Size(min=0, max=100) List<@From(URIGen.class) URI> crlUris) throws URISyntaxException {
+    public void validParentChildSubResources(List<@From(IpResourceGen.class) IpResource> parentResources, int childResourceCount, @Size(min=0, max=1000) List<@From(URIGen.class) URI> crlUris) throws URISyntaxException {
         assumeThat(parentResources.size(), greaterThan(0));
         assumeThat(childResourceCount, greaterThan(0));
 
