@@ -8,6 +8,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
@@ -26,9 +27,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
@@ -273,20 +272,33 @@ public abstract class RpkiSignedObjectParser {
 
         //To loop over
         ASN1EncodableVector signedAttributes = signer.getSignedAttributes().toASN1EncodableVector();
+        Map<Attribute, Boolean> seenAttributes = new HashMap<>();
 
         boolean allAttributesCorrect = true;
         for (int i = 0; i < signedAttributes.size(); i++) {
-            ASN1Encodable signedAttribute = signedAttributes.get(i);
-            if (!isAllowedSignedAttribute((Attribute) signedAttribute)) {
+            Attribute signedAttribute = (Attribute)signedAttributes.get(i);
+            if (!isAllowedSignedAttribute(signedAttribute)) {
                 allAttributesCorrect = false;
                 break;
+            }
+
+            // The signedAttrs element MUST include only a single instance of any particular attribute.
+            if(seenAttributes.putIfAbsent(signedAttribute, true) != null) {
+                allAttributesCorrect = false;
+                break;
+            }
+
+            // Additionally, even though the syntax allows for a SET OF AttributeValue, in an RPKI signed object, the
+            // attrValues MUST consist of only a single AttributeValue.
+            if (signedAttribute.getAttributeValues() == null || signedAttribute.getAttributeValues().length != 1) {
+                allAttributesCorrect = false;
             }
         }
 
         if (allAttributesCorrect) {
             validationResult.pass(SIGNED_ATTRS_CORRECT);
         } else {
-            validationResult.warn(SIGNED_ATTRS_CORRECT);
+            validationResult.error(SIGNED_ATTRS_CORRECT);
         }
 
         return allAttributesCorrect;
@@ -300,6 +312,8 @@ public abstract class RpkiSignedObjectParser {
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
             return false;
         }
+        // Checks that signedAttrs match content-type and digest in EncapsulatedContentInfo are implemented in CMS
+        // parsing by bouncy castle through SignerInformation.verify.
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
 
@@ -310,6 +324,7 @@ public abstract class RpkiSignedObjectParser {
 
         //Check if the signedAttributes are allowed
         verifyOptionalSignedAttributes(signer);
+
         verifyUnsignedAttributes(signer);
 
         SignerId signerId = signer.getSID();
@@ -341,6 +356,11 @@ public abstract class RpkiSignedObjectParser {
             final SignerInformationVerifier verifier = new JcaSignerInfoVerifierBuilder(
                 BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey());
 
+            // In addition to signature, checks:
+            // * RFC 3852 11.1 Check the content-type attribute is correct
+            // * RFC 6211 Validate Algorithm Identifier protection attribute if present
+            // * RFC 3852 11.2 Check the message-digest attribute is correct
+            // * RFC 3852 11.4 Validate countersignature attribute(s)
             validationResult.rejectIfFalse(signer.verify(verifier), SIGNATURE_VERIFICATION);
         } catch (OperatorCreationException | CMSException e) {
             errorMessage = String.valueOf(e.getMessage());
