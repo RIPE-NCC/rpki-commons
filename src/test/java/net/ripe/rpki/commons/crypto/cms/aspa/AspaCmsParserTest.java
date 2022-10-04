@@ -12,10 +12,10 @@ import java.util.Optional;
 import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CONTENT_TYPE;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-public class AspaCmsParserTest {
+class AspaCmsParserTest {
 
     @Test
-    public void should_parse_aspa_rpkimancer() throws IOException {
+    void should_parse_aspa_rpkimancer() throws IOException {
         AspaCms aspa = parseValidAspa("interop/aspa/aspa-rpkimancer.asa");
         assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS65000"));
         assertThat(aspa.getProviderASSet()).containsExactly(
@@ -25,7 +25,7 @@ public class AspaCmsParserTest {
     }
 
     @Test
-    public void should_parse_aspa_krill() throws IOException {
+    void should_parse_aspa_krill() throws IOException {
         AspaCms aspa = parseValidAspa("interop/aspa/AS211321.asa");
         assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS211321"));
         assertThat(aspa.getProviderASSet()).containsExactly(
@@ -50,7 +50,7 @@ public class AspaCmsParserTest {
     }
 
     @Test
-    public void parseAspa_wrong_file_type() throws IOException {
+    void parseAspa_wrong_file_type() throws IOException {
         AspaCmsParser parser = new AspaCmsParser();
         ValidationResult result = ValidationResult.withLocation("goodROAASIDZero.roa");
         parser.parse(result, Resources.toByteArray(Resources.getResource("conformance/root/goodROAASIDZero.roa")));

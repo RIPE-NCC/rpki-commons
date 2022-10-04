@@ -16,8 +16,11 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 
+import javax.annotation.CheckForNull;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
@@ -26,6 +29,8 @@ import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CUSTOMER_AS
 public class AspaCmsParser extends RpkiSignedObjectParser {
 
     private int version;
+
+    @CheckForNull
     private Asn customerAsn;
     private ImmutableSortedSet<ProviderAS> providerASSet = ImmutableSortedSet.of();
 
@@ -68,7 +73,8 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
         );
 
         // *  The CustomerASID value MUST NOT appear in any providerASID field.
-        validationResult.rejectIfTrue(providerASSet.contains(customerAsn), ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, customerAsn.toString(), Joiner.on(", ").join(providerASSet));
+        Set<Asn> providerAsns = providerASSet.stream().map(ProviderAS::getProviderAsn).collect(Collectors.toSet());
+        validationResult.rejectIfTrue(providerAsns.contains(customerAsn), ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
     }
 
     @Override
