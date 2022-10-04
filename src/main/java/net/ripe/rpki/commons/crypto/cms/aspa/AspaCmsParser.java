@@ -7,6 +7,7 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -56,10 +57,12 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             String.valueOf(getContentType())
         );
 
+        X509ResourceCertificate resourceCertificate = getCertificate();
         validationResult.rejectIfFalse(
-            customerAsn != null &&
-                getCertificate().containsResources(new IpResourceSet(customerAsn)),
-            ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
+                customerAsn != null &&
+                        resourceCertificate != null &&
+                        resourceCertificate.containsResources(new IpResourceSet(customerAsn)),
+                ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
         );
     }
 
