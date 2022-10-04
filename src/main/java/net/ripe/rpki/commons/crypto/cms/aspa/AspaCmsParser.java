@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceSet;
@@ -20,12 +21,13 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
+import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS;
 
 public class AspaCmsParser extends RpkiSignedObjectParser {
 
     private int version;
     private Asn customerAsn;
-    private ImmutableSortedSet<ProviderAS> providerASSet;
+    private ImmutableSortedSet<ProviderAS> providerASSet = ImmutableSortedSet.of();
 
     @Override
     public void parse(ValidationResult result, byte[] encoded) {
@@ -64,6 +66,9 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
                         resourceCertificate.containsResources(new IpResourceSet(customerAsn)),
                 ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
         );
+
+        // *  The CustomerASID value MUST NOT appear in any providerASID field.
+        validationResult.rejectIfTrue(providerASSet.contains(customerAsn), ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, customerAsn.toString(), Joiner.on(", ").join(providerASSet));
     }
 
     @Override
@@ -105,6 +110,11 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             }
 
             ASN1Sequence providerAsnsSequence = expect(seq.getObjectAt(index), ASN1Sequence.class);
+            // TODO:
+            //    *  The elements of providers MUST be ordered in ascending numerical
+            //      order by the value of the providerASID field.
+            //   *  Each value of providerASID MUST be unique (with respect to the
+            //        other elements of providers).
             this.providerASSet = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
                 .map(this::parseProviderAS)
                 .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
