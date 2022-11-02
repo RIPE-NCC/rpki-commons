@@ -194,7 +194,7 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 5, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 4, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertFalse("" + validationResult.getAllValidationChecksForCurrentLocation(), validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }

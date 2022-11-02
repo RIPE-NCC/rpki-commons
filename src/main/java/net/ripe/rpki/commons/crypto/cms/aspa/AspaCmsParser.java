@@ -72,9 +72,11 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
                 ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
         );
 
-        // *  The CustomerASID value MUST NOT appear in any providerASID field.
-        Set<Asn> providerAsns = providerASSet.stream().map(ProviderAS::getProviderAsn).collect(Collectors.toSet());
-        validationResult.rejectIfTrue(providerAsns.contains(customerAsn), ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
+        // *  The CustomerASID value MUST NOT appear in any providerASID field
+        if (customerAsn != null) {
+            boolean providerAsInCustomerAs = providerASSet.stream().map(ProviderAS::getProviderAsn).anyMatch(customerAsn::equals);
+            validationResult.rejectIfTrue(providerAsInCustomerAs, ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
+        }
     }
 
     @Override

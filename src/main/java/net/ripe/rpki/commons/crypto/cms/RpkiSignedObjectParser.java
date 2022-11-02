@@ -295,11 +295,7 @@ public abstract class RpkiSignedObjectParser {
             }
         }
 
-        if (allAttributesCorrect) {
-            validationResult.pass(SIGNED_ATTRS_CORRECT);
-        } else {
-            validationResult.error(SIGNED_ATTRS_CORRECT);
-        }
+        validationResult.rejectIfFalse(allAttributesCorrect, SIGNED_ATTRS_CORRECT);
 
         return allAttributesCorrect;
     }
