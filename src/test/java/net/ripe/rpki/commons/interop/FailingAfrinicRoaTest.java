@@ -7,8 +7,10 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static net.ripe.rpki.commons.validation.ValidationString.SIGNED_ATTRS_CORRECT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FailingAfrinicRoaTest {
 
@@ -24,8 +26,7 @@ public class FailingAfrinicRoaTest {
 
         roaParser.parse(result, encoded);
 
-        assertFalse(result.hasFailures());
+        // Accept failure about multi-valued signed attribute.
+        assertThat(result.getFailuresForAllLocations().stream().filter(failure -> !failure.getKey().equals(SIGNED_ATTRS_CORRECT))).isEmpty();
     }
-
-
 }

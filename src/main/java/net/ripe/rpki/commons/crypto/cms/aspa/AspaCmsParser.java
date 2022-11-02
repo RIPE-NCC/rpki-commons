@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceSet;
@@ -7,6 +8,7 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -14,17 +16,23 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 
+import javax.annotation.CheckForNull;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
+import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS;
 
 public class AspaCmsParser extends RpkiSignedObjectParser {
 
     private int version;
+
+    @CheckForNull
     private Asn customerAsn;
-    private ImmutableSortedSet<ProviderAS> providerASSet;
+    private ImmutableSortedSet<ProviderAS> providerASSet = ImmutableSortedSet.of();
 
     @Override
     public void parse(ValidationResult result, byte[] encoded) {
@@ -56,11 +64,19 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             String.valueOf(getContentType())
         );
 
+        X509ResourceCertificate resourceCertificate = getCertificate();
         validationResult.rejectIfFalse(
-            customerAsn != null &&
-                getCertificate().containsResources(new IpResourceSet(customerAsn)),
-            ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
+                customerAsn != null &&
+                        resourceCertificate != null &&
+                        resourceCertificate.containsResources(new IpResourceSet(customerAsn)),
+                ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
         );
+
+        // *  The CustomerASID value MUST NOT appear in any providerASID field
+        if (customerAsn != null) {
+            boolean providerAsInCustomerAs = providerASSet.stream().map(ProviderAS::getProviderAsn).anyMatch(customerAsn::equals);
+            validationResult.rejectIfTrue(providerAsInCustomerAs, ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
+        }
     }
 
     @Override
@@ -102,6 +118,11 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             }
 
             ASN1Sequence providerAsnsSequence = expect(seq.getObjectAt(index), ASN1Sequence.class);
+            // TODO:
+            //    *  The elements of providers MUST be ordered in ascending numerical
+            //      order by the value of the providerASID field.
+            //   *  Each value of providerASID MUST be unique (with respect to the
+            //        other elements of providers).
             this.providerASSet = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
                 .map(this::parseProviderAS)
                 .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));

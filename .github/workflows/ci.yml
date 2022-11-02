@@ -30,3 +30,13 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Build with Maven
         run: mvn -B verify --file pom.xml
+      - name: Archive test results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: |
+            target/surefire-reports/
+      - name: Publish Test Report
+        if: ${{ always() }}
+        uses: scacap/action-surefire-report@v1
