@@ -8,7 +8,6 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
-import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
@@ -128,7 +127,6 @@ public abstract class RpkiSignedObjectParser {
             validationResult.pass(DECODE_CONTENT);
         } catch (IOException e) {
             validationResult.error(DECODE_CONTENT);
-            return;
         }
     }
 
@@ -163,7 +161,7 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        validationResult.rejectIfFalse(crls.size() == 0, CMS_NO_CRL_ALLOWED);
+        validationResult.rejectIfFalse(crls.isEmpty(), CMS_NO_CRL_ALLOWED);
     }
 
     private List<? extends X509CRL> extractCrl(CMSSignedDataParser sp) {
@@ -272,7 +270,7 @@ public abstract class RpkiSignedObjectParser {
 
         //To loop over
         ASN1EncodableVector signedAttributes = signer.getSignedAttributes().toASN1EncodableVector();
-        Map<Attribute, Boolean> seenAttributes = new HashMap<>();
+        Set<Attribute> seenAttributes = new HashSet<>();
 
         boolean allAttributesCorrect = true;
         for (int i = 0; i < signedAttributes.size(); i++) {
@@ -283,7 +281,7 @@ public abstract class RpkiSignedObjectParser {
             }
 
             // The signedAttrs element MUST include only a single instance of any particular attribute.
-            if(seenAttributes.putIfAbsent(signedAttribute, true) != null) {
+            if (!seenAttributes.add(signedAttribute)) {
                 allAttributesCorrect = false;
                 break;
             }
@@ -292,6 +290,7 @@ public abstract class RpkiSignedObjectParser {
             // attrValues MUST consist of only a single AttributeValue.
             if (signedAttribute.getAttributeValues() == null || signedAttribute.getAttributeValues().length != 1) {
                 allAttributesCorrect = false;
+                break;
             }
         }
 
