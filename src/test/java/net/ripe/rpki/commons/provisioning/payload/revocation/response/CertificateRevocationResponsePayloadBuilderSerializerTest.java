@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.provisioning.payload.revocation.response;
 
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocationKeyElement;
 import net.ripe.rpki.commons.xml.XmlSerializer;
@@ -40,7 +41,7 @@ public class CertificateRevocationResponsePayloadBuilderSerializerTest {
     }
 
     @Test
-    public void shouldProduceXmlConformStandard() {
+    public void shouldProduceXmlConformStandard() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD);
 
         Pattern expectedXmlRegex = Pattern.compile(
@@ -55,14 +56,14 @@ public class CertificateRevocationResponsePayloadBuilderSerializerTest {
     }
 
     @Test
-    public void shouldDeserializeXml() {
+    public void shouldDeserializeXml() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD);
         CertificateRevocationResponsePayload deserialized = SERIALIZER.deserialize(actualXml);
         assertEquals(TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD, deserialized);
     }
 
     @Test
-    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException, IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD);
 
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));

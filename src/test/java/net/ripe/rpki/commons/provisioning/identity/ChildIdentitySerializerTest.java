@@ -36,7 +36,7 @@ public class ChildIdentitySerializerTest {
                     "</ns0:child_request>\n";
 
     @Test
-    public void shouldDeserializeXml() {
+    public void shouldDeserializeXml() throws IdentitySerializerException {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
         ChildIdentity childId = serializer.deserialize(exampleChildIdXml);
 
@@ -47,7 +47,7 @@ public class ChildIdentitySerializerTest {
     }
 
     @Test
-    public void shouldDoDaRoundTripThang() {
+    public void shouldDoDaRoundTripThang() throws IdentitySerializerException {
         ChildIdentity childIdentity = new ChildIdentity(ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
@@ -61,7 +61,7 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeInvalidXml() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize("NOT VALID");
         });
 
@@ -72,7 +72,7 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildRequestIsNotPresent() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize("<xml></xml>");
         });
 
@@ -94,7 +94,7 @@ public class ChildIdentitySerializerTest {
     public void shouldFailToDeserializeXmlIfChildBpkiTaIsNotPresent() {
         ChildIdentitySerializer serializer = new ChildIdentitySerializer();
 
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize("<ns0:child_request child_handle=\"Bob\"  xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\"></ns0:child_request>");
         });
 

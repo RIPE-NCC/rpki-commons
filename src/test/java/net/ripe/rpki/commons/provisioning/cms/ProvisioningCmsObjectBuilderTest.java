@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
+import lombok.SneakyThrows;
 import net.ripe.rpki.commons.crypto.cms.RPKISignedData;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
@@ -71,6 +72,7 @@ public class ProvisioningCmsObjectBuilderTest {
         signedDataParser.getSignedContent().drain();
     }
 
+    @SneakyThrows
     public static ProvisioningCmsObject createProvisioningCmsObjectForPayload(AbstractProvisioningPayload payload) {
         ProvisioningCmsObjectBuilder builder = new ProvisioningCmsObjectBuilder();
         builder.withCmsCertificate(ProvisioningCmsCertificateBuilderTest.TEST_CMS_CERT.getCertificate());

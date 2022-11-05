@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.provisioning.payload.list.response;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
+import net.ripe.rpki.commons.provisioning.identity.IdentitySerializerException;
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElementBuilder;
@@ -90,7 +91,7 @@ public class ResourceClassListResponsePayloadSerializerTest {
 
     // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
     @Test
-    public void shouldCreatePayloadXmlConformDraft() {
+    public void shouldCreatePayloadXmlConformDraft() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD);
 
         Pattern expectedXmlRegex = Pattern.compile(
@@ -111,14 +112,14 @@ public class ResourceClassListResponsePayloadSerializerTest {
     }
 
     @Test
-    public void shouldDeserializeXml() {
+    public void shouldDeserializeXml() throws IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD);
         ResourceClassListResponsePayload deserialized = SERIALIZER.deserialize(actualXml);
         assertEquals(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD, deserialized);
     }
 
     @Test
-    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException {
+    public void shouldProduceSchemaValidatedXml() throws SAXException, IOException, IdentitySerializerException {
         String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD);
         assertTrue(RelaxNgSchemaValidator.validateAgainstRelaxNg(actualXml));
     }

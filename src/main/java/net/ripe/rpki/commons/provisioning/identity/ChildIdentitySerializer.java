@@ -23,7 +23,7 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
     }
 
     @Override
-    public ChildIdentity deserialize(String xml) {
+    public ChildIdentity deserialize(String xml) throws IdentitySerializerException {
         try (final StringReader characterStream = new StringReader(xml)) {
             final Document doc = XML.newNamespaceAwareDocumentBuilder().parse(new InputSource(characterStream));
 
@@ -40,14 +40,13 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
             return new ChildIdentity(childHandle, provisioningIdentityCertificate);
 
         } catch (SAXException | IOException | ParserConfigurationException e) {
-            //TODO: make it a checked exception?
             throw new IdentitySerializerException("Fail to parse child request", e);
         }
     }
 
 
     @Override
-    public String serialize(ChildIdentity childIdentity) {
+    public String serialize(ChildIdentity childIdentity) throws IdentitySerializerException {
 
         try {
             final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
@@ -65,7 +64,6 @@ public class ChildIdentitySerializer extends IdentitySerializer<ChildIdentity> {
             return serialize(document);
 
         } catch (ParserConfigurationException | TransformerException e) {
-            //TODO: make it a checked exception?
             throw new IdentitySerializerException(e);
         }
     }

@@ -25,7 +25,7 @@ public class RepositoryResponseSerializer extends IdentitySerializer<RepositoryR
     }
 
     @Override
-    public RepositoryResponse deserialize(String xml) {
+    public RepositoryResponse deserialize(String xml) throws IdentitySerializerException {
         try (final StringReader characterStream = new StringReader(xml)) {
             final Document doc = XML.newNamespaceAwareDocumentBuilder().parse(new InputSource(characterStream));
 
@@ -60,7 +60,7 @@ public class RepositoryResponseSerializer extends IdentitySerializer<RepositoryR
 
 
     @Override
-    public String serialize(RepositoryResponse repositoryResponse) {
+    public String serialize(RepositoryResponse repositoryResponse) throws IdentitySerializerException {
         try {
             final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
 

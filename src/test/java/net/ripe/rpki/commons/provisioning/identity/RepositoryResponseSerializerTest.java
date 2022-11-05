@@ -35,7 +35,7 @@ public class RepositoryResponseSerializerTest  {
             "</repository_response>";
 
     @Test
-    public void testDeserializeXML() {
+    public void testDeserializeXML() throws IdentitySerializerException {
         RepositoryResponseSerializer serializer = new RepositoryResponseSerializer();
         RepositoryResponse repositoryResponse = serializer.deserialize(exampleRepositoryResponse);
 
@@ -47,7 +47,7 @@ public class RepositoryResponseSerializerTest  {
     }
 
     @Test
-    public void shouldDoRoundTripDezerializeSerialize() {
+    public void shouldDoRoundTripDezerializeSerialize() throws IdentitySerializerException {
         RepositoryResponseSerializer serializer = new RepositoryResponseSerializer();
         RepositoryResponse repositoryResponse = serializer.deserialize(exampleRepositoryResponse);
 
@@ -60,7 +60,7 @@ public class RepositoryResponseSerializerTest  {
     @Test
     public void shouldFailToParseCorruptedXML() {
         RepositoryResponseSerializer serializer = new RepositoryResponseSerializer();
-        Exception exception = assertThrows(IdentitySerializer.IdentitySerializerException.class, () -> {
+        Exception exception = assertThrows(IdentitySerializerException.class, () -> {
             serializer.deserialize(exampleRepositoryResponse.replaceAll("repository_response", "publisher_request") );
         });
 
