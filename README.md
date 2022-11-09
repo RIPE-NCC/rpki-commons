@@ -59,10 +59,10 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
-### 2022-xx-yy 1.31-SNAPSHOT
+### 2022-11-09 1.31
   * Validate that ASPA customer ASN does not appear in provider ASNs.
 
-### 2022-5-11 1.30
+### 2022-05-11 1.30
   * Improve binary signing time support for CMS
   * Support ASPA CMS objects based on draft standard and sidrops mailing list
     ASN.1 schema.
