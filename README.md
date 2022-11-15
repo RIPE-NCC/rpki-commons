@@ -59,6 +59,10 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
+### 2022-11-xx 1.32
+  * Use ImmutableResourceSet to store resources of X509ResourceCertificate.
+    This breaks serialisation compatibility. 
+
 ### 2022-11-09 1.31
   * Validate that ASPA customer ASN does not appear in provider ASNs.
 
