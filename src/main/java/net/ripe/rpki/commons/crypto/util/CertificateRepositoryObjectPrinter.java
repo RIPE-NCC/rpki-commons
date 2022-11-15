@@ -38,7 +38,7 @@ public final class CertificateRepositoryObjectPrinter {
         printWriter.println("Subject: " + resourceCertificate.getSubject());
         printWriter.println("Not valid before: " + resourceCertificate.getValidityPeriod().getNotValidBefore());
         printWriter.println("Not valid after:  " + resourceCertificate.getValidityPeriod().getNotValidAfter());
-        printWriter.println("Resources: " + resourceCertificate.getResources());
+        printWriter.println("Resources: " + resourceCertificate.resources());
     }
 
     private static void printManifestCms(PrintWriter printWriter, ManifestCms manifest) {
