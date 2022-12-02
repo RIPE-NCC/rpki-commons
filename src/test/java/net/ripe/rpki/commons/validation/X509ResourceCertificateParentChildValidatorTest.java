@@ -2,9 +2,6 @@ package net.ripe.rpki.commons.validation;
 
 import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
-import com.pholser.junit.quickcheck.generator.Also;
-import com.pholser.junit.quickcheck.generator.NullAllowed;
-import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
