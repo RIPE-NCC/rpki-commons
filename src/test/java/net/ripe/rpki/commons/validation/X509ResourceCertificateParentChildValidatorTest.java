@@ -21,7 +21,6 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificate
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.rpki.commons.validation.properties.IpResourceGen;
-import net.ripe.rpki.commons.validation.properties.URIGen;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -31,12 +30,9 @@ import org.junit.runner.RunWith;
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.KeyPair;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.hamcrest.Matchers.greaterThan;
@@ -230,7 +226,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     }
 
     @Property
-    public void validParentChildSubResources(List<@From(IpResourceGen.class) IpResource> parentResources, int childResourceCount, @Size(min=0, max=1000) List<@From(URIGen.class) URI> crlUris) throws URISyntaxException {
+    public void validParentChildSubResources(List<@From(IpResourceGen.class) IpResource> parentResources, int childResourceCount) {
         assumeThat(parentResources.size(), greaterThan(0));
         assumeThat(childResourceCount, greaterThan(0));
 
@@ -243,7 +239,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
             return;
         }
 
-        ValidationResult result = validateParentChildPair(parentResourceSet, childResourceSet, crlUris);
+        ValidationResult result = validateParentChildPair(parentResourceSet, childResourceSet);
         assertFalse(result.hasFailures());
     }
 
@@ -312,30 +308,10 @@ public class X509ResourceCertificateParentChildValidatorTest {
         return validateParentChildPairImpl(parentResourceSet, childResourceSet, false);
     }
 
-    private ValidationResult validateParentChildPair(IpResourceSet parentResourceSet, IpResourceSet childResourceSet, List<URI> crlUris) {
-        return validateParentChildPairImpl(parentResourceSet, childResourceSet, false, crlUris);
-    }
-
     private ValidationResult validateParentChildPairImpl(IpResourceSet parentResourceSet, IpResourceSet childResourceSet, boolean reconsidered) {
-        return validateParentChildPairImpl(parentResourceSet, childResourceSet, reconsidered, null);
-    }
-
-    private ValidationResult validateParentChildPairImpl(IpResourceSet parentResourceSet, IpResourceSet childResourceSet, boolean reconsidered, List<URI> crlUris) {
-        final X509ResourceCertificate parentCertificate;
-
-        if (crlUris == null) {
-            parentCertificate = createRootCertificateBuilder()
-                    .withResources(parentResourceSet)
-                    .build();
-        } else {
-            URI[] arrayUris = new URI[crlUris.size()];
-            arrayUris = crlUris.toArray(arrayUris);
-
-            parentCertificate = createRootCertificateBuilder()
-                    .withResources(parentResourceSet)
-                    .withCrlDistributionPoints(arrayUris)
-                    .build();
-        }
+        final X509ResourceCertificate parentCertificate = createRootCertificateBuilder()
+            .withResources(parentResourceSet)
+            .build();
 
         final X509ResourceCertificate childCertificate = createChildCertificateBuilder()
             .withResources(childResourceSet)

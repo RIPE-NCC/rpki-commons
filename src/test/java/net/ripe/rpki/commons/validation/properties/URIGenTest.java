@@ -14,13 +14,19 @@ class URIGenTest {
 
     @Test
     void generateTest() {
-        URIGen uriGen = new URIGen();
+        String[] schemas = { "rsync" };
+        URIGen uriGen = new URIGen(schemas);
+
         Random random = new Random();
         SourceOfRandomness r = new SourceOfRandomness(random);
 
         for (int i = 0; i < 1000; i++) {
             URI uri = uriGen.generate(r, null);
             assertNotNull(uri);
+            assertNotNull(uri.getHost());
+            assertNotNull(uri.getScheme());
+            assertNotNull(uri.getPath());
+            assertEquals("rsync", uri.getScheme());
         }
     }
 }
