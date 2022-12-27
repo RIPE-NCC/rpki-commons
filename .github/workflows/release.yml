@@ -1,0 +1,36 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2.3.4
+
+      - name: Setup Java
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 8
+
+      - name: Increment Version
+        run: |
+          ./mvnw build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit
+          git config user.name my-bot-user
+          git config user.email my-bot-user@email.com
+          git add .
+          git commit -m "updated version in pom.xml"
+          git push
+
+      - name: Release to Nexus Repository
+        uses: samuelmeuli/action-maven-publish@v1
+        with:
+          gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
+          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          nexus_username: ${{ secrets.OSSRH_USERNAME }}
+          nexus_password: ${{ secrets.OSSRH_PASSWORD }}
