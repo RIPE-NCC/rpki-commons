@@ -26,4 +26,5 @@ jobs:
         run: |       
           MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"   
           mvn versions:set -DnewVersion=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/rpki-commons-//')
-          mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release      
+          mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release
+          echo "done"
