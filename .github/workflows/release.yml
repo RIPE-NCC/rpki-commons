@@ -7,12 +7,12 @@ on:
 
 jobs:
   build:
-    runs-on: maven:3.6-jdk-8-alpine
+    runs-on: ubuntu-latest
 
     steps:
       - name: Prepare environment
         run: |             
-            apk update && apk add rsync git gnupg
+            apt-get install rsync git gnupg
 
       - name: Checkout Code
         uses: actions/checkout@v2.3.4
