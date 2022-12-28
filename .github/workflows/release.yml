@@ -2,8 +2,7 @@ name: release
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, add-release-action ]
 
 jobs:
   build:
