@@ -28,6 +28,8 @@ jobs:
           SCM_DEVELOPER_URL: "blabla"          
         run: |       
           # checking GPG signing support
+          VERSION=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/rpki-commons-//')
+          echo "Will be releasing ${VERSION}"
           if [ -n "$GPG_KEY" ]; then
             echo "$GPG_KEY" | gpg --batch --no-tty --allow-secret-key-import --import -
             unset GPG_KEY
@@ -35,7 +37,8 @@ jobs:
 
             # GPG stuff works, do the release
             export MAVEN_OPTS="-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$HOME/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"   
-            mvn versions:set -DnewVersion=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/rpki-commons-//')
+                        
+            mvn versions:set -DnewVersion=${VERSION}
             mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release
             echo "done"
           else
