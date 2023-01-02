@@ -24,9 +24,9 @@ jobs:
 
       - name: Release
         env: 
-          GPG_PASSPHRASE: "bla"
-          SCM_DEVELOPER_URL: "blabla"          
-          GPG_KEY: "foobar"          
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY: ${{ secrets.GPG_KEY }}
+          SCM_DEVELOPER_URL: ${{ secrets.SCM_DEVELOPER_URL }}          
         run: |       
           # checking GPG signing support          
           if [ -n "$GPG_KEY" ]; then
