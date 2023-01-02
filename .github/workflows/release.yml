@@ -26,6 +26,7 @@ jobs:
         env: 
           GPG_PASSPHRASE: "bla"
           SCM_DEVELOPER_URL: "blabla"          
+          GPG_KEY: "foobar"          
         run: |       
           # checking GPG signing support
           VERSION=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/rpki-commons-//')
