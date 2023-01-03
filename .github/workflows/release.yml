@@ -26,7 +26,10 @@ jobs:
         env: 
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GPG_KEY: ${{ secrets.GPG_KEY }}
-          SCM_DEVELOPER_URL: ${{ secrets.SCM_DEVELOPER_URL }}          
+          SONATYPE_NEXUS_SNAPSHOTS_USERNAME: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_USERNAME }}
+          SONATYPE_NEXUS_SNAPSHOTS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_PASSWORD }}
+          SONATYPE_NEXUS_STAGING_USERNAME: ${{ secrets.SONATYPE_NEXUS_STAGING_USERNAME }}
+          SONATYPE_NEXUS_STAGING_PASSWORD: ${{ secrets.SONATYPE_NEXUS_STAGING_PASSWORD }}          
         run: |       
           # checking GPG signing support          
           if [ -n "$GPG_KEY" ]; then
