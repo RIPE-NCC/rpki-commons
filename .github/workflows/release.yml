@@ -2,7 +2,7 @@ name: release
 
 on:
   push:
-    branches: [ main, add-release-action ]
+    branches: [ main ]
     tags: 'rpki-commons-*'
 
 jobs:
