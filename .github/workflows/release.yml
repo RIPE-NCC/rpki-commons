@@ -30,7 +30,7 @@ jobs:
           SONATYPE_NEXUS_STAGING_USERNAME: ${{ secrets.SONATYPE_NEXUS_STAGING_USERNAME }}
           SONATYPE_NEXUS_STAGING_PASSWORD: ${{ secrets.SONATYPE_NEXUS_STAGING_PASSWORD }}          
         run: |                   
-          echo "$GPG_KEY" | gpg --batch --no-tty --allow-secret-key-import --import -
+          gpg --batch --no-tty --allow-secret-key-import --import - <<< "$GPG_KEY"
           unset GPG_KEY
           export GPG_KEYID=$(gpg --with-colon --list-secret-keys | head -n1 | cut -d : -f 5)
 
