@@ -134,7 +134,15 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
         return new IpResourceSet(resourceExtension.deriveResources(ImmutableResourceSet.of(parentResources)));
     }
 
+    public ImmutableResourceSet deriveResources(ImmutableResourceSet parentResources) {
+        return resourceExtension.deriveResources(parentResources);
+    }
+
     public boolean containsResources(IpResourceSet that) {
+        return resourceExtension.containsResources(that);
+    }
+
+    public boolean containsResources(ImmutableResourceSet that) {
         return resourceExtension.containsResources(that);
     }
 }

@@ -84,4 +84,8 @@ public class ResourceExtension implements Serializable {
     public boolean containsResources(IpResourceSet that) {
         return resources.contains(that);
     }
+
+    public boolean containsResources(ImmutableResourceSet that) {
+        return resources.contains(that);
+    }
 }
