@@ -16,6 +16,15 @@ import java.util.function.UnaryOperator;
 
 @Value
 public class ResourceExtension implements Serializable {
+    private static final ImmutableResourceSet[] RESOURCES_BY_TYPE;
+
+    static {
+        RESOURCES_BY_TYPE = new ImmutableResourceSet[IpResourceType.values().length];
+        for (IpResourceType type : IpResourceType.values()) {
+            RESOURCES_BY_TYPE[type.ordinal()] = ImmutableResourceSet.of(type.getMinimum().upTo(type.getMaximum()));
+        }
+    }
+
     @NonNull Set<IpResourceType> inheritedResourceTypes;
     @NonNull ImmutableResourceSet resources;
 
@@ -75,7 +84,7 @@ public class ResourceExtension implements Serializable {
         }
         ImmutableResourceSet result = this.resources;
         for (IpResourceType type : inheritedResourceTypes) {
-            result = result.union(parentResources.intersection(ImmutableResourceSet.of(type.getMinimum().upTo(type.getMaximum()))));
+            result = result.union(parentResources.intersection(RESOURCES_BY_TYPE[type.ordinal()]));
         }
         return result;
     }
