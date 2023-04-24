@@ -8,10 +8,7 @@ import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
 @Value
@@ -64,8 +61,11 @@ public class ResourceExtension implements Serializable {
         return new ResourceExtension(this.inheritedResourceTypes, resources);
     }
 
-    public ResourceExtension mapResources(UnaryOperator<ImmutableResourceSet> mapper) {
-        return new ResourceExtension(this.inheritedResourceTypes, mapper.apply(this.resources));
+    public Optional<ResourceExtension> mapResources(UnaryOperator<ImmutableResourceSet> mapper) {
+        ImmutableResourceSet updatedResources = mapper.apply(this.resources);
+        return this.inheritedResourceTypes.isEmpty() && updatedResources.isEmpty()
+            ? Optional.empty()
+            : Optional.of(new ResourceExtension(this.inheritedResourceTypes, updatedResources));
     }
 
     /**
