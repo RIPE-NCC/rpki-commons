@@ -59,6 +59,13 @@ public class ResourceExtension implements Serializable {
         return new ResourceExtension(this.inheritedResourceTypes, mapper.apply(this.resources));
     }
 
+    /**
+     * Determines the effective resources based on the parent resources and this resource extensions inherited and
+     * specified resources.
+     *
+     * @param parentResources parent certificate's resources
+     * @return the effective resource set
+     */
     public ImmutableResourceSet deriveResources(ImmutableResourceSet parentResources) {
         if (inheritedResourceTypes.isEmpty()) {
             return this.resources;
