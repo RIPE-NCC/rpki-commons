@@ -38,7 +38,10 @@ public class ResourceExtension implements Serializable {
     }
 
     public static ResourceExtension of(Collection<IpResourceType> inheritedResourceTypes, ImmutableResourceSet resources) {
-        return new ResourceExtension(Collections.unmodifiableSet(EnumSet.copyOf(inheritedResourceTypes)), resources);
+        // EnumSet.copyOf is unsafe since it requires a non-empty set when the parameter is not already an EnumSet!
+        EnumSet<IpResourceType> inherited = EnumSet.noneOf(IpResourceType.class);
+        inherited.addAll(inheritedResourceTypes);
+        return new ResourceExtension(Collections.unmodifiableSet(inherited), resources);
     }
 
     public static ResourceExtension ofResources(ImmutableResourceSet resources) {
@@ -46,7 +49,10 @@ public class ResourceExtension implements Serializable {
     }
 
     public static ResourceExtension ofInherited(Collection<IpResourceType> inheritedResourceTypes) {
-        return new ResourceExtension(Collections.unmodifiableSet(EnumSet.copyOf(inheritedResourceTypes)), ImmutableResourceSet.empty());
+        // EnumSet.copyOf is unsafe since it requires a non-empty set when the parameter is not already an EnumSet!
+        EnumSet<IpResourceType> inherited = EnumSet.noneOf(IpResourceType.class);
+        inherited.addAll(inheritedResourceTypes);
+        return new ResourceExtension(Collections.unmodifiableSet(inherited), ImmutableResourceSet.empty());
     }
 
     public static ResourceExtension allInherited() {
@@ -54,7 +60,10 @@ public class ResourceExtension implements Serializable {
     }
 
     public ResourceExtension withInheritedResourceTypes(Collection<IpResourceType> inheritedResourceTypes) {
-        return new ResourceExtension(Collections.unmodifiableSet(EnumSet.copyOf(inheritedResourceTypes)), this.resources);
+        // EnumSet.copyOf is unsafe since it requires a non-empty set when the parameter is not already an EnumSet!
+        EnumSet<IpResourceType> inherited = EnumSet.noneOf(IpResourceType.class);
+        inherited.addAll(inheritedResourceTypes);
+        return new ResourceExtension(Collections.unmodifiableSet(inherited), this.resources);
     }
 
     public ResourceExtension withResources(ImmutableResourceSet resources) {
