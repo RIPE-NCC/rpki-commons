@@ -5,7 +5,7 @@ import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.EnumSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,7 +15,7 @@ public class ResourceExtensionTest {
     @Test
     public void should_enforce_non_empty_resource_extension() {
         assertThatThrownBy(() -> ResourceExtension.ofResources(ImmutableResourceSet.empty())).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> ResourceExtension.ofInherited(Collections.emptySet())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> ResourceExtension.ofInherited(EnumSet.noneOf(IpResourceType.class))).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

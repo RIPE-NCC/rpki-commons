@@ -49,10 +49,7 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
     }
 
     public EnumSet<IpResourceType> getInheritedResourceTypes() {
-        // EnumSet.copyOf is unsafe since it requires a non-empty set when the parameter is not already an EnumSet!
-        EnumSet<IpResourceType> inherited = EnumSet.noneOf(IpResourceType.class);
-        inherited.addAll(resourceExtension.getInheritedResourceTypes());
-        return inherited;
+        return resourceExtension.getInheritedResourceTypes();
     }
 
     public boolean isResourceTypesInherited(EnumSet<IpResourceType> resourceTypes) {

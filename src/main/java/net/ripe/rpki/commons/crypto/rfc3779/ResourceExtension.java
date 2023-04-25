@@ -22,10 +22,10 @@ public class ResourceExtension implements Serializable {
         }
     }
 
-    @NonNull Set<IpResourceType> inheritedResourceTypes;
+    @NonNull EnumSet<IpResourceType> inheritedResourceTypes;
     @NonNull ImmutableResourceSet resources;
 
-    private ResourceExtension(@NonNull Set<IpResourceType> inheritedResourceTypes, @NonNull ImmutableResourceSet resources) {
+    private ResourceExtension(@NonNull EnumSet<IpResourceType> inheritedResourceTypes, @NonNull ImmutableResourceSet resources) {
         Validate.isTrue(!inheritedResourceTypes.isEmpty() || !resources.isEmpty(), "empty resource extension");
         for (IpResourceType inheritedResourceType : inheritedResourceTypes) {
             if (resources.containsType(inheritedResourceType)) {
@@ -37,33 +37,28 @@ public class ResourceExtension implements Serializable {
         this.resources = resources;
     }
 
-    public static ResourceExtension of(Collection<IpResourceType> inheritedResourceTypes, ImmutableResourceSet resources) {
-        // EnumSet.copyOf is unsafe since it requires a non-empty set when the parameter is not already an EnumSet!
-        EnumSet<IpResourceType> inherited = EnumSet.noneOf(IpResourceType.class);
-        inherited.addAll(inheritedResourceTypes);
-        return new ResourceExtension(Collections.unmodifiableSet(inherited), resources);
+    public EnumSet<IpResourceType> getInheritedResourceTypes() {
+        return EnumSet.copyOf(inheritedResourceTypes);
+    }
+
+    public static ResourceExtension of(EnumSet<IpResourceType> inheritedResourceTypes, ImmutableResourceSet resources) {
+        return new ResourceExtension(EnumSet.copyOf(inheritedResourceTypes), resources);
     }
 
     public static ResourceExtension ofResources(ImmutableResourceSet resources) {
-        return new ResourceExtension(Collections.unmodifiableSet(EnumSet.noneOf(IpResourceType.class)), resources);
+        return new ResourceExtension(EnumSet.noneOf(IpResourceType.class), resources);
     }
 
-    public static ResourceExtension ofInherited(Collection<IpResourceType> inheritedResourceTypes) {
-        // EnumSet.copyOf is unsafe since it requires a non-empty set when the parameter is not already an EnumSet!
-        EnumSet<IpResourceType> inherited = EnumSet.noneOf(IpResourceType.class);
-        inherited.addAll(inheritedResourceTypes);
-        return new ResourceExtension(Collections.unmodifiableSet(inherited), ImmutableResourceSet.empty());
+    public static ResourceExtension ofInherited(EnumSet<IpResourceType> inheritedResourceTypes) {
+        return new ResourceExtension(EnumSet.copyOf(inheritedResourceTypes), ImmutableResourceSet.empty());
     }
 
     public static ResourceExtension allInherited() {
-        return new ResourceExtension(Collections.unmodifiableSet(EnumSet.allOf(IpResourceType.class)), ImmutableResourceSet.empty());
+        return new ResourceExtension(EnumSet.allOf(IpResourceType.class), ImmutableResourceSet.empty());
     }
 
-    public ResourceExtension withInheritedResourceTypes(Collection<IpResourceType> inheritedResourceTypes) {
-        // EnumSet.copyOf is unsafe since it requires a non-empty set when the parameter is not already an EnumSet!
-        EnumSet<IpResourceType> inherited = EnumSet.noneOf(IpResourceType.class);
-        inherited.addAll(inheritedResourceTypes);
-        return new ResourceExtension(Collections.unmodifiableSet(inherited), this.resources);
+    public ResourceExtension withInheritedResourceTypes(EnumSet<IpResourceType> inheritedResourceTypes) {
+        return new ResourceExtension(EnumSet.copyOf(inheritedResourceTypes), this.resources);
     }
 
     public ResourceExtension withResources(ImmutableResourceSet resources) {
