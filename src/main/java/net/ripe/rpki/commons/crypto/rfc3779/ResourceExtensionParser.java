@@ -6,6 +6,7 @@ import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
+import net.ripe.ipresource.ImmutableResourceSet;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -16,6 +17,9 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERBitString;
 
+import java.security.cert.X509Certificate;
+import java.util.EnumSet;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -32,6 +36,35 @@ public class ResourceExtensionParser {
 
     private static final AddressFamily[] SUPPORTED_ADDRESS_FAMILIES = new AddressFamily[]{AddressFamily.IPV4, AddressFamily.IPV6};
 
+    public ResourceExtension parse(X509Certificate certificate) {
+        EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
+
+        ImmutableResourceSet.Builder builder = new ImmutableResourceSet.Builder();
+        byte[] ipAddressBlocksExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
+        if (ipAddressBlocksExtension != null) {
+            SortedMap<AddressFamily, IpResourceSet> ipResources = parseIpAddressBlocks(ipAddressBlocksExtension);
+            for (Map.Entry<AddressFamily, IpResourceSet> resourcesByType : ipResources.entrySet()) {
+                if (resourcesByType.getValue() == null) {
+                    inheritedResourceTypes.add(resourcesByType.getKey().toIpResourceType());
+                } else {
+                    builder.addAll(resourcesByType.getValue());
+                }
+            }
+        }
+
+        byte[] asnExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
+        if (asnExtension != null) {
+            IpResourceSet asResources = parseAsIdentifiers(asnExtension);
+            if (asResources == null) {
+                inheritedResourceTypes.add(IpResourceType.ASN);
+            } else {
+                builder.addAll(asResources);
+            }
+        }
+        ImmutableResourceSet resources = builder.build();
+
+        return ResourceExtension.of(inheritedResourceTypes, resources);
+    }
 
     /**
      * Parses the IP address blocks extension and merges all address families
@@ -79,7 +112,7 @@ public class ResourceExtensionParser {
      */
     SortedMap<AddressFamily, IpResourceSet> derToIpAddressBlocks(ASN1Encodable der) {
         ASN1Sequence seq = expect(der, ASN1Sequence.class);
-        SortedMap<AddressFamily, IpResourceSet> map = new TreeMap<AddressFamily, IpResourceSet>();
+        SortedMap<AddressFamily, IpResourceSet> map = new TreeMap<>();
 
         for (int i = 0; i < seq.size(); i++) {
             derToIpAddressFamily(seq.getObjectAt(i), map);

@@ -59,6 +59,9 @@ POM version to `1.0` and then builds and releases the artifacts.
 
 ## Changelog
 
+### 2023-04-20 1.33
+  * Add `ResourceExtension` class to represent the RFC3779 resource extension.
+
 ### 2022-11-16 1.32
   * Use ImmutableResourceSet to store resources of X509ResourceCertificate.
     This breaks serialisation compatibility.
