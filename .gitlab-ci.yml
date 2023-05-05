@@ -76,6 +76,8 @@ snapshot:deploy:
 
 release:deploy:
   stage: deploy
+  # Disable for now since releases have been moved to Github actions
+  when: manual
   environment:
     name: release
   <<: *gpg_setup
