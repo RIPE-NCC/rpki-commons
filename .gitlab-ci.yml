@@ -1,7 +1,7 @@
 image: maven:3.6-jdk-8-alpine
 # Inspired by https://gitlab.com/gitlab-examples/maven/simple-maven-dep and
 # https://gitlab.com/gitlab-org/gitlab-ci-yml/blob/master/Maven.gitlab-ci.yml
-# 
+#
 # Signing procedure inspired by https://gitlab.com/gitlab-org/gitlab-runner/merge_requests/922/diffs
 # and related code.
 #
@@ -73,22 +73,3 @@ snapshot:deploy:
     - mvn $MAVEN_CLI_OPTS package gpg:sign deploy -s ci_settings.xml
   only:
     - main
-
-release:deploy:
-  stage: deploy
-  # Disable for now since releases have been moved to Github actions
-  when: manual
-  environment:
-    name: release
-  <<: *gpg_setup
-  script:
-    - if [ ! -f ci_settings.xml ];
-        then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/project/packages/maven_repository.html#creating-maven-packages-with-gitlab-cicd for instructions.";
-      fi
-    - if [[ "$CI_COMMIT_TAG" =~ ^rpki-commons-.* ]]; then echo "Correct tag"; else exit 1; fi
-    # Update version in pom.xml to match the tag
-    - mvn versions:set -DnewVersion=$(echo $CI_COMMIT_TAG | sed -e 's/rpki-commons-//')
-    # Use the release profile from pom.xml to deploy
-    - mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release
-  only:
-    - tags
