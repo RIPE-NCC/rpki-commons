@@ -52,10 +52,13 @@ Releasing
 ----------
 
 To release a version of rpki-commons you can push a tag
-`rpki-commons-<VERSION>`. The RIPENCC internal Gitlab pipeline will build and
-publish the artifacts for `<VERSION>`. E.g. a tag `rpki-commons-1.0` updates the
-POM version to `1.0` and then builds and releases the artifacts.
+`rpki-commons-<VERSION>`. The Github release action will build and
+publish the artifacts for `<VERSION>`. E.g. a tag `rpki-commons-1.0`
+updates the POM version to `1.0` and then builds and releases the
+artifacts.
 
+After successful deployment update the pom version to point to the
+next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
