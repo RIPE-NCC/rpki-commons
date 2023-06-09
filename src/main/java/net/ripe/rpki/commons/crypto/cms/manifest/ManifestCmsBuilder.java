@@ -65,7 +65,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     public ManifestCms build(PrivateKey privateKey) {
         String location = "unknown.mft";
         ManifestCmsParser parser = new ManifestCmsParser();
-        parser.parse(ValidationResult.withLocation(location), generateCms(certificate.getCertificate(), privateKey, signatureProvider, new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID), encodeManifest()));
+        parser.parse(ValidationResult.withLocation(location), generateCms(certificate.getCertificate(), privateKey, signatureProvider, ManifestCms.CONTENT_TYPE, encodeManifest()));
         return parser.getManifestCms();
     }
 
