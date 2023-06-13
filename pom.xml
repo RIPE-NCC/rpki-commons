@@ -46,10 +46,10 @@
         <java.runtime.version>1.8</java.runtime.version>
 
         <net.ripe.ipresource.version>1.52</net.ripe.ipresource.version>
-        <bouncycastle.version>1.70</bouncycastle.version>
-        <guava.version>31.0.1-jre</guava.version>
+        <bouncycastle.version>1.73</bouncycastle.version>
+        <guava.version>32.0.0-jre</guava.version>
         <joda-time.version>2.10.13</joda-time.version>
-        <xstream.version>1.4.19</xstream.version>
+        <xstream.version>1.4.20</xstream.version>
         <commons-io.version>2.11.0</commons-io.version>
         <lombok.version>1.18.22</lombok.version>
     </properties>
@@ -86,12 +86,12 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
+            <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
+            <artifactId>bcmail-jdk18on</artifactId>
         </dependency>
 
         <dependency>
@@ -199,13 +199,13 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcmail-jdk15on</artifactId>
+                <artifactId>bcmail-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <dependency>
