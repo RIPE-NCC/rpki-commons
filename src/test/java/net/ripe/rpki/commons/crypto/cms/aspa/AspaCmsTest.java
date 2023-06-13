@@ -46,8 +46,8 @@ public class AspaCmsTest {
     private static final BigInteger ROA_CERT_SERIAL = BigInteger.TEN;
 
     private static final ImmutableSortedSet<ProviderAS> PROVIDER_AS_SET = ImmutableSortedSet.<ProviderAS>naturalOrder()
-        .add(new ProviderAS(Asn.parse("AS65001"), Optional.empty()))
-        .add(new ProviderAS(Asn.parse("AS65002"), Optional.of(AddressFamily.IPV4)))
+        .add(new ProviderAS(Asn.parse("AS65001")))
+        .add(new ProviderAS(Asn.parse("AS65002")))
         .build();
 
     private static final Asn CUSTOMER_ASN = Asn.parse("AS65000");
@@ -67,7 +67,7 @@ public class AspaCmsTest {
         ImmutableSortedSet<ProviderAS> providerAsSet = providerAsIdSet.stream()
             .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
         AspaCms cms = createAspa(customerAsn, providerAsSet);
-        assertEquals(0, cms.getVersion());
+        assertEquals(1, cms.getVersion());
         assertEquals(customerAsn, cms.getCustomerAsn());
         assertEquals(providerAsSet, cms.getProviderASSet());
     }

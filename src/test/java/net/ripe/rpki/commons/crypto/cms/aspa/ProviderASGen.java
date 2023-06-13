@@ -21,7 +21,6 @@ public class ProviderASGen extends Generator<ProviderAS> {
     @Override
     public ProviderAS generate(SourceOfRandomness random, GenerationStatus status) {
         Asn providerAsn = new Asn(Integer.toUnsignedLong(random.nextInt()));
-        Optional<AddressFamily> afiLimit = random.choose(Arrays.asList(Optional.empty()));
-        return new ProviderAS(providerAsn, afiLimit);
+        return new ProviderAS(providerAsn);
     }
 }
