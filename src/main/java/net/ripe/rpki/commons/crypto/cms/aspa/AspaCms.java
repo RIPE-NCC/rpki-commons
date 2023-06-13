@@ -48,7 +48,7 @@ public class AspaCms extends RpkiSignedObject {
 
     public AspaCms(RpkiSignedObjectInfo cmsObjectData, int version, Asn customerAsn, ImmutableSortedSet<ProviderAS> providerASSet) {
         super(cmsObjectData);
-        Validate.isTrue(version == 0, "version must be 0");
+        Validate.isTrue(version == 1, "version must be 1");
         this.version = version;
         this.customerAsn = customerAsn;
         this.providerASSet = providerASSet;

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DLTaggedObject;
 
 import java.security.PrivateKey;
 
@@ -57,47 +58,26 @@ public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
     public byte[] getEncoded(PrivateKey privateKey) {
         return generateCms(certificate.getCertificate(), privateKey, signatureProvider, AspaCms.CONTENT_TYPE, encodeAspa());
     }
-
     /**
      * <pre>
+     * ct-ASPA CONTENT-TYPE ::= { TYPE ASProviderAttestation IDENTIFIED BY id-ct-ASPA }
      * ASProviderAttestation ::= SEQUENCE {
-     *   version [0]   ASPAVersion DEFAULT v0,
-     *   customerASID  ASID,
-     *   providers     ProviderASSet
+     *     version [0]   INTEGER DEFAULT 0,
+     *     customerASID  ASID,
+     *     providers     ProviderASSet
      * }
-     *
-     * ASPAVersion ::= INTEGER  { v0(0) }
-     *
-     * ProviderASSet ::= SEQUENCE (SIZE(1..MAX)) OF ProviderAS
-     *
-     * ProviderAS ::= SEQUENCE {
-     *   providerASID  ASID,
-     *   afiLimit      AddressFamilyIdentifier OPTIONAL
-     * }
-     *
-     * ASID ::= INTEGER
-     *
-     * AddressFamilyIdentifier ::= OCTET STRING (SIZE (2))
+     * ProviderASSet ::= SEQUENCE (SIZE(1..MAX)) OF ASID
      * </pre>
      */
     private byte[] encodeAspa() {
         Validate.notNull(customerAsn, "Customer AS ID must not be null");
         Validate.notEmpty(providerASSet, "ProviderASSet must not be empty");
         ASN1Encodable[] encodables = {
-            // Version is default value, so must not be encoded
+            // Version is needs to be 1, but needs to be explicitly tagged
+            new DLTaggedObject(0, new ASN1Integer(1)),
             new ASN1Integer(customerAsn.getValue()),
-            new DERSequence(providerASSet.stream().map(as -> {
-                if (as.getAfiLimit().isPresent()) {
-                    return new DERSequence(new ASN1Encodable[] {
-                        new ASN1Integer(as.getProviderAsn().getValue()),
-                        as.getAfiLimit().get().toDer()
-                    });
-                } else {
-                    return new DERSequence(new ASN1Encodable[] {
-                        new ASN1Integer(as.getProviderAsn().getValue())
-                    });
-                }
-            }).toArray(ASN1Encodable[]::new))
+            new DERSequence(providerASSet.stream().map(as ->new ASN1Integer(as.getProviderAsn().getValue()
+            )).toArray(ASN1Encodable[]::new))
         };
         return Asn1Util.encode(new DERSequence(encodables));
     }

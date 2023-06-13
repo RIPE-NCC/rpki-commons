@@ -15,23 +15,14 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 class AspaCmsParserTest {
 
     @Test
-    void should_parse_aspa_rpkimancer() throws IOException {
-        AspaCms aspa = parseValidAspa("interop/aspa/aspa-rpkimancer.asa");
-        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS65000"));
+    void should_parse_draft15_aspa() throws IOException {
+        AspaCms aspa = parseValidAspa("interop/aspa/draft-ietf-sidrops-profile-15-sample.asa");
+        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS15562"));
         assertThat(aspa.getProviderASSet()).containsExactly(
-                        new ProviderAS(Asn.parse("AS65001"), Optional.empty()),
-                        new ProviderAS(Asn.parse("AS65002"), Optional.of(AddressFamily.IPV4))
-        );
-    }
-
-    @Test
-    void should_parse_aspa_krill() throws IOException {
-        AspaCms aspa = parseValidAspa("interop/aspa/AS211321.asa");
-        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS211321"));
-        assertThat(aspa.getProviderASSet()).containsExactly(
-                        new ProviderAS(Asn.parse("AS65000"), Optional.empty()),
-                        new ProviderAS(Asn.parse("AS65001"), Optional.of(AddressFamily.IPV4)),
-                        new ProviderAS(Asn.parse("AS65002"), Optional.of(AddressFamily.IPV6))
+                        new ProviderAS(Asn.parse("AS2914")),
+                        new ProviderAS(Asn.parse("AS8283")),
+                        new ProviderAS(Asn.parse("AS51088")),
+                        new ProviderAS(Asn.parse("206238"))
         );
     }
 
