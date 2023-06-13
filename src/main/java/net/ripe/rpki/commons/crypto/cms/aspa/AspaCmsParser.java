@@ -1,12 +1,12 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
-import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -15,8 +15,7 @@ import org.bouncycastle.asn1.*;
 
 import javax.annotation.CheckForNull;
 import java.util.Comparator;
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -91,14 +90,13 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             int index = 0;
             ASN1Encodable maybeVersion = seq.getObjectAt(index);
             if (maybeVersion instanceof DLTaggedObject) {
-                // Version is optional and defaults to 0, so should not be explicitly encoded when using DER encoding
-                // If it is present and correct, we still accept the object. If the version is different, reject the
-                // object.
+                // Version is optional and defaults to 0 if missing. An explicitly tagged integer is present when
+                // another version is present.
                 decodeVersion(validationResult, (DLTaggedObject) maybeVersion);
 
                 ++index;
             } else {
-                validationResult.rejectIfFalse(false, ValidationString.ASPA_VERSION, "no version present");
+                validationResult.rejectIfFalse(false, ValidationString.ASPA_VERSION, "0 [missing]");
             }
 
             validationResult.rejectIfFalse(index < itemCount && seq.getObjectAt(index) instanceof ASN1Integer, ValidationString.ASPA_CUSTOMER_ASN_PRESENT);
@@ -115,14 +113,23 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             }
 
             ASN1Sequence providerAsnsSequence = expect(seq.getObjectAt(index), ASN1Sequence.class);
-            // TODO:
-            //    *  The elements of providers MUST be ordered in ascending numerical
-            //      order by the value of the providerASID field.
-            //   *  Each value of providerASID MUST be unique (with respect to the
-            //        other elements of providers).
-            this.providerASSet = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
+
+            List<ProviderAS> providerAsList = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
                 .map(this::parseProviderAS)
-                .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
+                .collect(Collectors.toList());
+
+            //  * The elements of providers MUST be ordered in ascending numerical
+            //    order.¶
+            validationResult.rejectIfFalse(Comparators.isInStrictOrder(providerAsList, Comparator.naturalOrder()), ValidationString.ASPA_PROVIDER_AS_SET_VALID, "elements are in order");
+
+            if (validationResult.hasFailureForCurrentLocation()) {
+                return;
+            }
+
+            this.providerASSet = ImmutableSortedSet.copyOf(providerAsList);
+            //  *  Each value of providerASID MUST be unique (with respect to the
+            //     other elements of providers).
+            validationResult.rejectIfFalse(providerASSet.size() == providerAsnsSequence.size(), ValidationString.ASPA_PROVIDER_AS_SET_VALID, "elements are unique");
             validationResult.rejectIfTrue(providerASSet.isEmpty(), ValidationString.ASPA_PROVIDER_AS_SET_NOT_EMPTY);
         } catch (IllegalArgumentException ex) {
             validationResult.error(ValidationString.ASPA_CONTENT_STRUCTURE);
