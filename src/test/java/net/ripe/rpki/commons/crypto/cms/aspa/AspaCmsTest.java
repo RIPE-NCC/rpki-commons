@@ -1,39 +1,36 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.When;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.AsnGen;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.util.UTC;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.security.auth.x500.X500Principal;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeThat;
 
 @RunWith(JUnitQuickcheck.class)
 public class AspaCmsTest {
@@ -45,10 +42,9 @@ public class AspaCmsTest {
     private static final URI TEST_CA_LOCATION = URI.create("rsync://certificate/repository/ca.cer");
     private static final BigInteger ROA_CERT_SERIAL = BigInteger.TEN;
 
-    private static final ImmutableSortedSet<ProviderAS> PROVIDER_AS_SET = ImmutableSortedSet.<ProviderAS>naturalOrder()
-        .add(new ProviderAS(Asn.parse("AS65001")))
-        .add(new ProviderAS(Asn.parse("AS65002")))
-        .build();
+    private static final ImmutableSortedSet<Asn> PROVIDER_AS_SET = ImmutableSortedSet.of(
+        Asn.parse("AS65001"), Asn.parse("AS65002")
+    );
 
     private static final Asn CUSTOMER_ASN = Asn.parse("AS65000");
 
@@ -62,9 +58,9 @@ public class AspaCmsTest {
     }
 
     @Property(trials = 100)
-    public void should_generate_aspa(int customerAsId, @When(satisfies = "!#_.isEmpty") List<ProviderAS> providerAsIdSet) {
+    public void should_generate_aspa(int customerAsId, @When(satisfies = "!#_.isEmpty") List<Asn> providerAsIdSet) {
         Asn customerAsn = new Asn(Integer.toUnsignedLong(customerAsId));
-        ImmutableSortedSet<ProviderAS> providerAsSet = providerAsIdSet.stream()
+        ImmutableSortedSet<Asn> providerAsSet = providerAsIdSet.stream()
             .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
         AspaCms cms = createAspa(customerAsn, providerAsSet);
         assertEquals(1, cms.getVersion());
@@ -76,7 +72,7 @@ public class AspaCmsTest {
         return createAspa(CUSTOMER_ASN, PROVIDER_AS_SET);
     }
 
-    public static AspaCms createAspa(Asn customerAsn, ImmutableSortedSet<ProviderAS> providerAsSet) {
+    public static AspaCms createAspa(Asn customerAsn, ImmutableSortedSet<Asn> providerAsSet) {
         AspaCmsBuilder builder = new AspaCmsBuilder();
         builder.withCertificate(createCertificate(new IpResourceSet(customerAsn)));
         builder.withCustomerAsn(customerAsn);

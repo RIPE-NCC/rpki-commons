@@ -19,10 +19,10 @@ class AspaCmsParserTest {
         AspaCms aspa = parseValidAspa("interop/aspa/draft-ietf-sidrops-profile-15-sample.asa");
         assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS15562"));
         assertThat(aspa.getProviderASSet()).containsExactly(
-                        new ProviderAS(Asn.parse("AS2914")),
-                        new ProviderAS(Asn.parse("AS8283")),
-                        new ProviderAS(Asn.parse("AS51088")),
-                        new ProviderAS(Asn.parse("206238"))
+                        Asn.parse("AS2914"),
+                        Asn.parse("AS8283"),
+                        Asn.parse("AS51088"),
+                        Asn.parse("206238")
         );
     }
 

@@ -26,7 +26,7 @@ public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
 
     private Asn customerAsn;
 
-    private ImmutableSortedSet<ProviderAS> providerASSet;
+    private ImmutableSortedSet<Asn> providerASSet;
 
     public AspaCmsBuilder withCertificate(X509ResourceCertificate certificate) {
         this.certificate = certificate;
@@ -43,8 +43,8 @@ public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
         return this;
     }
 
-    public AspaCmsBuilder withProviderASSet(Iterable<? extends ProviderAS> providerASSet) {
-        this.providerASSet = ImmutableSortedSet.<ProviderAS>naturalOrder().addAll(providerASSet).build();
+    public AspaCmsBuilder withProviderASSet(Iterable<? extends Asn> providerASSet) {
+        this.providerASSet = ImmutableSortedSet.<Asn>naturalOrder().addAll(providerASSet).build();
         return this;
     }
 
@@ -76,7 +76,7 @@ public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
             // Version is needs to be 1, but needs to be explicitly tagged
             new DLTaggedObject(0, new ASN1Integer(1)),
             new ASN1Integer(customerAsn.getValue()),
-            new DERSequence(providerASSet.stream().map(as ->new ASN1Integer(as.getProviderAsn().getValue()
+            new DERSequence(providerASSet.stream().map(as ->new ASN1Integer(as.getValue()
             )).toArray(ASN1Encodable[]::new))
         };
         return Asn1Util.encode(new DERSequence(encodables));
