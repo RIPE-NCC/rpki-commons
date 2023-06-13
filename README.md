@@ -65,6 +65,8 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ### 2023-06-xx 1.34
   * Add `GenericRpkiSignedObjectParser` to parse object type from `content-type` and signing time.
   * Update a number of dependencies.
+  * Verify non-overlap, not being continous, being in order of resource
+    extension elements.
 
 ### 2023-04-20 1.33
   * Add `ResourceExtension` class to represent the RFC3779 resource extension.

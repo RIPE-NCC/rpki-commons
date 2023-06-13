@@ -1,12 +1,6 @@
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import net.ripe.ipresource.IpAddress;
-import net.ripe.ipresource.IpRange;
-import net.ripe.ipresource.IpResource;
-import net.ripe.ipresource.IpResourceRange;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
-import net.ripe.ipresource.ImmutableResourceSet;
+import net.ripe.ipresource.*;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -144,8 +138,24 @@ public class ResourceExtensionParser {
         } else if (der instanceof ASN1Sequence) {
             IpResourceSet result = new IpResourceSet();
             ASN1Sequence seq = (ASN1Sequence) der;
+
+            IpResource previous = null;
             for (int i = 0; i < seq.size(); i++) {
-                result.add(derToIpAddressOrRange(type, seq.getObjectAt(i)));
+                IpResource current = derToIpAddressOrRange(type, seq.getObjectAt(i));
+                // Check if previous and next are (1) in order and (2) not continuous
+                if (previous != null) {
+                    Validate.isTrue(!previous.adjacent(current), "IP resources in extension MUST NOT be adjacent");
+                    //    The addressesOrRanges element is a SEQUENCE OF IPAddressOrRange
+                    //   types.  The addressPrefix and addressRange elements MUST be sorted
+                    //   using the binary representation of:
+                    //
+                    //      <lowest IP address in range> | <prefix length>
+                    UniqueIpResource start = current.getStart();
+                    Validate.isTrue(previous.getEnd().compareTo(start) < 0, "addressOrRanges MUST be sorted");
+                }
+
+                result.add(current);
+                previous = current;
             }
             return result;
         } else {
@@ -209,8 +219,24 @@ public class ResourceExtensionParser {
         expect(der, ASN1Sequence.class);
         ASN1Sequence seq = (ASN1Sequence) der;
         IpResourceSet result = new IpResourceSet();
+
+        // The asIdsOrRanges element is a SEQUENCE of ASIdOrRange types.  Any
+        // pair of items in the asIdsOrRanges SEQUENCE MUST NOT overlap.  Any
+        // contiguous series of AS identifiers MUST be combined into a single
+        // range whenever possible.  The AS identifiers in the asIdsOrRanges
+        // element MUST be sorted by increasing numeric value.
+        IpResource previous = null;
         for (int i = 0; i < seq.size(); ++i) {
-            result.add(derToAsIdOrRange(seq.getObjectAt(i)));
+            IpResource current = derToAsIdOrRange(seq.getObjectAt(i));
+
+            if (previous != null) {
+                UniqueIpResource start = current.getStart();
+
+                Validate.isTrue(!start.adjacent(previous.getEnd()), "ASIdOrRange entries MUST NOT be adjacent");
+                Validate.isTrue(start.max(previous.getEnd()).equals(start), "ASIdOrRange entries MUST be sorted by increasing numeric value");
+            }
+            result.add(current);
+            previous = current;
         }
         return result;
     }
