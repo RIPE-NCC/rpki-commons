@@ -1,7 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Delegate;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
@@ -9,10 +8,12 @@ import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import java.util.Objects;
 import java.util.Optional;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProviderAS implements Comparable<ProviderAS> {
     @Delegate
-    @NonNull Asn providerAsn;
+    Asn providerAsn;
 
     @Override
     public int compareTo(ProviderAS that) {
