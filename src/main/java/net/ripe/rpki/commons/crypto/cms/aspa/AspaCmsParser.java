@@ -28,7 +28,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
     @CheckForNull
     private Asn customerAsn;
-    private ImmutableSortedSet<ProviderAS> providerASSet = ImmutableSortedSet.of();
+    private ImmutableSortedSet<Asn> providerASSet = ImmutableSortedSet.of();
 
     @Override
     public void parse(ValidationResult result, byte[] encoded) {
@@ -70,7 +70,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
         // *  The CustomerASID value MUST NOT appear in any providerASID field
         if (customerAsn != null) {
-            boolean providerAsInCustomerAs = providerASSet.stream().map(ProviderAS::getProviderAsn).anyMatch(customerAsn::equals);
+            boolean providerAsInCustomerAs = providerASSet.stream().anyMatch(customerAsn::equals);
             validationResult.rejectIfTrue(providerAsInCustomerAs, ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
         }
     }
@@ -114,8 +114,8 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
             ASN1Sequence providerAsnsSequence = expect(seq.getObjectAt(index), ASN1Sequence.class);
 
-            List<ProviderAS> providerAsList = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
-                .map(this::parseProviderAS)
+            List<Asn> providerAsList = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
+                .map(this::parseProviderAsn)
                 .collect(Collectors.toList());
 
             //  * The elements of providers MUST be ordered in ascending numerical
@@ -146,10 +146,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
         }
     }
 
-    private ProviderAS parseProviderAS(ASN1Encodable asn1Encodable) {
-        ValidationResult validationResult = getValidationResult();
-        Asn asn = Asn1Util.parseAsId(expect(asn1Encodable, ASN1Integer.class));
-
-        return new ProviderAS(asn);
+    private Asn parseProviderAsn(ASN1Encodable asn1Encodable) {
+        return Asn1Util.parseAsId(expect(asn1Encodable, ASN1Integer.class));
     }
 }
