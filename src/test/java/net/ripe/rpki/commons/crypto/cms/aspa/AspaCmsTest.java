@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.io.BaseEncoding;
 import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.When;
@@ -66,6 +67,8 @@ public class AspaCmsTest {
         assertEquals(1, cms.getVersion());
         assertEquals(customerAsn, cms.getCustomerAsn());
         assertEquals(providerAsSet, cms.getProviderASSet());
+
+        System.out.println(BaseEncoding.base64().encode(cms.getEncoded()));
     }
 
     public static AspaCms createAspa() {

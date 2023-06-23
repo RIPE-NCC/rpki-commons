@@ -70,8 +70,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
         // *  The CustomerASID value MUST NOT appear in any providerASID field
         if (customerAsn != null) {
-            boolean providerAsInCustomerAs = providerASSet.stream().anyMatch(customerAsn::equals);
-            validationResult.rejectIfTrue(providerAsInCustomerAs, ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
+            validationResult.rejectIfTrue(providerASSet.contains(customerAsn), ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
         }
     }
 
@@ -96,6 +95,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
                 ++index;
             } else {
+                // Other pass/fails for same key are in `decodeVersion`
                 validationResult.rejectIfFalse(false, ValidationString.ASPA_VERSION, "0 [missing]");
             }
 

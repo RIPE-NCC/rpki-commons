@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GenericRpkiSignedObjectParserTest {
     @Test
     void should_parse_aspa() throws IOException {
-        GenericRpkiSignedObjectParser parser = parse("interop/aspa/draft-ietf-sidrops-profile-15-sample.asa");
+        GenericRpkiSignedObjectParser parser = parse("interop/aspa/GOOD-draft-ietf-sidrops-profile-15-sample.asa");
 
         assertThat(parser.getRepositoryObjectType().get()).isEqualTo(RepositoryObjectType.Aspa);
         assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2023-06-07T09:08:41+00:00"));
