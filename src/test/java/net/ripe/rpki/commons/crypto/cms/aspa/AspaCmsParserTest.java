@@ -34,6 +34,16 @@ class AspaCmsParserTest {
         AspaCms aspa = parseValidAspa("interop/aspa/GOOD-profile-15-rpki-commons-propertytest-sample.asa");
         assertThat(aspa.getVersion()).isEqualTo(1);
     }
+    
+    @Test
+    void should_accept_apnic_test_aspa_v1() throws IOException {
+        AspaCms aspa = parseValidAspa("interop/aspa/GOOD-profile-15-APNIC-rpki-aspa-demo-AS1000.asa");
+        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS1000"));
+        assertThat(aspa.getVersion()).isEqualTo(1);
+        assertThat(aspa.getProviderASSet()).containsExactly(
+                        Asn.parse("AS1025")
+        );
+    }
 
     @Test
     void should_reject_apnic_test_aspa_WRONG_VERSION() throws IOException {
