@@ -62,6 +62,8 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
+## 2023-xx-xx 1.35
+
 ### 2023-06-26 1.34
   * Add `GenericRpkiSignedObjectParser` to parse object type from `content-type` and signing time.
   * Update a number of dependencies.
