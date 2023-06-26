@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -41,7 +42,11 @@ public class ManifestCms extends RpkiSignedObject {
 
     public static final int DEFAULT_VERSION = 0;
 
+    // since 1.34
+    @Deprecated
     public static final String CONTENT_TYPE_OID = "1.2.840.113549.1.9.16.1.26";
+
+    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.26");
 
     public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
 

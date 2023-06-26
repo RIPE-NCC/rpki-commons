@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class GenericRpkiSignedObjectParserTest {
     @Test
@@ -21,15 +20,6 @@ public class GenericRpkiSignedObjectParserTest {
         assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2021-11-11T11:19:00+00:00"));
     }
 
-    @Test
-    void should_parse_roa() throws IOException {
-        GenericRpkiSignedObjectParser parser = parse("interop/rpkid-objects/nI2bsx18I5mlex8lBpY0WSJUYio.roa");
-
-        assertThat(parser.getRepositoryObjectType().get()).isEqualTo(RepositoryObjectType.Roa);
-        assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2011-11-11T01:55:18+00:00"));
-    }
-
-
     @Disabled("Our parser rejects GBR objects: corrupted stream - out of bounds length found: 115 >= 32")
     @Test
     void should_parse_gbr() throws IOException {
@@ -38,6 +28,23 @@ public class GenericRpkiSignedObjectParserTest {
         assertThat(parser.getRepositoryObjectType().get()).isEqualTo(RepositoryObjectType.Gbr);
         assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2016-08-19T12:10:32+00:00"));
     }
+
+    @Test
+    void should_parse_manifest() throws IOException {
+        GenericRpkiSignedObjectParser parser = parse("conformance/root/root.mft");
+
+        assertThat(parser.getRepositoryObjectType().get()).isEqualTo(RepositoryObjectType.Manifest);
+        assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2013-10-28T21:24:39+00:00"));
+    }
+
+    @Test
+    void should_parse_roa() throws IOException {
+        GenericRpkiSignedObjectParser parser = parse("interop/rpkid-objects/nI2bsx18I5mlex8lBpY0WSJUYio.roa");
+
+        assertThat(parser.getRepositoryObjectType().get()).isEqualTo(RepositoryObjectType.Roa);
+        assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2011-11-11T01:55:18+00:00"));
+    }
+
 
     private GenericRpkiSignedObjectParser parse(String path) throws IOException {
         byte[] bytes = Resources.toByteArray(Resources.getResource(path));

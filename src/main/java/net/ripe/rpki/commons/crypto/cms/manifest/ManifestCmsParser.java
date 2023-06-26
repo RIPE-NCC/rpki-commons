@@ -64,7 +64,7 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 
     private void validateManifest() {
         ValidationResult validationResult = getValidationResult();
-        validationResult.rejectIfFalse(new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID).equals(getContentType()), MANIFEST_CONTENT_TYPE);
+        validationResult.rejectIfFalse(ManifestCms.CONTENT_TYPE.equals(getContentType()), MANIFEST_CONTENT_TYPE);
         // RFC 6486 section 5.1.2:
         // This EE certificate MUST describe its Internet Number Resources
         // (INRs) using the "inherit" attribute, rather than explicit
