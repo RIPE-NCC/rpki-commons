@@ -80,7 +80,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     /**
-     * Encode the <emph>unique</emph> addresses with the given addressFamily <b>in deterministic order</b>
+     * Encode the <emph>unique</emph> (Set) roa-prefixes with the given addressFamily <b>in deterministic order</b>
      *
      * <pre>
      * ROAIPAddressFamily ::= SEQUENCE {
@@ -90,11 +90,11 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
      *
      * @requires all prefixes are of given addressFamily.
      */
-    ASN1Encodable encodeRoaIpAddressFamily(AddressFamily addressFamily, List<RoaPrefix> prefixes) {
+    ASN1Encodable encodeRoaIpAddressFamily(AddressFamily addressFamily, Set<RoaPrefix> prefixes) {
         Validate.isTrue(addressFamily == AddressFamily.IPV4 || addressFamily == AddressFamily.IPV6, "ROA can only contain IPv4 or IPv6 AFI");
 
         ASN1Encodable[] encodablePrefixes = prefixes.stream()
-                .sorted()
+                .sorted() // sort before encoding - ensures natural order is used as comparator.
                 .map(this::encodeRoaIpAddress)
                 .toArray(ASN1Encodable[]::new);
 
@@ -127,25 +127,15 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
      * @return DER encoding of prefixes
      */
     private Stream<ASN1Encodable> addRoaIpAddressFamily(IpResourceType type, List<RoaPrefix> prefixes) {
-        List<RoaPrefix> selectedPrefixes = prefixes.stream()
+        Set<RoaPrefix> selectedPrefixes = prefixes.stream()
                 .filter(roaPrefix -> type == roaPrefix.getPrefix().getType())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
         if (selectedPrefixes.isEmpty()) {
             return Stream.empty();
         }
 
         return Stream.of(encodeRoaIpAddressFamily(AddressFamily.fromIpResourceType(type), selectedPrefixes));
-    }
-
-    private List<RoaPrefix> selectPrefixes(IpResourceType type, List<RoaPrefix> prefixes) {
-        List<RoaPrefix> result = new ArrayList<RoaPrefix>();
-        for (RoaPrefix roaPrefix : prefixes) {
-            if (type == roaPrefix.getPrefix().getType()) {
-                result.add(roaPrefix);
-            }
-        }
-        return result;
     }
 
     /**

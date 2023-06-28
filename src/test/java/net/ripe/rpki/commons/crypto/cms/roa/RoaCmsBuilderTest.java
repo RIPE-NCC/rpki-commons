@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import org.junit.Before;
@@ -7,6 +8,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest.*;
@@ -52,7 +54,7 @@ public class RoaCmsBuilderTest {
 
     @Test
     public void shouldEncodeRoaIpAddressFamily() {
-        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY, subject.encodeRoaIpAddressFamily(AddressFamily.IPV4, ipv4Prefixes));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY, subject.encodeRoaIpAddressFamily(AddressFamily.IPV4, Set.copyOf(ipv4Prefixes)));
     }
 
     @Test
