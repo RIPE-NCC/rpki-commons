@@ -25,6 +25,7 @@ import java.net.URI;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -107,7 +108,8 @@ public class RoaCmsTest {
     @Test
     public void shouldGenerateRoaCms() {
         assertEquals(TEST_ASN, subject.getAsn());
-        assertEquals(allPrefixes, subject.getPrefixes());
+        // prefixes in ROA are sorted
+        assertEquals(allPrefixes.stream().sorted().collect(Collectors.toList()), subject.getPrefixes());
         assertEquals(allResources, subject.getResources());
     }
 

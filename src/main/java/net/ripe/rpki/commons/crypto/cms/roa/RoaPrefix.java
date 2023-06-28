@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
 import com.google.common.annotations.VisibleForTesting;
+import lombok.EqualsAndHashCode;
 import net.ripe.ipresource.IpRange;
 import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang3.Validate;
@@ -11,7 +12,8 @@ import javax.annotation.CheckForNull;
 import java.io.Serializable;
 import java.util.Comparator;
 
-public class RoaPrefix extends EqualsSupport implements Serializable, Comparable<RoaPrefix> {
+@EqualsAndHashCode
+public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
     private static final Comparator<RoaPrefix> ROA_PREFIX_COMPARATOR = Comparator.comparing(RoaPrefix::getPrefix)
             .thenComparing(RoaPrefix::getMaximumLength, Comparator.nullsFirst(Comparator.naturalOrder()));
     private static final long serialVersionUID = 1L;
