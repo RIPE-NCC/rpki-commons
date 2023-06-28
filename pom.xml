@@ -42,8 +42,8 @@
         <build.number>DEV</build.number>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <java.language.version>1.8</java.language.version>
-        <java.runtime.version>1.8</java.runtime.version>
+        <java.language.version>11</java.language.version>
+        <java.runtime.version>11</java.runtime.version>
 
         <net.ripe.ipresource.version>1.52</net.ripe.ipresource.version>
         <bouncycastle.version>1.73</bouncycastle.version>
@@ -422,8 +422,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.5.1</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>${java.language.version}</source>
+                        <target>${java.runtime.version}</target>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>

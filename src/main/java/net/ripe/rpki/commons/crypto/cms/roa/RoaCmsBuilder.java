@@ -17,6 +17,9 @@ import org.bouncycastle.asn1.DERSequence;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Creates a RoaCms using the DER encoding specified in the ROA format standard.
@@ -85,6 +88,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
      * </pre>
      */
     ASN1Encodable encodeRoaIpAddressFamily(AddressFamily addressFamily, List<RoaPrefix> prefixes) {
+        Validate.isTrue(addressFamily == AddressFamily.IPV4 || addressFamily == AddressFamily.IPV6, "ROA can only contain IPv4 or IPv6 AFI");
         ASN1Encodable[] encodablesPrefixes = new ASN1Encodable[prefixes.size()];
         for (int i = 0; i < prefixes.size(); ++i) {
             encodablesPrefixes[i] = encodeRoaIpAddress(prefixes.get(i));
@@ -100,18 +104,25 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
      */
     ASN1Encodable encodeRoaIpAddressFamilySequence(List<RoaPrefix> prefixes) {
         Validate.isTrue(!prefixes.isEmpty(), "no prefixes");
-        List<ASN1Encodable> encodables = new ArrayList<ASN1Encodable>(2);
-        addRoaIpAddressFamily(encodables, IpResourceType.IPv4, prefixes);
-        addRoaIpAddressFamily(encodables, IpResourceType.IPv6, prefixes);
+        List<ASN1Encodable> encodables = Stream.concat(
+            addRoaIpAddressFamily(IpResourceType.IPv4, prefixes),
+            addRoaIpAddressFamily(IpResourceType.IPv6, prefixes)
+        ).collect(Collectors.toList());
+
         Validate.isTrue(!encodables.isEmpty(), "no encodable prefixes");
         return new DERSequence(encodables.toArray(new ASN1Encodable[encodables.size()]));
     }
 
-    private void addRoaIpAddressFamily(List<ASN1Encodable> encodables, IpResourceType type, List<RoaPrefix> prefixes) {
-        List<RoaPrefix> selectedPrefixes = selectPrefixes(type, prefixes);
-        if (!selectedPrefixes.isEmpty()) {
-            encodables.add(encodeRoaIpAddressFamily(AddressFamily.fromIpResourceType(type), selectedPrefixes));
+    private Stream<ASN1Encodable> addRoaIpAddressFamily(IpResourceType type, List<RoaPrefix> prefixes) {
+        List<RoaPrefix> selectedPrefixes = prefixes.stream()
+                .filter(roaPrefix -> type == roaPrefix.getPrefix().getType())
+                .collect(Collectors.toList());
+
+        if (selectedPrefixes.isEmpty()) {
+            return Stream.empty();
         }
+
+        return Stream.of(encodeRoaIpAddressFamily(AddressFamily.fromIpResourceType(type), selectedPrefixes));
     }
 
     private List<RoaPrefix> selectPrefixes(IpResourceType type, List<RoaPrefix> prefixes) {

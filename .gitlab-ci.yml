@@ -1,4 +1,4 @@
-image: maven:3.6-jdk-8-alpine
+image: maven:3.6-jdk-11-alpine
 # Inspired by https://gitlab.com/gitlab-examples/maven/simple-maven-dep and
 # https://gitlab.com/gitlab-org/gitlab-ci-yml/blob/master/Maven.gitlab-ci.yml
 #
