@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Optional;
 
-import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CONTENT_TYPE;
-import static net.ripe.rpki.commons.validation.ValidationString.ASPA_VERSION;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class AspaCmsParserTest {
@@ -43,6 +42,20 @@ class AspaCmsParserTest {
         assertThat(aspa.getProviderASSet()).containsExactly(
                         Asn.parse("AS1025")
         );
+    }
+
+    /**
+     * draft 15 mentions <emph>implicit</emph> tags by accident, this was changed without a OID change later.
+     */
+    @Test
+    void should_reject_draft15_rpki_commons_with_implicit_tag() throws IOException {
+        AspaCmsParser parser = new AspaCmsParser();
+        ValidationResult result = ValidationResult.withLocation("BAD-profile-15-rpki-commons-propertytest-sample-implicit-tag.asa");
+        parser.parse(result, Resources.toByteArray(Resources.getResource("interop/aspa/BAD-profile-15-rpki-commons-propertytest-sample-implicit-tag.asa")));
+
+        AssertionsForClassTypes.assertThat(result.hasFailures()).isTrue();
+        // Content structure check should fail because tags are wrong
+        assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_CONTENT_STRUCTURE.equals(check.getKey()));
     }
 
     @Test
