@@ -2,16 +2,13 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.io.Resources;
 import net.ripe.ipresource.Asn;
-import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static net.ripe.rpki.commons.validation.ValidationString.*;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AspaCmsParserTest {
 
@@ -53,7 +50,7 @@ class AspaCmsParserTest {
         ValidationResult result = ValidationResult.withLocation("BAD-profile-15-rpki-commons-propertytest-sample-implicit-tag.asa");
         parser.parse(result, Resources.toByteArray(Resources.getResource("interop/aspa/BAD-profile-15-rpki-commons-propertytest-sample-implicit-tag.asa")));
 
-        AssertionsForClassTypes.assertThat(result.hasFailures()).isTrue();
+        assertThat(result.hasFailures()).isTrue();
         // Content structure check should fail because tags are wrong
         assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_CONTENT_STRUCTURE.equals(check.getKey()));
     }
@@ -64,7 +61,7 @@ class AspaCmsParserTest {
         ValidationResult result = ValidationResult.withLocation("BAD-profile-15-APNIC-rpki-aspa-demo-AS1000.asa");
         parser.parse(result, Resources.toByteArray(Resources.getResource("interop/aspa/BAD-profile-15-APNIC-rpki-aspa-demo-AS1000.asa")));
 
-        AssertionsForClassTypes.assertThat(result.hasFailures()).isTrue();
+        assertThat(result.hasFailures()).isTrue();
         assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_VERSION.equals(check.getKey()));
     }
 
@@ -75,7 +72,8 @@ class AspaCmsParserTest {
         parser.parse(result, Resources.toByteArray(Resources.getResource("interop/aspa/BAD-profile-13-AS211321-profile-13.asa")));
 
         assertThat(result.hasFailures()).isTrue();
-        assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_VERSION.equals(check.getKey()));
+        // Abort after wrong version
+        assertThat(result.getFailuresForAllLocations()).allMatch(check -> ASPA_VERSION.equals(check.getKey()));
     }
 
     private AspaCms parseValidAspa(String path) throws IOException {

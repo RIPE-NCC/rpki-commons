@@ -61,15 +61,15 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
         );
 
         X509ResourceCertificate resourceCertificate = getCertificate();
-        validationResult.rejectIfFalse(
-                customerAsn != null &&
-                        resourceCertificate != null &&
-                        resourceCertificate.containsResources(new IpResourceSet(customerAsn)),
-                ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
-        );
-
-        // *  The CustomerASID value MUST NOT appear in any providerASID field
         if (customerAsn != null) {
+            // Do not reject for customer ASN not being certified if parsing failed earlier.
+            validationResult.rejectIfFalse(
+                            resourceCertificate != null &&
+                            resourceCertificate.containsResources(new IpResourceSet(customerAsn)),
+                    ValidationString.ASPA_CUSTOMER_ASN_CERTIFIED
+            );
+
+            // *  The CustomerASID value MUST NOT appear in any providerASID field
             validationResult.rejectIfTrue(providerASSet.contains(customerAsn), ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
         }
     }
