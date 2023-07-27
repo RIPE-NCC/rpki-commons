@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.io.BaseEncoding;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -75,8 +76,8 @@ public class X509ResourceCertificateTest {
         builder.withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
         builder.withSerial(TEST_SERIAL_NUMBER);
         builder.withValidityPeriod(TEST_VALIDITY_PERIOD);
-        builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
-        builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
+        builder.withPublicKey(KeyPairFactoryTest.EC_TEST_KEY_PAIR.getPublic());
+        builder.withSigningKeyPair(KeyPairFactoryTest.EC_TEST_KEY_PAIR);
         builder.withAuthorityKeyIdentifier(true);
 
         X509CertificateInformationAccessDescriptor[] descriptors = {
@@ -151,6 +152,7 @@ public class X509ResourceCertificateTest {
     @Test
     public void shouldSupportInheritedAsnsOnly() {
         X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.parse("10.0.0.0/8")).withInheritedResourceTypes(EnumSet.of(IpResourceType.ASN)).build();
+        System.out.println(BaseEncoding.base64().encode(subject.getEncoded()));
 
         assertTrue(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.ASN)));
         assertFalse(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv4)));

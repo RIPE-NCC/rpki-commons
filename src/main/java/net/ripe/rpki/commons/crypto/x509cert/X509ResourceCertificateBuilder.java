@@ -26,7 +26,9 @@ public class X509ResourceCertificateBuilder {
     private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
 
     public X509ResourceCertificateBuilder() {
-        builderHelper = new X509CertificateBuilderHelper();
+        builderHelper = new X509CertificateBuilderHelper()
+                .withSignatureProvider(X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER)
+                .withSignatureAlgorithm(X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM);
         builderHelper.withResources(resources);
         // https://tools.ietf.org/html/rfc6487#section-4.8.9
         builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);

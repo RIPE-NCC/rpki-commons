@@ -17,3 +17,4 @@ target/
 .vscode/settings.jsonbuilds
 builds
 .factorypath
+.pregenerated-test-key*

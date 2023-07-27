@@ -67,13 +67,17 @@ public final class X509CertificateBuilderHelper {
 
     public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
 
+    public static final String ECDSA_SIGNATURE_ALGORITHM = "SHA256withECDSA";
+
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
+
+    public static final String ECDSA_SIGNATURE_PROVIDER = "SunEC";
 
     private static final BigInteger MAX_20_OCTETS = BigInteger.ONE.shiftLeft(160).subtract(BigInteger.ONE);
 
-    private String signatureProvider = DEFAULT_SIGNATURE_PROVIDER;
+    private String signatureProvider;
 
-    private String signatureAlgorithm = DEFAULT_SIGNATURE_ALGORITHM;
+    private String signatureAlgorithm;
 
     private BigInteger serial;
 
@@ -334,7 +338,7 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(publicKey, "no publicKey");
         Validate.notNull(signingKeyPair, "no signingKeyPair");
         Validate.notNull(validityPeriod, "no validityPeriod");
-        Validate.isTrue("RSA".equals(publicKey.getAlgorithm()), "publicKey algorithm is not RSA");
+        Validate.isTrue("RSA".equals(publicKey.getAlgorithm()) || "EC".equals(publicKey.getAlgorithm()), "publicKey algorithm is not RSA or EC");
         if (!ca) {
             Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
                     "keyCertSign only allowed for ca");

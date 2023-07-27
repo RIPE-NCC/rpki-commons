@@ -8,13 +8,7 @@ import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -25,9 +19,9 @@ import java.security.cert.Certificate;
 /**
  * Caches generated keys in a key store so that they can be reused in the next test run. FOR TESTING ONLY!
  */
-public final class PregeneratedKeyPairFactory extends KeyPairFactory {
+public final class PregeneratedEcKeyPairFactory extends EcKeyPairFactory {
 
-    private static final PregeneratedKeyPairFactory INSTANCE = new PregeneratedKeyPairFactory("SunRsaSign");
+    private static final PregeneratedEcKeyPairFactory INSTANCE = new PregeneratedEcKeyPairFactory("SunEC");
 
     private static final char[] PASSPHRASE = "passphrase".toCharArray();
 
@@ -37,9 +31,9 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     private int count = 0;
 
-    private PregeneratedKeyPairFactory(String provider) {
+    private PregeneratedEcKeyPairFactory(String provider) {
         super(provider);
-        keyStoreFile =  new File(".pregenerated-test-key-pairs-" + provider + ".keystore");
+        keyStoreFile =  new File(".pregenerated-test-key-pairs-ec-" + provider + ".keystore");
         initKeyStore();
     }
 
@@ -56,12 +50,12 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
         }
     }
 
-    public static PregeneratedKeyPairFactory getInstance() {
+    public static PregeneratedEcKeyPairFactory getInstance() {
         return INSTANCE;
     }
 
     @Override
-    public KeyPairFactory withProvider(String provider) {
+    public EcKeyPairFactory withProvider(String provider) {
         return this;
     }
 
@@ -91,7 +85,7 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     private static X509ResourceCertificate createCertificate(KeyPair keyPair) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
-        builder.withSignatureProvider("SunRsaSign");
+        builder.withSignatureProvider("SunEC");
         builder.withSerial(BigInteger.ONE);
         final DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now.minusYears(2), now.minusYears(1)));
