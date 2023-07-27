@@ -5,6 +5,7 @@ import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,6 +29,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     private static final String[] ALLOWED_SIGNATURE_ALGORITHM_OIDS = {
             PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
+            X9ObjectIdentifiers.ecdsa_with_SHA256.getId()
     };
 
     protected X509Certificate certificate;
@@ -73,7 +75,11 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     }
 
     protected void validatePublicKey() {
-        validateRsaPk();
+        if (isRsaPk(certificate.getPublicKey())) {
+            validateRsaPk();
+        } else {
+            validateEcPk();
+        }
     }
 
     void validateRsaPk() {

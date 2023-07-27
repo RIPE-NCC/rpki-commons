@@ -11,6 +11,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactor
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.joda.time.DateTime;
 
@@ -36,7 +37,8 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     public static final List<String> ALLOWED_SIGNATURE_ALGORITHM_OIDS = Arrays.asList(
         SHA256WITHRSA_ENCRYPTION_OID,
-        RSA_ENCRYPTION_OID
+        RSA_ENCRYPTION_OID,
+        X9ObjectIdentifiers.ecdsa_with_SHA256.getId()
     );
 
     /**

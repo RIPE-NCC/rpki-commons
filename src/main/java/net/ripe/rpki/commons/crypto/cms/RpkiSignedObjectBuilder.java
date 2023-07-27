@@ -66,8 +66,9 @@ public abstract class RpkiSignedObjectBuilder {
             default:
                 Preconditions.checkArgument(false, "Not a supported public key type");
         }
-        Preconditions.checkArgument(signatureAlgorithm == X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM && !X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER.equals(signatureProvider));
-        Preconditions.checkArgument(signatureAlgorithm == X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM && !X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER.equals(signatureProvider));
+        Preconditions.checkArgument(!(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM.equals(signatureAlgorithm) && X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER.equals(signatureProvider)));
+        Preconditions.checkArgument(!(X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM.equals(signatureAlgorithm) && X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER.equals(signatureProvider)));
+
 
         addSignerInfo(generator, privateKey, signatureProvider, signatureAlgorithm, signingCertificate);
         generator.addCertificates(new JcaCertStore(Collections.singleton(signingCertificate)));
@@ -92,9 +93,13 @@ public abstract class RpkiSignedObjectBuilder {
 
     private AttributeTable createSignedAttributes(Date signingTime) {
         Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<>();
-        Attribute binarySigningTime = new Attribute(CMSAttributes.binarySigningTime, new DERSet(new ASN1Integer(signingTime.toInstant().toEpochMilli() / 1000)));
 
+        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(signingTime)));
+        attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
+
+        Attribute binarySigningTime = new Attribute(CMSAttributes.binarySigningTime, new DERSet(new ASN1Integer(signingTime.toInstant().toEpochMilli() / 1000)));
         attributes.put(CMSAttributes.binarySigningTime, binarySigningTime);
+
         return new AttributeTable(attributes);
     }
 }
