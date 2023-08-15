@@ -11,8 +11,7 @@ import net.ripe.rpki.commons.util.XML;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.xml.DomXmlSerializer;
 import net.ripe.rpki.commons.xml.DomXmlSerializerException;
-import net.ripe.rpki.commons.xml.converters.DateTimeConverter;
-import org.joda.time.DateTime;
+import net.ripe.rpki.commons.xml.converters.InstantConverter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,6 +23,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Supplier;
@@ -42,7 +42,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected static final IpResourceSetProvisioningConverter IP_RESOURCE_SET_PROVISIONING_CONVERTER = IpResourceSetProvisioningConverter.INSTANCE;
     protected static final CertificateUrlListConverter CERTIFICATE_URL_LIST_CONVERTER = CertificateUrlListConverter.INSTANCE;
-    protected static final DateTimeConverter DATE_TIME_CONVERTER = new DateTimeConverter();
+    protected static final InstantConverter INSTANT_CONVERTER = new InstantConverter();
 
     private final PayloadMessageType type;
 
@@ -164,7 +164,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         clazz.setResourceSetAs(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_as")));
         clazz.setResourceSetIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_ipv4")));
         clazz.setResourceSetIpv6(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_ipv6")));
-        clazz.setValidityNotAfter((DateTime) DATE_TIME_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_notafter")));
+        clazz.setValidityNotAfter((Instant) INSTANT_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_notafter")));
         clazz.setSiaHeadUri(getAttributeValue(element, "suggested_sia_head").orElse(null));
         List<CertificateElement> certificateElements = getChildElements(element, "certificate")
                 .stream()
@@ -183,7 +183,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         node.setAttribute("resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetAsn()));
         node.setAttribute("resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv4()));
         node.setAttribute("resource_set_ipv6", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv6()));
-        node.setAttribute("resource_set_notafter", DATE_TIME_CONVERTER.toString(classElement.getValidityNotAfter()));
+        node.setAttribute("resource_set_notafter", INSTANT_CONVERTER.toString(classElement.getValidityNotAfter()));
         if (classElement.getSiaHeadUri() != null) {
             node.setAttribute("suggested_sia_head", classElement.getSiaHeadUri());
         }

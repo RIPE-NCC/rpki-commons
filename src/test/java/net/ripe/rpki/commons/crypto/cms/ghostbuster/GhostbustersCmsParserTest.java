@@ -6,10 +6,8 @@ import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -18,6 +16,8 @@ import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD;
@@ -43,16 +43,18 @@ public class GhostbustersCmsParserTest {
 
         GhostbustersCms ghostbustersCms = parser.getGhostbustersCms();
         String vCard = ghostbustersCms.getVCardContent();
-        assertEquals("BEGIN:VCARD\r\n" +
-            "VERSION:3.0\r\n" +
-            "ADR:;;5147 Crystal Springs Drive NE;Bainbridge Island;Washington;98110;Uni\r\n" +
-            " ted States\r\n" +
-            "EMAIL:randy@psg.com\r\n" +
-            "FN:Randy Bush\r\n" +
-            "N:;;;;\r\n" +
-            "ORG:RGnet\\, LLC\r\n" +
-            "TEL:+1 206 356 8341\r\n" +
-            "END:VCARD\r\n", vCard);
+        assertEquals("""
+            BEGIN:VCARD\r
+            VERSION:3.0\r
+            ADR:;;5147 Crystal Springs Drive NE;Bainbridge Island;Washington;98110;Uni\r
+             ted States\r
+            EMAIL:randy@psg.com\r
+            FN:Randy Bush\r
+            N:;;;;\r
+            ORG:RGnet\\, LLC\r
+            TEL:+1 206 356 8341\r
+            END:VCARD\r
+            """, vCard);
     }
 
     @Test
@@ -66,8 +68,12 @@ public class GhostbustersCmsParserTest {
 
     @Test
     public void ghostbusters_record_must_have_single_vcard() {
-        ValidationResult validationResult = validatePayload("BEGIN:VCARD\r\nEND:VCARD\r\nBEGIN:VCARD\n" +
-            "END:VCARD\n");
+        ValidationResult validationResult = validatePayload("""
+            BEGIN:VCARD\r
+            END:VCARD\r
+            BEGIN:VCARD
+            END:VCARD
+            """);
 
         assertTrue(validationResult.hasFailures());
         assertTrue(validationResult.getFailuresForCurrentLocation().stream()
@@ -101,7 +107,7 @@ public class GhostbustersCmsParserTest {
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        final DateTime now = UTC.dateTime();
+        var now = ZonedDateTime.now(ZoneOffset.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(CRL_DP);

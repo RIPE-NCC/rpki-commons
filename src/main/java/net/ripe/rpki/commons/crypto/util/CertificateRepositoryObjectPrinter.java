@@ -36,8 +36,8 @@ public final class CertificateRepositoryObjectPrinter {
         printWriter.println("Object Type: X509Certificate with RFC3779 Internet Resource Extension");
         printWriter.println("Serial: " + resourceCertificate.getSerialNumber());
         printWriter.println("Subject: " + resourceCertificate.getSubject());
-        printWriter.println("Not valid before: " + resourceCertificate.getValidityPeriod().getNotValidBefore());
-        printWriter.println("Not valid after:  " + resourceCertificate.getValidityPeriod().getNotValidAfter());
+        printWriter.println("Not valid before: " + resourceCertificate.getValidityPeriod().notValidBefore());
+        printWriter.println("Not valid after:  " + resourceCertificate.getValidityPeriod().notValidAfter());
         printWriter.println("Resources: " + resourceCertificate.resources());
     }
 
@@ -86,9 +86,9 @@ public final class CertificateRepositoryObjectPrinter {
         SortedSet<Entry> revokedCertificates = crl.getRevokedCertificates();
         for (Entry entry : revokedCertificates) {
             printWriter.print("    ");
-            printWriter.print(entry.getSerialNumber());
+            printWriter.print(entry.serialNumber());
             printWriter.print(" ");
-            printWriter.println(entry.getRevocationDateTime());
+            printWriter.println(entry.revokedAt());
         }
     }
 

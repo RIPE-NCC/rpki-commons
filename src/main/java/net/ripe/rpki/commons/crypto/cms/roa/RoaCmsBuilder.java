@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
@@ -16,6 +15,7 @@ import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERSequence;
 
 import java.security.PrivateKey;
+import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,11 +27,16 @@ import java.util.stream.Stream;
  */
 public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
 
+    private Clock clock = Clock.systemUTC();
     private X509ResourceCertificate certificate;
     private Asn asn;
     private List<RoaPrefix> prefixes;
     private String signatureProvider;
 
+    public RoaCmsBuilder withClock(Clock clock) {
+        this.clock = clock;
+        return this;
+    }
 
     public RoaCmsBuilder withCertificate(X509ResourceCertificate certificate) {
         this.certificate = certificate;
@@ -57,7 +62,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     public RoaCms build(PrivateKey privateKey) {
         String location = "unknown.roa";
         RoaCmsParser parser = new RoaCmsParser();
-        parser.parse(ValidationResult.withLocation(location), generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
+        parser.parse(ValidationResult.withLocation(location).withClock(clock), generateCms(certificate.getCertificate(), privateKey, signatureProvider, RoaCms.CONTENT_TYPE, encodeRouteOriginAttestation(asn, prefixes)));
         return parser.getRoaCms();
     }
 
@@ -110,13 +115,13 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     ASN1Encodable encodeRoaIpAddressFamilySequence(List<RoaPrefix> prefixes) {
         Validate.isTrue(!prefixes.isEmpty(), "no prefixes");
 
-        List<ASN1Encodable> encodables = Stream.concat(
+        var encodables = Stream.concat(
             addRoaIpAddressFamily(IpResourceType.IPv4, prefixes),
             addRoaIpAddressFamily(IpResourceType.IPv6, prefixes)
-        ).collect(Collectors.toList());
+        ).toArray(ASN1Encodable[]::new);
 
-        Validate.isTrue(!encodables.isEmpty(), "no encodable prefixes");
-        return new DERSequence(encodables.toArray(new ASN1Encodable[encodables.size()]));
+        Validate.isTrue(encodables.length > 0, "no encodable prefixes");
+        return new DERSequence(encodables);
     }
 
     /**

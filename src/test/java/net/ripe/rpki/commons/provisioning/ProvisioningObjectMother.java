@@ -18,17 +18,18 @@ import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassList
 import net.ripe.rpki.commons.provisioning.payload.revocation.request.CertificateRevocationRequestPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
 import net.ripe.rpki.commons.provisioning.x509.pkcs10.RpkiCaCertificateRequestBuilderParserTest;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.cert.X509CRL;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class ProvisioningObjectMother {
 
@@ -65,7 +66,7 @@ public class ProvisioningObjectMother {
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = new DateTime(2011, 3, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+        var now = ZonedDateTime.of(2011, 3, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now, now.plusYears(5)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(RPKI_CA_CERT_REQUEST_CA_CRL_URI);
@@ -80,9 +81,9 @@ public class ProvisioningObjectMother {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(new X500Principal("CN=nl.bluelight"));
         builder.withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic());
-        DateTime now = UTC.dateTime();
+        var now = Instant.now();
         builder.withThisUpdateTime(now);
-        builder.withNextUpdateTime(now.plusHours(24));
+        builder.withNextUpdateTime(now.plus(24, ChronoUnit.HOURS));
         builder.withNumber(BigInteger.TEN);
 
         return builder.build(TEST_KEY_PAIR.getPrivate()).getCrl();
@@ -100,8 +101,7 @@ public class ProvisioningObjectMother {
         return createCmsForPayload(RequestNotPerformedResponsePayloadSerializerTest.NOT_PERFORMED_PAYLOAD);
     }
 
-    public static ProvisioningCmsObject createRevocationRequestCmsObject() throws Exception {
-
+    public static ProvisioningCmsObject createRevocationRequestCmsObject() {
         CertificateRevocationRequestPayloadBuilder revokePayloadBuilder = new CertificateRevocationRequestPayloadBuilder();
         revokePayloadBuilder.withClassName(RPKI_CA_CERT_REQUEST_PAYLOAD.getRequestElement().getClassName());
         revokePayloadBuilder.withPublicKey(RPKI_CA_CERT_REQUEST_KEYPAIR.getPublic());

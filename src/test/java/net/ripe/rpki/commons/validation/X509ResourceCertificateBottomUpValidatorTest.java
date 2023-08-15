@@ -10,7 +10,6 @@ import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceCertificateLocator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateBottomUpValidator;
 import org.apache.commons.lang3.Validate;
@@ -22,13 +21,17 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
-import java.security.cert.CRLException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class X509ResourceCertificateBottomUpValidatorTest {
@@ -36,7 +39,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only - RIPE NCC - NL");
     private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
-    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(UTC.dateTime().minusMinutes(1), UTC.dateTime().plusYears(1));
+    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(1), ZonedDateTime.now(ZoneOffset.UTC).plusYears(1));
 
     private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only - First Child - NL");
     private static final BigInteger FIRST_CHILD_SERIAL_NUMBER = ROOT_SERIAL_NUMBER.add(BigInteger.valueOf(1));
@@ -44,7 +47,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final BigInteger SECOND_CHILD_SERIAL_NUMBER = FIRST_CHILD_SERIAL_NUMBER.add(BigInteger.valueOf(1));
     private static final IpResourceSet CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/17, ffce::/16, AS21212");
     private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
-    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(UTC.dateTime().minusMonths(2), UTC.dateTime().minusMonths(1));
+    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(ZonedDateTime.now(ZoneOffset.UTC).minusMonths(2), ZonedDateTime.now(ZoneOffset.UTC).minusMonths(1));
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
     private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -79,7 +82,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     }
 
     @Test
-    public void testShouldBeValidChildCertificates() throws CRLException {
+    public void testShouldBeValidChildCertificates() {
         child = createChildBuilder().build();
         grandchild = createSecondChildBuilder().build();
 
@@ -97,7 +100,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         assertTrue(validator.getValidationResult().hasFailures());
 
         assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-        assertTrue(ValidationString.RESOURCE_RANGE.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.RESOURCE_RANGE, validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     @Test
@@ -111,7 +114,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         System.out.println(validator.getValidationResult().getFailuresForAllLocations());
         assertTrue(validator.getValidationResult().hasFailureForLocation(GRAND_CHILD_VALIDATION_LOCATION));
-        assertTrue(ValidationString.RESOURCE_RANGE.equals(validator.getValidationResult().getFailures(GRAND_CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.RESOURCE_RANGE, validator.getValidationResult().getFailures(GRAND_CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     @Test
@@ -122,7 +125,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         validator.validate("child", child);
         assertTrue(validator.getValidationResult().hasFailures());
         assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-        assertTrue(ValidationString.SIGNATURE_VALID.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.SIGNATURE_VALID, validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     @Test
@@ -133,7 +136,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         validator.validate("child", child);
         assertTrue(validator.getValidationResult().hasFailures());
         assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-        assertTrue(ValidationString.NOT_VALID_AFTER.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.NOT_VALID_AFTER, validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     @Test
@@ -145,7 +148,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         System.out.println(validator.getValidationResult());
         assertTrue(validator.getValidationResult().hasFailures());
         assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-        assertTrue(ValidationString.PREV_SUBJECT_EQ_ISSUER.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.PREV_SUBJECT_EQ_ISSUER, validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     @Test
@@ -189,22 +192,22 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         validator.validate("child", child);
         assertTrue(validator.getValidationResult().hasFailures());
         assertTrue(validator.getValidationResult().hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-        assertTrue(ValidationString.AKI_PRESENT.equals(validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.AKI_PRESENT, validator.getValidationResult().getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     @Test
-    public void testShouldFailOnCrlCheck() throws CRLException {
+    public void testShouldFailOnCrlCheck() {
         child = createChildBuilder().build();
         grandchild = createSecondChildBuilder().build();
 
-        rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plusDays(2)).build(ROOT_KEY_PAIR.getPrivate());
+        rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.notValidBefore().plus(2, ChronoUnit.DAYS)).build(ROOT_KEY_PAIR.getPrivate());
         X509ResourceCertificateBottomUpValidator validator = new X509ResourceCertificateBottomUpValidator(new ResourceCertificateLocatorImpl());
         validator.validate("child", child);
 
         ValidationResult validationResult = validator.getValidationResult();
         assertTrue(validationResult.hasFailures());
         assertTrue(validationResult.hasFailureForLocation(CHILD_VALIDATION_LOCATION));
-        assertTrue(ValidationString.CERT_NOT_REVOKED.equals(validationResult.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.CERT_NOT_REVOKED, validationResult.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     @Test
@@ -217,7 +220,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         ValidationResult validationResult = validator.getValidationResult();
         assertTrue(validationResult.hasFailures());
-        assertTrue(ValidationString.CRL_SIGNATURE_VALID.equals(validationResult.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey()));
+        assertEquals(ValidationString.CRL_SIGNATURE_VALID, validationResult.getFailures(CHILD_VALIDATION_LOCATION).get(0).getKey());
     }
 
     private X509ResourceCertificate getRootResourceCertificate() {
@@ -285,8 +288,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withThisUpdateTime(VALIDITY_PERIOD.notValidBefore().plus(1, ChronoUnit.DAYS));
+        builder.withNextUpdateTime(ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -297,8 +300,8 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(FIRST_CHILD_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withThisUpdateTime(VALIDITY_PERIOD.notValidBefore().plus(1, ChronoUnit.DAYS));
+        builder.withNextUpdateTime(ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(FIRST_CHILD_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -312,9 +315,9 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         public CertificateRepositoryObjectFile<X509ResourceCertificate> findParent(X509ResourceCertificate certificate) {
             Validate.isTrue(!certificate.isRoot());
             if (certificate.equals(grandchild)) {
-                return new CertificateRepositoryObjectFile<X509ResourceCertificate>(X509ResourceCertificate.class, "child", child.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509ResourceCertificate.class, "child", child.getEncoded());
             } else if (certificate.equals(child)) {
-                return new CertificateRepositoryObjectFile<X509ResourceCertificate>(X509ResourceCertificate.class, "root", root.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509ResourceCertificate.class, "root", root.getEncoded());
             } else {
                 throw new IllegalArgumentException("unable to find parent for certificate: " + certificate);
             }
@@ -324,11 +327,11 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         public CertificateRepositoryObjectFile<X509Crl> findCrl(X509ResourceCertificate certificate) {
 
             if (certificate.equals(child)) {
-                return new CertificateRepositoryObjectFile<X509Crl>(X509Crl.class, "rootCrl", rootCrl.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509Crl.class, "rootCrl", rootCrl.getEncoded());
             }
 
             if (certificate.equals(grandchild)) {
-                return new CertificateRepositoryObjectFile<X509Crl>(X509Crl.class, "childCrl", childCrl.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509Crl.class, "childCrl", childCrl.getEncoded());
             }
 
             return null;

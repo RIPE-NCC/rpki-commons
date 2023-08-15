@@ -12,16 +12,16 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificate
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.joda.time.DateTime;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.x500.X500Principal;
 import java.net.URI;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class RpkiSignedObject implements CertificateRepositoryObject {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * CMS signed objects must indicate signing algorithm as "sha256WithRsa".
@@ -52,7 +52,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
 
     private String oid; // Storing oid as String  so that this class is serializable
 
-    private DateTime signingTime;
+    private @Nullable Instant signingTime;
 
     private Boolean revoked;
 
@@ -60,7 +60,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         this(cmsObjectData.getEncoded(), cmsObjectData.getCertificate(), cmsObjectData.getContentType(), cmsObjectData.getSigningTime());
     }
 
-    protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, ASN1ObjectIdentifier oid, DateTime signingTime) { //NOPMD - ArrayIsStoredDirectly
+    protected RpkiSignedObject(byte[] encoded, X509ResourceCertificate certificate, ASN1ObjectIdentifier oid, @Nullable Instant signingTime) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;
         this.certificate = certificate;
         this.oid = oid.getId();
@@ -72,7 +72,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         return encoded;
     }
 
-    public DateTime getSigningTime() {
+    public @Nullable Instant getSigningTime() {
         return signingTime;
     }
 
@@ -92,12 +92,12 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
         return certificate.getValidityPeriod();
     }
 
-    public DateTime getNotValidBefore() {
-        return certificate.getValidityPeriod().getNotValidBefore();
+    public @NotNull Instant getNotValidBefore() {
+        return certificate.getValidityPeriod().notValidBefore();
     }
 
-    public DateTime getNotValidAfter() {
-        return certificate.getValidityPeriod().getNotValidAfter();
+    public @NotNull Instant getNotValidAfter() {
+        return certificate.getValidityPeriod().notValidAfter();
     }
 
     public X500Principal getCertificateIssuer() {
@@ -159,8 +159,8 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
     }
 
     @Override
-    public boolean isPastValidityTime() {
-        return getCertificate().isPastValidityTime();
+    public boolean isPastValidityTime(@NotNull Instant instant) {
+        return getCertificate().isPastValidityTime(instant);
     }
 
     @Override

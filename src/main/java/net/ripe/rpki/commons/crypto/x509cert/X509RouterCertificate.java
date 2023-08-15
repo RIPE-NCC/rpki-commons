@@ -8,9 +8,11 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.X509RouterCertificateValidator;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 
 public class X509RouterCertificate extends X509GenericCertificate implements X509CertificateObject {
 
@@ -62,8 +64,8 @@ public class X509RouterCertificate extends X509GenericCertificate implements X50
     }
 
     @Override
-    public boolean isPastValidityTime() {
-        return getValidityPeriod().isExpiredNow();
+    public boolean isPastValidityTime(@NotNull Instant instant) {
+        return getValidityPeriod().isExpiredAt(instant);
     }
 
     @Override

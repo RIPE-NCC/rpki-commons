@@ -1,15 +1,18 @@
 package net.ripe.rpki.commons.validation;
 
-import net.ripe.rpki.commons.FixedDateRule;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class ValidationResultTest {
@@ -18,10 +21,7 @@ public class ValidationResultTest {
 
     private static final ValidationLocation FIRST_LOCATION = new ValidationLocation("firstValidatedObject");
 
-    private static final DateTime NOW = new DateTime(2008, 4, 5, 0, 0, 0, 0, DateTimeZone.UTC);
-
-    @Rule
-    public FixedDateRule fixedDateRule = new FixedDateRule(NOW);
+    private static final Instant NOW = ZonedDateTime.of(2008, 4, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
 
     private ValidationResult result;
 
@@ -35,12 +35,12 @@ public class ValidationResultTest {
         assertFalse(result.hasFailures());
         assertFalse(result.hasFailureForLocation(FIRST_LOCATION));
         assertFalse(result.hasFailureForLocation(new ValidationLocation("invalid object")));
-        assertTrue(result.getValidatedLocations().size() == 1);
+        assertEquals(1, result.getValidatedLocations().size());
         assertTrue(result.getValidatedLocations().contains(FIRST_LOCATION));
         assertNotNull(result.getAllValidationChecksForLocation(FIRST_LOCATION));
         assertEquals(3, result.getAllValidationChecksForLocation(FIRST_LOCATION).size());
         assertNotNull(result.getFailures(FIRST_LOCATION));
-        assertTrue(result.getFailures(FIRST_LOCATION).size() == 0);
+        assertEquals(0, result.getFailures(FIRST_LOCATION).size());
     }
 
     @Test
@@ -62,17 +62,17 @@ public class ValidationResultTest {
         assertTrue(result.hasFailures());
         assertFalse(result.hasFailureForLocation(FIRST_LOCATION));
         assertTrue(result.hasFailureForLocation(SECOND_LOCATION));
-        assertTrue(result.getValidatedLocations().size() == 2);
+        assertEquals(2, result.getValidatedLocations().size());
         assertTrue(result.getValidatedLocations().contains(FIRST_LOCATION));
         assertTrue(result.getValidatedLocations().contains(SECOND_LOCATION));
         assertNotNull(result.getAllValidationChecksForLocation(FIRST_LOCATION));
-        assertTrue(result.getAllValidationChecksForLocation(FIRST_LOCATION).size() == 3);
+        assertEquals(3, result.getAllValidationChecksForLocation(FIRST_LOCATION).size());
         assertNotNull(result.getAllValidationChecksForLocation(SECOND_LOCATION));
-        assertTrue(result.getAllValidationChecksForLocation(SECOND_LOCATION).size() == 3);
+        assertEquals(3, result.getAllValidationChecksForLocation(SECOND_LOCATION).size());
         assertNotNull(result.getFailures(FIRST_LOCATION));
-        assertTrue(result.getFailures(FIRST_LOCATION).size() == 0);
+        assertEquals(0, result.getFailures(FIRST_LOCATION).size());
         assertNotNull(result.getFailures(SECOND_LOCATION));
-        assertTrue(result.getFailures(SECOND_LOCATION).size() == 3);
+        assertEquals(3, result.getFailures(SECOND_LOCATION).size());
     }
 
     @Test
@@ -83,10 +83,10 @@ public class ValidationResultTest {
 
     @Test
     public void shouldTrackValidationMetrics() {
-        result = ValidationResult.withLocation(FIRST_LOCATION);
+        result = ValidationResult.withLocation(FIRST_LOCATION).withClock(Clock.fixed(NOW, ZoneOffset.UTC));
         result.addMetric("name", "value");
 
-        assertEquals(Arrays.asList(new ValidationMetric("name", "value", NOW.getMillis())), result.getMetrics(FIRST_LOCATION));
+        assertEquals(List.of(new ValidationMetric("name", "value", NOW.toEpochMilli())), result.getMetrics(FIRST_LOCATION));
         assertEquals(Collections.<ValidationMetric>emptyList(), result.getMetrics(SECOND_LOCATION));
     }
 

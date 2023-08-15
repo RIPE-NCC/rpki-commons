@@ -1,7 +1,7 @@
 package net.ripe.rpki.commons.validation;
 
 
-import org.joda.time.Duration;
+import java.time.Duration;
 
 /**
  * User controlled options to use when validating objects.
@@ -70,7 +70,7 @@ public class ValidationOptions {
      * @return
      */
     public static ValidationOptions paranoidTestValidations() {
-        return new ValidationOptions(true, Duration.standardHours(-7), Duration.standardHours(-7));
+        return new ValidationOptions(true, Duration.ofHours(-7), Duration.ofHours(-7));
     }
 
     public static ValidationOptions withStaleConfigurations(Duration maxCrlStalePeriod, Duration maxMftStalePeriod) {

@@ -1,9 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms;
 
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -14,13 +12,16 @@ import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.Time;
 import org.bouncycastle.cms.SignerInformation;
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
+import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static net.ripe.rpki.commons.validation.ValidationString.ONLY_ONE_BINARY_SIGNING_TIME_ATTR;
+import static net.ripe.rpki.commons.validation.ValidationString.ONLY_ONE_SIGNING_TIME_ATTR;
+import static net.ripe.rpki.commons.validation.ValidationString.SIGNING_TIME_ATTR_ONE_VALUE;
+import static net.ripe.rpki.commons.validation.ValidationString.SIGNING_TIME_MUST_EQUAL_BINARY_SIGNING_TIME;
 
 /**
  * Extract signing time or binary signing time.
@@ -41,15 +42,15 @@ public class SigningInformationUtil {
      * @ensures res.valid && all signing time attributes have a single value && all signing time values have the same value
      */
     public static SigningTimeResult extractSigningTime(ValidationResult validationResult, SignerInformation signer) {
-        ImmutablePair<DateTime, Boolean> signingTime = extractTime(
+        ImmutablePair<Instant, Boolean> signingTime = extractTime(
                 validationResult, CMSAttributes.signingTime, ONLY_ONE_SIGNING_TIME_ATTR, signer,
-                attrValue -> UTC.dateTime(Time.getInstance(attrValue).getDate().getTime())
+                attrValue -> Instant.ofEpochMilli(Time.getInstance(attrValue).getDate().getTime())
                 );
         // Bouncy castle does not support https://datatracker.ietf.org/doc/html/rfc6019 binary signing time
         // parsing, which is the number of seconds since the unix epoch.
-        ImmutablePair<DateTime, Boolean> binarySigningTime = extractTime(
+        ImmutablePair<Instant, Boolean> binarySigningTime = extractTime(
                 validationResult, CMSAttributes.binarySigningTime, ONLY_ONE_BINARY_SIGNING_TIME_ATTR, signer,
-                attrValue -> UTC.dateTime(Instant.ofEpochSecond(ASN1Integer.getInstance(attrValue).getValue().longValueExact())));
+                attrValue -> Instant.ofEpochSecond(ASN1Integer.getInstance(attrValue).getValue().longValueExact()));
         boolean valid = signingTime.right && binarySigningTime.right;
 
         if (signingTime.left != null && binarySigningTime.left != null) {
@@ -62,7 +63,7 @@ public class SigningInformationUtil {
         return new SigningTimeResult(valid);
     }
 
-    private static ImmutablePair<DateTime, Boolean> extractTime(ValidationResult validationResult, ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer, Function<ASN1Encodable, DateTime> timeExtractor) {
+    private static ImmutablePair<Instant, Boolean> extractTime(ValidationResult validationResult, ASN1ObjectIdentifier identifier, String onlyOneValidationKey, SignerInformation signer, Function<ASN1Encodable, Instant> timeExtractor) {
         // Do not use AttributeSet, this would deduplicate.
         ASN1EncodableVector signingTimeAttributes = signer.getSignedAttributes().getAll(identifier);
         if (signingTimeAttributes.size() == 0) {
@@ -84,26 +85,17 @@ public class SigningInformationUtil {
         return ImmutablePair.of(timeExtractor.apply(signingTimeValues[0]), true);
     }
 
-    @Data
-    public static class SigningTimeResult {
-        /** The value of the signing time. */
-        public final Optional<DateTime> optionalSigningTime;
-        /**
-         * Whether the signing time attribute was valid.
-         * A SigningTime can not be invalid <b>and</b> have a value.
-         *
-         * However, the signing time of a CMS object <i>is</i> valid if the value is missing.
-         */
-        public final boolean valid;
-
+    /**
+     * @param valid Whether the signing time attribute was valid. A SigningTime can not be invalid <b>and</b> have a value. However, the signing time of a CMS object <i>is</i> valid if the value is missing.
+     * @param optionalSigningTime The value of the signing time.
+     */
+    public record SigningTimeResult(boolean valid, Optional<Instant> optionalSigningTime) {
         public SigningTimeResult(boolean valid) {
-            this.valid = valid;
-            this.optionalSigningTime = Optional.empty();
+            this(valid, Optional.empty());
         }
 
-        public SigningTimeResult(DateTime signingTime) {
-            this.optionalSigningTime = Optional.ofNullable(signingTime);
-            this.valid = true;
+        public SigningTimeResult(@Nullable Instant signingTime) {
+            this(true, Optional.ofNullable(signingTime));
         }
     }
 }

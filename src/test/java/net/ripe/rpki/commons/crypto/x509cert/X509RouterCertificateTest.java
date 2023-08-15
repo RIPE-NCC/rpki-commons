@@ -2,8 +2,6 @@ package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
@@ -15,6 +13,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -34,7 +34,7 @@ public class X509RouterCertificateTest {
     private static final ValidityPeriod TEST_VALIDITY_PERIOD;
 
     static {
-        final DateTime now = UTC.dateTime();
+        var now = ZonedDateTime.now(ZoneOffset.UTC);
         TEST_VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1), now.plusYears(100));
     }
 

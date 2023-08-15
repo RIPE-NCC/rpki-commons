@@ -9,8 +9,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -19,10 +17,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.joda.time.DateTime;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,13 +36,7 @@ import java.util.stream.Collectors;
  */
 public class ManifestCms extends RpkiSignedObject {
 
-    private static final long serialVersionUID = 1L;
-
     public static final int DEFAULT_VERSION = 0;
-
-    // since 1.34
-    @Deprecated
-    public static final String CONTENT_TYPE_OID = "1.2.840.113549.1.9.16.1.26";
 
     public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.26");
 
@@ -66,23 +58,23 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     public int getVersion() {
-        return manifestCmsGeneralInfo.getVersion();
+        return manifestCmsGeneralInfo.version();
     }
 
     public BigInteger getNumber() {
-        return manifestCmsGeneralInfo.getNumber();
+        return manifestCmsGeneralInfo.number();
     }
 
     public String getFileHashAlgorithm() {
-        return manifestCmsGeneralInfo.getFileHashAlgorithm();
+        return manifestCmsGeneralInfo.fileHashAlgorithm();
     }
 
-    public DateTime getThisUpdateTime() {
-        return manifestCmsGeneralInfo.getThisUpdateTime();
+    public Instant getThisUpdateTime() {
+        return manifestCmsGeneralInfo.thisUpdateTime();
     }
 
-    public DateTime getNextUpdateTime() {
-        return manifestCmsGeneralInfo.getNextUpdateTime();
+    public Instant getNextUpdateTime() {
+        return manifestCmsGeneralInfo.nextUpdateTime();
     }
 
     public int size() {
@@ -149,21 +141,21 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     private void checkManifestValidityTimes(ValidationOptions options, ValidationResult result) {
-        DateTime thisUpdateTime = getThisUpdateTime();
-        DateTime nextUpdateTime = getNextUpdateTime();
+        var thisUpdateTime = getThisUpdateTime();
+        var nextUpdateTime = getNextUpdateTime();
 
         result.rejectIfFalse(thisUpdateTime.isBefore(nextUpdateTime), ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME, thisUpdateTime.toString(), nextUpdateTime.toString());
-        result.rejectIfTrue(thisUpdateTime.isAfterNow(), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, thisUpdateTime.toString());
+        result.rejectIfTrue(thisUpdateTime.isAfter(result.now()), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, thisUpdateTime.toString());
 
-        if(options.isStrictManifestCRLValidityChecks()){
-            boolean postGracePeriod = nextUpdateTime.plus(options.getManifestMaxStalePeriod()).isBeforeNow();
+        if (options.isStrictManifestCRLValidityChecks()) {
+            boolean postGracePeriod = nextUpdateTime.plus(options.getManifestMaxStalePeriod()).isBefore(result.now());
             if (postGracePeriod) {
                 result.error(ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
             } else {
-                result.warnIfTrue(nextUpdateTime.isBeforeNow(), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+                result.warnIfTrue(nextUpdateTime.isBefore(result.now()), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
             }
         } else {
-            result.warnIfTrue(nextUpdateTime.isBeforeNow(), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
+            result.warnIfTrue(nextUpdateTime.isBefore(result.now()), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, nextUpdateTime.toString());
         }
 
     }

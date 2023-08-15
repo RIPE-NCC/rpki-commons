@@ -3,30 +3,25 @@ package net.ripe.rpki.commons.validation;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.joda.time.DateTimeUtils;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 
-public final class ValidationResult implements Serializable {
-
-    private static final long serialVersionUID = 2L;
+public final class ValidationResult {
 
     private static final String[] EMPTY_PARAM = {};
 
-    private Map<ValidationLocation, ResultsPerLocation> results = new TreeMap<>();
+    private Clock clock = Clock.systemUTC();
+
+    private final Map<ValidationLocation, ResultsPerLocation> results = new TreeMap<>();
 
     private ValidationLocation currentLocation;
 
-    private Map<ValidationLocation, List<ValidationMetric>> metrics = new TreeMap<>();
+    private final Map<ValidationLocation, List<ValidationMetric>> metrics = new TreeMap<>();
 
     private boolean storingPassingChecks = true;
 
@@ -44,6 +39,15 @@ public final class ValidationResult implements Serializable {
 
     public static ValidationResult withLocation(ValidationLocation location) {
         return new ValidationResult(location);
+    }
+
+    public ValidationResult withClock(Clock clock) {
+        this.clock = clock;
+        return this;
+    }
+
+    public Instant now() {
+        return clock.instant();
     }
 
     public ValidationResult withoutStoringPassingChecks() {
@@ -198,7 +202,7 @@ public final class ValidationResult implements Serializable {
         if (!metrics.containsKey(currentLocation)) {
             metrics.put(currentLocation, new ArrayList<>());
         }
-        metrics.get(currentLocation).add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+        metrics.get(currentLocation).add(new ValidationMetric(name, value, clock.millis()));
         return this;
     }
 
@@ -235,11 +239,11 @@ public final class ValidationResult implements Serializable {
     }
 
     public Set<ValidationCheck> getFailuresForCurrentLocation() {
-        return new HashSet<ValidationCheck>(getFailures(currentLocation));
+        return new HashSet<>(getFailures(currentLocation));
     }
 
     public List<ValidationCheck> getFailuresForAllLocations() {
-        List<ValidationCheck> failures = new ArrayList<ValidationCheck>();
+        List<ValidationCheck> failures = new ArrayList<>();
         for (ResultsPerLocation checks : results.values()) {
             failures.addAll(checks.error);
         }
@@ -266,7 +270,7 @@ public final class ValidationResult implements Serializable {
     }
 
     public List<ValidationCheck> getWarnings() {
-        List<ValidationCheck> warnings = new ArrayList<ValidationCheck>();
+        List<ValidationCheck> warnings = new ArrayList<>();
         for (ResultsPerLocation checks : results.values()) {
             warnings.addAll(checks.warning);
         }

@@ -4,7 +4,6 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import org.apache.commons.lang3.Validate;
-import org.bouncycastle.asn1.x509.PolicyInformation;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;

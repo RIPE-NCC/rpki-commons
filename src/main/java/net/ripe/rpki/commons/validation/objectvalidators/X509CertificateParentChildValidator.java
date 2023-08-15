@@ -1,21 +1,20 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
 import com.google.common.primitives.Booleans;
-import net.ripe.rpki.commons.crypto.JavaSecurityConstants;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.bouncycastle.asn1.x509.Extension;
-import org.joda.time.DateTime;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.util.Arrays;
 
-import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.*;
+import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.CRLSIGN_INDEX;
+import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.DIG_SIGN_INDEX;
+import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.KEYCERTSIGN_INDEX;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 
@@ -89,9 +88,9 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
     }
 
     protected void verifyValidity() {
-        final DateTime now = UTC.dateTime();
-        final DateTime notValidBefore = child.getValidityPeriod().getNotValidBefore();
-        final DateTime notValidAfter = child.getValidityPeriod().getNotValidAfter();
+        final var now = result.now();
+        final var notValidBefore = child.getValidityPeriod().notValidBefore();
+        final var notValidAfter = child.getValidityPeriod().notValidAfter();
         result.rejectIfTrue(now.isBefore(notValidBefore), NOT_VALID_BEFORE, notValidBefore.toString());
         result.rejectIfTrue(now.isAfter(notValidAfter), NOT_VALID_AFTER, notValidAfter.toString());
     }

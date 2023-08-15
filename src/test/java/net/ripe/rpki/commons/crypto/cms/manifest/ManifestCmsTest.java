@@ -13,39 +13,35 @@ import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDes
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
-import net.ripe.rpki.commons.util.UTC;
-import net.ripe.rpki.commons.validation.ValidationCheck;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationOptions;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationStatus;
-import net.ripe.rpki.commons.validation.ValidationString;
+import net.ripe.rpki.commons.validation.*;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class ManifestCmsTest {
@@ -63,21 +59,24 @@ public class ManifestCmsTest {
     private static final X500Principal MANIFEST_DN = new X500Principal("CN=manifest");
 
     // Manifest data
-    private static byte[] FILE1_CONTENTS = {'a', 'b', 'c'};
-    private static byte[] FILE2_CONTENTS = {'d', 'e', 'f'};
+    private static final byte[] FILE1_CONTENTS = {'a', 'b', 'c'};
+    private static final byte[] FILE2_CONTENTS = {'d', 'e', 'f'};
 
-    private static final DateTime THIS_UPDATE_TIME = new DateTime(2008, 9, 1, 22, 43, 29, 0, DateTimeZone.UTC);
-    private static final DateTime MFT_EE_NOT_BEFORE = THIS_UPDATE_TIME.minusMinutes(5);
-    private static final DateTime NEXT_UPDATE_TIME = THIS_UPDATE_TIME.plusHours(24);
-    private static final DateTime MFT_EE_NOT_AFTER = THIS_UPDATE_TIME.plusDays(7);
+    private static final Instant THIS_UPDATE_TIME = Instant.parse("2008-09-01T22:43:29Z");
+    private static final Instant MFT_EE_NOT_BEFORE = THIS_UPDATE_TIME.minusSeconds(5 * 60);
+    private static final Instant NEXT_UPDATE_TIME = THIS_UPDATE_TIME.plusSeconds(24 * 60 * 60);
+    private static final Instant MFT_EE_NOT_AFTER = THIS_UPDATE_TIME.plusSeconds(7 * 24 * 60 * 60);
 
     // Test Manifest entries
-    private static Map<String, byte[]> files = new HashMap<String, byte[]>();
+    private static final Map<String, byte[]> files = new HashMap<>();
 
     static {
         files.put("filename1.cer", FILE1_CONTENTS);
         files.put("filename2.roa", FILE2_CONTENTS);
     }
+
+    private final Clock clock = Clock.fixed(THIS_UPDATE_TIME, ZoneOffset.UTC);
+    private final ValidationResult validationResult = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION).withClock(clock);
 
     private CrlLocator crlLocator;
     private ManifestCms subject;
@@ -95,16 +94,9 @@ public class ManifestCmsTest {
 
     @Before
     public void setUp() {
-        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());
-
         rootCertificate = getRootResourceCertificate();
         crlLocator = mock(CrlLocator.class);
         subject = getRootManifestCms();
-    }
-
-    @After
-    public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -128,14 +120,13 @@ public class ManifestCmsTest {
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
-        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, validationResult)).thenReturn(crl);
 
-        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, validationResult);
 
-        assertEquals(0, result.getFailuresForCurrentLocation().size());
-        assertFalse(result.hasFailures());
+        assertEquals(0, validationResult.getFailuresForCurrentLocation().size());
+        assertFalse(validationResult.hasFailures());
     }
 
     @Test
@@ -143,51 +134,46 @@ public class ManifestCmsTest {
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
-        final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
-        result.setLocation(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION));
+        validationResult.setLocation(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION));
         final ValidationLocation rootMftCrlValidationLocation = new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION);
 
-        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenAnswer(new Answer<X509Crl>() {
-            @Override
-            public X509Crl answer(InvocationOnMock invocationOnMock) throws Throwable {
-                assertEquals(rootMftCrlValidationLocation, result.getCurrentLocation());
-                result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
-                return null;
-            }
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, validationResult)).thenAnswer((Answer<X509Crl>) invocationOnMock -> {
+            assertEquals(rootMftCrlValidationLocation, validationResult.getCurrentLocation());
+            validationResult.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
+            return null;
         });
 
-        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, VALIDATION_OPTIONS, validationResult);
 
-        assertTrue(result.hasFailureForCurrentLocation());
-        assertEquals(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), result.getCurrentLocation());
-        assertTrue(result.hasFailureForLocation(rootMftCrlValidationLocation));
-        assertTrue(result.getAllValidationChecksForLocation(new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION)).contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_SIGNATURE_VALID)));
+        assertTrue(validationResult.hasFailureForCurrentLocation());
+        assertEquals(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), validationResult.getCurrentLocation());
+        assertTrue(validationResult.hasFailureForLocation(rootMftCrlValidationLocation));
+        assertTrue(validationResult.getAllValidationChecksForLocation(new ValidationLocation(ROOT_MANIFEST_CRL_LOCATION)).contains(new ValidationCheck(ValidationStatus.ERROR, ValidationString.CRL_SIGNATURE_VALID)));
     }
 
     @Test
     public void shouldWarnWhenManifestIsStale() {
         X509Crl crl = getRootCrl();
 
-        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
+        validationResult.withClock(Clock.fixed(NEXT_UPDATE_TIME.plus(1, ChronoUnit.DAYS), ZoneOffset.UTC));
 
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.standardDays(100 * 365));
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.ofDays(100 * 365));
 
-        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, validationResult)).thenReturn(crl);
 
-        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, validationResult);
 
-        assertFalse("" + result.getFailuresForAllLocations(), result.hasFailures());
-        assertEquals(0, result.getFailuresForCurrentLocation().size());
+        assertFalse("" + validationResult.getFailuresForAllLocations(), validationResult.hasFailures());
+        assertEquals(0, validationResult.getFailuresForCurrentLocation().size());
 
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
+                validationResult.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
 
@@ -195,45 +181,43 @@ public class ManifestCmsTest {
     public void shouldRejectWhenManifestIsTooStaleDueToNegativeGracePeriod() {
         X509Crl crl = getRootCrl();
 
-        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.minusDays(1).getMillis());
+        validationResult.withClock(Clock.fixed(NEXT_UPDATE_TIME.minus(1, ChronoUnit.DAYS), ZoneOffset.UTC));
 
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.standardDays(-2));
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.ofDays(-2));
 
-        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, validationResult)).thenReturn(crl);
 
-        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, validationResult);
 
-        assertTrue(result.hasFailures());
+        assertTrue(validationResult.hasFailures());
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
+                validationResult.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
 
     @Test
     public void shouldRejectWhenThisUpdateTimeIsNotBeforeNextUpdateTime() {
         X509Crl crl = getRootCrl();
-        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
+        validationResult.withClock(Clock.fixed(NEXT_UPDATE_TIME.plus(1, ChronoUnit.DAYS), ZoneOffset.UTC));
 
         subject = getRootManifestBuilder().withThisUpdateTime(NEXT_UPDATE_TIME.plusSeconds(1)).build(MANIFEST_KEY_PAIR.getPrivate());
 
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
-        subject.validateWithCrl(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toASCIIString(), context, ValidationOptions.strictValidation(), result, crl);
+        subject.validateWithCrl(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toASCIIString(), context, ValidationOptions.strictValidation(), validationResult, crl);
 
-        assertTrue(result.hasFailures());
+        assertTrue(validationResult.hasFailures());
         assertEquals(
                 new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.plusSeconds(1).toString(), NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME)
+                validationResult.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME)
         );
     }
 
@@ -241,24 +225,22 @@ public class ManifestCmsTest {
     public void shouldRejectWhenManifestIsTooStale() {
         X509Crl crl = getRootCrl();
 
-        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
-
+        validationResult.withClock(Clock.fixed(NEXT_UPDATE_TIME.plus(1, ChronoUnit.DAYS), ZoneOffset.UTC));
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO,Duration.ZERO);
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
-        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, validationResult)).thenReturn(crl);
 
-        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, validationResult);
 
-        assertTrue(result.hasFailures());
+        assertTrue(validationResult.hasFailures());
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
+                validationResult.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
     }
 
@@ -269,29 +251,27 @@ public class ManifestCmsTest {
     public void shouldRejectWhenCertificateIsExpired() {
         X509Crl crl = getRootCrl();
 
-        DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(8).getMillis());
-
+        validationResult.withClock(Clock.fixed(NEXT_UPDATE_TIME.plus(8, ChronoUnit.DAYS), ZoneOffset.UTC));
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
-        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.standardDays(100));
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+        ValidationOptions options = ValidationOptions.withStaleConfigurations(Duration.ZERO, Duration.ofDays(100));
 
-        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, validationResult)).thenReturn(crl);
 
-        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, validationResult);
 
-        assertTrue(result.hasFailures());
+        assertTrue(validationResult.hasFailures());
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.WARNING, ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
+                validationResult.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_PAST_NEXT_UPDATE_TIME)
         );
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.ERROR, ValidationString.NOT_VALID_AFTER, MFT_EE_NOT_AFTER.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
+                validationResult.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.NOT_VALID_AFTER)
         );
     }
 
@@ -302,31 +282,29 @@ public class ManifestCmsTest {
     public void shouldRejectWhenThisUpdateInFuture() {
         X509Crl crl = getRootCrl();
 
-        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.minusSeconds(1).getMillis());
-
+        validationResult.withClock(Clock.fixed(THIS_UPDATE_TIME.minus(1, ChronoUnit.SECONDS), ZoneOffset.UTC));
         IpResourceSet resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = ValidationOptions.backCompatibleRipeNccValidator();
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
-        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
+        when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, validationResult)).thenReturn(crl);
 
-        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, result);
+        subject.validate(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, crlLocator, options, validationResult);
 
-        assertTrue(result.hasFailures());
+        assertTrue(validationResult.hasFailures());
 
         assertEquals(
                 new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME, THIS_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME)
+                validationResult.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_BEFORE_THIS_UPDATE_TIME)
         );
     }
 
     @Test
     public void shouldRejectFileNamesThatEscapeRepository() {
         X509Crl crl = getRootCrl();
-        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.minusSeconds(1).getMillis());
+        Clock clock = Clock.fixed(NEXT_UPDATE_TIME.minus(1, ChronoUnit.SECONDS), ZoneOffset.UTC);
 
         ManifestCmsBuilder builder = getRootManifestBuilder();
         builder.addFile("this-one-is-ok.roa", new byte[0]);
@@ -348,7 +326,7 @@ public class ManifestCmsTest {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = ValidationOptions.strictValidation();
-        ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+        ValidationResult result = validationResult.withClock(clock);
 
         subject.validateWithCrl(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toString(), context, options, result, crl);
 
@@ -380,7 +358,7 @@ public class ManifestCmsTest {
     @Test
     public void shouldNotMatchIfAdditionalFilesPresent() {
         ManifestCms mft = getRootManifestCms();
-        Map<String, byte[]> wrongFiles = new HashMap<String, byte[]>(files);
+        Map<String, byte[]> wrongFiles = new HashMap<>(files);
         wrongFiles.put("newfile", FILE1_CONTENTS);
         assertFalse(mft.matchesFiles(wrongFiles));
     }
@@ -388,7 +366,7 @@ public class ManifestCmsTest {
     @Test
     public void shouldNotMatchIfFileContentChanged() {
         ManifestCms mft = getRootManifestCms();
-        Map<String, byte[]> wrongFiles = new HashMap<String, byte[]>(files);
+        Map<String, byte[]> wrongFiles = new HashMap<>(files);
         wrongFiles.put("filename2", FILE1_CONTENTS);
         assertFalse(mft.matchesFiles(wrongFiles));
     }
@@ -396,16 +374,16 @@ public class ManifestCmsTest {
     @Test
     public void shouldPastValidityTimeForCmsBeTheSameAsTheCertificate() {
         ManifestCms subject = getRootManifestCms();
-        assertEquals(subject.getCertificate().isPastValidityTime(), subject.isPastValidityTime());
+        assertEquals(subject.getCertificate().isPastValidityTime(Instant.now()), subject.isPastValidityTime(Instant.now()));
     }
 
     @Test
     public void shouldBeRevoked() {
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate);
-        final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
+        final ValidationResult result = validationResult;
 
         X509Crl crl = getRootCrlBuilder()
-                .addEntry(subject.getCertificate().getSerialNumber(), DateTime.now().minusMinutes(1))
+                .addEntry(subject.getCertificate().getSerialNumber(), Instant.now().minus(1, ChronoUnit.MINUTES))
                 .build(ROOT_KEY_PAIR.getPrivate());
 
         when(crlLocator.getCrl(ROOT_MANIFEST_CRL_LOCATION, context, result)).thenReturn(crl);
@@ -439,8 +417,8 @@ public class ManifestCmsTest {
     private X509CrlBuilder getRootCrlBuilder() {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(X509ResourceCertificateTest.TEST_SELF_SIGNED_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(NEXT_UPDATE_TIME.minusHours(24));
-        builder.withNextUpdateTime(NEXT_UPDATE_TIME.plusHours(24));
+        builder.withThisUpdateTime(NEXT_UPDATE_TIME.minus(24, ChronoUnit.HOURS));
+        builder.withNextUpdateTime(NEXT_UPDATE_TIME.plus(24, ChronoUnit.HOURS));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -455,7 +433,7 @@ public class ManifestCmsTest {
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
         builder.withCertificate(getManifestEEResourceCertificateBuilder().build());
         builder.withManifestNumber(BigInteger.valueOf(68));
-        builder.withThisUpdateTime(validityPeriod.getNotValidBefore()).withNextUpdateTime(validityPeriod.getNotValidAfter());
+        builder.withThisUpdateTime(validityPeriod.notValidBefore()).withNextUpdateTime(validityPeriod.notValidAfter());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         return builder;
     }

@@ -1,18 +1,16 @@
 package net.ripe.rpki.commons.xml.converters;
 
 import com.thoughtworks.xstream.converters.SingleValueConverter;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 public class JavaUtilTimestampConverter implements SingleValueConverter {
 
-    private static final DateTimeFormatter FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return Timestamp.class.equals(type);
@@ -20,11 +18,11 @@ public class JavaUtilTimestampConverter implements SingleValueConverter {
 
     @Override
     public Object fromString(String s) {
-        return new Timestamp(FORMATTER.parseDateTime(s).getMillis());
+        return new Timestamp(FORMATTER.parse(s).query(Instant::from).toEpochMilli());
     }
 
     @Override
     public String toString(Object datetime) {
-        return FORMATTER.print(UTC.dateTime(datetime));
+        return FORMATTER.format(((Timestamp) datetime).toInstant());
     }
 }

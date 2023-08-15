@@ -1,14 +1,12 @@
 package net.ripe.rpki.commons.rsync;
 
-import org.joda.time.DateTimeUtils;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Clock;
+import java.util.*;
 
 public class Rsync {
 
@@ -16,9 +14,12 @@ public class Rsync {
 
     private static final String RSYNC_PROXY = "RSYNC_PROXY";
 
-    private static final String COMMAND = "rsync";
+    private static final String RSYNC_COMMAND = "rsync";
 
     private static final Logger log = LoggerFactory.getLogger(Rsync.class);
+
+    @Setter
+    private @NotNull Clock clock = Clock.systemUTC();
 
     private Command command;
 
@@ -26,7 +27,7 @@ public class Rsync {
 
     private String destination;
 
-    private List<String> options = new ArrayList<String>();
+    private final List<String> options = new ArrayList<>();
 
     private int timeoutInSeconds = DEFAULT_TIMEOUT_IN_SECONDS;
 
@@ -124,8 +125,8 @@ public class Rsync {
     }
 
     public int execute() {
-        List<String> args = new ArrayList<String>();
-        args.add(COMMAND);
+        List<String> args = new ArrayList<>();
+        args.add(RSYNC_COMMAND);
         args.add("--timeout=" + timeoutInSeconds);
         args.addAll(options);
         if ((source != null) && (destination != null)) {
@@ -145,21 +146,21 @@ public class Rsync {
             rsync = new Command(args);
         }
 
-        startedAt = DateTimeUtils.currentTimeMillis();
+        startedAt = clock.millis();
         try {
             rsync.execute();
             command = rsync;
             int exitStatus = rsync.getExitStatus();
             if (exitStatus != 0) {
-                log.error("rsync command line: " + args);
-                log.error("rsync exit status: " + exitStatus);
-                log.error("rsync stderr: " + rsync.getErrors());
-                log.error("rsync stdout: " + rsync.getOutputs());
+                log.error("rsync command line: {}", args);
+                log.error("rsync exit status: {}", exitStatus);
+                log.error("rsync stderr: {}", rsync.getErrors());
+                log.error("rsync stdout: {}", rsync.getOutputs());
             }
 
             return exitStatus;
         } finally {
-            finishedAt = DateTimeUtils.currentTimeMillis();
+            finishedAt = clock.millis();
         }
     }
 

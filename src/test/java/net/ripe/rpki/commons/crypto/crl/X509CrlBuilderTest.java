@@ -2,9 +2,6 @@ package net.ripe.rpki.commons.crypto.crl;
 
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,6 +15,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
@@ -27,9 +28,9 @@ public class X509CrlBuilderTest {
     private static final PublicKey PUBLIC_KEY = KeyPairFactoryTest.TEST_KEY_PAIR.getPublic();
     private static final PrivateKey PRIVATE_KEY = KeyPairFactoryTest.TEST_KEY_PAIR.getPrivate();
 
-    private static final DateTime THIS_UPDATE_TIME = new DateTime(2007, 2, 28, 2, 53, 23, 0, DateTimeZone.UTC);
-    private static final DateTime NEXT_UPDATE_TIME = new DateTime(2007, 3, 1, 2, 53, 23, 0, DateTimeZone.UTC);
-    private static final DateTime REVOCATION_TIME = new DateTime(2007, 2, 25, 19, 23, 44, 123, DateTimeZone.UTC);
+    private static final Instant THIS_UPDATE_TIME = ZonedDateTime.of(2007, 2, 28, 2, 53, 23, 0, ZoneOffset.UTC).toInstant();
+    private static final Instant NEXT_UPDATE_TIME = ZonedDateTime.of(2007, 3, 1, 2, 53, 23, 0, ZoneOffset.UTC).toInstant();
+    private static final Instant REVOCATION_TIME = ZonedDateTime.of(2007, 2, 25, 19, 23, 44, 123000000, ZoneOffset.UTC).toInstant();
 
     private X509CrlBuilder subject;
     private X509Crl emptyCrl;
@@ -61,8 +62,8 @@ public class X509CrlBuilderTest {
 
     @Test
     public void shouldHaveUpdateTimes() {
-        assertEquals(THIS_UPDATE_TIME, new DateTime(emptyCrl.getThisUpdateTime(), DateTimeZone.UTC));
-        assertEquals(NEXT_UPDATE_TIME, new DateTime(emptyCrl.getNextUpdateTime(), DateTimeZone.UTC));
+        assertEquals(THIS_UPDATE_TIME, emptyCrl.getThisUpdateTime());
+        assertEquals(NEXT_UPDATE_TIME, emptyCrl.getNextUpdateTime());
     }
 
     @Test
@@ -79,8 +80,8 @@ public class X509CrlBuilderTest {
     @Test
     public void shouldHaveCrlEntryForRevokedCertificate() {
         X509Crl.Entry entry = nonEmptyCrl.getRevokedCertificate(BigInteger.TEN);
-        assertEquals(BigInteger.TEN, entry.getSerialNumber());
-        assertEquals(REVOCATION_TIME.withMillisOfSecond(0), entry.getRevocationDateTime());
+        assertEquals(BigInteger.TEN, entry.serialNumber());
+        assertEquals(REVOCATION_TIME.truncatedTo(ChronoUnit.SECONDS), entry.revokedAt());
     }
 
     @Test
@@ -134,7 +135,7 @@ public class X509CrlBuilderTest {
 
     @Test
     public void shouldNotBeSatisfiedByCrlWithFewerEntries() {
-        subject.addEntry(BigInteger.valueOf(42), UTC.dateTime());
+        subject.addEntry(BigInteger.valueOf(42), Instant.now());
         assertFalse(subject.isSatisfiedByEntries(nonEmptyCrl));
     }
 

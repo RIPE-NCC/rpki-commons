@@ -7,15 +7,8 @@ import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.UTC;
-import net.ripe.rpki.commons.validation.ValidationCheck;
-import net.ripe.rpki.commons.validation.ValidationLocation;
-import net.ripe.rpki.commons.validation.ValidationResult;
-import net.ripe.rpki.commons.validation.ValidationStatus;
-import net.ripe.rpki.commons.validation.ValidationString;
+import net.ripe.rpki.commons.validation.*;
 import net.ripe.rpki.commons.validation.properties.URIGen;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,14 +19,21 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.CAB_BASELINE_REQUIREMENTS_POLICY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
-import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
+import static net.ripe.rpki.commons.validation.ValidationString.CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT;
+import static net.ripe.rpki.commons.validation.ValidationString.CERT_SIA_CA_REPOSITORY_URI_PRESENT;
+import static net.ripe.rpki.commons.validation.ValidationString.CERT_SIA_IS_PRESENT;
 import static org.junit.Assert.*;
 
 
@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 @RunWith(JUnitQuickcheck.class)
 public class X509ResourceCertificateParserTest {
 
-    private X509ResourceCertificateParser subject = new X509ResourceCertificateParser();
+    private final X509ResourceCertificateParser subject = new X509ResourceCertificateParser();
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {
@@ -100,8 +100,8 @@ public class X509ResourceCertificateParserTest {
         builder.withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        builder.withValidityPeriod(ValidityPeriod.of(now, Period.ofYears(1)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withSignatureAlgorithm("MD5withRSA");
         X509Certificate certificate = builder.generateCertificate();

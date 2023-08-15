@@ -7,17 +7,13 @@ import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayload;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
-import net.ripe.rpki.commons.util.UTC;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1UTCTime;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CRLHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
@@ -26,7 +22,6 @@ import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
-import org.joda.time.DateTimeUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,6 +30,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertStoreException;
 import java.security.cert.X509CRL;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.SHA256WITHRSA_ENCRYPTION_OID;
@@ -62,10 +59,8 @@ public class ProvisioningCmsObjectBuilderTest {
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         subject.withPayloadContent(payload);
 
-        signingTime = UTC.dateTime().getMillis() / 1000 * 1000; // truncate milliseconds
-        DateTimeUtils.setCurrentMillisFixed(signingTime);
+        signingTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).toEpochMilli();
         cmsObject = subject.build(ProvisioningCmsCertificateBuilderTest.EE_KEYPAIR.getPrivate());
-        DateTimeUtils.setCurrentMillisSystem();
 
         signedDataParser = new CMSSignedDataParser(new BcDigestCalculatorProvider(), cmsObject.getEncoded());
         signedDataParser.getSignedContent().drain();
@@ -154,8 +149,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedCrl() throws Exception {
-        @SuppressWarnings("unchecked")
-        Collection<X509CRL> crls = signedDataParser.getCRLs().getMatches(new BouncyCastleUtil.X509CRLHolderStoreSelector());
+        Collection<X509CRLHolder> crls = signedDataParser.getCRLs().getMatches(new BouncyCastleUtil.X509CRLHolderStoreSelector());
 
         assertNotNull(crls);
         assertFalse(crls.isEmpty());

@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.rsync;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.Thread;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class Command extends Thread {
             outputReader.start();
 
             //allows the readers to start
-            yield();
+            Thread.yield();
 
             outputReader.join();
             errorReader.join();

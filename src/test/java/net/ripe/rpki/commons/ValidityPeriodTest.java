@@ -1,108 +1,61 @@
 package net.ripe.rpki.commons;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.Period;
-import org.joda.time.ReadableInstant;
-import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.*;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.*;
 
 
 public class ValidityPeriodTest {
 
-    @Rule
-    public FixedDateRule fixedDateRule = new FixedDateRule(new DateTime(2008, 04, 05, 0, 0, 0, 0, DateTimeZone.UTC));
-
+    public Clock clock = Clock.fixed(
+        ZonedDateTime.of(2008, 4, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(),
+        ZoneOffset.UTC
+    );
 
     @Test
     public void testWrongValidityPeriod() {
-        try {
-            final DateTime now = UTC.dateTime();
-            new ValidityPeriod(now, now.minus(Period.millis(1)));
-            fail("IllegalArgumentException expected");
-        } catch (IllegalArgumentException expected) {
-        }
+        assertThatThrownBy(() -> {
+            final Instant now = clock.instant();
+            new ValidityPeriod(now, now.minusMillis(1));
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void singleInstantShouldBeOK() {
-        DateTime now = UTC.dateTime();
+        var now = clock.instant();
         new ValidityPeriod(now, now);
-    }
-
-    @Test
-    public void shouldAllowUnspecifiedNotValidAfterDate() {
-        ValidityPeriod closed = new ValidityPeriod(date(2008, 1, 1), date(2008, 12, 1));
-        ValidityPeriod open = new ValidityPeriod(date(2008, 1, 1), null);
-
-        assertTrue(closed.isClosed());
-        assertFalse(open.isClosed());
-        assertTrue("open should contain closed", open.contains(closed));
-        assertFalse("closed should not contain open", closed.contains(open));
-        assertTrue(open.isValidAt(date(2008, 1, 1)));
-        assertTrue(open.isValidAt(date(2023, 1, 1)));
-        assertFalse(open.isValidAt(date(2003, 1, 1)));
-    }
-
-    @Test
-    public void shouldAllowUnspecifiedNotBeforeAfterDate() {
-        ValidityPeriod closed = new ValidityPeriod(date(2008, 1, 1), date(2008, 12, 1));
-        ValidityPeriod open = new ValidityPeriod(null, date(2008, 12, 1));
-
-        assertTrue(closed.isClosed());
-        assertFalse(open.isClosed());
-        assertTrue("open should contain closed", open.contains(closed));
-        assertFalse("closed should not contain open", closed.contains(open));
-        assertTrue(open.isValidAt(date(2008, 1, 1)));
-        assertFalse(open.isValidAt(date(2023, 1, 1)));
-        assertTrue(open.isValidAt(date(2003, 1, 1)));
     }
 
     @Test
     public void shouldSupportJavaUtilDate() {
         ValidityPeriod subject = new ValidityPeriod(new Date(), new Date());
-        assertNotNull(subject.getNotValidBefore());
-        assertNotNull(subject.getNotValidAfter());
-
-        subject = new ValidityPeriod(new Date(), null);
-        assertNotNull(subject.getNotValidBefore());
-        assertNull(subject.getNotValidAfter());
-
-        subject = new ValidityPeriod(null, new Date());
-        assertNull(subject.getNotValidBefore());
-        assertNotNull(subject.getNotValidAfter());
+        assertNotNull(subject.notValidBefore());
+        assertNotNull(subject.notValidAfter());
     }
 
     @Test
     public void shouldTruncateToOneSecondAccuracy() {
-        ValidityPeriod subject = new ValidityPeriod(new DateTime(2008, 3, 30, 15, 44, 58, 943, DateTimeZone.UTC), new DateTime(2008, 5, 30, 15, 44, 23, 123, DateTimeZone.UTC));
-        assertEquals(new DateTime(2008, 3, 30, 15, 44, 58, 0, DateTimeZone.UTC), subject.getNotValidBefore());
-        assertEquals(new DateTime(2008, 5, 30, 15, 44, 23, 0, DateTimeZone.UTC), subject.getNotValidAfter());
+        ValidityPeriod subject = new ValidityPeriod(
+            ZonedDateTime.of(2008, 3, 30, 15, 44, 58, 943, ZoneOffset.UTC),
+            ZonedDateTime.of(2008, 5, 30, 15, 44, 23, 123, ZoneOffset.UTC)
+        );
+        assertEquals(ZonedDateTime.of(2008, 3, 30, 15, 44, 58, 0, ZoneOffset.UTC).toInstant(), subject.notValidBefore());
+        assertEquals(ZonedDateTime.of(2008, 5, 30, 15, 44, 23, 0, ZoneOffset.UTC).toInstant(), subject.notValidAfter());
     }
 
     @Test
     public void shouldSupportIntersection() {
-        DateTime t1 = new DateTime(2008, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        DateTime t2 = new DateTime(2008, 2, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        DateTime t3 = new DateTime(2008, 11, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        DateTime t4 = new DateTime(2008, 12, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+        var t1 = ZonedDateTime.of(2008, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var t2 = ZonedDateTime.of(2008, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var t3 = ZonedDateTime.of(2008, 11, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var t4 = ZonedDateTime.of(2008, 12, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
         assertEquals(null, new ValidityPeriod(t1, t2).intersectedWith(new ValidityPeriod(t3, t4)));
-        assertEquals(new ValidityPeriod(), new ValidityPeriod().intersectedWith(new ValidityPeriod()));
-        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod(t1, t3).intersectedWith(new ValidityPeriod()));
-        assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod().intersectedWith(new ValidityPeriod(t1, t3)));
         assertEquals(new ValidityPeriod(t2, t3), new ValidityPeriod(t1, t3).intersectedWith(new ValidityPeriod(t2, t4)));
         assertEquals(new ValidityPeriod(t2, t3), new ValidityPeriod(t2, t4).intersectedWith(new ValidityPeriod(t1, t3)));
         assertEquals(new ValidityPeriod(t1, t3), new ValidityPeriod(t1, t4).intersectedWith(new ValidityPeriod(t1, t3)));
@@ -124,45 +77,38 @@ public class ValidityPeriodTest {
     @Test
     public void shouldBeValidWithinTheValidityPeriod() {
         ValidityPeriod validityPeriod = new ValidityPeriod(date(2008, 1, 1), date(2009, 1, 1));
-        assertTrue(validityPeriod.isValidNow());
+        assertTrue(validityPeriod.isValidAt(date(2008, 6, 1)));
     }
 
     @Test
     public void shouldBeInvalidOutsideTheValidityPeriod() {
         ValidityPeriod validityPeriod = new ValidityPeriod(date(2007, 1, 1), date(2008, 1, 1));
-        assertTrue(validityPeriod.isExpiredNow());
+        assertTrue(validityPeriod.isExpiredAt(Instant.now()));
         assertTrue(validityPeriod.isExpiredAt(date(2020, 1, 1)));
     }
 
     @Test
-    public void shouldNeverBeExpiredIfNotValidAfterIsNotDefined() {
-        ValidityPeriod validityPeriod = new ValidityPeriod(date(2007, 1, 1), null);
-        assertFalse(validityPeriod.isExpiredAt(date(1920, 1, 1)));
-        assertFalse(validityPeriod.isExpiredAt(date(2020, 1, 1)));
-    }
-
-    @Test
     public void truncatedMillisDates() {
-        long instant = 1502895557772L;
+        var instant = new Date(1502895557772L);
 
-        final ValidityPeriod validityPeriod = new ValidityPeriod(new Date(instant), new Date(instant));
+        final ValidityPeriod validityPeriod = new ValidityPeriod(instant, instant);
 
-         assertEquals(validityPeriod.getNotValidBefore().getMillisOfSecond(), 0);
-         assertEquals(validityPeriod.getNotValidAfter().getMillisOfSecond(), 0);
+         assertEquals(validityPeriod.notValidBefore().toEpochMilli() % 1000, 0);
+         assertEquals(validityPeriod.notValidAfter().toEpochMilli() % 1000, 0);
     }
 
     @Test
-    public void truncatedMillisDateTimes() {
-        long instant = 1502895557772L;
+    public void truncatedMillisInstants() {
+        var instant = Instant.ofEpochMilli(1502895557772L);
 
-        final ValidityPeriod validityPeriod = new ValidityPeriod(UTC.dateTime(instant), UTC.dateTime(instant));
+        final ValidityPeriod validityPeriod = new ValidityPeriod(instant, instant);
 
-         assertEquals(validityPeriod.getNotValidBefore().getMillisOfSecond(), 0);
-         assertEquals(validityPeriod.getNotValidAfter().getMillisOfSecond(), 0);
+         assertEquals(validityPeriod.notValidBefore().toEpochMilli() % 1000, 0);
+         assertEquals(validityPeriod.notValidAfter().toEpochMilli() % 1000, 0);
     }
 
 
-    private ReadableInstant date(int year, int month, int day) {
-        return new LocalDate(year, month, day).toDateTimeAtStartOfDay(DateTimeZone.UTC);
+    private Instant date(int year, int month, int day) {
+        return LocalDate.of(year, month, day).atStartOfDay(ZoneOffset.UTC).toInstant();
     }
 }

@@ -9,10 +9,6 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,14 +16,19 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.decode;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class ManifestCmsParserTest {
@@ -35,8 +36,8 @@ public class ManifestCmsParserTest {
     public static final X500Principal TEST_DN = new X500Principal("CN=Test");
     public static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
 
-    public static final DateTime THIS_UPDATE_TIME = new DateTime(2008, 9, 1, 22, 43, 29, 0, DateTimeZone.UTC);
-    public static final DateTime NEXT_UPDATE_TIME = new DateTime(2008, 9, 2, 6, 43, 29, 0, DateTimeZone.UTC);
+    public static final Instant THIS_UPDATE_TIME = ZonedDateTime.of(2008, 9, 1, 22, 43, 29, 0, ZoneOffset.UTC).toInstant();
+    public static final Instant NEXT_UPDATE_TIME = ZonedDateTime.of(2008, 9, 2, 6, 43, 29, 0, ZoneOffset.UTC).toInstant();
 
     public static final byte[] FOO_CONTENT = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32};
 
@@ -141,7 +142,6 @@ public class ManifestCmsParserTest {
         String location = "unknown.mft";
         parser = new ManifestCmsParser();
 
-        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
         builder.withCertificate(createValidManifestEECertificate()).withManifestNumber(BigInteger.valueOf(68));
         builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
@@ -152,14 +152,9 @@ public class ManifestCmsParserTest {
         parser.parse(location, builder.build(TEST_KEY_PAIR.getPrivate()).getEncoded());
     }
 
-    @After
-    public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
-    }
-
     @Test
     public void shouldDecodeFileAndHash() {
-        Map<String, byte[]> actual = new TreeMap<String, byte[]>();
+        Map<String, byte[]> actual = new TreeMap<>();
         parser.decodeFileAndHash(actual, decode(ENCODED_FILE_AND_HASH_1));
         assertEquals(1, actual.size());
         assertTrue(actual.containsKey("foo1"));
@@ -168,14 +163,14 @@ public class ManifestCmsParserTest {
 
     @Test
     public void shouldDecodeEmptyFileList() {
-        Map<String, byte[]> actual = new TreeMap<String, byte[]>();
+        Map<String, byte[]> actual = new TreeMap<>();
         parser.decodeFileList(actual, decode(ENCODED_EMPTY_FILE_LIST));
         assertTrue(actual.isEmpty());
     }
 
     @Test
     public void shouldDecodeFileList() {
-        Map<String, byte[]> actual = new TreeMap<String, byte[]>();
+        Map<String, byte[]> actual = new TreeMap<>();
         parser.decodeFileList(actual, decode(ENCODED_FILE_LIST));
         assertEquals(2, actual.size());
         assertTrue(actual.containsKey("foo1"));
@@ -196,7 +191,6 @@ public class ManifestCmsParserTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRejectManifestWithNonInheritEECert() {
-        DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
 
         // Use 10/8 EE cert
@@ -210,7 +204,8 @@ public class ManifestCmsParserTest {
          * Tested this way because we have no other way to create an invalid manifest. The actual
          * code enforcing this check *is* in the parser class though. So this will also work for
          * Manifests set up by others. Our manifest builder uses this parser under the hood to this
-         * validation just after creation of a new object, and before returning it, when we ask it to build..
+         * validation just after creation of a new object, and before returning it, when we ask it to
+         * build.
          */
         builder.build(TEST_KEY_PAIR.getPrivate());
     }

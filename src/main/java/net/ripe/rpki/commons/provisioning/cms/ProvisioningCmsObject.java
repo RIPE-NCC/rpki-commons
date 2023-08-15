@@ -1,25 +1,25 @@
 package net.ripe.rpki.commons.provisioning.cms;
 
-import com.google.common.base.Preconditions;
-import lombok.NonNull;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
-import org.joda.time.DateTime;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 
 
 public class ProvisioningCmsObject {
 
-    private byte[] encodedContent;
+    private final byte[] encodedContent;
     private final X509Certificate cmsCertificate;
     private final Collection<X509Certificate> caCertificates;
     private final X509CRL crl;
-    private AbstractProvisioningPayload payload;
-    /** Signing time MUST be present https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.3 */
-    private final DateTime signingTime;
+    private final AbstractProvisioningPayload payload;
+    /** Signing time MUST be present {@see https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.3} */
+    private final @Nullable Instant signingTime;
 
     // No support for signingTime, which is a required attribute for valid objects.
     @Deprecated
@@ -34,7 +34,7 @@ public class ProvisioningCmsObject {
         this.signingTime = null;
     }
 
-    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload, @NonNull DateTime signingTime) {
+    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload, @NotNull Instant signingTime) {
         // -
         // ArrayIsStoredDirectly
         this.encodedContent = encodedContent;
@@ -79,7 +79,7 @@ public class ProvisioningCmsObject {
      * href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2"
      * >http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2</a><br >
      */
-    public DateTime getSigningTime() {
+    public Instant getSigningTime() {
         return signingTime;
     }
 

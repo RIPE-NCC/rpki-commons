@@ -2,10 +2,11 @@ package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.joda.time.DateTime;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.createValidManifestEECertificate;
@@ -25,9 +26,9 @@ public class ManifestCMSBuilderPropertyTest {
             builder.withManifestNumber(manifestNumber);
             builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
             builder.withCertificate(createValidManifestEECertificate(TEST_KEY_PAIR));
-            DateTime start = DateTime.now();
-            builder.withThisUpdateTime(start);
-            builder.withNextUpdateTime(start.plusHours(validityHours));
+            var start = ZonedDateTime.now(ZoneOffset.UTC);
+            builder.withThisUpdateTime(start.toInstant());
+            builder.withNextUpdateTime(start.plusHours(validityHours).toInstant());
             ManifestCms manifestCms = builder.build(TEST_KEY_PAIR.getPrivate());
 
             ManifestCmsParser mftParser = new ManifestCmsParser();

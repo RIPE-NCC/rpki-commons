@@ -9,8 +9,7 @@ import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-
-import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * See https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-07.
@@ -35,7 +34,7 @@ public class AspaCms extends RpkiSignedObject {
      * providerASSET) to propagate prefixes in the specified address family
      * other ASes.
      */
-    @NonNull
+    @NotNull
     Asn customerAsn;
 
     /**
@@ -43,10 +42,10 @@ public class AspaCms extends RpkiSignedObject {
      * authorized to further propagate announcements in the specified
      * address family received from the customer.
      */
-    @NonNull
+    @NotNull
     ImmutableSortedSet<ProviderAS> providerASSet;
 
-    public AspaCms(RpkiSignedObjectInfo cmsObjectData, int version, Asn customerAsn, ImmutableSortedSet<ProviderAS> providerASSet) {
+    public AspaCms(RpkiSignedObjectInfo cmsObjectData, int version, @NotNull Asn customerAsn, @NotNull ImmutableSortedSet<ProviderAS> providerASSet) {
         super(cmsObjectData);
         Validate.isTrue(version == 0, "version must be 0");
         this.version = version;

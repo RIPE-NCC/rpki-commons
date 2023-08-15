@@ -1,7 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
-import lombok.NonNull;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
@@ -11,6 +10,7 @@ import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERSequence;
+import org.jetbrains.annotations.NotNull;
 
 import java.security.PrivateKey;
 
@@ -37,7 +37,7 @@ public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
         return this;
     }
 
-    public AspaCmsBuilder withCustomerAsn(@NonNull Asn customerAsn) {
+    public AspaCmsBuilder withCustomerAsn(@NotNull Asn customerAsn) {
         this.customerAsn = customerAsn;
         return this;
     }

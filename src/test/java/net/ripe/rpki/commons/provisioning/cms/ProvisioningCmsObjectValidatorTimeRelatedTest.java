@@ -6,14 +6,13 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +24,8 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
 
     private ValidationResult validationResult;
 
+    private Clock clock = Clock.systemUTC();
+
     @BeforeEach
     public void setup() {
         validationResult = ValidationResult.withLocation("n/a");
@@ -33,11 +34,6 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
         ca1CmsObject = readProvisioningPDU("src/test/resources/interop/up-down/krill-ca1-list-pdu.der");
         ca1IdCert = readProvisioningIdentityCertificate("src/test/resources/interop/up-down/krill-ca1-id-cert.der");
         ca2IdCert = readProvisioningIdentityCertificate("src/test/resources/interop/up-down/krill-ca2-id-cert.der");
-    }
-
-    @AfterEach
-    public void restoreClock() {
-        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @SneakyThrows
@@ -57,12 +53,12 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
     }
 
 
-    private static void validateObjects(ValidationResult validationResult, ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate idCert) {
+    private void validateObjects(ValidationResult validationResult, ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate idCert) {
         validateObjectsWithLastSigningTime(validationResult, null, cmsObject, idCert);
     }
 
 
-    private static void validateObjectsWithLastSigningTime(ValidationResult validationResult, DateTime lastSigningTime, ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate idCert) {
+    private void validateObjectsWithLastSigningTime(ValidationResult validationResult, Instant lastSigningTime, ProvisioningCmsObject cmsObject, ProvisioningIdentityCertificate idCert) {
         ProvisioningCmsObjectValidator subject = new ProvisioningCmsObjectValidator(
                 ValidationOptions.strictValidation(),
                 Optional.ofNullable(lastSigningTime),
@@ -70,7 +66,7 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
                 idCert
         );
 
-        subject.validate(validationResult);
+        subject.validate(validationResult.withClock(clock));
     }
 
     //
@@ -78,8 +74,8 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
     //
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_cms_sig_not_from_id_cert() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_cms_sig_not_from_id_cert() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T12:39:46.000Z"), ZoneOffset.UTC);
 
         assertThat(ca1IdCert.getPublicKey()).isNotEqualTo(ca2IdCert.getPublicKey());
         validateObjects(validationResult, ca1CmsObject, ca2IdCert);
@@ -99,40 +95,40 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
     //
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_cms_ee_not_valid_yet() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T10:00:00Z").getMillis());
+    void testValidateProvisioningCmsAndIdentityCertificate_cms_ee_not_valid_yet() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T10:00:00Z"), ZoneOffset.UTC);
 
         validateObjects(validationResult, ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isTrue();
     }
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_both_certs_not_valid_yet() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2021-01-11T10:00:00Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_both_certs_not_valid_yet() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T10:00:00Z"), ZoneOffset.UTC);
 
         validateObjects(validationResult, ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isTrue();
     }
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_current_certs() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_current_certs() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T12:39:46.000Z"), ZoneOffset.UTC);
 
         validateObjects(validationResult, ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isFalse();
     }
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_cms_ee_expired() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-13T12:39:46.000Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_cms_ee_expired() {
+        clock = Clock.fixed(Instant.parse("2022-01-13T12:39:46.000Z"), ZoneOffset.UTC);
 
         validateObjects(validationResult, ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isTrue();
     }
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_two_expired_certs() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2040-01-11T10:00:00Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_two_expired_certs() {
+        clock = Clock.fixed(Instant.parse("2024-01-11T10:00:00Z"), ZoneOffset.UTC);
 
         validateObjects(validationResult, ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isTrue();
@@ -149,24 +145,24 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
     //
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_no_last() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_no_last() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T12:39:46.000Z"), ZoneOffset.UTC);
 
         validateObjectsWithLastSigningTime(validationResult, null, ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isFalse();
     }
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_after_last() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_after_last() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T12:39:46.000Z"), ZoneOffset.UTC);
 
-        validateObjectsWithLastSigningTime(validationResult, DateTime.parse("2022-01-11T11:00:00.000Z"), ca1CmsObject, ca1IdCert);
+        validateObjectsWithLastSigningTime(validationResult, Instant.parse("2022-01-11T11:00:00.000Z"), ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isFalse();
     }
 
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_at_last() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_at_last() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T12:39:46.000Z"), ZoneOffset.UTC);
 
         validateObjectsWithLastSigningTime(validationResult, ca1CmsObject.getSigningTime(), ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isFalse();
@@ -174,10 +170,10 @@ public class ProvisioningCmsObjectValidatorTimeRelatedTest {
 
     // i.e. replay of an object
     @Test
-    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_before_last() throws IOException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2022-01-11T12:39:46.000Z").getMillis());
+    public void testValidateProvisioningCmsAndIdentityCertificate_signing_time_before_last() {
+        clock = Clock.fixed(Instant.parse("2022-01-11T12:39:46.000Z"), ZoneOffset.UTC);
 
-        validateObjectsWithLastSigningTime(validationResult, DateTime.parse("2022-01-11T13:00:00.000Z"), ca1CmsObject, ca1IdCert);
+        validateObjectsWithLastSigningTime(validationResult, Instant.parse("2022-01-11T13:00:00.000Z"), ca1CmsObject, ca1IdCert);
         assertThat(validationResult.hasFailures()).isTrue();
     }
 }

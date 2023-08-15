@@ -12,14 +12,12 @@ import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildLooseValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
 import net.ripe.rpki.commons.validation.properties.IpResourceGen;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +26,9 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
     private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
-    private static final DateTime NOW = UTC.dateTime();
+    private static final ZonedDateTime NOW = ZonedDateTime.now(ZoneOffset.UTC);
     private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(NOW.minusMinutes(1), NOW.plusYears(1));
 
     private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=First Child, C=NL");
@@ -115,7 +116,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
 
     @Test
     public void shouldRejectRevokedCertificate() {
-        rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.getNotValidBefore().plusDays(2)).build(ROOT_KEY_PAIR.getPrivate());
+        rootCrl = getRootCRL().addEntry(FIRST_CHILD_SERIAL_NUMBER, VALIDITY_PERIOD.notValidBefore().plus(2, ChronoUnit.DAYS)).build(ROOT_KEY_PAIR.getPrivate());
 
         X509ResourceCertificateParentChildValidator validator = new X509ResourceCertificateParentChildValidator(options, result, root, rootCrl, root.getResources());
         validate(validator, child);
@@ -377,8 +378,8 @@ public class X509ResourceCertificateParentChildValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withThisUpdateTime(VALIDITY_PERIOD.notValidBefore().plus(1, ChronoUnit.DAYS));
+        builder.withNextUpdateTime(ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

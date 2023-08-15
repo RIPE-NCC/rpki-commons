@@ -1,10 +1,7 @@
 package net.ripe.rpki.commons.crypto.crl;
 
-import lombok.EqualsAndHashCode;
-import lombok.Value;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
@@ -13,32 +10,23 @@ import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.joda.time.DateTime;
+import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
-import java.security.cert.X509CRLEntry;
-import java.security.cert.X509Certificate;
+import java.security.*;
+import java.security.cert.*;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public class X509Crl implements CertificateRepositoryObject {
 
@@ -131,12 +119,12 @@ public class X509Crl implements CertificateRepositoryObject {
         return X509CertificateUtil.getAuthorityKeyIdentifier(getCrl());
     }
 
-    public DateTime getThisUpdateTime() {
-        return UTC.dateTime(getCrl().getThisUpdate());
+    public Instant getThisUpdateTime() {
+        return Instant.ofEpochMilli(getCrl().getThisUpdate().getTime());
     }
 
-    public DateTime getNextUpdateTime() {
-        return UTC.dateTime(getCrl().getNextUpdate());
+    public Instant getNextUpdateTime() {
+        return Instant.ofEpochMilli(getCrl().getNextUpdate().getTime());
     }
 
     public X500Principal getIssuer() {
@@ -160,8 +148,8 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     @Override
-    public boolean isPastValidityTime() {
-        return getNextUpdateTime().isBeforeNow();
+    public boolean isPastValidityTime(@NotNull Instant instant) {
+        return getNextUpdateTime().isBefore(instant);
     }
 
     @Override
@@ -178,7 +166,7 @@ public class X509Crl implements CertificateRepositoryObject {
     }
 
     public SortedSet<Entry> getRevokedCertificates() {
-        SortedSet<Entry> result = new TreeSet<Entry>();
+        SortedSet<Entry> result = new TreeSet<>();
         Set<? extends X509CRLEntry> entries = getCrl().getRevokedCertificates();
         if (entries != null) {
             for (X509CRLEntry entry : entries) {
@@ -240,34 +228,21 @@ public class X509Crl implements CertificateRepositoryObject {
         return getCrl().isRevoked(certificate);
     }
 
-    public static class X509CRLEntryComparator implements Comparator<X509CRLEntry> {
-        @Override
-        public int compare(X509CRLEntry o1, X509CRLEntry o2) {
-            return o1.getSerialNumber().compareTo(o2.getSerialNumber());
-        }
-    }
-
-    @Value
-    public static class Entry implements Comparable<Entry>, Serializable {
-        private static final long serialVersionUID = 1L;
-        private final BigInteger serialNumber;
-        private final DateTime revocationDateTime;
-
-        public Entry(BigInteger serial, DateTime revocationDateTime) {
-            Validate.notNull(serial, "serial is required");
-            Validate.notNull(revocationDateTime, "revocationDateTime is required");
-            this.serialNumber = serial;
-            this.revocationDateTime = revocationDateTime.withMillisOfSecond(0);
+    public record Entry(@NotNull BigInteger serialNumber, @NotNull Instant revokedAt) implements Comparable<Entry> {
+        public Entry(@NotNull BigInteger serialNumber, @NotNull Instant revokedAt) {
+            Validate.notNull(serialNumber, "serial is required");
+            Validate.notNull(revokedAt, "revocationDateTime is required");
+            this.serialNumber = serialNumber;
+            this.revokedAt = revokedAt.truncatedTo(ChronoUnit.SECONDS);
         }
 
-        public Entry(X509CRLEntry entry) {
-            this.serialNumber = entry.getSerialNumber();
-            this.revocationDateTime = UTC.dateTime(entry.getRevocationDate());
+        public Entry(@NotNull X509CRLEntry entry) {
+            this(entry.getSerialNumber(), Instant.ofEpochMilli(entry.getRevocationDate().getTime()));
         }
 
         @Override
         public int compareTo(Entry o) {
-            return getSerialNumber().compareTo(o.getSerialNumber());
+            return serialNumber().compareTo(o.serialNumber());
         }
     }
 }

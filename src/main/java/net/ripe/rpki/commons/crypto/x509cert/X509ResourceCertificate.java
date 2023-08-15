@@ -14,9 +14,11 @@ import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateValidator;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.EnumSet;
 
 /**
@@ -118,8 +120,8 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
     }
 
     @Override
-    public boolean isPastValidityTime() {
-        return getValidityPeriod().isExpiredNow();
+    public boolean isPastValidityTime(@NotNull Instant instant) {
+        return getValidityPeriod().isExpiredAt(instant);
     }
 
     @Override

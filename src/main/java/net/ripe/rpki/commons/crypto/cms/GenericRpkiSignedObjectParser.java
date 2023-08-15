@@ -6,14 +6,15 @@ import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
 import net.ripe.rpki.commons.util.RepositoryObjectType;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.joda.time.DateTime;
+import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static net.ripe.rpki.commons.util.RepositoryObjectType.*;
 
 public class GenericRpkiSignedObjectParser extends RpkiSignedObjectParser {
-    public DateTime getSigningTime() {
+    public @Nullable Instant getSigningTime() {
         return super.getSigningTime();
     }
 

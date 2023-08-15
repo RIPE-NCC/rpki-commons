@@ -4,8 +4,6 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.File;
@@ -21,6 +19,8 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 /**
  * Caches generated keys in a key store so that they can be reused in the next test run. FOR TESTING ONLY!
@@ -91,7 +91,7 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withSignatureProvider("SunRsaSign");
         builder.withSerial(BigInteger.ONE);
-        final DateTime now = UTC.dateTime();
+        var now = ZonedDateTime.now(ZoneOffset.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now.minusYears(2), now.minusYears(1)));
         builder.withCa(false);
         builder.withIssuerDN(new X500Principal("CN=issuer"));

@@ -1,13 +1,13 @@
 package net.ripe.rpki.commons.crypto;
 
-import net.ripe.rpki.commons.util.EqualsSupport;
-import net.ripe.rpki.commons.util.UTC;
 import org.apache.commons.lang3.Validate;
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
-import org.joda.time.ReadableInstant;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.Serializable;
+import java.time.Instant;
+import java.time.Period;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -15,97 +15,64 @@ import java.util.Date;
  * have up-to second accuracy with validity fields, this class truncates not
  * before and not after to second accuracy.
  */
-public class ValidityPeriod extends EqualsSupport implements Serializable {
-    private static final long serialVersionUID = 2L;
-
-    private final DateTime notValidBefore;
-    private final DateTime notValidAfter;
-
-    public ValidityPeriod() {
-        this((Date) null, (Date) null);
+public record ValidityPeriod(@NotNull Instant notValidBefore, @NotNull Instant notValidAfter) {
+    public ValidityPeriod(@NotNull Instant notValidBefore, @NotNull Instant notValidAfter) {
+        this.notValidBefore = truncatedMillis(notValidBefore);
+        this.notValidAfter = truncatedMillis(notValidAfter);
+        Validate.isTrue(!this.notValidAfter.isBefore(this.notValidBefore), "Got an invalid validity time from: " + notValidBefore + " to: " + notValidAfter);
     }
 
-    public ValidityPeriod(ReadableInstant notValidBefore, ReadableInstant notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(UTC.dateTime(notValidBefore));
-        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(UTC.dateTime(notValidAfter));
-        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
+    public ValidityPeriod(@NotNull Date notValidBefore, @NotNull Date notValidAfter) {
+        this(Instant.ofEpochMilli(notValidBefore.getTime()), Instant.ofEpochMilli(notValidAfter.getTime()));
     }
 
-    public ValidityPeriod(Date notValidBefore, Date notValidAfter) {
-        this.notValidBefore = (notValidBefore == null) ? null : truncatedMillis(UTC.dateTime(notValidBefore));
-        this.notValidAfter = (notValidAfter == null) ? null : truncatedMillis(UTC.dateTime(notValidAfter));
-        Validate.isTrue(isDateOrderingValid(this.notValidBefore, this.notValidAfter), "Got an invalid validatity time from: " + notValidBefore + " to: " + notValidAfter);
+    public ValidityPeriod(@NotNull ZonedDateTime notValidBefore, @NotNull ZonedDateTime notValidAfter) {
+        this(notValidBefore.toInstant(), notValidAfter.toInstant());
     }
 
-    private static boolean isDateOrderingValid(DateTime notValidBefore, DateTime notValidAfter) {
-        return (notValidBefore == null || notValidAfter == null || notValidBefore.isEqual(notValidAfter) || notValidBefore.isBefore(notValidAfter));
+    public static ValidityPeriod of(@NotNull ZonedDateTime notValidBefore, @NotNull Period period) {
+        return new ValidityPeriod(notValidBefore, notValidBefore.plus(period));
+    }
+
+    private static boolean isDateOrderingValid(Instant notValidBefore, Instant notValidAfter) {
+        return !notValidAfter.isBefore(notValidBefore);
     }
 
     // Match resolution of certificate validity period (seconds)
-    private DateTime truncatedMillis(DateTime dateTime) {
-        return dateTime.withMillisOfSecond(0);
+    private Instant truncatedMillis(Instant instant) {
+        return instant.truncatedTo(ChronoUnit.SECONDS);
     }
 
-    public DateTime getNotValidAfter() {
-        return notValidAfter;
+    public ValidityPeriod withNotValidBefore(Instant notValidBefore) {
+        return new ValidityPeriod(notValidBefore, notValidAfter());
     }
 
-    public DateTime getNotValidBefore() {
-        return notValidBefore;
-    }
-
-    public ValidityPeriod withNotValidBefore(ReadableInstant notValidBefore) {
-        return new ValidityPeriod(notValidBefore, getNotValidAfter());
-    }
-
-    public ValidityPeriod withNotValidAfter(ReadableInstant notValidAfter) {
-        return new ValidityPeriod(getNotValidBefore(), notValidAfter);
+    public ValidityPeriod withNotValidAfter(Instant notValidAfter) {
+        return new ValidityPeriod(notValidBefore(), notValidAfter);
     }
 
     public boolean contains(ValidityPeriod other) {
-        return isValidAt(other.getNotValidBefore()) && isValidAt(other.getNotValidAfter());
+        return isValidAt(other.notValidBefore()) && isValidAt(other.notValidAfter());
     }
 
-    public boolean isExpiredNow() {
-        return isExpiredAt(new Instant());
+    public boolean isExpiredAt(@NotNull Instant instant) {
+        return instant.isAfter(notValidAfter());
     }
 
-    public boolean isExpiredAt(ReadableInstant instant) {
-        return notValidAfter != null && instant.isAfter(getNotValidAfter());
-    }
-
-    public boolean isValidNow() {
-        return isValidAt(new Instant());
-    }
-
-    public boolean isValidAt(ReadableInstant instant) {
-        if (instant == null) {
-            return !isClosed();
-        } else {
-            return (notValidBefore == null || !instant.isBefore(getNotValidBefore()))
-                    && (notValidAfter == null || !instant.isAfter(getNotValidAfter()));
-        }
+    public boolean isValidAt(@NotNull Instant instant) {
+        return !instant.isBefore(notValidBefore()) && !instant.isAfter(notValidAfter());
     }
 
     /**
-     * @return true if this instances notValidBefore and notValidAfter are both
-     *         specified.
-     */
-    public boolean isClosed() {
-        return notValidBefore != null && notValidAfter != null;
-    }
-
-    /**
-     * Calculates the intersection of two validity periods, taking into account
-     * open-ended validity periods.
+     * Calculates the intersection of two validity periods.
      *
      * @param other the validity period to intersect with.
      * @return the intersection of this and the other validity period, or null
      *         if there is no overlap.
      */
-    public ValidityPeriod intersectedWith(ValidityPeriod other) {
-        DateTime latestNotValidBefore = latestDateTimeOf(notValidBefore, other.notValidBefore);
-        DateTime earliestNotValidAfter = earliestDateTimeOf(notValidAfter, other.notValidAfter);
+    public @Nullable ValidityPeriod intersectedWith(@NotNull ValidityPeriod other) {
+        Instant latestNotValidBefore = latestDateTimeOf(notValidBefore, other.notValidBefore);
+        Instant earliestNotValidAfter = earliestDateTimeOf(notValidAfter, other.notValidAfter);
         if (isDateOrderingValid(latestNotValidBefore, earliestNotValidAfter)) {
             return new ValidityPeriod(latestNotValidBefore, earliestNotValidAfter);
         } else {
@@ -114,28 +81,16 @@ public class ValidityPeriod extends EqualsSupport implements Serializable {
         }
     }
 
-    private DateTime earliestDateTimeOf(DateTime date1, DateTime date2) {
-        if (date1 == null) {
-            return date2;
-        }
-        if (date2 == null) {
-            return date1;
-        }
+    private Instant earliestDateTimeOf(Instant date1, Instant date2) {
         return date1.isBefore(date2) ? date1 : date2;
     }
 
-    private DateTime latestDateTimeOf(DateTime date1, DateTime date2) {
-        if (date1 == null) {
-            return date2;
-        }
-        if (date2 == null) {
-            return date1;
-        }
+    private Instant latestDateTimeOf(Instant date1, Instant date2) {
         return date1.isAfter(date2) ? date1 : date2;
     }
 
     @Override
     public String toString() {
-        return getNotValidBefore() + " - " + getNotValidAfter();
+        return notValidBefore() + " - " + notValidAfter();
     }
 }

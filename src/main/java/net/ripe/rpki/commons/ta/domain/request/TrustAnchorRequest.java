@@ -2,12 +2,9 @@ package net.ripe.rpki.commons.ta.domain.request;
 
 
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
-import org.joda.time.DateTimeUtils;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TrustAnchorRequest implements Serializable {
@@ -20,7 +17,7 @@ public class TrustAnchorRequest implements Serializable {
     private final X509CertificateInformationAccessDescriptor[] siaDescriptors;
 
     public TrustAnchorRequest(URI taCertificatePublicationUri, X509CertificateInformationAccessDescriptor[] siaDescriptors, List<TaRequest> taRequests) {
-        this.creationTimestamp = DateTimeUtils.currentTimeMillis();
+        this.creationTimestamp = System.currentTimeMillis();
         this.taCertificatePublicationUri = taCertificatePublicationUri;
         this.taRequests = taRequests;
         this.siaDescriptors = siaDescriptors;

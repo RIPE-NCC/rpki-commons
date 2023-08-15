@@ -7,7 +7,7 @@ import net.ripe.rpki.commons.crypto.cms.aspa.AspaCmsTest;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsTest;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
+import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsObjectMother;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -18,6 +18,8 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import org.junit.Test;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.createCertificateRepositoryObject;
@@ -78,7 +80,7 @@ public class CertificateRepositoryObjectFactoryTest {
     @Test
     public void shouldParseRoaCms() {
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("roa.roa"));
-        RoaCms roaCms = RoaCmsTest.getRoaCms();
+        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(ZonedDateTime.now(ZoneOffset.UTC));
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(roaCms.getEncoded(), validationResult);
 

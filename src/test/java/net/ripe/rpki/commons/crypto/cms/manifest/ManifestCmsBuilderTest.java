@@ -1,9 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
-import net.ripe.rpki.commons.FixedDateRule;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -16,9 +14,6 @@ import static org.junit.Assert.*;
 
 
 public class ManifestCmsBuilderTest {
-
-    @Rule
-    public FixedDateRule fixedDateRule = new FixedDateRule(THIS_UPDATE_TIME);
 
     private ManifestCmsBuilder subject = new ManifestCmsBuilder();
 

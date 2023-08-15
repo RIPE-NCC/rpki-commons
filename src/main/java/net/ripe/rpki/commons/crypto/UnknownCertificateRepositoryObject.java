@@ -5,8 +5,10 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
+import java.time.Instant;
 
 import static net.ripe.rpki.commons.validation.ValidationString.VALIDATOR_REPO_EXECUTION;
 
@@ -36,7 +38,7 @@ public class UnknownCertificateRepositoryObject implements CertificateRepository
     }
 
     @Override
-    public boolean isPastValidityTime() {
+    public boolean isPastValidityTime(@NotNull Instant instant) {
         throw new UnsupportedOperationException("Unknown object type");
     }
 

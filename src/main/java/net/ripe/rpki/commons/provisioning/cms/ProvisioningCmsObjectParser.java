@@ -37,7 +37,6 @@ import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.util.StoreException;
-import org.joda.time.DateTime;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -50,6 +49,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.*;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
@@ -67,7 +67,7 @@ public class ProvisioningCmsObjectParser {
 
     private X509Certificate cmsCertificate;
 
-    private Collection<X509Certificate> caCertificates = new HashSet<X509Certificate>();
+    private Collection<X509Certificate> caCertificates = new HashSet<>();
 
     private X509CRL crl;
 
@@ -79,7 +79,7 @@ public class ProvisioningCmsObjectParser {
     private AbstractProvisioningPayload payload;
 
     @Setter(AccessLevel.PRIVATE)
-    private DateTime signingTime;
+    private Instant signingTime;
 
     public ProvisioningCmsObjectParser() {
         this(ValidationResult.withLocation("n/a"));
@@ -118,7 +118,7 @@ public class ProvisioningCmsObjectParser {
 
     private String extractMessages(CMSException e) {
         Throwable t = e;
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         while (t != null && !messages.contains(t.getMessage())) {
             messages.add(t.getMessage());
             t = t.getCause();
@@ -397,10 +397,10 @@ public class ProvisioningCmsObjectParser {
     private void verifySigningTime(SignerInformation signer) {
         final SigningInformationUtil.SigningTimeResult signingTimeResult = SigningInformationUtil.extractSigningTime(validationResult, signer);
 
-        if (!validationResult.rejectIfFalse(signingTimeResult.optionalSigningTime.isPresent(), SIGNING_TIME_ATTR_PRESENT)) {
+        if (!validationResult.rejectIfFalse(signingTimeResult.optionalSigningTime().isPresent(), SIGNING_TIME_ATTR_PRESENT)) {
             return;
         }
-        this.signingTime = signingTimeResult.getOptionalSigningTime().get();
+        this.signingTime = signingTimeResult.optionalSigningTime().get();
     }
 
     /**

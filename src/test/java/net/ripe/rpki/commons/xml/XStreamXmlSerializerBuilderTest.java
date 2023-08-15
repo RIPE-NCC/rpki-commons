@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.xml;
 
-import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.security.ForbiddenClassException;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
@@ -8,20 +7,19 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsTest;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest;
+import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsObjectMother;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.util.VersionedId;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
@@ -49,8 +47,13 @@ public class XStreamXmlSerializerBuilderTest {
         XStreamXmlSerializerBuilder<ValidityPeriod> builder = new XStreamXmlSerializerBuilder<>(ValidityPeriod.class, NOT_STRICT);
         XStreamXmlSerializer<ValidityPeriod> serializer = builder.build();
 
-        String serializedData = serializer.serialize(new ValidityPeriod());
-        Assert.assertEquals("<ValidityPeriod/>", serializedData);
+        var now = ZonedDateTime.of(2023, 7, 21, 12, 5, 37, 0, ZoneOffset.UTC);
+        String serializedData = serializer.serialize(new ValidityPeriod(now, now));
+        Assert.assertEquals("""
+            <ValidityPeriod>
+              <notValidBefore>2023-07-21T12:05:37Z</notValidBefore>
+              <notValidAfter>2023-07-21T12:05:37Z</notValidAfter>
+            </ValidityPeriod>""", serializedData);
     }
 
     @Test
@@ -77,9 +80,9 @@ public class XStreamXmlSerializerBuilderTest {
 
     @Test
     public void shouldAliasDateTimeAndUseConverter() {
-        XStreamXmlSerializerBuilder<DateTime> builder = new XStreamXmlSerializerBuilder<>(DateTime.class, NOT_STRICT);
-        XStreamXmlSerializer<DateTime> serializer = builder.build();
-        DateTime dateTime = new DateTime(2011, 1, 31, 13, 59, 59, 0, DateTimeZone.UTC);
+        XStreamXmlSerializerBuilder<Instant> builder = new XStreamXmlSerializerBuilder<>(Instant.class, NOT_STRICT);
+        XStreamXmlSerializer<Instant> serializer = builder.build();
+        Instant dateTime = ZonedDateTime.of(2011, 1, 31, 13, 59, 59, 0, ZoneOffset.UTC).toInstant();
 
         String serializedData = serializer.serialize(dateTime);
         Assert.assertEquals("<datetime>2011-01-31T13:59:59Z</datetime>", serializedData);
@@ -90,23 +93,11 @@ public class XStreamXmlSerializerBuilderTest {
     public void shouldConvertDateTimeFromTimeStamp() {
         XStreamXmlSerializerBuilder<Timestamp> builder = new XStreamXmlSerializerBuilder<>(Timestamp.class, NOT_STRICT);
         XStreamXmlSerializer<Timestamp> serializer = builder.build();
-        Timestamp timestamp = new Timestamp(new DateTime(2011, 1, 31, 13, 59, 59, 0, DateTimeZone.UTC).getMillis());
+        Timestamp timestamp = new Timestamp(ZonedDateTime.of(2011, 1, 31, 13, 59, 59, 4_000_000, ZoneOffset.UTC).toInstant().toEpochMilli());
 
         String serializedData = serializer.serialize(timestamp);
-        Assert.assertEquals("<sql-timestamp>2011-01-31T13:59:59.000Z</sql-timestamp>", serializedData);
+        Assert.assertEquals("<sql-timestamp>2011-01-31T13:59:59.004Z</sql-timestamp>", serializedData);
         assertEquals(timestamp, serializer.deserialize(serializedData));
-    }
-
-    @Test
-    public void shouldConvertDateTimeFromReadablePeriod() {
-        XStreamXmlSerializerBuilder<Period> builder = new XStreamXmlSerializerBuilder<>(Period.class, NOT_STRICT);
-        XStreamXmlSerializer<Period> serializer = builder.build();
-        DateTime now = UTC.dateTime();
-        Period period = new Period(now, now.plusHours(1));
-
-        String serializedData = serializer.serialize(period);
-        Assert.assertEquals("<org.joda.time.Period>PT1H</org.joda.time.Period>", serializedData);
-        assertEquals(period, serializer.deserialize(serializedData));
     }
 
     @Test
@@ -157,7 +148,7 @@ public class XStreamXmlSerializerBuilderTest {
     public void shouldConvertRoaCms() {
         XStreamXmlSerializerBuilder<RoaCms> builder = new XStreamXmlSerializerBuilder<>(RoaCms.class, NOT_STRICT);
         XStreamXmlSerializer<RoaCms> serializer = builder.build();
-        RoaCms roaCms = RoaCmsTest.getRoaCms();
+        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(ZonedDateTime.now(ZoneOffset.UTC));
 
         String serializedData = serializer.serialize(roaCms);
         Assert.assertTrue(Pattern.matches("<RoaCms>\\s*<encoded>[^<]+</encoded>\\s*</RoaCms>", serializedData));
@@ -285,7 +276,7 @@ public class XStreamXmlSerializerBuilderTest {
     }
 
     @Test
-    public void shouldNotDeserializeUnknownTypeInObjectField() throws Throwable {
+    public void shouldNotDeserializeUnknownTypeInObjectField() {
         // Similar to above but without the alias
         XStreamXmlSerializerBuilder<OtherSerializeMe> builder = new XStreamXmlSerializerBuilder<>(OtherSerializeMe.class, NOT_STRICT);
         XStreamXmlSerializer<OtherSerializeMe> serializer = builder.build();
@@ -300,21 +291,22 @@ public class XStreamXmlSerializerBuilderTest {
     @Test
     public void shouldNotPopCalculatorApp() {
         // Exploit example from https://www.baeldung.com/java-xstream-remote-code-execution
-        final String potentialRceXML = "<sorted-set>\n" +
-                "    <string>foo</string>\n" +
-                "    <dynamic-proxy>\n" +
-                "        <interface>java.lang.Comparable</interface>\n" +
-                "        <handler class=\"java.beans.EventHandler\">\n" +
-                "            <target class=\"java.lang.ProcessBuilder\">\n" +
-                "                <command>\n" +
-                "                    <string>open</string>\n" +
-                "                    <string>/Applications/Calculator.app</string>\n" +
-                "                </command>\n" +
-                "            </target>\n" +
-                "            <action>start</action>\n" +
-                "        </handler>\n" +
-                "    </dynamic-proxy>\n" +
-                "</sorted-set>";
+        final String potentialRceXML = """
+            <sorted-set>
+                <string>foo</string>
+                <dynamic-proxy>
+                    <interface>java.lang.Comparable</interface>
+                    <handler class="java.beans.EventHandler">
+                        <target class="java.lang.ProcessBuilder">
+                            <command>
+                                <string>open</string>
+                                <string>/Applications/Calculator.app</string>
+                            </command>
+                        </target>
+                        <action>start</action>
+                    </handler>
+                </dynamic-proxy>
+            </sorted-set>""";
 
         XStreamXmlSerializer<SerializeMe> serializer = new XStreamXmlSerializerBuilder<>(SerializeMe.class, NOT_STRICT)
             .withAllowedTypeHierarchy(SortedSet.class)

@@ -13,10 +13,12 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERSequence;
-import org.joda.time.DateTime;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,8 +26,8 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
 
     private X509ResourceCertificate certificate;
     private BigInteger number;
-    private DateTime thisUpdateTime;
-    private DateTime nextUpdateTime;
+    private Instant thisUpdateTime;
+    private Instant nextUpdateTime;
     private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
     private Map<String, byte[]> files = new TreeMap<>();
 
@@ -47,12 +49,12 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
         return this;
     }
 
-    public ManifestCmsBuilder withThisUpdateTime(DateTime instant) {
+    public ManifestCmsBuilder withThisUpdateTime(@NotNull Instant instant) {
         this.thisUpdateTime = instant;
         return this;
     }
 
-    public ManifestCmsBuilder withNextUpdateTime(DateTime instant) {
+    public ManifestCmsBuilder withNextUpdateTime(@NotNull Instant instant) {
         this.nextUpdateTime = instant;
         return this;
     }
@@ -99,8 +101,8 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     byte[] encodeManifest() {
         ASN1Encodable[] seq = {
                 new ASN1Integer(number),
-                new ASN1GeneralizedTime(thisUpdateTime.toDate()),
-                new ASN1GeneralizedTime(nextUpdateTime.toDate()),
+                new ASN1GeneralizedTime(new Date(thisUpdateTime.toEpochMilli())),
+                new ASN1GeneralizedTime(new Date(nextUpdateTime.toEpochMilli())),
                 new ASN1ObjectIdentifier(ManifestCms.FILE_HASH_ALGORITHM),
                 encodeFileList()
         };

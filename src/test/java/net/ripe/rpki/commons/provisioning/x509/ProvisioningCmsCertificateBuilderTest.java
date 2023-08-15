@@ -3,8 +3,6 @@ package net.ripe.rpki.commons.provisioning.x509;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +11,8 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -122,7 +122,7 @@ public class ProvisioningCmsCertificateBuilderTest {
 
     @Test
     public void shouldSetValidityPeriod() {
-        final DateTime now = UTC.dateTime();
+        var now = ZonedDateTime.now(ZoneOffset.UTC);
         final ValidityPeriod yearInDays = new ValidityPeriod(now, now.plusDays(365));
 
         final X509Certificate certificate = subject.withValidityPeriod(yearInDays).build().getCertificate();

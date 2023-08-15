@@ -22,20 +22,18 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.VersionedId;
 import net.ripe.rpki.commons.validation.roa.AnnouncedRoute;
 import net.ripe.rpki.commons.validation.roa.RouteValidityState;
-import net.ripe.rpki.commons.xml.converters.DateTimeConverter;
+import net.ripe.rpki.commons.xml.converters.InstantConverter;
 import net.ripe.rpki.commons.xml.converters.IpResourceConverter;
 import net.ripe.rpki.commons.xml.converters.IpResourceSetConverter;
 import net.ripe.rpki.commons.xml.converters.JavaUtilTimestampConverter;
 import net.ripe.rpki.commons.xml.converters.ManifestCmsConverter;
-import net.ripe.rpki.commons.xml.converters.ReadablePeriodConverter;
 import net.ripe.rpki.commons.xml.converters.RoaCmsConverter;
 import net.ripe.rpki.commons.xml.converters.VersionedIdConverter;
 import net.ripe.rpki.commons.xml.converters.X500PrincipalConverter;
 import net.ripe.rpki.commons.xml.converters.X509ResourceCertificateConverter;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import javax.security.auth.x500.X500Principal;
+import java.time.Instant;
 
 public class XStreamXmlSerializerBuilder<T> {
 
@@ -43,15 +41,15 @@ public class XStreamXmlSerializerBuilder<T> {
     private static final boolean NOT_STRICT = false;
     private XStream xStream;
 
-    private Class<T> objectType;
+    private final Class<T> objectType;
 
 
     public static <C> XStreamXmlSerializerBuilder<C> newStrictXmlSerializerBuilder(Class<C> objectType) {
-        return new XStreamXmlSerializerBuilder<C>(objectType, STRICT);
+        return new XStreamXmlSerializerBuilder<>(objectType, STRICT);
     }
 
     public static <C> XStreamXmlSerializerBuilder<C> newForgivingXmlSerializerBuilder(Class<C> objectType) {
-        return new XStreamXmlSerializerBuilder<C>(objectType, NOT_STRICT);
+        return new XStreamXmlSerializerBuilder<>(objectType, NOT_STRICT);
     }
 
     protected XStreamXmlSerializerBuilder(Class<T> objectType, boolean strict) {
@@ -115,27 +113,25 @@ public class XStreamXmlSerializerBuilder<T> {
 
     private void registerDateTimeRelated() {
         // Explictly allow Period without aliasing.
-        withAllowedType(Period.class);
-        withAliasType("datetime", DateTime.class);
-        withConverter(new DateTimeConverter());
-        withConverter(new ReadablePeriodConverter());
+        withAliasClass("datetime", Instant.class);
+        withConverter(new InstantConverter());
         withConverter(new JavaUtilTimestampConverter());
-        withAliasType("ValidityPeriod", ValidityPeriod.class);
+        withAliasClass("ValidityPeriod", ValidityPeriod.class);
     }
 
     private void registerRpkiRelated() {
-        withAliasType("X509ResourceCertificate", X509ResourceCertificate.class);
-        withAliasType("X509Crl", X509Crl.class);
-        withAliasType("ManifestCms", ManifestCms.class);
-        withAliasType("RoaCms", RoaCms.class);
-        withAliasType("RouteValidityState", RouteValidityState.class);
-        withAliasType("RoaPrefix", RoaPrefix.class);
-        withAliasType("AnnouncedRoute", AnnouncedRoute.class);
-        withAliasType("X509CertificateInformationAccessDescriptor", X509CertificateInformationAccessDescriptor.class);
+        withAliasClass("X509ResourceCertificate", X509ResourceCertificate.class);
+        withAliasClass("X509Crl", X509Crl.class);
+        withAliasClass("ManifestCms", ManifestCms.class);
+        withAliasClass("RoaCms", RoaCms.class);
+        withAliasClass("RouteValidityState", RouteValidityState.class);
+        withAliasClass("RoaPrefix", RoaPrefix.class);
+        withAliasClass("AnnouncedRoute", AnnouncedRoute.class);
+        withAliasClass("X509CertificateInformationAccessDescriptor", X509CertificateInformationAccessDescriptor.class);
 
-        withAliasType("principal", X500Principal.class);
+        withAliasClass("principal", X500Principal.class);
         withConverter(new X500PrincipalConverter());
-        withAliasType("versionedId", VersionedId.class);
+        withAliasClass("versionedId", VersionedId.class);
         withConverter(new VersionedIdConverter());
 
         withConverter(new X509ResourceCertificateConverter());
@@ -160,6 +156,11 @@ public class XStreamXmlSerializerBuilder<T> {
 
     public final XStreamXmlSerializerBuilder<T> withAliasType(String alias, Class<?> type) {
         xStream.aliasType(alias, type);
+        return this;
+    }
+
+    public final XStreamXmlSerializerBuilder<T> withAliasClass(String alias, Class<?> type) {
+        xStream.alias(alias, type);
         return this;
     }
 
@@ -199,14 +200,14 @@ public class XStreamXmlSerializerBuilder<T> {
     }
 
     public XStreamXmlSerializer<T> build() {
-        return new XStreamXmlSerializer<T>(xStream, objectType);
+        return new XStreamXmlSerializer<>(xStream, objectType);
     }
 
     protected XStream getXStream() {
         return xStream;
     }
 
-    private final static class MyXStream extends XStream {
+    private static final class MyXStream extends XStream {
 
         private MyXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
             super(new SunUnsafeReflectionProvider(), hierarchicalStreamDriver);
@@ -220,7 +221,6 @@ public class XStreamXmlSerializerBuilder<T> {
         protected MapperWrapper wrapMapper(MapperWrapper next) {
             return new MapperWrapper(next) {
                 @Override
-                @SuppressWarnings("rawtypes")
                 public boolean shouldSerializeMember(Class definedIn, String fieldName) {
                     return definedIn != Object.class && super.shouldSerializeMember(definedIn, fieldName);
                 }

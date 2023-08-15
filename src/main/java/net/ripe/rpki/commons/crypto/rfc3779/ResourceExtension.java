@@ -1,11 +1,11 @@
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import lombok.NonNull;
 import lombok.Value;
 import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.*;
@@ -22,10 +22,10 @@ public class ResourceExtension implements Serializable {
         }
     }
 
-    @NonNull EnumSet<IpResourceType> inheritedResourceTypes;
-    @NonNull ImmutableResourceSet resources;
+    private @NotNull EnumSet<IpResourceType> inheritedResourceTypes;
+    private @NotNull ImmutableResourceSet resources;
 
-    private ResourceExtension(@NonNull EnumSet<IpResourceType> inheritedResourceTypes, @NonNull ImmutableResourceSet resources) {
+    private ResourceExtension(@NotNull EnumSet<IpResourceType> inheritedResourceTypes, @NotNull ImmutableResourceSet resources) {
         Validate.isTrue(!inheritedResourceTypes.isEmpty() || !resources.isEmpty(), "empty resource extension");
         for (IpResourceType inheritedResourceType : inheritedResourceTypes) {
             if (resources.containsType(inheritedResourceType)) {

@@ -4,11 +4,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
-import net.ripe.rpki.commons.util.UTC;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,15 +12,15 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.cert.CertificateParsingException;
-import java.security.cert.X509Certificate;
+import java.time.Period;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER;
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class X509RouterCertificateBuilderTest {
@@ -38,8 +34,8 @@ public class X509RouterCertificateBuilderTest {
         subject.withSerial(BigInteger.ONE);
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        subject.withValidityPeriod(ValidityPeriod.of(now, Period.ofYears(1)));
         subject.withAsns(new int[]{1, 2, 3, 4, 5});
     }
 

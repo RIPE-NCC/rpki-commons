@@ -7,14 +7,12 @@ import net.ripe.rpki.commons.crypto.crl.CrlLocator;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.util.EnumSet;
 
 import static org.junit.Assert.*;
@@ -51,12 +50,8 @@ public class X509ResourceCertificateTest {
     private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private CrlLocator crlLocator;
 
-    private static final ValidityPeriod TEST_VALIDITY_PERIOD;
-
-    static {
-        final DateTime now = UTC.dateTime();
-        TEST_VALIDITY_PERIOD = new ValidityPeriod(now.minusMinutes(1), now.plusYears(100));
-    }
+    private static final Instant now = Instant.now();
+    private static final ValidityPeriod TEST_VALIDITY_PERIOD = new ValidityPeriod(now.minusSeconds(60), now.plusSeconds(100L * 60 * 60 * 24 * 365));
 
     private static final BigInteger TEST_SERIAL_NUMBER = BigInteger.valueOf(900);
 
@@ -266,13 +261,10 @@ public class X509ResourceCertificateTest {
                 .build();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
 
-        when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenAnswer(new Answer<X509Crl>() {
-            @Override
-            public X509Crl answer(InvocationOnMock invocationOnMock) throws Throwable {
-                assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
-                result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
-                return null;
-            }
+        when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenAnswer((Answer<X509Crl>) invocationOnMock -> {
+            assertEquals(CRL_DP_VALIDATION_LOCATION, result.getCurrentLocation());
+            result.rejectIfFalse(false, ValidationString.CRL_SIGNATURE_VALID);
+            return null;
         });
 
         result.setLocation(new ValidationLocation(TEST_TA_URI));
@@ -317,7 +309,7 @@ public class X509ResourceCertificateTest {
     @Test
     public void shouldNotBePastValidityTime() {
         X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
-        assertEquals(cert.getValidityPeriod().isExpiredNow(), cert.isPastValidityTime());
+        assertEquals(cert.getValidityPeriod().isExpiredAt(now), cert.isPastValidityTime(now));
     }
 
     @Test
@@ -334,9 +326,9 @@ public class X509ResourceCertificateTest {
                 .withSerial(serialNumber)
                 .build();
 
-        X509Crl crl = X509CrlTest.getCrlBuilder()
+        X509Crl crl = X509CrlTest.getCrlBuilder(Instant.now())
                 .withAuthorityKeyIdentifier(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic())
-                .addEntry(serialNumber, DateTime.now().minusDays(1))
+                .addEntry(serialNumber, Instant.now().minusSeconds(60 * 60 * 24))
                 .build(KeyPairFactoryTest.TEST_KEY_PAIR.getPrivate());
 
         CrlLocator crlLocator = Mockito.mock(CrlLocator.class);

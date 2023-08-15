@@ -1,22 +1,20 @@
 package net.ripe.rpki.commons.crypto.crl;
 
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidator;
-import org.joda.time.DateTime;
 
 import java.security.SignatureException;
 
 public class X509CrlValidator implements CertificateRepositoryObjectValidator<X509Crl> {
 
-    private AbstractX509CertificateWrapper parent;
+    private final AbstractX509CertificateWrapper parent;
 
-    private ValidationOptions options;
-    private ValidationResult result;
+    private final ValidationOptions options;
+    private final ValidationResult result;
 
 
     public X509CrlValidator(ValidationOptions options, ValidationResult result, AbstractX509CertificateWrapper parent) {
@@ -38,9 +36,9 @@ public class X509CrlValidator implements CertificateRepositoryObjectValidator<X5
     }
 
     private void checkValidityTimes(X509Crl crl) {
-        DateTime now = UTC.dateTime();
-        DateTime nextUpdateTime = crl.getNextUpdateTime();
-        DateTime thisUpdateTime = crl.getThisUpdateTime();
+        var now = result.now();
+        var nextUpdateTime = crl.getNextUpdateTime();
+        var thisUpdateTime = crl.getThisUpdateTime();
 
         result.rejectIfTrue(thisUpdateTime.isAfter(now), ValidationString.CRL_THIS_UPDATE_AFTER_NOW, thisUpdateTime.toString());
         if (options.isStrictManifestCRLValidityChecks()) {

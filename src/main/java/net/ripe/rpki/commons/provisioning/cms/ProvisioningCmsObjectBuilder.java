@@ -27,22 +27,14 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.joda.time.DateTimeUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.security.cert.X509Extension;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.security.cert.*;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -57,6 +49,8 @@ public class ProvisioningCmsObjectBuilder {
     private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
     private String payloadContent;
+
+    private Instant signingTime = Instant.now();
 
     public ProvisioningCmsObjectBuilder withCmsCertificate(X509Certificate cmsCertificate) {
         this.cmsCertificate = cmsCertificate;
@@ -78,6 +72,11 @@ public class ProvisioningCmsObjectBuilder {
         return this;
     }
 
+    public ProvisioningCmsObjectBuilder withSigningTime(@NotNull Instant signingTime) {
+        this.signingTime = signingTime;
+        return this;
+    }
+
     public ProvisioningCmsObject build(PrivateKey privateKey) {
         Validate.notEmpty(payloadContent, "Payload content is required");
 
@@ -94,7 +93,7 @@ public class ProvisioningCmsObjectBuilder {
                 .map(ValidationCheck::getKey)
                 .collect(Collectors.joining(","));
 
-            Validate.isTrue(false, "Validation of generated CMS object failed with following errors: " + message, ",");
+            throw new IllegalArgumentException("Validation of generated CMS object failed with following errors: " + message +  ".");
         }
 
         return parser.getProvisioningCmsObject();
@@ -113,7 +112,7 @@ public class ProvisioningCmsObjectBuilder {
         addCertificateAndCrl(generator);
         addSignerInfo(generator, privateKey);
 
-        CMSSignedData data = generator.generate(new CMSProcessableByteArray(CONTENT_TYPE, payloadContent.getBytes(Charset.forName("UTF-8"))), true);
+        CMSSignedData data = generator.generate(new CMSProcessableByteArray(CONTENT_TYPE, payloadContent.getBytes(StandardCharsets.UTF_8)), true);
 
         return data.getEncoded();
     }
@@ -145,7 +144,7 @@ public class ProvisioningCmsObjectBuilder {
         Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<>();
         // -
         // ReplaceHashtableWithMap
-        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(DateTimeUtils.currentTimeMillis()))));
+        Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(new Date(signingTime.toEpochMilli()))));
         attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
         return new AttributeTable(attributes);
     }

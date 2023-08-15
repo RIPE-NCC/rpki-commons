@@ -15,7 +15,7 @@ import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoVerifierBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.StoreException;
-import org.joda.time.DateTime;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.*;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
@@ -42,7 +43,7 @@ public abstract class RpkiSignedObjectParser {
 
     protected ASN1ObjectIdentifier contentType;
 
-    private Optional<DateTime> signingTime;
+    private Optional<Instant> signingTime;
 
     private ValidationResult validationResult;
 
@@ -76,7 +77,7 @@ public abstract class RpkiSignedObjectParser {
         return contentType;
     }
 
-    protected DateTime getSigningTime() {
+    protected @Nullable Instant getSigningTime() {
         return signingTime.orElse(null);
     }
 
@@ -226,10 +227,10 @@ public abstract class RpkiSignedObjectParser {
         }
 
         final SigningInformationUtil.SigningTimeResult st = SigningInformationUtil.extractSigningTime(validationResult, signer);
-        if (!st.valid) {
+        if (!st.valid()) {
             return;
         }
-        this.signingTime = st.optionalSigningTime;
+        this.signingTime = st.optionalSigningTime();
 
         verifySignature(certificate, signer);
     }

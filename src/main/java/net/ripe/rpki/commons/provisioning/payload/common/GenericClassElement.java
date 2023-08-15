@@ -4,9 +4,9 @@ import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.joda.time.DateTime;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,19 +23,19 @@ public class GenericClassElement extends EqualsSupport {
 
     private IpResourceSet resourceSetIpv6 = new IpResourceSet();
 
-    private List<CertificateElement> certificateElements = new ArrayList<CertificateElement>();
+    private List<CertificateElement> certificateElements = new ArrayList<>();
 
     private X509ResourceCertificate issuer;
 
-    private DateTime validityNotAfter;
+    private Instant validityNotAfter;
 
     private String siaHeadUri;
 
-    public DateTime getValidityNotAfter() {
+    public Instant getValidityNotAfter() {
         return validityNotAfter;
     }
 
-    public void setValidityNotAfter(DateTime validityNotAfter) {
+    public void setValidityNotAfter(Instant validityNotAfter) {
         this.validityNotAfter = validityNotAfter;
     }
 
@@ -94,15 +94,9 @@ public class GenericClassElement extends EqualsSupport {
 
         for (IpResource resource : ipResourceSet) {
             switch (resource.getType()) {
-                case ASN:
-                    asns.add(resource);
-                    break;
-                case IPv4:
-                    ipv4.add(resource);
-                    break;
-                case IPv6:
-                    ipv6.add(resource);
-                    break;
+                case ASN -> asns.add(resource);
+                case IPv4 -> ipv4.add(resource);
+                case IPv6 -> ipv6.add(resource);
             }
         }
 

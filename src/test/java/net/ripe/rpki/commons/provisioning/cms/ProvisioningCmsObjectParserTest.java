@@ -3,13 +3,13 @@ package net.ripe.rpki.commons.provisioning.cms;
 import com.google.common.io.Resources;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
+import java.time.Instant;
 
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +55,7 @@ public class ProvisioningCmsObjectParserTest {
 
         subject.parseCms(interopFileName, object);
         assertThat(subject.getValidationResult().hasFailures()).isFalse();
-        assertThat(subject.getProvisioningCmsObject().getSigningTime()).isBetween(DateTime.parse("2011-07-01T00:00:00Z"), DateTime.parse("2011-08-01T00:00:00Z"));
+        assertThat(subject.getProvisioningCmsObject().getSigningTime()).isBetween(Instant.parse("2011-07-01T00:00:00Z"), Instant.parse("2011-08-01T00:00:00Z"));
     }
 
     @Test

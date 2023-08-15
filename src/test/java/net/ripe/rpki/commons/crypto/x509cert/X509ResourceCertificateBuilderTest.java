@@ -3,19 +3,20 @@ package net.ripe.rpki.commons.crypto.x509cert;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
-import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
-import static org.junit.Assert.*;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class X509ResourceCertificateBuilderTest {
 
@@ -29,8 +30,8 @@ public class X509ResourceCertificateBuilderTest {
         subject.withSerial(BigInteger.ONE);
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        subject.withValidityPeriod(new ValidityPeriod(now, ZonedDateTime.of(now.getYear() + 1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)));
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
 

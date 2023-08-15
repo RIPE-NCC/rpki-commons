@@ -5,11 +5,12 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.net.URI;
+import java.time.Instant;
 
-public interface CertificateRepositoryObject extends Serializable {
+public interface CertificateRepositoryObject {
 
     URI getCrlUri();
 
@@ -18,7 +19,7 @@ public interface CertificateRepositoryObject extends Serializable {
     void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result);
     void validate(String location, CertificateRepositoryObjectValidationContext context, X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result);
 
-    boolean isPastValidityTime();
+    boolean isPastValidityTime(@NotNull Instant instant);
 
     boolean isRevoked();
 

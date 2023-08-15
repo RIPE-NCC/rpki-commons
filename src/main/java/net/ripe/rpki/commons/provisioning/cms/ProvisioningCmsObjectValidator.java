@@ -7,8 +7,8 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.joda.time.DateTime;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static net.ripe.rpki.commons.validation.ValidationString.SIGNING_TIME_GREATER_OR_EQUAL;
@@ -40,7 +40,7 @@ public class ProvisioningCmsObjectValidator {
      * rfc6492#3.1.1.6.4.3 requires that either one of the signing-time attribute or the binary-signing-time
      * attribute, or both attributes, MUST be present.
      */
-    private final Optional<DateTime> optionalLastSigningTime;
+    private final Optional<Instant> optionalLastSigningTime;
 
     // Prefer the constructor that moves the singning time check into this validator.
     @Deprecated
@@ -51,7 +51,7 @@ public class ProvisioningCmsObjectValidator {
         this.optionalLastSigningTime = Optional.empty();
     }
 
-    public ProvisioningCmsObjectValidator(ValidationOptions options, Optional<DateTime> lastSigningTime, ProvisioningCmsObject cmsObject,ProvisioningIdentityCertificate identityCertificate) {
+    public ProvisioningCmsObjectValidator(ValidationOptions options, Optional<Instant> lastSigningTime, ProvisioningCmsObject cmsObject,ProvisioningIdentityCertificate identityCertificate) {
         this.options = options;
         this.cmsObject = cmsObject;
         this.identityCertificate = identityCertificate;
@@ -91,7 +91,7 @@ public class ProvisioningCmsObjectValidator {
         //     signing-time attribute is greater than or equal to the time value
         //     passed in previously valid CMS objects that were passed from the
         //     same originator to this recipient. [...]
-        final DateTime thisSigningTime = cmsObject.getSigningTime();
+        final var thisSigningTime = cmsObject.getSigningTime();
 
         if (thisSigningTime != null) {
             optionalLastSigningTime.ifPresent(lastSigningTime ->

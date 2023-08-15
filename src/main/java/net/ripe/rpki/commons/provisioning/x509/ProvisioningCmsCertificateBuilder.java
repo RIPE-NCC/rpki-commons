@@ -2,14 +2,14 @@ package net.ripe.rpki.commons.provisioning.x509;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
-import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 
 public class ProvisioningCmsCertificateBuilder {
@@ -23,8 +23,8 @@ public class ProvisioningCmsCertificateBuilder {
     public ProvisioningCmsCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
 
-        final DateTime now = UTC.dateTime();
-        builderHelper.withValidityPeriod(new ValidityPeriod(now.minusMinutes(DEFAULT_VALIDITY_TIME_MINUTES_BEFORE_NOW), now.plusMinutes(DEFAULT_VALIDITY_TIME_MINUTES_FROM_NOW)));
+        final Instant now = Instant.now();
+        builderHelper.withValidityPeriod(new ValidityPeriod(now.minus(DEFAULT_VALIDITY_TIME_MINUTES_BEFORE_NOW, ChronoUnit.MINUTES), now.plus(DEFAULT_VALIDITY_TIME_MINUTES_FROM_NOW, ChronoUnit.MINUTES)));
     }
 
     public ProvisioningCmsCertificateBuilder withSignatureProvider(String signatureProvider) {

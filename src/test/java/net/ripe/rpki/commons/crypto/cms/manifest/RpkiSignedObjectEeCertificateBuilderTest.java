@@ -7,21 +7,19 @@ import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.x509cert.RpkiSignedObjectEeCertificateBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
-import net.ripe.rpki.commons.util.UTC;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.Instant;
 import java.util.EnumSet;
 
 import static org.junit.Assert.*;
 
 public class RpkiSignedObjectEeCertificateBuilderTest {
 
-    public static final int KEY_SIZE = 2048;
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
     private RpkiSignedObjectEeCertificateBuilder subject;
@@ -46,7 +44,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         subject.withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic());
 
 
-        DateTime now = UTC.dateTime();
+        var now = Instant.now();
         ValidityPeriod vp = new ValidityPeriod(now, now.plusSeconds(5));
 
         subject.withValidityPeriod(vp);
@@ -158,7 +156,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
         subject.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         subject.withIssuerDN(resourceCertificate.getSubject());
 
-        DateTime now = UTC.dateTime();
+        var now = Instant.now();
         subject.withValidityPeriod(new ValidityPeriod(now, now.plusSeconds(5)));
 
         URI publicationUri = URI.create("rsync://somewhere/certificate.cer");

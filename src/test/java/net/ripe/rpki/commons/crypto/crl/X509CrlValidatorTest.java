@@ -5,21 +5,23 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
-import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -34,8 +36,8 @@ public class X509CrlValidatorTest {
     private static final ValidityPeriod VALIDITY_PERIOD;
 
     static {
-        final DateTime now = UTC.dateTime();
-        VALIDITY_PERIOD = new ValidityPeriod(now.minusDays(2), now.plusDays(2));
+        var now = Instant.now();
+        VALIDITY_PERIOD = new ValidityPeriod(now.minus(2, ChronoUnit.DAYS), now.plus(2, ChronoUnit.DAYS));
     }
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -78,9 +80,9 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenThisUpdateInFuture() {
-        DateTime now = UTC.dateTime().withMillisOfSecond(0);
-        DateTime thisUpdateTime = now.plusDays(2);
-        DateTime nextUpdateTime = now.plusDays(4);
+        var now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        var thisUpdateTime = now.plus(2, ChronoUnit.DAYS);
+        var nextUpdateTime = now.plus(4, ChronoUnit.DAYS);
         X509Crl crl = getRootCRL().withThisUpdateTime(thisUpdateTime).withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
@@ -91,9 +93,9 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
-        options = ValidationOptions.withStaleConfigurations(Duration.standardDays(1), Duration.ZERO);
+        options = ValidationOptions.withStaleConfigurations(Duration.ofDays(1), Duration.ZERO);
 
-        DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
+        var nextUpdateTime = Instant.now().minusSeconds(1).truncatedTo(ChronoUnit.SECONDS);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
@@ -104,9 +106,9 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenNextUpdateOutsideMaxStaleDays() {
-        options = ValidationOptions.withStaleConfigurations(Duration.standardDays(1), Duration.ZERO);
+        options = ValidationOptions.withStaleConfigurations(Duration.ofDays(1), Duration.ZERO);
         subject = new X509CrlValidator(options, result, parent);
-        DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillisOfSecond(0); // Truncate millis
+        var nextUpdateTime = Instant.now().minus(2, ChronoUnit.DAYS).truncatedTo(ChronoUnit.SECONDS);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
@@ -117,9 +119,9 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldRejectWhenNextUpdateOutsideNegativeMaxStaleDays() {
-        options = ValidationOptions.withStaleConfigurations(Duration.standardDays(-8), Duration.ZERO);
+        options = ValidationOptions.withStaleConfigurations(Duration.ofDays(-8), Duration.ZERO);
         subject = new X509CrlValidator(options, result, parent);
-        DateTime nextUpdateTime = UTC.dateTime().withMillisOfSecond(0); // Truncate millis
+        var nextUpdateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
@@ -130,8 +132,8 @@ public class X509CrlValidatorTest {
 
     @Test
     public void shouldNotRejectWhenBetweenThisUpdateAndNextUpdate() {
-        DateTime thisUpdateTime = UTC.dateTime().minusDays(1);
-        DateTime nextUpdateTime = thisUpdateTime.plusDays(2);
+        var thisUpdateTime = Instant.now().minus(1, ChronoUnit.DAYS);
+        var nextUpdateTime = thisUpdateTime.plus(2, ChronoUnit.DAYS);
         X509Crl crl = getRootCRL().withThisUpdateTime(thisUpdateTime).withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
@@ -160,8 +162,8 @@ public class X509CrlValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withThisUpdateTime(VALIDITY_PERIOD.notValidBefore().plus(1, ChronoUnit.DAYS));
+        builder.withNextUpdateTime(ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
