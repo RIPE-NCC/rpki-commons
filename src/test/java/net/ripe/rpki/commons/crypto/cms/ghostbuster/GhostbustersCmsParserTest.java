@@ -7,14 +7,14 @@ import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDes
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.security.auth.x500.X500Principal;
-import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -37,7 +37,7 @@ public class GhostbustersCmsParserTest {
     @Test
     public void testShouldParseGoodGbr() throws Exception {
         String path = "src/test/resources/conformance/root/goodRealGbrNothingIsWrong.gbr";
-        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        byte[] bytes = Files.readAllBytes(Paths.get(path));
         GhostbustersCmsParser parser = new GhostbustersCmsParser();
         parser.parse(ValidationResult.withLocation("test1.gbr"), bytes);
 
@@ -96,7 +96,7 @@ public class GhostbustersCmsParserTest {
     @Test(expected = IllegalArgumentException.class)
     public void testShouldParseBadGbr() throws Exception {
         String path = "src/test/resources/conformance/root/badGBRNotVCard.gbr";
-        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        byte[] bytes = Files.readAllBytes(Paths.get(path));
         GhostbustersCmsParser parser = new GhostbustersCmsParser();
         parser.parse(ValidationResult.withLocation("test2.gbr"), bytes);
         parser.getGhostbustersCms().getVCardContent();

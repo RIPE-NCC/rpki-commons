@@ -2,12 +2,7 @@ package net.ripe.rpki.commons.validation.interop;
 
 import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
-import net.ripe.rpki.commons.crypto.cms.ghostbuster.GhostbustersCmsParser;
-import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
-import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
