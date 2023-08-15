@@ -62,6 +62,11 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
+## 2023-xx-xx 2.0 
+  * Build targets JDK 17
+  * Replace Joda time with Java time
+  * Prefer Java records to implement value classes
+
 ## 2023-xx-xx 1.35
   * Build targets JDK 11
   * Prefixes in ROAs are sorted by (prefix, maxlength - missing first)
