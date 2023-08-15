@@ -5,9 +5,9 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
 
 public class RequestNotPerformedResponsePayload extends AbstractProvisioningResponsePayload {
 
-    private NotPerformedError status;
+    private final NotPerformedError status;
 
-    private String description;
+    private final String description;
 
     protected RequestNotPerformedResponsePayload(NotPerformedError status, String description) {
         super(PayloadMessageType.error_response);

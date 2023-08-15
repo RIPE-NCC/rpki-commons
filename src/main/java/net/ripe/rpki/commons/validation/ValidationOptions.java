@@ -20,7 +20,7 @@ public class ValidationOptions {
      * NEXT_UPDATE_TIME of CRL. When a crl is in the grace period, the crl causes a warning on
      * validation instead of a failure.
      */
-    private Duration crlMaxStalePeriod;
+    private final Duration crlMaxStalePeriod;
 
     /**
      *  When {@link ValidationOptions#strictManifestCRLValidityChecks} is enabled, this is the grace period for the
@@ -29,7 +29,7 @@ public class ValidationOptions {
      *
      * This grace period is not applied to the EE certificate.
      */
-    private Duration manifestMaxStalePeriod;
+    private final Duration manifestMaxStalePeriod;
 
     /**
      * Setting this will allow resources over claim on X509ResourceCertificateParentChildLooseValidator.

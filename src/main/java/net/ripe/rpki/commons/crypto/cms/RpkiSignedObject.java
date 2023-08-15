@@ -46,13 +46,13 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
      */
     public static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
 
-    private byte[] encoded;
+    private final byte[] encoded;
 
-    private X509ResourceCertificate certificate;
+    private final X509ResourceCertificate certificate;
 
-    private String oid; // Storing oid as String  so that this class is serializable
+    private final String oid; // Storing oid as String  so that this class is serializable
 
-    private @Nullable Instant signingTime;
+    private final @Nullable Instant signingTime;
 
     private Boolean revoked;
 

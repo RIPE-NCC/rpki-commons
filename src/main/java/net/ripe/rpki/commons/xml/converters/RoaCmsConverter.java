@@ -12,7 +12,6 @@ import org.apache.commons.lang3.Validate;
 
 public class RoaCmsConverter implements Converter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return RoaCms.class.equals(type);

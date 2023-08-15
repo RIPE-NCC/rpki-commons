@@ -8,6 +8,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,11 +22,11 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
     private static final int MAX_CHAIN_LENGTH = 30;
     private X509ResourceCertificate certificate;
-    private Collection<X509ResourceCertificate> trustAnchors;
-    private ResourceCertificateLocator locator;
-    private List<CertificateWithLocation> certificates = new LinkedList<>();
-    private ValidationOptions options;
-    private ValidationResult result;
+    private final Collection<X509ResourceCertificate> trustAnchors;
+    private final ResourceCertificateLocator locator;
+    private final List<CertificateWithLocation> certificates = new LinkedList<>();
+    private final ValidationOptions options;
+    private final ValidationResult result;
     private ValidationLocation location;
 
 
@@ -63,14 +64,14 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
         checkTrustAnchor();
 
-        X509ResourceCertificate parent = certificates.get(0).getCertificate();
+        X509ResourceCertificate parent = certificates.get(0).certificate();
         certificates.remove(0); // No need to validate the root (1st parent) certificate against itself
 
         IpResourceSet resources = parent.getResources();
 
         for (CertificateWithLocation certificateWithLocation : certificates) {
-            String childLocation = certificateWithLocation.getLocation().getName();
-            X509ResourceCertificate child = certificateWithLocation.getCertificate();
+            String childLocation = certificateWithLocation.location().getName();
+            X509ResourceCertificate child = certificateWithLocation.certificate();
 
             X509Crl crl = getCRL(child, result);
             if (result.hasFailures()) {
@@ -101,11 +102,11 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
                 return;
             }
 
-            ValidationLocation parentLocation = new ValidationLocation(parent.getName());
+            ValidationLocation parentLocation = new ValidationLocation(parent.name());
             result.setLocation(parentLocation);
 
             X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-            parser.parse(result, parent.getContent());
+            parser.parse(result, parent.content());
             if (result.hasFailures()) {
                 return;
             }
@@ -124,31 +125,15 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
         if (crlFile == null) {
             return null;
         }
-        return X509Crl.parseDerEncoded(crlFile.getContent(), validationResult);
+        return X509Crl.parseDerEncoded(crlFile.content(), validationResult);
     }
 
     private void checkTrustAnchor() {
         if ((trustAnchors != null) && (!trustAnchors.isEmpty())) {
-            result.rejectIfFalse(trustAnchors.contains(certificates.get(0).getCertificate()), ROOT_IS_TA);
+            result.rejectIfFalse(trustAnchors.contains(certificates.get(0).certificate()), ROOT_IS_TA);
         }
     }
 
-    private static class CertificateWithLocation {
-
-        private final X509ResourceCertificate certificate;
-        private final ValidationLocation location;
-
-        public CertificateWithLocation(X509ResourceCertificate certificate, ValidationLocation location) {
-            this.location = location;
-            this.certificate = certificate;
-        }
-
-        public X509ResourceCertificate getCertificate() {
-            return certificate;
-        }
-
-        public ValidationLocation getLocation() {
-            return location;
-        }
+    private record CertificateWithLocation(@NotNull X509ResourceCertificate certificate, @NotNull ValidationLocation location) {
     }
 }

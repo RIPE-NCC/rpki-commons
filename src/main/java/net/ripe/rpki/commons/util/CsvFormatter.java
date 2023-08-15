@@ -17,9 +17,9 @@ public class CsvFormatter {
 
     private static final String SEPARATOR = ",";
 
-    private List<CsvColumn> columns = new ArrayList<CsvColumn>();
+    private List<CsvColumn> columns = new ArrayList<>();
 
-    private Map<CsvColumn, List<String>> rowValues = new HashMap<CsvColumn, List<String>>();
+    private final Map<CsvColumn, List<String>> rowValues = new HashMap<>();
 
     private int rows = 0;
 
@@ -46,7 +46,7 @@ public class CsvFormatter {
     private void addColumn(String heading, boolean quoteValues) {
         CsvColumn column = new CsvColumn(heading, quoteValues);
         columns.add(column);
-        rowValues.put(column, new ArrayList<String>());
+        rowValues.put(column, new ArrayList<>());
     }
 
     // Setters for testing
@@ -115,7 +115,7 @@ public class CsvFormatter {
             }
             columnNumber++;
         }
-        out.write(headerLine.toString() + "\n");
+        out.write(headerLine + "\n");
     }
 
     private void printRow(Writer out, int i) throws IOException {
@@ -131,7 +131,7 @@ public class CsvFormatter {
             }
             columnNumber++;
         }
-        out.write(rowOutput.toString() + "\n");
+        out.write(rowOutput + "\n");
     }
 
     private void printValue(int i, StringBuilder rowOutput, CsvColumn col) {
@@ -148,8 +148,8 @@ public class CsvFormatter {
 
 
     static class CsvColumn {
-        private String heading;
-        private boolean quoteValues;
+        private final String heading;
+        private final boolean quoteValues;
 
         public CsvColumn(String heading, boolean quoteValues) {
             this.heading = heading;

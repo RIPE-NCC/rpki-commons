@@ -2,7 +2,6 @@ package net.ripe.rpki.commons.rsync;
 
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.*;

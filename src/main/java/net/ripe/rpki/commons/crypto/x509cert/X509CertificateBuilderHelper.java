@@ -246,7 +246,7 @@ public final class X509CertificateBuilderHelper {
     /**
      * Override this to add your extensions to the certificate generator
      */
-    protected X509v3CertificateBuilder createCertificateGenerator() {
+    private X509v3CertificateBuilder createCertificateGenerator() {
         try {
             X509v3CertificateBuilder generator = createX509V3CertificateGenerator();
 
@@ -294,7 +294,7 @@ public final class X509CertificateBuilderHelper {
      * must be present. This means at least one IPvX or ASN must be either set
      * explicitly or inherited..
      */
-    protected void validateResource(IpResourceSet resources) {
+    private void validateResource(IpResourceSet resources) {
         // at least one resource type must be either set or inherited
         final boolean atLeastOneResourceTypeUsed = EnumSet.allOf(IpResourceType.class)
             .stream()

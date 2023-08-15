@@ -8,7 +8,7 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
  */
 public class CertificateIssuanceResponsePayload extends AbstractProvisioningResponsePayload {
 
-    private CertificateIssuanceResponseClassElement classElement;
+    private final CertificateIssuanceResponseClassElement classElement;
 
     protected CertificateIssuanceResponsePayload(CertificateIssuanceResponseClassElement classElement) {
         super(PayloadMessageType.issue_response);

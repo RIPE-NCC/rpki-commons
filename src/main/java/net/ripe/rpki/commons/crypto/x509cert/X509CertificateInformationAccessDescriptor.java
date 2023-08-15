@@ -10,8 +10,6 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 public class X509CertificateInformationAccessDescriptor extends EqualsSupport implements Serializable {
@@ -33,17 +31,13 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
     private String method;
     private URI location;
 
-    private static final Map<ASN1ObjectIdentifier, String> METHOD_STRING_TABLE;
-
-    static {
-        Map<ASN1ObjectIdentifier, String> map = new HashMap<ASN1ObjectIdentifier, String>();
-        map.put(ID_CA_CA_ISSUERS, "ca issuer");
-        map.put(ID_AD_CA_REPOSITORY, "ca repository");
-        map.put(ID_AD_SIGNED_OBJECT_REPOSITORY, "signed object repository");
-        map.put(ID_AD_SIGNED_OBJECT, "signed object");
-        map.put(ID_AD_RPKI_MANIFEST, "manifest");
-        METHOD_STRING_TABLE = Collections.unmodifiableMap(map);
-    }
+    private static final Map<ASN1ObjectIdentifier, String> METHOD_STRING_TABLE = Map.of(
+        ID_CA_CA_ISSUERS, "ca issuer",
+        ID_AD_CA_REPOSITORY, "ca repository",
+        ID_AD_SIGNED_OBJECT_REPOSITORY, "signed object repository",
+        ID_AD_SIGNED_OBJECT, "signed object",
+        ID_AD_RPKI_MANIFEST, "manifest"
+    );
 
     public X509CertificateInformationAccessDescriptor(AccessDescription accessDescription) {
         try {

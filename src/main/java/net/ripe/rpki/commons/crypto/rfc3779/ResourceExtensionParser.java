@@ -141,9 +141,8 @@ public class ResourceExtensionParser {
     IpResourceSet derToIpAddressChoice(IpResourceType type, ASN1Encodable der) {
         if (der instanceof ASN1Null) {
             return null;
-        } else if (der instanceof ASN1Sequence) {
+        } else if (der instanceof ASN1Sequence seq) {
             IpResourceSet result = new IpResourceSet();
-            ASN1Sequence seq = (ASN1Sequence) der;
             for (int i = 0; i < seq.size(); i++) {
                 result.add(derToIpAddressOrRange(type, seq.getObjectAt(i)));
             }

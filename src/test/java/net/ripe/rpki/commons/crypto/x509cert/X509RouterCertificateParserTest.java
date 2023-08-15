@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 
 public class X509RouterCertificateParserTest {
 
-    private X509RouterCertificateParser subject = new X509RouterCertificateParser();
+    private final X509RouterCertificateParser subject = new X509RouterCertificateParser();
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireResourceCertificatePolicy() {

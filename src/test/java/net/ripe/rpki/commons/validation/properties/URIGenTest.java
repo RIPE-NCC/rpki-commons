@@ -1,7 +1,5 @@
 package net.ripe.rpki.commons.validation.properties;
 
-import com.pholser.junit.quickcheck.generator.GenerationStatus;
-import com.pholser.junit.quickcheck.internal.generator.SimpleGenerationStatus;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import org.junit.jupiter.api.Test;
 

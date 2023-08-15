@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.validation.ValidationString.SIGNED_ATTRS_CORRECT;
 import static org.assertj.core.api.Assertions.assertThat;

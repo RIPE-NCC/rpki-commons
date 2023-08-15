@@ -29,7 +29,7 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
     private Instant thisUpdateTime;
     private Instant nextUpdateTime;
     private String signatureProvider = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
-    private Map<String, byte[]> files = new TreeMap<>();
+    private final Map<String, byte[]> files = new TreeMap<>();
 
 
     public ManifestCmsBuilder() {

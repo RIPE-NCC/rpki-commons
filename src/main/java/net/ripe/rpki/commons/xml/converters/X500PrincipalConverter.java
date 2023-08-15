@@ -6,7 +6,6 @@ import javax.security.auth.x500.X500Principal;
 
 public class X500PrincipalConverter implements SingleValueConverter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return X500Principal.class.equals(type);

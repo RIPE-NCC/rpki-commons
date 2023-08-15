@@ -8,7 +8,7 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
  */
 public class CertificateIssuanceRequestPayload extends AbstractProvisioningQueryPayload {
 
-    private CertificateIssuanceRequestElement requestElement;
+    private final CertificateIssuanceRequestElement requestElement;
 
     public CertificateIssuanceRequestPayload(CertificateIssuanceRequestElement requestElement) {
         super(PayloadMessageType.issue);

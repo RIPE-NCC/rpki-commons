@@ -50,10 +50,12 @@ public class CertificateIssuanceRequestPayloadSerializerTest {
 
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_REQUEST_PAYLOAD);
 
-        Pattern expectedXmlRegex = Pattern.compile("<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n" +
-                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"issue\"\\s+version=\"1\">\n" +
-                        "   <request\\s+class_name=\"ripe-region\"\\s+req_resource_set_as=\"456,1234\"\\s+req_resource_set_ipv4=\"10.0.0.0/8\"\\s+req_resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\">[^<]*</request>\n" +
-                        "</message>\n",
+        Pattern expectedXmlRegex = Pattern.compile("""
+                <\\?xml version="1.0" encoding="UTF-8"\\?>
+                <message\\s+xmlns="http://www.apnic.net/specs/rescerts/up-down/"\\s+recipient="recipient"\\s+sender="sender"\\s+type="issue"\\s+version="1">
+                   <request\\s+class_name="ripe-region"\\s+req_resource_set_as="456,1234"\\s+req_resource_set_ipv4="10.0.0.0/8"\\s+req_resource_set_ipv6="2001:db8::/48,2001:db8:2::-2001:db8:5::">[^<]*</request>
+                </message>
+                """,
                 Pattern.DOTALL);
 
         assertTrue("actual: " + actualXml, expectedXmlRegex.matcher(actualXml).matches());

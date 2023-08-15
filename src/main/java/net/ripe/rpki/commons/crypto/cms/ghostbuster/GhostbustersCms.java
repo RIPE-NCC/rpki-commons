@@ -10,7 +10,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 public class GhostbustersCms extends RpkiSignedObject {
 
     public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.35");
-    private String vCardContent;
+    private final String vCardContent;
 
     GhostbustersCms(RpkiSignedObjectInfo cmsObjectData, String vCardContent) {
         super(cmsObjectData);

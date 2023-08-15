@@ -31,7 +31,7 @@ public class RpkiCaCertificateRequestParser {
 
     private static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
 
-    private JcaPKCS10CertificationRequest pkcs10CertificationRequest;
+    private final JcaPKCS10CertificationRequest pkcs10CertificationRequest;
 
     private URI caRepositoryUri;
 
@@ -119,10 +119,10 @@ public class RpkiCaCertificateRequestParser {
         ASN1Set pkcs9ExtensionRequest = getPkcs9ExtensionRequest();
 
         Object extensionRequestElement = pkcs9ExtensionRequest.getObjects().nextElement();
-        if (extensionRequestElement instanceof Extensions) {
-            return (Extensions) extensionRequestElement;
+        if (extensionRequestElement instanceof Extensions extensions) {
+            return extensions;
         } else if (extensionRequestElement instanceof ASN1Sequence) {
-            return Extensions.getInstance((ASN1Sequence) extensionRequestElement);
+            return Extensions.getInstance(extensionRequestElement);
         } else {
             throw new RpkiCaCertificateRequestParserException("Encountered an element I do not understand, type: "
                     + extensionRequestElement.getClass().getSimpleName());
@@ -148,9 +148,7 @@ public class RpkiCaCertificateRequestParser {
             if (!pkcs10CertificationRequest.isSignatureValid(contentVerifierProvider)) {
                 throw new RpkiCaCertificateRequestParserException("signature validation failed");
             }
-        } catch (OperatorCreationException e) {
-            throw new RpkiCaCertificateRequestParserException("Could not verify request", e);
-        } catch (PKCSException e) {
+        } catch (OperatorCreationException | PKCSException e) {
             throw new RpkiCaCertificateRequestParserException("Could not verify request", e);
         }
     }

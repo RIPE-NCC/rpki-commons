@@ -60,7 +60,7 @@ public class CommandTest {
 
     @Test
     public void shouldFailOnInvalidArguments() {
-        Command cmd = new Command(Arrays.asList(new String[]{COMMAND, "invalid_argument"}));
+        Command cmd = new Command(Arrays.asList(COMMAND, "invalid_argument"));
 
         cmd.execute();
 

@@ -39,12 +39,14 @@ public class PayloadParserTest {
 
     @Test
     public void shouldParseTypeFromMultilineMessageElement() {
-        String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\n" +
-                "         recipient=\"recipient\"\n" +
-                "         sender=\"sender\"\n" +
-                "         type=\"list\"\n" +
-                "         version=\"1\"/>\n";
+        String message = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <message xmlns="http://www.apnic.net/specs/rescerts/up-down/"
+                     recipient="recipient"
+                     sender="sender"
+                     type="list"
+                     version="1"/>
+            """;
         ValidationResult result = ValidationResult.withLocation("a");
         AbstractProvisioningPayload wrapper = PayloadParser.parse(message, result);
 

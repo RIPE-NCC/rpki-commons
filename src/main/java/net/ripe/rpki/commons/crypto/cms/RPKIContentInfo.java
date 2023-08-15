@@ -29,8 +29,8 @@ import org.bouncycastle.asn1.cms.ContentInfo;
 public class RPKIContentInfo
     extends ContentInfo
 {
-    private ASN1ObjectIdentifier contentType;
-    private ASN1Encodable        content;
+    private final ASN1ObjectIdentifier contentType;
+    private final ASN1Encodable        content;
 
     /**
      * Return an ContentInfo object from the given object.

@@ -29,7 +29,7 @@ public class CertificateRepositoryObjectValidationContext {
 
     private final IpResourceSet resources;
 
-    private IpResourceSet overclaiming = new IpResourceSet();
+    private final IpResourceSet overclaiming = new IpResourceSet();
 
     public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
         this(location, certificate, certificate.getResources(), Lists.newArrayList(certificate.getSubject().getName()));

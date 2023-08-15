@@ -27,9 +27,9 @@ public class RPKISignedData
     private static final ASN1Integer VERSION_4 = new ASN1Integer(4);
     private static final ASN1Integer VERSION_5 = new ASN1Integer(5);
 
-    private ASN1Integer version;
-    private ASN1Set     digestAlgorithms;
-    private ContentInfo contentInfo;
+    private final ASN1Integer version;
+    private final ASN1Set     digestAlgorithms;
+    private final ContentInfo contentInfo;
     private ASN1Set     certificates;
     private ASN1Set     crls;
     private ASN1Set     signerInfos;
@@ -190,26 +190,19 @@ public class RPKISignedData
             // to be varying implementations...
             // for the moment we ignore anything which doesn't fit.
             //
-            if (o instanceof ASN1TaggedObject)
-            {
-                ASN1TaggedObject tagged = (ASN1TaggedObject)o;
-
-                switch (tagged.getTagNo())
-                {
-                case 0:
-                    certsBer = tagged instanceof BERTaggedObject;
-                    certificates = ASN1Set.getInstance(tagged, false);
-                    break;
-                case 1:
-                    crlsBer = tagged instanceof BERTaggedObject;
-                    crls = ASN1Set.getInstance(tagged, false);
-                    break;
-                default:
-                    throw new IllegalArgumentException("unknown tag value " + tagged.getTagNo());
+            if (o instanceof ASN1TaggedObject tagged) {
+                switch (tagged.getTagNo()) {
+                    case 0 -> {
+                        certsBer = tagged instanceof BERTaggedObject;
+                        certificates = ASN1Set.getInstance(tagged, false);
+                    }
+                    case 1 -> {
+                        crlsBer = tagged instanceof BERTaggedObject;
+                        crls = ASN1Set.getInstance(tagged, false);
+                    }
+                    default -> throw new IllegalArgumentException("unknown tag value " + tagged.getTagNo());
                 }
-            }
-            else
-            {
+            } else {
                 signerInfos = (ASN1Set)o;
             }
         }

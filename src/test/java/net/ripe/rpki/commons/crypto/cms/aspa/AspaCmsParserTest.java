@@ -45,8 +45,7 @@ class AspaCmsParserTest {
                 .withFailMessage(() -> "" + result.getFailuresForAllLocations())
                 .isEmpty();
 
-        AspaCms aspa = parser.getAspa();
-        return aspa;
+        return parser.getAspa();
     }
 
     @Test

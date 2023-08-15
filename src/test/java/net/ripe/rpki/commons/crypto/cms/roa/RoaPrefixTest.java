@@ -20,16 +20,16 @@ public class RoaPrefixTest {
         var p2_8 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 8);
         var p2_24 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 24);
 
-        var prefixList = new ArrayList(List.of(p2_24, p1, p2_8, p2));
+        var prefixList = new ArrayList<>(List.of(p2_24, p1, p2_8, p2));
 
         // Static case of re-sorting a list in wrong order
-        assertThat(new TreeSet(List.of(p2_24, p1, p2_8, p2)))
+        assertThat(new TreeSet<>(List.of(p2_24, p1, p2_8, p2)))
                 .containsExactly(p1, p2, p2_8, p2_24);
 
         // But test a number of random shuffles as well
         for (int i=0; i < 16; i++) {
             Collections.shuffle(prefixList);
-            assertThat(new TreeSet(prefixList))
+            assertThat(new TreeSet<>(prefixList))
                     .containsExactly(p1, p2, p2_8, p2_24);
         }
     }

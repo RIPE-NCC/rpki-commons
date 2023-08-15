@@ -4,7 +4,6 @@ package net.ripe.rpki.commons.provisioning.cms;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import net.ripe.rpki.commons.provisioning.payload.list.request.ResourceClassListQueryPayloadBuilder;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateBuilderTest;
-import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificate;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBuilderTest;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
@@ -24,7 +23,7 @@ public class ProvisioningCmsObjectValidatorTest {
 
     private ProvisioningCmsObjectValidator subject;
 
-    private ValidationOptions options = ValidationOptions.strictValidation();
+    private final ValidationOptions options = ValidationOptions.strictValidation();
 
     @BeforeEach
     public void setUp() throws Exception {

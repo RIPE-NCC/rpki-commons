@@ -85,12 +85,12 @@ public class URIGen extends Generator<URI> {
     }
 
     private String host() throws Exception {
-        switch (r.nextInt(0,2)) {
-            case HOST_REG_NAME: return regName();
-            case HOST_IPV4: return ipv4();
-            case HOST_IPV6: return ipv6();
-            default: throw new Exception("Invalid option for host");
-        }
+        return switch (r.nextInt(0, 2)) {
+            case HOST_REG_NAME -> regName();
+            case HOST_IPV4 -> ipv4();
+            case HOST_IPV6 -> ipv6();
+            default -> throw new Exception("Invalid option for host");
+        };
     }
 
     private String regName() {

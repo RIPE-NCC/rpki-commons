@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
-import com.google.common.base.Charsets;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.validation.ValidationResult;

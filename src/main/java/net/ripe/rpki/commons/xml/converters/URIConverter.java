@@ -9,7 +9,6 @@ import java.net.URI;
 public class URIConverter extends AbstractSingleValueConverter {
 
     @Override
-    @SuppressWarnings("rawtypes")
     public boolean canConvert(Class type) {
         return type.equals(URI.class);
     }

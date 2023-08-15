@@ -335,7 +335,7 @@ public class XStreamXmlSerializerBuilderTest {
     }
 
     private static class OtherSerializeMe implements SerializeMeInterface {
-        Object canBeAnything;
+        final Object canBeAnything;
 
         public OtherSerializeMe(final Object canBeAnything) {
             this.canBeAnything = canBeAnything;
@@ -343,7 +343,7 @@ public class XStreamXmlSerializerBuilderTest {
     }
 
     private static class WithSerializeMeInterfaceField {
-        SerializeMeInterface inner;
+        final SerializeMeInterface inner;
 
         public WithSerializeMeInterfaceField(final SerializeMeInterface inner) { this.inner = inner; }
 

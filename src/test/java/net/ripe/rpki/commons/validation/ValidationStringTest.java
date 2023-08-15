@@ -12,7 +12,7 @@ public class ValidationStringTest {
     @Test
     public void shouldHaveMessageForEachField() throws Exception {
         Class<?> c = ValidationString.class;
-        List<String> missingFields = new ArrayList<String>();
+        List<String> missingFields = new ArrayList<>();
         for (Field f : c.getFields()) {
             String key = (String) f.get(null);
             ValidationCheck validationCheck = new ValidationCheck(ValidationStatus.PASSED, key);
@@ -23,7 +23,7 @@ public class ValidationStringTest {
             }
         }
         if (missingFields.size() > 0) {
-            org.junit.Assert.fail("Missing fields in BundleResource file (check ValidationMessage class for location): " + missingFields.toString());
+            org.junit.Assert.fail("Missing fields in BundleResource file (check ValidationMessage class for location): " + missingFields);
         }
     }
 }

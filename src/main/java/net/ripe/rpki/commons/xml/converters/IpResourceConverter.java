@@ -5,7 +5,6 @@ import net.ripe.ipresource.IpResource;
 
 public class IpResourceConverter extends AbstractSingleValueConverter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return IpResource.class.isAssignableFrom(type);

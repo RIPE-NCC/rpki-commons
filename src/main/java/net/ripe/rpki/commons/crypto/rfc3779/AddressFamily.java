@@ -121,25 +121,19 @@ public class AddressFamily implements Comparable<AddressFamily>, Serializable {
     }
 
     public static AddressFamily fromIpResourceType(IpResourceType type) {
-        switch (type) {
-            case IPv4:
-                return IPV4;
-            case IPv6:
-                return IPV6;
-            default:
-                throw new IllegalArgumentException("no address family for type: " + type);
-        }
+        return switch (type) {
+            case IPv4 -> IPV4;
+            case IPv6 -> IPV6;
+            default -> throw new IllegalArgumentException("no address family for type: " + type);
+        };
     }
 
     public IpResourceType toIpResourceType() {
-        switch (addressFamilyIdentifier) {
-            case AFI_IPV4:
-                return IpResourceType.IPv4;
-            case AFI_IPV6:
-                return IpResourceType.IPv6;
-            default:
-                throw new IllegalStateException("no IP resource type for AFI: " + addressFamilyIdentifier);
-        }
+        return switch (addressFamilyIdentifier) {
+            case AFI_IPV4 -> IpResourceType.IPv4;
+            case AFI_IPV6 -> IpResourceType.IPv6;
+            default -> throw new IllegalStateException("no IP resource type for AFI: " + addressFamilyIdentifier);
+        };
     }
 
 }

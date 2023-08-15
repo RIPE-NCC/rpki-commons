@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import static net.ripe.rpki.commons.crypto.cms.CMSUtils.attachSignersToOutputStream;
 import static net.ripe.rpki.commons.crypto.cms.CMSUtils.createDerSetFromList;
 import static net.ripe.rpki.commons.crypto.cms.CMSUtils.fixAlgID;
-import static net.ripe.rpki.commons.crypto.cms.CMSUtils.getSafeOutputStream;
+import static net.ripe.rpki.commons.crypto.cms.CMSUtils.getNullSafeOutputStream;
 
 /**
  * CMSSignedDataGenerator from BouncyCastle was originally for PKCS7, which follows RFC5652, allowing BER signed data.
@@ -88,7 +88,7 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
             OutputStream cOut = attachSignersToOutputStream(signerGens, bOut);
 
             // Just in case it's unencapsulated and there are no signers!
-            cOut = getSafeOutputStream(cOut);
+            cOut = getNullSafeOutputStream(cOut);
 
             try
             {

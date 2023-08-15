@@ -18,7 +18,7 @@ public class ProvisioningCmsCertificateBuilder {
     /** default validity before now - to compensate for clock drift */
     private static final int DEFAULT_VALIDITY_TIME_MINUTES_BEFORE_NOW = 1;
 
-    private X509CertificateBuilderHelper builderHelper;
+    private final X509CertificateBuilderHelper builderHelper;
 
     public ProvisioningCmsCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();

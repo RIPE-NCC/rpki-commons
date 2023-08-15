@@ -47,7 +47,7 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
 
             final ProvisioningIdentityCertificate publisherBpkiTa =
                 getBpkiElementContent(doc, "publisher_bpki_ta")
-                    .map(bpkiTa -> getProvisioningIdentityCertificate(bpkiTa))
+                    .map(this::getProvisioningIdentityCertificate)
                     .orElseThrow(() -> new IdentitySerializerException("publisher_bpki_ta element not found"));
 
             final Optional<PublisherRequest.Referral> referral =
@@ -81,8 +81,8 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
             final Optional<Element> referralElement = publisherRequest.getReferral()
                 .map(referral -> {
                     final Element result = document.createElementNS(XMLNS, "referral");
-                    result.setAttribute("referrer", referral.getReferrer());
-                    result.setTextContent(AUTHORIZATION_TOKEN_ENCODER.encodeToString(referral.getAuthorizationToken()));
+                    result.setAttribute("referrer", referral.referrer());
+                    result.setTextContent(AUTHORIZATION_TOKEN_ENCODER.encodeToString(referral.authorizationToken()));
                     return result;
                 });
 

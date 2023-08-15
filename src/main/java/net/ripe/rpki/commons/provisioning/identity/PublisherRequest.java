@@ -47,10 +47,7 @@ public class PublisherRequest {
         return VERSION;
     }
 
-    @Value
-    public static class Referral {
-        String referrer;
-        byte[] authorizationToken;
+    public record Referral(String referrer, byte[] authorizationToken) {
     }
 
 }

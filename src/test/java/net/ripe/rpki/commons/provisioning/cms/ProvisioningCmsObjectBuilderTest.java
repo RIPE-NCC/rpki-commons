@@ -29,7 +29,6 @@ import java.io.ByteArrayInputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertStoreException;
-import java.security.cert.X509CRL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -149,6 +148,7 @@ public class ProvisioningCmsObjectBuilderTest {
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedCrl() throws Exception {
+        @SuppressWarnings("unchecked")
         Collection<X509CRLHolder> crls = signedDataParser.getCRLs().getMatches(new BouncyCastleUtil.X509CRLHolderStoreSelector());
 
         assertNotNull(crls);

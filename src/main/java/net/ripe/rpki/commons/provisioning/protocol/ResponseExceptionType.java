@@ -10,10 +10,10 @@ public enum ResponseExceptionType {
 
     THROTTLING(503 /*HttpServletResponse.SC_SERVICE_UNAVAILABLE*/, "The server cannot handle your request at this time");
 
-    private int httpResponseCode;
-    private String description;
+    private final int httpResponseCode;
+    private final String description;
 
-    private ResponseExceptionType(int httpResponseCode, String description) {
+    ResponseExceptionType(int httpResponseCode, String description) {
         this.httpResponseCode = httpResponseCode;
         this.description = description;
     }

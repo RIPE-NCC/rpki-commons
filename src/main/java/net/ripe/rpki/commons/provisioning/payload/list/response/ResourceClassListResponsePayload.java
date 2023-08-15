@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class ResourceClassListResponsePayload extends AbstractProvisioningResponsePayload {
 
-    private List<ResourceClassListResponseClassElement> classElements;
+    private final List<ResourceClassListResponseClassElement> classElements;
 
     public ResourceClassListResponsePayload(List<ResourceClassListResponseClassElement> classElements) {
         super(PayloadMessageType.list_response);

@@ -12,7 +12,6 @@ import org.apache.commons.lang3.Validate;
 
 public class X509ResourceCertificateConverter implements Converter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return X509ResourceCertificate.class.equals(type);

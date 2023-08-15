@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 public class RoaCmsParserTest {
 
-    public static final Asn TEST_ASN = new Asn(42l);
+    public static final Asn TEST_ASN = new Asn(42L);
 
     public static final RoaPrefix TEST_IPV4_PREFIX_1 = new RoaPrefix(IpRange.parse("10.64.0.0/12"), 24);
     public static final RoaPrefix TEST_IPV4_PREFIX_2 = new RoaPrefix(IpRange.parse("10.32.0.0/12"), null);
@@ -97,12 +97,12 @@ public class RoaCmsParserTest {
     public void setUp() {
         String location = "test.roa";
         parser = new RoaCmsParser();
-        ipv4Prefixes = new ArrayList<RoaPrefix>();
+        ipv4Prefixes = new ArrayList<>();
         ipv4Prefixes.add(TEST_IPV4_PREFIX_1);
         ipv4Prefixes.add(TEST_IPV4_PREFIX_2);
         ipv4Prefixes.sort(RoaPrefix::compareTo);
 
-        allPrefixes = new ArrayList<RoaPrefix>(ipv4Prefixes);
+        allPrefixes = new ArrayList<>(ipv4Prefixes);
         allPrefixes.add(TEST_IPV6_PREFIX); // no sort needed, added in canonical order.
 
         parser.parse(location, RoaCmsTest.createRoaCms(allPrefixes).getEncoded());
@@ -116,7 +116,7 @@ public class RoaCmsParserTest {
 
     @Test
     public void shouldParseRoaIpAddressFamily() {
-        List<RoaPrefix> result = new ArrayList<RoaPrefix>();
+        List<RoaPrefix> result = new ArrayList<>();
         parser.parseRoaIpAddressFamily(result, decode(ENCODED_ROA_IP_ADDRESS_FAMILY));
         assertEquals(ipv4Prefixes, result);
     }

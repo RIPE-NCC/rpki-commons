@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 
 public class ValidityPeriodTest {
 
-    public Clock clock = Clock.fixed(
+    public final Clock clock = Clock.fixed(
         ZonedDateTime.of(2008, 4, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(),
         ZoneOffset.UTC
     );

@@ -20,11 +20,11 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class X509CertificateParentChildValidator<T extends AbstractX509CertificateWrapper> {
 
-    private T parent;
+    private final T parent;
 
     protected T child;
 
-    private X509Crl crl;
+    private final X509Crl crl;
 
     protected final ValidationOptions options;
     protected final ValidationResult result;

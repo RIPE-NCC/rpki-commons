@@ -15,10 +15,10 @@ public class KeyPairFactoryTest {
 
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
 
-    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static final KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static final KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
 
-    private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<String, KeyPair>();
+    private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<>();
 
 
     public static KeyPair getKeyPair(String name) {

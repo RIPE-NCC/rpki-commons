@@ -35,23 +35,15 @@ public final class CertificateRepositoryObjectFactory {
 
         ValidationChecks.knownObjectType(objectType, validationResult);
 
-        switch (objectType) {
-            case Manifest:
-                return parseManifest(encoded, validationResult);
-            case Roa:
-                return parseRoa(encoded, validationResult);
-            case Certificate:
-                return parseX509Certificate(encoded, validationResult);
-            case Crl:
-                return parseCrl(encoded, validationResult);
-            case Gbr:
-                return parseGbr(encoded, validationResult);
-            case Aspa:
-                return parseAspa(encoded, validationResult);
-            case Unknown:
-                return new UnknownCertificateRepositoryObject(encoded);
-        }
-        throw new IllegalArgumentException("Unrecognized repository object type: " + objectType);
+        return switch (objectType) {
+            case Manifest -> parseManifest(encoded, validationResult);
+            case Roa -> parseRoa(encoded, validationResult);
+            case Certificate -> parseX509Certificate(encoded, validationResult);
+            case Crl -> parseCrl(encoded, validationResult);
+            case Gbr -> parseGbr(encoded, validationResult);
+            case Aspa -> parseAspa(encoded, validationResult);
+            case Unknown -> new UnknownCertificateRepositoryObject(encoded);
+        };
     }
 
     private static X509Crl parseCrl(byte[] encoded, ValidationResult validationResult) {

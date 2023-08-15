@@ -16,9 +16,9 @@ public class RoaCms extends RpkiSignedObject implements Roa {
 
     private static final long serialVersionUID = 1L;
 
-    private Asn asn;
+    private final Asn asn;
 
-    private List<RoaPrefix> prefixes;
+    private final List<RoaPrefix> prefixes;
 
     protected RoaCms(RpkiSignedObjectInfo cmsObjectInfo, Asn asn, List<RoaPrefix> prefixes) {
         super(cmsObjectInfo);

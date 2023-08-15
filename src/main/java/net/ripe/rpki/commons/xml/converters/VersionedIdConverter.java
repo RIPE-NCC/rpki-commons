@@ -9,7 +9,6 @@ import net.ripe.rpki.commons.util.VersionedId;
  */
 public class VersionedIdConverter implements SingleValueConverter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return VersionedId.class.equals(type);

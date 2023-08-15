@@ -15,11 +15,11 @@ import java.util.List;
 public class RouteOriginValidationPolicy {
 
     public static NestedIntervalMap<IpResource, List<AllowedRoute>> allowedRoutesToNestedIntervalMap(Iterable<? extends AllowedRoute> allowedRoutes) {
-        NestedIntervalMap<IpResource, List<AllowedRoute>> result = new NestedIntervalMap<IpResource, List<AllowedRoute>>(IpResourceIntervalStrategy.getInstance());
+        NestedIntervalMap<IpResource, List<AllowedRoute>> result = new NestedIntervalMap<>(IpResourceIntervalStrategy.getInstance());
         for (AllowedRoute allowedRoute : allowedRoutes) {
             List<AllowedRoute> allowed = result.findExact(allowedRoute.getPrefix());
             if (allowed == null) {
-                List<AllowedRoute> list = new LinkedList<AllowedRoute>();
+                List<AllowedRoute> list = new LinkedList<>();
                 list.add(allowedRoute);
                 result.put(allowedRoute.getPrefix(), list);
             } else {
@@ -31,7 +31,7 @@ public class RouteOriginValidationPolicy {
 
     public RouteValidityState validateAnnouncedRoute(NestedIntervalMap<IpResource, ? extends Iterable<? extends AllowedRoute>> allowedRoutes, AnnouncedRoute announcedRoute) {
         RouteValidityState result = RouteValidityState.UNKNOWN;
-        for (Iterable<? extends AllowedRoute> routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.getPrefix())) {
+        for (Iterable<? extends AllowedRoute> routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.prefix())) {
             for (AllowedRoute allowedRoute : routes) {
                 switch (validate(allowedRoute, announcedRoute)) {
                     case VALID:
@@ -51,7 +51,7 @@ public class RouteOriginValidationPolicy {
     }
 
     private RouteValidityState validate(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
-        IpRange announcedPrefix = announcedRoute.getPrefix();
+        IpRange announcedPrefix = announcedRoute.prefix();
 
         if (isUnknown(allowedRoute, announcedPrefix)) {
             return RouteValidityState.UNKNOWN;
@@ -78,7 +78,7 @@ public class RouteOriginValidationPolicy {
     }
 
     private boolean isAsnInvalid(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
-        return !allowedRoute.getAsn().equals(announcedRoute.getOriginAsn());
+        return !allowedRoute.getAsn().equals(announcedRoute.originAsn());
     }
 
 }

@@ -1,7 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.ipresource.IpResourceSet;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

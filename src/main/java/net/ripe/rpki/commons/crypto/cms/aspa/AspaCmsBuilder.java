@@ -87,14 +87,14 @@ public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
             // Version is default value, so must not be encoded
             new ASN1Integer(customerAsn.getValue()),
             new DERSequence(providerASSet.stream().map(as -> {
-                if (as.getAfiLimit().isPresent()) {
+                if (as.afiLimit().isPresent()) {
                     return new DERSequence(new ASN1Encodable[] {
-                        new ASN1Integer(as.getProviderAsn().getValue()),
-                        as.getAfiLimit().get().toDer()
+                        new ASN1Integer(as.providerAsn().getValue()),
+                        as.afiLimit().get().toDer()
                     });
                 } else {
                     return new DERSequence(new ASN1Encodable[] {
-                        new ASN1Integer(as.getProviderAsn().getValue())
+                        new ASN1Integer(as.providerAsn().getValue())
                     });
                 }
             }).toArray(ASN1Encodable[]::new))

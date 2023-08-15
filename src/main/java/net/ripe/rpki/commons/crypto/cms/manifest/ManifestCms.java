@@ -132,7 +132,7 @@ public class ManifestCms extends RpkiSignedObject {
     private void checkEntries(ValidationResult result) {
         List<String> failedEntries = getFileNames().stream()
                 .filter(s -> !FILE_NAME_PATTERN.matcher(s).matches())
-                .collect(Collectors.toList());
+                .toList();
         result.rejectIfFalse(
                 failedEntries.isEmpty(),
                 ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE,
@@ -186,7 +186,7 @@ public class ManifestCms extends RpkiSignedObject {
     }
 
     public static class FileContentSpecification implements Specification<byte[]> {
-        private byte[] hash;
+        private final byte[] hash;
 
         public FileContentSpecification(byte[] hash) {
             this.hash = Arrays.copyOf(hash, hash.length);

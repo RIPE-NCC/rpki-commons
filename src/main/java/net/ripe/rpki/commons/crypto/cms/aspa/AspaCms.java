@@ -2,7 +2,6 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import lombok.Value;
 import net.ripe.ipresource.Asn;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;

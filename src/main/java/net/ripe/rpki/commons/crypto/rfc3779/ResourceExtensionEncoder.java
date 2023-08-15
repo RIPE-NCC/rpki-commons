@@ -63,7 +63,7 @@ public class ResourceExtensionEncoder {
      * @return the DER encoding of the IP Address Block Extension.
      */
     public ASN1Object encodeIpAddressBlocks(boolean inheritIpv4, boolean inheritIpv6, IpResourceSet resources) {
-        SortedMap<AddressFamily, IpResourceSet> addressBlocks = new TreeMap<AddressFamily, IpResourceSet>();
+        SortedMap<AddressFamily, IpResourceSet> addressBlocks = new TreeMap<>();
 
         if (inheritIpv4) {
             addressBlocks.put(AddressFamily.IPV4, null);
@@ -105,7 +105,7 @@ public class ResourceExtensionEncoder {
      * OPTIONAL, rdi [1] EXPLICIT ASIdentifierChoice OPTIONAL}
      */
     ASN1Object asIdentifiersToDer(boolean inheritAsn, IpResourceSet asnResources, boolean inheritRdi, IpResourceSet rdiResources) {
-        List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>(2);
+        List<ASN1Encodable> seq = new ArrayList<>(2);
         if (inheritAsn || asnResources.containsType(IpResourceType.ASN)) {
             seq.add(new DERTaggedObject(0, asIdentifierChoiceToDer(inheritAsn, asnResources)));
         }
@@ -127,7 +127,7 @@ public class ResourceExtensionEncoder {
      * asIdsOrRanges ::= SEQUENCE OF ASIdOrRange
      */
     DERSequence asIdsOrRangesToDer(IpResourceSet resources) {
-        List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>();
+        List<ASN1Encodable> seq = new ArrayList<>();
         for (IpResource resource : resources) {
             if (IpResourceType.ASN == resource.getType()) {
                 seq.add(asIdOrRangeToDer(IpResourceRange.range(resource.getStart(), resource.getEnd())));
@@ -162,7 +162,7 @@ public class ResourceExtensionEncoder {
      * IPAddrBlocks ::= SEQUENCE OF IPAddressFamily
      */
     ASN1Object ipAddressBlocksToDer(SortedMap<AddressFamily, IpResourceSet> resources) {
-        List<ASN1Encodable> seq = new ArrayList<ASN1Encodable>(2);
+        List<ASN1Encodable> seq = new ArrayList<>(2);
         for (AddressFamily addressFamily : resources.keySet()) {
             seq.add(ipAddressFamilyToDer(addressFamily, resources.get(addressFamily)));
         }
@@ -190,7 +190,7 @@ public class ResourceExtensionEncoder {
             return DERNull.INSTANCE;
         }
 
-        List<ASN1Encodable> addressesOrRanges = new ArrayList<ASN1Encodable>();
+        List<ASN1Encodable> addressesOrRanges = new ArrayList<>();
         for (IpResource resource : resources) {
             if (resource.getType() == type) {
                 addressesOrRanges.add(ipAddressOrRangeToDer(asRange(resource)));

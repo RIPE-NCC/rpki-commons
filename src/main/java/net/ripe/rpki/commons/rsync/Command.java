@@ -13,9 +13,9 @@ public class Command extends Thread {
     public static final int NOT_EXECUTED = -1;
     public static final int COMMAND_FAILED = -2;
 
-    private List<String> args;
-    private Map<String, String> envp;
-    private String execDir;
+    private final List<String> args;
+    private final Map<String, String> envp;
+    private final String execDir;
 
     private int exitStatus = NOT_EXECUTED;
 

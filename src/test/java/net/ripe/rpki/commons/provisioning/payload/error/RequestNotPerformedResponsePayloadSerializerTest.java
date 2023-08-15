@@ -1,7 +1,6 @@
 package net.ripe.rpki.commons.provisioning.payload.error;
 
 import net.ripe.rpki.commons.provisioning.payload.RelaxNgSchemaValidator;
-import net.ripe.rpki.commons.provisioning.payload.issue.request.CertificateIssuanceRequestPayload;
 import net.ripe.rpki.commons.xml.XmlSerializer;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -20,7 +19,7 @@ public class RequestNotPerformedResponsePayloadSerializerTest {
 
     private static final XmlSerializer<RequestNotPerformedResponsePayload> SERIALIZER = new RequestNotPerformedResponsePayloadSerializer();
 
-    public static RequestNotPerformedResponsePayload NOT_PERFORMED_PAYLOAD = createRequestNotPerformedResponsePayload();
+    public static final RequestNotPerformedResponsePayload NOT_PERFORMED_PAYLOAD = createRequestNotPerformedResponsePayload();
 
     public static RequestNotPerformedResponsePayload createRequestNotPerformedResponsePayload() {
         RequestNotPerformedResponsePayloadBuilder builder = new RequestNotPerformedResponsePayloadBuilder();

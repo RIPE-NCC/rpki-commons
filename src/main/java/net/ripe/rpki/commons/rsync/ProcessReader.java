@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ProcessReader extends Thread {
 
-    private InputStream input;
+    private final InputStream input;
     private OutputStream output;
     private List<String> lines;
 
@@ -38,7 +38,7 @@ public class ProcessReader extends Thread {
             PrintWriter printer = null;
 
             if (output == null) {
-                lines = new ArrayList<String>();
+                lines = new ArrayList<>();
             } else {
                 printer = new PrintWriter(output);
             }

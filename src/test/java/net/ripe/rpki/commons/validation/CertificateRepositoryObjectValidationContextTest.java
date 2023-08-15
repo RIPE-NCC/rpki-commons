@@ -19,11 +19,11 @@ public class CertificateRepositoryObjectValidationContextTest {
 
     private static final IpResourceSet CHILD_RESOURCE_SET = IpResourceSet.parse("10.8.0.0/16");
 
-    private static URI location = URI.create("rsync://host/path");
-    private static X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
-    private static URI childLocation = URI.create("rsync://host/path/child");
+    private static final URI location = URI.create("rsync://host/path");
+    private static final X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
+    private static final URI childLocation = URI.create("rsync://host/path/child");
 
-    private CertificateRepositoryObjectValidationContext subject = create();
+    private final CertificateRepositoryObjectValidationContext subject = create();
 
     private X509ResourceCertificate certificateWithInheritedResources;
 

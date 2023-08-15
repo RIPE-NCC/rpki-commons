@@ -23,7 +23,7 @@ public class CsvFormatterTest {
     @Before
     public void setUp() {
         subject = new CsvFormatter();
-        columns = new ArrayList<CsvColumn>();
+        columns = new ArrayList<>();
         subject.setColumnList(columns);
     }
 

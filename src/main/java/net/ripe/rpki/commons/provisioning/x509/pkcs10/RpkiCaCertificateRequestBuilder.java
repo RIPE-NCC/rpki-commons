@@ -96,7 +96,7 @@ public class RpkiCaCertificateRequestBuilder {
     private Extensions createExtensions() throws IOException {
         // Make extension for SIA in request. See here:
         // http://www.bouncycastle.org/wiki/display/JA1/X.509+Public+Key+Certificate+and+Certification+Request+Generation
-        List<Extension> extensions = new ArrayList<Extension>();
+        List<Extension> extensions = new ArrayList<>();
 
         X509CertificateInformationAccessDescriptor[] descriptors;
         if (notificationUri == null) {

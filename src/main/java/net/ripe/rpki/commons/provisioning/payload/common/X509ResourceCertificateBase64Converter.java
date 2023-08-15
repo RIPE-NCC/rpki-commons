@@ -11,7 +11,6 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 
 public class X509ResourceCertificateBase64Converter implements Converter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return type == X509ResourceCertificate.class;

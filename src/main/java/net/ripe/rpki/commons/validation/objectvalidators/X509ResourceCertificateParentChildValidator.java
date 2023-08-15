@@ -11,7 +11,7 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class X509ResourceCertificateParentChildValidator extends X509CertificateParentChildValidator<X509ResourceCertificate> implements X509ResourceCertificateValidator {
 
-    private IpResourceSet resources;
+    private final IpResourceSet resources;
 
     public X509ResourceCertificateParentChildValidator(ValidationOptions options,
                                                        ValidationResult result,

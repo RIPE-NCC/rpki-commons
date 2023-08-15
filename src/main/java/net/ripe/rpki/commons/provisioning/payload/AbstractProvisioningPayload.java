@@ -9,13 +9,13 @@ public abstract class AbstractProvisioningPayload extends EqualsSupport {
 
     public static final Integer SUPPORTED_VERSION = 1;
 
-    private Integer version;
+    private final Integer version;
 
     private String sender = DEFAULT_SENDER;
 
     private String recipient = DEFAULT_RECIPIENT;
 
-    private PayloadMessageType type;
+    private final PayloadMessageType type;
 
     protected AbstractProvisioningPayload(PayloadMessageType type) {
         this(SUPPORTED_VERSION, type);

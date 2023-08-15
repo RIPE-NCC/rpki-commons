@@ -17,7 +17,6 @@ import net.ripe.rpki.commons.provisioning.payload.revocation.response.Certificat
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.xml.XmlSerializer;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,23 +79,15 @@ public final class PayloadParser {
 
     public static String serialize(AbstractProvisioningPayload payload) {
         PayloadMessageType type = payload.getType();
-        switch (type) {
-            case list:
-                return LIST_SERIALIZER.serialize((ResourceClassListQueryPayload) payload);
-            case list_response:
-                return LIST_RESPONSE_SERIALIZER.serialize((ResourceClassListResponsePayload) payload);
-            case issue:
-                return ISSUE_SERIALIZER.serialize((CertificateIssuanceRequestPayload) payload);
-            case issue_response:
-                return ISSUE_RESPONSE_SERIALIZER.serialize((CertificateIssuanceResponsePayload) payload);
-            case revoke:
-                return REVOKE_SERIALIZER.serialize((CertificateRevocationRequestPayload) payload);
-            case revoke_response:
-                return REVOKE_RESPONSE_SERIALIZER.serialize((CertificateRevocationResponsePayload) payload);
-            case error_response:
-                return ERROR_RESPONSE_SERIALIZER.serialize((RequestNotPerformedResponsePayload) payload);
-            default:
-                throw new NotImplementedException("Don't have serializer for PayloadMessageType: " + type);
-        }
+        return switch (type) {
+            case list -> LIST_SERIALIZER.serialize((ResourceClassListQueryPayload) payload);
+            case list_response -> LIST_RESPONSE_SERIALIZER.serialize((ResourceClassListResponsePayload) payload);
+            case issue -> ISSUE_SERIALIZER.serialize((CertificateIssuanceRequestPayload) payload);
+            case issue_response -> ISSUE_RESPONSE_SERIALIZER.serialize((CertificateIssuanceResponsePayload) payload);
+            case revoke -> REVOKE_SERIALIZER.serialize((CertificateRevocationRequestPayload) payload);
+            case revoke_response ->
+                REVOKE_RESPONSE_SERIALIZER.serialize((CertificateRevocationResponsePayload) payload);
+            case error_response -> ERROR_RESPONSE_SERIALIZER.serialize((RequestNotPerformedResponsePayload) payload);
+        };
     }
 }

@@ -12,28 +12,28 @@ import static org.junit.Assert.*;
 
 public class ParentIdentitySerializerTest {
 
-    static final String exampleXml =
-            "<ns0:parent_response xmlns:ns0=\"http://www.hactrn.net/uris/rpki/rpki-setup/\" valid_until=\"2012-06-30T04:07:50Z\" service_uri=\"http://localhost:4401/up-down/Alice/Bob\" child_handle=\"Bob\" parent_handle=\"Alice\" version=\"2\" tag=\"1234\">\n" +
-                    "<ns0:parent_bpki_ta>\n" +
-                    "MIIDJDCCAgygAwIBAgIBATANBgkqhkiG9w0BAQsFADArMSkwJwYDVQQDEyBBbGlj\n" +
-                    "ZSBCUEtJIFJlc291cmNlIFRydXN0IEFuY2hvcjAeFw0xMTA3MDEwNDA3MTlaFw0x\n" +
-                    "MjA2MzAwNDA3MTlaMCsxKTAnBgNVBAMTIEFsaWNlIEJQS0kgUmVzb3VyY2UgVHJ1\n" +
-                    "c3QgQW5jaG9yMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0nVOC7Ik\n" +
-                    "bc9D3lNPspAp96LEmxqhfWcF70wOk8MHX2skMoHYa3UsyTMOJR4Pv+DRieLbPI8E\n" +
-                    "ExrLZRqTrY4+OKRG5sekk3zeIc40g4p8jw6aPxlPUFvJAQdsW+iOYljaPhgWMiGH\n" +
-                    "Qm2ZfsXUlvr8XtmkryGbzcaJy2CaAnUi5dwUmpMx7GEcUz+LpJ6tfyB1aF1CpnBm\n" +
-                    "pvOhIl+Tlk55Zpo2Nn1Ty0TiTX40fK/ToKZn+/5LkRBKXjGUSWlMyWBVJZVCHo/Z\n" +
-                    "PLtPbjUr0gczIYp24q4GxmAHbK12GT/4vGdnQCyadKBDF4Kv0BP6TFf+BP3aE2P7\n" +
-                    "biQa919zuZzfCQIDAQABo1MwUTAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQj\n" +
-                    "tovHYOZzUno6MsFjYyKdJZf3NDAfBgNVHSMEGDAWgBQjtovHYOZzUno6MsFjYyKd\n" +
-                    "JZf3NDANBgkqhkiG9w0BAQsFAAOCAQEApkybLXSqUGFf6TxVz+AXVbMtTr22tUJ+\n" +
-                    "nMocs6lDsyXt2QC/ef3iPTECfJXJrWxCF3PaAWcjV/QQVw3Z2BqblHPmNPM0DxhJ\n" +
-                    "OBv065L041zZla4163XSzEzRHJn+99E9jPs15w7if2A1m2XH2W2gg3aSMBSqZXcM\n" +
-                    "6Z+W6XsH0dx5c10YspJBSXRls7SsKRpS30fCs2+jSYA0AWvxCTfCNmVf6ssMmAyr\n" +
-                    "6Ynrt3fS0MpprBPxJF3KWveHLhaUxLYefSsnsV6o3nfZYwyDlo9m7t3IQCg+Yg7k\n" +
-                    "FO2iB8/TDRIdP6bpBvpVrQ13FvWqC6CglZ0fbFRNklotIVxcP1cuNw==\n" +
-                    "</ns0:parent_bpki_ta>\n" +
-                    "</ns0:parent_response>";
+    static final String exampleXml = """
+            <ns0:parent_response xmlns:ns0="http://www.hactrn.net/uris/rpki/rpki-setup/" valid_until="2012-06-30T04:07:50Z" service_uri="http://localhost:4401/up-down/Alice/Bob" child_handle="Bob" parent_handle="Alice" version="2" tag="1234">
+            <ns0:parent_bpki_ta>
+            MIIDJDCCAgygAwIBAgIBATANBgkqhkiG9w0BAQsFADArMSkwJwYDVQQDEyBBbGlj
+            ZSBCUEtJIFJlc291cmNlIFRydXN0IEFuY2hvcjAeFw0xMTA3MDEwNDA3MTlaFw0x
+            MjA2MzAwNDA3MTlaMCsxKTAnBgNVBAMTIEFsaWNlIEJQS0kgUmVzb3VyY2UgVHJ1
+            c3QgQW5jaG9yMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0nVOC7Ik
+            bc9D3lNPspAp96LEmxqhfWcF70wOk8MHX2skMoHYa3UsyTMOJR4Pv+DRieLbPI8E
+            ExrLZRqTrY4+OKRG5sekk3zeIc40g4p8jw6aPxlPUFvJAQdsW+iOYljaPhgWMiGH
+            Qm2ZfsXUlvr8XtmkryGbzcaJy2CaAnUi5dwUmpMx7GEcUz+LpJ6tfyB1aF1CpnBm
+            pvOhIl+Tlk55Zpo2Nn1Ty0TiTX40fK/ToKZn+/5LkRBKXjGUSWlMyWBVJZVCHo/Z
+            PLtPbjUr0gczIYp24q4GxmAHbK12GT/4vGdnQCyadKBDF4Kv0BP6TFf+BP3aE2P7
+            biQa919zuZzfCQIDAQABo1MwUTAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQj
+            tovHYOZzUno6MsFjYyKdJZf3NDAfBgNVHSMEGDAWgBQjtovHYOZzUno6MsFjYyKd
+            JZf3NDANBgkqhkiG9w0BAQsFAAOCAQEApkybLXSqUGFf6TxVz+AXVbMtTr22tUJ+
+            nMocs6lDsyXt2QC/ef3iPTECfJXJrWxCF3PaAWcjV/QQVw3Z2BqblHPmNPM0DxhJ
+            OBv065L041zZla4163XSzEzRHJn+99E9jPs15w7if2A1m2XH2W2gg3aSMBSqZXcM
+            6Z+W6XsH0dx5c10YspJBSXRls7SsKRpS30fCs2+jSYA0AWvxCTfCNmVf6ssMmAyr
+            6Ynrt3fS0MpprBPxJF3KWveHLhaUxLYefSsnsV6o3nfZYwyDlo9m7t3IQCg+Yg7k
+            FO2iB8/TDRIdP6bpBvpVrQ13FvWqC6CglZ0fbFRNklotIVxcP1cuNw==
+            </ns0:parent_bpki_ta>
+            </ns0:parent_response>""";
 
 
     @Test

@@ -16,7 +16,7 @@ public class RoaCmsConverterTest {
     private XStream xStream;
     private RoaCmsConverter subject;
 
-    private String expectedXmlRegEx = """
+    private final String expectedXmlRegEx = """
             <net\\.ripe\\..*\\.RoaCms>
               <encoded>[^<]*</encoded>
             </net\\.ripe\\..*\\.RoaCms>""";

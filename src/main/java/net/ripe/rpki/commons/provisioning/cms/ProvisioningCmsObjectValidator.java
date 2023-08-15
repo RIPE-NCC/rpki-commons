@@ -25,9 +25,9 @@ import static net.ripe.rpki.commons.validation.ValidationString.SIGNING_TIME_GRE
  */
 public class ProvisioningCmsObjectValidator {
 
-    private ValidationOptions options;
-    private ProvisioningCmsObject cmsObject;
-    private ProvisioningIdentityCertificate identityCertificate;
+    private final ValidationOptions options;
+    private final ProvisioningCmsObject cmsObject;
+    private final ProvisioningIdentityCertificate identityCertificate;
 
     private ValidationResult validationResult;
     private ProvisioningCmsCertificate cmsCertificate;

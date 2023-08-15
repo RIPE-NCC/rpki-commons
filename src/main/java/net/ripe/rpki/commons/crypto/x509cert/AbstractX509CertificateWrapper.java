@@ -74,10 +74,9 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof AbstractX509CertificateWrapper)) {
+        if (!(obj instanceof final AbstractX509CertificateWrapper other)) {
             return false;
         }
-        final AbstractX509CertificateWrapper other = (AbstractX509CertificateWrapper) obj;
         return certificate.equals(other.certificate);
     }
 

@@ -2,7 +2,6 @@ package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayloadXmlSerializer;
 import net.ripe.rpki.commons.provisioning.payload.PayloadMessageType;
-import net.ripe.rpki.commons.provisioning.serialization.IpResourceSetProvisioningConverter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

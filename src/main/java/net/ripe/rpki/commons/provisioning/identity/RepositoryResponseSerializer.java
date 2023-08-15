@@ -49,7 +49,7 @@ public class RepositoryResponseSerializer extends IdentitySerializer<RepositoryR
 
             final ProvisioningIdentityCertificate repositoryBpkiTa =
                 getBpkiElementContent(doc, "repository_bpki_ta")
-                    .map(bpkiTa -> getProvisioningIdentityCertificate(bpkiTa))
+                    .map(this::getProvisioningIdentityCertificate)
                     .orElseThrow(() -> new IdentitySerializerException("repository_bpki_ta element not found"));
 
             return new RepositoryResponse(tag, serviceUri, publisherHandle, siaBase, rrdpNotificationUri, repositoryBpkiTa);
@@ -66,15 +66,15 @@ public class RepositoryResponseSerializer extends IdentitySerializer<RepositoryR
 
             final Element requestElement = document.createElementNS(XMLNS, "repository_response");
             requestElement.setAttribute("version", Integer.toString(repositoryResponse.getVersion()));
-            repositoryResponse.getTag().ifPresent(tag -> requestElement.setAttribute("tag", tag));
-            requestElement.setAttribute("service_uri", repositoryResponse.getServiceUri().toASCIIString());
-            requestElement.setAttribute("publisher_handle", repositoryResponse.getPublisherHandle());
-            requestElement.setAttribute("sia_base", repositoryResponse.getSiaBase().toASCIIString());
-            repositoryResponse.getRrdpNotificationUri()
+            repositoryResponse.tag().ifPresent(tag -> requestElement.setAttribute("tag", tag));
+            requestElement.setAttribute("service_uri", repositoryResponse.serviceUri().toASCIIString());
+            requestElement.setAttribute("publisher_handle", repositoryResponse.publisherHandle());
+            requestElement.setAttribute("sia_base", repositoryResponse.siaBase().toASCIIString());
+            repositoryResponse.rrdpNotificationUri()
                 .ifPresent(uri -> requestElement.setAttribute("rrdp_notification_uri", uri.toASCIIString()));
 
             final Element bpkiTaElement = document.createElementNS(XMLNS, "repository_bpki_ta");
-            bpkiTaElement.setTextContent(repositoryResponse.getRepositoryBpkiTa().getBase64String());
+            bpkiTaElement.setTextContent(repositoryResponse.repositoryBpkiTa().getBase64String());
 
             requestElement.appendChild(bpkiTaElement);
             document.appendChild(requestElement);

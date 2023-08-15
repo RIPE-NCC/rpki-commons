@@ -14,15 +14,17 @@ import static org.junit.Assert.*;
 
 
 public class XMLTest {
-    public final static String INTERNAL_ENTITY_TEST = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<!DOCTYPE foo [<!ENTITY toreplace \"3\"> ]>\n" +
-            "<stockCheck>\n" +
-            "    <productId>&toreplace;</productId>\n" +
-            "    <storeId>1</storeId>\n" +
-            "</stockCheck>";
-    public final static String EXTERNAL_ENTITY_TEST = "<!--?xml version=\"1.0\" ?-->\n" +
-            "<!DOCTYPE foo [<!ENTITY example SYSTEM \"/etc/passwd\"> ]>\n" +
-            "<data>&example;</data>";
+    public final static String INTERNAL_ENTITY_TEST = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE foo [<!ENTITY toreplace "3"> ]>
+        <stockCheck>
+            <productId>&toreplace;</productId>
+            <storeId>1</storeId>
+        </stockCheck>""";
+    public final static String EXTERNAL_ENTITY_TEST = """
+        <!--?xml version="1.0" ?-->
+        <!DOCTYPE foo [<!ENTITY example SYSTEM "/etc/passwd"> ]>
+        <data>&example;</data>""";
 
     private static InputStream inputStreamFrom(String s) {
         return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));

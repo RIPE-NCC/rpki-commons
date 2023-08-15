@@ -96,7 +96,7 @@ public final class BouncyCastleUtil {
     public static List<? extends X509Certificate> extractCertificates(CMSSignedDataParser signedDataParser) throws StoreException, CMSException, CertificateException {
         @SuppressWarnings("unchecked")
         Collection<X509CertificateHolder> holders = signedDataParser.getCertificates().getMatches(new X509CertificateHolderStoreSelector());
-        List<X509Certificate> result = new ArrayList<X509Certificate>();
+        List<X509Certificate> result = new ArrayList<>();
         for (X509CertificateHolder holder : holders) {
             result.add(holderToCertificate(holder));
         }
@@ -110,7 +110,7 @@ public final class BouncyCastleUtil {
     public static List<? extends X509CRL> extractCrls(CMSSignedDataParser signedDataParser) throws StoreException, CMSException, CRLException {
         @SuppressWarnings("unchecked")
         Collection<X509CRLHolder> holders = signedDataParser.getCRLs().getMatches(new X509CRLHolderStoreSelector());
-        List<X509CRL> result = new ArrayList<X509CRL>();
+        List<X509CRL> result = new ArrayList<>();
         for (X509CRLHolder holder : holders) {
             result.add(holderToCrl(holder));
         }

@@ -394,56 +394,58 @@ public class TrustAnchorRequestSerializerTest {
 
     }
 
-    private final String signingRequest = "<requests.TrustAnchorRequest>\n" +
-            "  <creationTimestamp>1558700883582</creationTimestamp>\n" +
-            "  <taCertificatePublicationUri>rsync://localhost:10873/ta/</taCertificatePublicationUri>\n" +
-            "  <taRequests>\n" +
-            "    <requests.SigningRequest>\n" +
-            "      <requestId>4ee2e78c-f746-426b-bf8b-c37e0155ca3e</requestId>\n" +
-            "      <resourceCertificateRequest>\n" +
-            "        <resourceClassName>DEFAULT</resourceClassName>\n" +
-            "        <subjectDN>CN=8ecc2cdf3247ef43295ebafca8c711ffd51de071</subjectDN>\n" +
-            "        <subjectInformationAccess>\n" +
-            "          <X509CertificateInformationAccessDescriptor>\n" +
-            "            <method>1.3.6.1.5.5.7.48.5</method>\n" +
-            "            <location>rsync://localhost/online/aca/</location>\n" +
-            "          </X509CertificateInformationAccessDescriptor>\n" +
-            "          <X509CertificateInformationAccessDescriptor>\n" +
-            "            <method>1.3.6.1.5.5.7.48.10</method>\n" +
-            "            <location>rsync://localhost/online/aca/jsws3zJH70MpXrr8qMcR_9Ud4HE.mft</location>\n" +
-            "          </X509CertificateInformationAccessDescriptor>\n" +
-            "          <X509CertificateInformationAccessDescriptor>\n" +
-            "            <method>1.3.6.1.5.5.7.48.13</method>\n" +
-            "            <location>http://localhost:7788/notification.xml</location>\n" +
-            "          </X509CertificateInformationAccessDescriptor>\n" +
-            "        </subjectInformationAccess>\n" +
-            "        <ipResourceSet>10.0.0.0/8, 11.0.0.0/8</ipResourceSet>\n" +
-            "        <encodedSubjectPublicKey>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtZC7nbyxIqHdncRCXV6wBtBfXtMjuz0TQLd20Hunnr/982wFMqRfsBqEI4+Q/KnPV+N1rsKGhTrAzOCnISDFO5d111qOrWWd/X0T3AjoBLu2yFwtsc+2PYXxM7aAwPl1YfBsmvDjc+BlZEmPgIVLTbkYW2dXaOKVWi5CHpcbHuzox3stStSF9C2CT49N7URwL5qQ7f55BA4kQ1U1grnQR9nbFWT0HjiVIeZow+9ofRD6Io/T6+sMS2LWb3E+YMK6DCdStlYwmZEu+2HpqBjRqB7/3nfO74djpnUXLMzSFIv4x95ZFAeV0GTvLbflfTRd9G9Wa5CF5hd9zrj5OMNwAwIDAQAB</encodedSubjectPublicKey>\n" +
-            "      </resourceCertificateRequest>\n" +
-            "    </requests.SigningRequest>\n" +
-            "  </taRequests>\n" +
-            "  <siaDescriptors>\n" +
-            "    <X509CertificateInformationAccessDescriptor>\n" +
-            "      <method>1.3.6.1.5.5.7.48.13</method>\n" +
-            "      <location>http://localhost:7788/notification.xml</location>\n" +
-            "    </X509CertificateInformationAccessDescriptor>\n" +
-            "    <X509CertificateInformationAccessDescriptor>\n" +
-            "      <method>1.3.6.1.5.5.7.48.5</method>\n" +
-            "      <location>rsync://localhost/online/</location>\n" +
-            "    </X509CertificateInformationAccessDescriptor>\n" +
-            "  </siaDescriptors>\n" +
-            "</requests.TrustAnchorRequest>";
+    private final String signingRequest = """
+        <requests.TrustAnchorRequest>
+          <creationTimestamp>1558700883582</creationTimestamp>
+          <taCertificatePublicationUri>rsync://localhost:10873/ta/</taCertificatePublicationUri>
+          <taRequests>
+            <requests.SigningRequest>
+              <requestId>4ee2e78c-f746-426b-bf8b-c37e0155ca3e</requestId>
+              <resourceCertificateRequest>
+                <resourceClassName>DEFAULT</resourceClassName>
+                <subjectDN>CN=8ecc2cdf3247ef43295ebafca8c711ffd51de071</subjectDN>
+                <subjectInformationAccess>
+                  <X509CertificateInformationAccessDescriptor>
+                    <method>1.3.6.1.5.5.7.48.5</method>
+                    <location>rsync://localhost/online/aca/</location>
+                  </X509CertificateInformationAccessDescriptor>
+                  <X509CertificateInformationAccessDescriptor>
+                    <method>1.3.6.1.5.5.7.48.10</method>
+                    <location>rsync://localhost/online/aca/jsws3zJH70MpXrr8qMcR_9Ud4HE.mft</location>
+                  </X509CertificateInformationAccessDescriptor>
+                  <X509CertificateInformationAccessDescriptor>
+                    <method>1.3.6.1.5.5.7.48.13</method>
+                    <location>http://localhost:7788/notification.xml</location>
+                  </X509CertificateInformationAccessDescriptor>
+                </subjectInformationAccess>
+                <ipResourceSet>10.0.0.0/8, 11.0.0.0/8</ipResourceSet>
+                <encodedSubjectPublicKey>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtZC7nbyxIqHdncRCXV6wBtBfXtMjuz0TQLd20Hunnr/982wFMqRfsBqEI4+Q/KnPV+N1rsKGhTrAzOCnISDFO5d111qOrWWd/X0T3AjoBLu2yFwtsc+2PYXxM7aAwPl1YfBsmvDjc+BlZEmPgIVLTbkYW2dXaOKVWi5CHpcbHuzox3stStSF9C2CT49N7URwL5qQ7f55BA4kQ1U1grnQR9nbFWT0HjiVIeZow+9ofRD6Io/T6+sMS2LWb3E+YMK6DCdStlYwmZEu+2HpqBjRqB7/3nfO74djpnUXLMzSFIv4x95ZFAeV0GTvLbflfTRd9G9Wa5CF5hd9zrj5OMNwAwIDAQAB</encodedSubjectPublicKey>
+              </resourceCertificateRequest>
+            </requests.SigningRequest>
+          </taRequests>
+          <siaDescriptors>
+            <X509CertificateInformationAccessDescriptor>
+              <method>1.3.6.1.5.5.7.48.13</method>
+              <location>http://localhost:7788/notification.xml</location>
+            </X509CertificateInformationAccessDescriptor>
+            <X509CertificateInformationAccessDescriptor>
+              <method>1.3.6.1.5.5.7.48.5</method>
+              <location>rsync://localhost/online/</location>
+            </X509CertificateInformationAccessDescriptor>
+          </siaDescriptors>
+        </requests.TrustAnchorRequest>""";
 
-    private final String revocationRequest = "<requests.TrustAnchorRequest>\n" +
-            "  <creationTimestamp>1610359575105</creationTimestamp>\n" +
-            "  <taCertificatePublicationUri>rsync://localhost:10873/ta/</taCertificatePublicationUri>\n" +
-            "  <taRequests>\n" +
-            "    <requests.RevocationRequest>\n" +
-            "      <requestId>3ced3f70-a2b4-42d4-9e46-2fe4cac6b4bf</requestId>\n" +
-            "      <resourceClassName>DEFAULT</resourceClassName>\n" +
-            "      <encodedPublicKey>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtZC7nbyxIqHdncRCXV6wBtBfXtMjuz0TQLd20Hunnr/982wFMqRfsBqEI4+Q/KnPV+N1rsKGhTrAzOCnISDFO5d111qOrWWd/X0T3AjoBLu2yFwtsc+2PYXxM7aAwPl1YfBsmvDjc+BlZEmPgIVLTbkYW2dXaOKVWi5CHpcbHuzox3stStSF9C2CT49N7URwL5qQ7f55BA4kQ1U1grnQR9nbFWT0HjiVIeZow+9ofRD6Io/T6+sMS2LWb3E+YMK6DCdStlYwmZEu+2HpqBjRqB7/3nfO74djpnUXLMzSFIv4x95ZFAeV0GTvLbflfTRd9G9Wa5CF5hd9zrj5OMNwAwIDAQAB</encodedPublicKey>\n" +
-            "    </requests.RevocationRequest>\n" +
-            "  </taRequests>\n" +
-            "  <siaDescriptors/>\n" +
-            "</requests.TrustAnchorRequest>";
+    private final String revocationRequest = """
+        <requests.TrustAnchorRequest>
+          <creationTimestamp>1610359575105</creationTimestamp>
+          <taCertificatePublicationUri>rsync://localhost:10873/ta/</taCertificatePublicationUri>
+          <taRequests>
+            <requests.RevocationRequest>
+              <requestId>3ced3f70-a2b4-42d4-9e46-2fe4cac6b4bf</requestId>
+              <resourceClassName>DEFAULT</resourceClassName>
+              <encodedPublicKey>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtZC7nbyxIqHdncRCXV6wBtBfXtMjuz0TQLd20Hunnr/982wFMqRfsBqEI4+Q/KnPV+N1rsKGhTrAzOCnISDFO5d111qOrWWd/X0T3AjoBLu2yFwtsc+2PYXxM7aAwPl1YfBsmvDjc+BlZEmPgIVLTbkYW2dXaOKVWi5CHpcbHuzox3stStSF9C2CT49N7URwL5qQ7f55BA4kQ1U1grnQR9nbFWT0HjiVIeZow+9ofRD6Io/T6+sMS2LWb3E+YMK6DCdStlYwmZEu+2HpqBjRqB7/3nfO74djpnUXLMzSFIv4x95ZFAeV0GTvLbflfTRd9G9Wa5CF5hd9zrj5OMNwAwIDAQAB</encodedPublicKey>
+            </requests.RevocationRequest>
+          </taRequests>
+          <siaDescriptors/>
+        </requests.TrustAnchorRequest>""";
 }

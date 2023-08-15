@@ -274,7 +274,7 @@ public class ResourceExtensionEncoderTest {
      */
     @Test
     public void shouldEncodeRfc3779AppendixBFirstExample() {
-        SortedMap<AddressFamily, IpResourceSet> resources = new TreeMap<AddressFamily, IpResourceSet>();
+        SortedMap<AddressFamily, IpResourceSet> resources = new TreeMap<>();
         resources.put(AddressFamily.IPV4.withSubsequentAddressFamilyIdentifier(1),
                 IpResourceSet.parse("10.0.32.0/20, 10.0.64.0/24, 10.1.0.0/16, 10.2.48.0/20, 10.2.64.0/24, 10.3.0.0/16"));
         resources.put(AddressFamily.IPV6, null);
@@ -288,7 +288,7 @@ public class ResourceExtensionEncoderTest {
      */
     @Test
     public void shouldEncodeRfc3779AppendixBSecondExample() {
-        SortedMap<AddressFamily, IpResourceSet> resources = new TreeMap<AddressFamily, IpResourceSet>();
+        SortedMap<AddressFamily, IpResourceSet> resources = new TreeMap<>();
         resources.put(AddressFamily.IPV6, IpResourceSet.parse("2001:0:2::/48"));
         resources.put(AddressFamily.IPV4.withSubsequentAddressFamilyIdentifier(1),
                 IpResourceSet.parse("10.0.0.0/8,176.16.0.0/12"));

@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class VersionedIdConverterTest {
 
-    private VersionedIdConverter subject = new VersionedIdConverter();
+    private final VersionedIdConverter subject = new VersionedIdConverter();
 
     @Test
     public void shouldSupportVersionedId() {

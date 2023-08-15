@@ -11,7 +11,7 @@ public abstract class TaResponse extends EqualsSupport implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID requestId;
+    private final UUID requestId;
 
     protected TaResponse(UUID requestId) {
         Validate.notNull(requestId, "requestId is required");

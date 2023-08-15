@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class IpResourceSetProvisioningConverterTest {
-    private IpResourceSetProvisioningConverter subject = new IpResourceSetProvisioningConverter();
+    private final IpResourceSetProvisioningConverter subject = new IpResourceSetProvisioningConverter();
 
     @Test
     public void shouldStripASPrefix() {

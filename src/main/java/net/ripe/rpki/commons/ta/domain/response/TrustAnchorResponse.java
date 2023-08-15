@@ -18,7 +18,7 @@ public class TrustAnchorResponse extends EqualsSupport implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final Long requestCreationTimestamp;
-    private List<TaResponse> taResponses;
+    private final List<TaResponse> taResponses;
     private final Map<URI, CertificateRepositoryObject> publishedObjects;
 
     public TrustAnchorResponse(final Long requestCreationTimestamp,
@@ -29,7 +29,7 @@ public class TrustAnchorResponse extends EqualsSupport implements Serializable {
 
         this.requestCreationTimestamp = requestCreationTimestamp;
         this.publishedObjects = new TreeMap<>(publishedObjects);
-        this.taResponses = (taResponses == null) ? new ArrayList<TaResponse>() : taResponses;
+        this.taResponses = (taResponses == null) ? new ArrayList<>() : taResponses;
     }
 
     public Long getRequestCreationTimestamp() {
@@ -59,9 +59,9 @@ public class TrustAnchorResponse extends EqualsSupport implements Serializable {
 
     public final static class Builder {
 
-        private Long requestCreationTimestamp;
-        private Map<URI, CertificateRepositoryObject> publishedObjects = new TreeMap<URI, CertificateRepositoryObject>();
-        private List<TaResponse> taResponses = new ArrayList<TaResponse>();
+        private final Long requestCreationTimestamp;
+        private final Map<URI, CertificateRepositoryObject> publishedObjects = new TreeMap<>();
+        private final List<TaResponse> taResponses = new ArrayList<>();
 
         private Builder(Long requestCreationTimestamp) {
             this.requestCreationTimestamp = requestCreationTimestamp;

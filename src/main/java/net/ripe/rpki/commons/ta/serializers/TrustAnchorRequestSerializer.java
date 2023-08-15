@@ -155,7 +155,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
 
             final Element creationTimestampElement = getSingleChildElement(taRequestElement, CREATION_TIMESTAMP);
             final String creationTimeStampText = getElementTextContent(creationTimestampElement);
-            final Long creationTimeStamp;
+            final long creationTimeStamp;
             try {
                 creationTimeStamp = Long.parseLong(creationTimeStampText);
             }catch (NumberFormatException e) {

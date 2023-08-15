@@ -27,9 +27,9 @@ public class ResourceClassListResponsePayloadSerializerTest {
     private static final XmlSerializer<ResourceClassListResponsePayload> SERIALIZER = new ResourceClassListResponsePayloadSerializer();
 
 
-    private static Instant validityNotAfter = Instant.parse("2011-01-01T23:58:23Z");
+    private static final Instant validityNotAfter = Instant.parse("2011-01-01T23:58:23Z");
 
-    public static ResourceClassListResponsePayload TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD = createResourceClassListResponsePayload();
+    public static final ResourceClassListResponsePayload TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD = createResourceClassListResponsePayload();
 
 
     public static ResourceClassListResponsePayload createResourceClassListResponsePayload() {

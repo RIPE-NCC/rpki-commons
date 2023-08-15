@@ -8,9 +8,9 @@ public class ValidationCheck extends EqualsSupport implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private ValidationStatus status;
-    private String key;
-    private String[] params;
+    private final ValidationStatus status;
+    private final String key;
+    private final String[] params;
 
     public ValidationCheck(ValidationStatus status, String key, String... params) {
         this.status = status;

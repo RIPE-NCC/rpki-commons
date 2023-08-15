@@ -4,10 +4,10 @@ import net.ripe.rpki.commons.util.EqualsSupport;
 
 public class CertificateRevocationKeyElement extends EqualsSupport {
 
-    private String className;
+    private final String className;
 
     // (XStream legacy) byte arrays are not allowed as attribute; hence we do the encoding ourselves
-    private String publicKeyHash;
+    private final String publicKeyHash;
 
     public CertificateRevocationKeyElement(String className, String publicKeyHash) {
         this.className = className;

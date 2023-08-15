@@ -15,10 +15,10 @@ public class ManifestCmsConverterTest {
     private XStream xStream;
     private ManifestCmsConverter subject;
 
-    private String expectedXmlRegEx =
-            "<net\\.ripe\\..*\\.ManifestCms>\n" +
-                    "  <encoded>[^<]*</encoded>\n" +
-                    "</net\\.ripe\\..*\\.ManifestCms>";
+    private final String expectedXmlRegEx = """
+            <net\\.ripe\\..*\\.ManifestCms>
+              <encoded>[^<]*</encoded>
+            </net\\.ripe\\..*\\.ManifestCms>""";
 
     @Before
     public void setUp() {

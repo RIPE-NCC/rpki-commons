@@ -67,13 +67,13 @@ public class ProvisioningCmsObjectParser {
 
     private X509Certificate cmsCertificate;
 
-    private Collection<X509Certificate> caCertificates = new HashSet<>();
+    private final Collection<X509Certificate> caCertificates = new HashSet<>();
 
     private X509CRL crl;
 
     private CMSSignedDataParser sp;
 
-    private ValidationResult validationResult;
+    private final ValidationResult validationResult;
 
     private String location;
     private AbstractProvisioningPayload payload;
@@ -250,11 +250,7 @@ public class ProvisioningCmsObjectParser {
     private Collection<? extends Certificate> extractCertificates(CMSSignedDataParser sp) {
         try {
             return BouncyCastleUtil.extractCertificates(sp);
-        } catch (CMSException e) {
-            return null;
-        } catch (StoreException e) {
-            return null;
-        } catch (CertificateException e) {
+        } catch (CMSException | StoreException | CertificateException e) {
             return null;
         }
     }
@@ -272,20 +268,14 @@ public class ProvisioningCmsObjectParser {
             return;
         }
 
-        CRL x509Crl = crls.get(0);
-        if (validationResult.rejectIfFalse(x509Crl instanceof X509CRL, CRL_IS_X509CRL)) {
-            crl = (X509CRL) x509Crl;
-        }
+        validationResult.pass(CRL_IS_X509CRL);
+        crl = crls.get(0);
     }
 
     private List<? extends X509CRL> extractCrl(CMSSignedDataParser sp) {
         try {
             return BouncyCastleUtil.extractCrls(sp);
-        } catch (CMSException e) {
-            return null;
-        } catch (StoreException e) {
-            return null;
-        } catch (CRLException e) {
+        } catch (CMSException | StoreException | CRLException e) {
             return null;
         }
     }

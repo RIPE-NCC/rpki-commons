@@ -11,13 +11,13 @@ public class CertificateUrlListConverter extends AbstractSingleValueConverter {
     public static final CertificateUrlListConverter INSTANCE = new CertificateUrlListConverter();
 
     @Override
-    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+    public boolean canConvert(Class type) {
         return type == List.class;
     }
 
     @Override
     public List<URI> fromString(String str) {
-        List<URI> result = new ArrayList<URI>();
+        List<URI> result = new ArrayList<>();
         for (String uri : str.split(",")) {
             result.add(URI.create(uri));
         }
@@ -30,7 +30,7 @@ public class CertificateUrlListConverter extends AbstractSingleValueConverter {
         if (obj == null) {
             return null;
         }
-        List<String> encodedUrls = new ArrayList<String>();
+        List<String> encodedUrls = new ArrayList<>();
         for (URI uri : (List<URI>) obj) {
             encodedUrls.add(uri.toString().replace(",", "%2C"));
         }

@@ -6,7 +6,7 @@ import net.ripe.rpki.commons.provisioning.payload.revocation.CertificateRevocati
 
 public class CertificateRevocationRequestPayload extends AbstractProvisioningQueryPayload {
 
-    private CertificateRevocationKeyElement keyElement;
+    private final CertificateRevocationKeyElement keyElement;
 
     public CertificateRevocationRequestPayload(CertificateRevocationKeyElement keyElement) {
         super(PayloadMessageType.revoke);

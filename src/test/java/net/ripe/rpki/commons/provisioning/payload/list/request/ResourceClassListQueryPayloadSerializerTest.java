@@ -15,12 +15,14 @@ public class ResourceClassListQueryPayloadSerializerTest {
     private static final XmlSerializer<ResourceClassListQueryPayload> SERIALIZER = new ResourceClassListQueryPayloadSerializer();
     public static final ResourceClassListQueryPayload TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD = new ResourceClassListQueryPayload();
 
-    public static final String XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\n" +
-            "         recipient=\"recipient attribute\"\n" +
-            "         sender=\"sender attribute\"\n" +
-            "         type=\"list\"\n" +
-            "         version=\"1\"/>\n";
+    public static final String XML = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <message xmlns="http://www.apnic.net/specs/rescerts/up-down/"
+                 recipient="recipient attribute"
+                 sender="sender attribute"
+                 type="list"
+                 version="1"/>
+        """;
 
     @Test
     public void shouldCreateParsableProvisioningObject() throws IOException {

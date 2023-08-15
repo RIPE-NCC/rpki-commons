@@ -8,8 +8,9 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.util.io.TeeOutputStream;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
@@ -35,25 +36,26 @@ public class CMSUtils {
     static OutputStream attachSignersToOutputStream(Collection<SignerInfoGenerator> signers, OutputStream s) {
         OutputStream result = s;
         for (SignerInfoGenerator signer : signers) {
-            result = getSafeTeeOutputStream(result, signer.getCalculatingOutputStream());
+            result = getNullSafeTeeOutputStream(result, signer.getCalculatingOutputStream());
         }
         return result;
     }
 
-    static OutputStream getSafeOutputStream(OutputStream s) {
-        OutputStream nullStream = new OutputStream() {
-
-            @Override
-            public void write(int b) throws IOException {
-
-            }
-        };
-        return s == null ? nullStream : s;
+    static @NotNull OutputStream getNullSafeOutputStream(@Nullable OutputStream s) {
+        if (s != null) {
+            return s;
+        } else {
+            return new OutputStream() {
+                @Override
+                public void write(int b) {
+                }
+            };
+        }
     }
 
-    static OutputStream getSafeTeeOutputStream(OutputStream s1,
-                                               OutputStream s2) {
-        return s1 == null ? getSafeOutputStream(s2)
-            : s2 == null ? getSafeOutputStream(s1) : new TeeOutputStream(s1, s2);
+    static OutputStream getNullSafeTeeOutputStream(OutputStream s1,
+                                                   OutputStream s2) {
+        return s1 == null ? getNullSafeOutputStream(s2)
+            : s2 == null ? getNullSafeOutputStream(s1) : new TeeOutputStream(s1, s2);
     }
 }

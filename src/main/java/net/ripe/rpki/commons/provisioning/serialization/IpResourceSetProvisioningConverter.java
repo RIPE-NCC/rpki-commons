@@ -9,7 +9,7 @@ public class IpResourceSetProvisioningConverter extends AbstractSingleValueConve
     public static final IpResourceSetProvisioningConverter INSTANCE = new IpResourceSetProvisioningConverter();
 
     @Override
-    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+    public boolean canConvert(Class type) {
         return type == IpResourceSet.class;
     }
 

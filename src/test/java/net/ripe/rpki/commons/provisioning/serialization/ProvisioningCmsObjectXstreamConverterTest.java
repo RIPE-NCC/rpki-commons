@@ -38,9 +38,10 @@ public class ProvisioningCmsObjectXstreamConverterTest {
         ProvisioningCmsObject cmsObject = ProvisioningObjectMother.createResourceClassListQueryProvisioningCmsObject();
         String xml = serializer.serialize(cmsObject);
 
-        String expectedRegex = "<ProvisioningCmsObject>\n" +
-                "  <encoded>[^<]*</encoded>\n" +
-                "</ProvisioningCmsObject>";
+        String expectedRegex = """
+            <ProvisioningCmsObject>
+              <encoded>[^<]*</encoded>
+            </ProvisioningCmsObject>""";
 
         assertTrue(Pattern.matches(expectedRegex, xml));
     }

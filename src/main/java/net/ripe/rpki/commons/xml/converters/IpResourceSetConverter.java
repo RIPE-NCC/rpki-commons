@@ -5,7 +5,6 @@ import net.ripe.ipresource.IpResourceSet;
 
 public class IpResourceSetConverter extends AbstractSingleValueConverter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return IpResourceSet.class.equals(type);

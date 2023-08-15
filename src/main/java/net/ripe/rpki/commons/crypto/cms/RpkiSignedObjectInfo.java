@@ -11,10 +11,10 @@ import java.time.Instant;
  */
 public class RpkiSignedObjectInfo {
 
-    private byte[] encoded;
-    private X509ResourceCertificate resourceCertificate;
-    private ASN1ObjectIdentifier contentType;
-    private @Nullable Instant signingTime;
+    private final byte[] encoded;
+    private final X509ResourceCertificate resourceCertificate;
+    private final ASN1ObjectIdentifier contentType;
+    private final @Nullable Instant signingTime;
 
     public RpkiSignedObjectInfo(byte[] encoded, X509ResourceCertificate resourceCertificate, ASN1ObjectIdentifier oid, @Nullable Instant signingTime) { //NOPMD - ArrayIsStoredDirectly
         this.encoded = encoded;

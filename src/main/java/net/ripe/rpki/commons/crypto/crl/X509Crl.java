@@ -213,13 +213,7 @@ public class X509Crl implements CertificateRepositoryObject {
     public void verify(PublicKey publicKey) throws SignatureException {
         try {
             getCrl().verify(publicKey, DEFAULT_SIGNATURE_PROVIDER);
-        } catch (InvalidKeyException e) {
-            throw new IllegalArgumentException(e);
-        } catch (CRLException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchProviderException e) {
+        } catch (InvalidKeyException | CRLException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new IllegalArgumentException(e);
         }
     }

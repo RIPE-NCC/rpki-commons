@@ -32,7 +32,7 @@ public class AllowedRoute extends EqualsSupport implements Serializable {
     }
 
     public static List<AllowedRoute> fromRoas(List<? extends Roa> roas) {
-        List<AllowedRoute> result = new ArrayList<AllowedRoute>();
+        List<AllowedRoute> result = new ArrayList<>();
         for (Roa roa : roas) {
             for (RoaPrefix roaPrefix : roa.getPrefixes()) {
                 result.add(new AllowedRoute(roa.getAsn(), roaPrefix.getPrefix(), roaPrefix.getEffectiveMaximumLength()));

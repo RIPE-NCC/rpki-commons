@@ -13,7 +13,7 @@ public class CertificateUrlListConverterTest {
     private static final URI URI_WITH_COMMA = URI.create("http://localhost/unescaped,comma");
     private static final URI URI_WITH_ESCAPED_COMMA = URI.create("http://localhost/escaped%2Ccomma");
 
-    private CertificateUrlListConverter subject = new CertificateUrlListConverter();
+    private final CertificateUrlListConverter subject = new CertificateUrlListConverter();
 
     @Test
     public void shouldEscapeCommasInUris() {

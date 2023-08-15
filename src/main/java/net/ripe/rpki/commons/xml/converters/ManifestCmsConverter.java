@@ -12,7 +12,6 @@ import org.apache.commons.lang3.Validate;
 
 public class ManifestCmsConverter implements Converter {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class type) {
         return ManifestCms.class.equals(type);

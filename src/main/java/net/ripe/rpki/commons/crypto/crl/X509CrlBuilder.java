@@ -106,9 +106,7 @@ public class X509CrlBuilder {
             X509v2CRLBuilder generator = createCrlGenerator();
             ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(key);
             return new X509Crl(generator.build(signer).getEncoded());
-        } catch (OperatorCreationException e) {
-            throw new X509CrlBuilderException(e);
-        } catch (IOException e) {
+        } catch (OperatorCreationException | IOException e) {
             throw new X509CrlBuilderException(e);
         }
     }

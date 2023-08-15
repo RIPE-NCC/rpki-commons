@@ -7,7 +7,6 @@ import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.EqualsSupport;
 
 import java.net.URI;
-import java.util.Iterator;
 import java.util.List;
 
 public class CertificateElement extends EqualsSupport {
@@ -38,9 +37,7 @@ public class CertificateElement extends EqualsSupport {
         allocatedIpv4 = new IpResourceSet();
         allocatedIpv6 = new IpResourceSet();
 
-        Iterator<IpResource> iter = ipResourceSet.iterator();
-        while (iter.hasNext()) {
-            IpResource resource = iter.next();
+        for (IpResource resource : ipResourceSet) {
             if (resource.getType().equals(IpResourceType.ASN)) {
                 allocatedAsn.add(resource);
             } else if (resource.getType().equals(IpResourceType.IPv4)) {

@@ -213,7 +213,7 @@ public final class X509CertificateUtil {
     }
 
     private static URI[] convertCrlDistributionPointToUris(CRLDistPoint crldp) {
-        List<URI> result = new ArrayList<URI>();
+        List<URI> result = new ArrayList<>();
         for (DistributionPoint dp : crldp.getDistributionPoints()) {
             GeneralNames names = (GeneralNames) dp.getDistributionPoint().getName();
             for (GeneralName name : names.getNames()) {

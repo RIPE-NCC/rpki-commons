@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class ResourceClassListResponsePayloadBuilder extends AbstractPayloadBuilder<ResourceClassListResponsePayload> {
 
-    private List<ResourceClassListResponseClassElement> classElements = new ArrayList<ResourceClassListResponseClassElement>();
+    private final List<ResourceClassListResponseClassElement> classElements = new ArrayList<>();
 
     public void addClassElement(ResourceClassListResponseClassElement classElement) {
         classElements.add(classElement);

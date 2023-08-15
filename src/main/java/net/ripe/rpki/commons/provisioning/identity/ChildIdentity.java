@@ -8,8 +8,8 @@ import java.util.UUID;
 public class ChildIdentity extends EqualsSupport {
 
     public static final int VERSION = 1;
-    private String handle;
-    private ProvisioningIdentityCertificate identityCertificate;
+    private final String handle;
+    private final ProvisioningIdentityCertificate identityCertificate;
 
 
     /**

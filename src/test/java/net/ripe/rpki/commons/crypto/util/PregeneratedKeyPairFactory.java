@@ -31,7 +31,7 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     private static final char[] PASSPHRASE = "passphrase".toCharArray();
 
-    private File keyStoreFile = new File(".pregenerated-test-key-pairs.keystore");
+    private final File keyStoreFile = new File(".pregenerated-test-key-pairs.keystore");
     private KeyStore pregeneratedKeys;
 
     private int count = 0;

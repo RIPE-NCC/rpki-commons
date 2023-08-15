@@ -17,7 +17,7 @@ import org.apache.commons.lang3.Validate;
 public class ProvisioningCmsObjectXstreamConverter implements Converter {
 
     @Override
-    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+    public boolean canConvert(Class type) {
         return ProvisioningCmsObject.class.equals(type);
     }
 

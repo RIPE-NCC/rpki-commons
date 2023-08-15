@@ -62,8 +62,7 @@ public class RpkiCaCertificateRequestBuilderParserTest {
         requestBuilder.withManifestUri(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_MFT_URI);
         requestBuilder.withNotificationUri(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_NOTIFICATION_URI);
         requestBuilder.withSubject(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_CA_SUBJECT);
-        PKCS10CertificationRequest pkcs10Request = requestBuilder.build(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_KEYPAIR);
-        return pkcs10Request;
+        return requestBuilder.build(ProvisioningObjectMother.RPKI_CA_CERT_REQUEST_KEYPAIR);
     }
 
 }

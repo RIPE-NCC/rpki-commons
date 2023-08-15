@@ -19,8 +19,6 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import javax.annotation.CheckForNull;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
@@ -74,7 +72,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
         // *  The CustomerASID value MUST NOT appear in any providerASID field
         if (customerAsn != null) {
-            boolean providerAsInCustomerAs = providerASSet.stream().map(ProviderAS::getProviderAsn).anyMatch(customerAsn::equals);
+            boolean providerAsInCustomerAs = providerASSet.stream().map(ProviderAS::providerAsn).anyMatch(customerAsn::equals);
             validationResult.rejectIfTrue(providerAsInCustomerAs, ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS, String.valueOf(customerAsn), Joiner.on(", ").join(providerASSet));
         }
     }

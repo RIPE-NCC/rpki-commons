@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 public class ManifestCmsBuilderTest {
 
-    private ManifestCmsBuilder subject = new ManifestCmsBuilder();
+    private final ManifestCmsBuilder subject = new ManifestCmsBuilder();
 
 
     @Before
