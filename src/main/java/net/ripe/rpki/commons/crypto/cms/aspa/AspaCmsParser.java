@@ -24,7 +24,7 @@ import java.util.stream.StreamSupport;
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
 import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS;
 
-public class AspaCmsParser extends RpkiSignedObjectParser {
+public class AspaCmsParser extends RpkiSignedObjectParser<AspaCms> {
 
     private int version;
 
@@ -33,21 +33,16 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
     private ImmutableSortedSet<ProviderAS> providerASSet = ImmutableSortedSet.of();
 
     @Override
-    public void parse(ValidationResult result, byte[] encoded) {
-        super.parse(result, encoded);
+    public Optional<AspaCms> validateTypeSpecific(RpkiSignedObjectInfo info) {
         validateAspa();
+        return getValidationResult().hasFailureForCurrentLocation() ? Optional.empty() : Optional.of(new AspaCms(info, version, customerAsn, providerASSet));
     }
 
+    @Deprecated(forRemoval = true)
     public AspaCms getAspa() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("ASPA record validation failed: " + getValidationResult().getFailuresForCurrentLocation());
-        }
-        RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
-        return new AspaCms(cmsObjectData, version, customerAsn, providerASSet);
-    }
-
-    public boolean isSuccess() {
-        return !getValidationResult().hasFailureForCurrentLocation();
+        return getResult().orElseThrow(
+            () -> new IllegalArgumentException("ASPA record validation failed: " + getValidationResult().getFailuresForCurrentLocation())
+        );
     }
 
     /**
@@ -62,7 +57,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
             String.valueOf(getContentType())
         );
 
-        X509ResourceCertificate resourceCertificate = getCertificate();
+        X509ResourceCertificate resourceCertificate = getResourceCertificate();
         validationResult.rejectIfFalse(
                 customerAsn != null &&
                         resourceCertificate != null &&

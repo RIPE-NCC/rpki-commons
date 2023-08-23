@@ -26,6 +26,7 @@ import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFacto
 import static net.ripe.rpki.commons.validation.ValidationStatus.ERROR;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class CertificateRepositoryObjectFactoryTest {
@@ -100,10 +101,9 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(3, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertThat(validationResult.getAllValidationChecksForCurrentLocation()).hasSize(2);
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
         assertFalse(validationResult.getResultForCurrentLocation(CMS_DATA_PARSING).isOk());
-        assertFalse(validationResult.getResultForCurrentLocation(ROA_CONTENT_TYPE).isOk());
     }
 
     @Test
@@ -169,7 +169,7 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals(3, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals(2, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }
 
@@ -196,7 +196,7 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertNull(object);
-        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 4, validationResult.getAllValidationChecksForCurrentLocation().size());
+        assertEquals("" + validationResult.getAllValidationChecksForCurrentLocation(), 2, validationResult.getAllValidationChecksForCurrentLocation().size());
         assertFalse("" + validationResult.getAllValidationChecksForCurrentLocation(), validationResult.hasNoFailuresOrWarnings());
         assertTrue(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk());
     }

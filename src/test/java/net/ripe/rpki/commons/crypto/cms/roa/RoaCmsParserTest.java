@@ -130,9 +130,8 @@ public class RoaCmsParserTest {
     @Test
     public void shouldParseRouteOriginAttestation() {
         parser.parseRouteOriginAttestation(decode(ENCODED_ROUTE_ORIGIN_ATTESTATION));
-        RoaCms roa = parser.getRoaCms();
-        assertEquals(TEST_ASN, roa.getAsn());
-        assertEquals(ipv4Prefixes, roa.getPrefixes());
+        assertEquals(TEST_ASN, parser.asn);
+        assertEquals(ipv4Prefixes, parser.prefixes);
     }
 
 }

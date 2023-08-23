@@ -11,7 +11,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactor
 import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.CMSSignedGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class RpkiSignedObject implements CertificateRepositoryObject {
+public class RpkiSignedObject implements CertificateRepositoryObject {
 
     /**
      * CMS signed objects must indicate signing algorithm as "sha256WithRsa".
@@ -32,7 +32,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
      * However, older versions of BouncyCastle did not support this OID and use "rsaEncryption" instead.
      * We accept both when parsing and validating, but sign with "sha256WithRsa" now.
      */
-    public static final String RSA_ENCRYPTION_OID = CMSSignedDataGenerator.ENCRYPTION_RSA;
+    public static final String RSA_ENCRYPTION_OID = CMSSignedGenerator.ENCRYPTION_RSA;
 
     public static final List<String> ALLOWED_SIGNATURE_ALGORITHM_OIDS = Arrays.asList(
         SHA256WITHRSA_ENCRYPTION_OID,
@@ -44,7 +44,7 @@ public abstract class RpkiSignedObject implements CertificateRepositoryObject {
      * 2.16.840.1.101.3.4.2.1. [RFC4055] It MUST NOT contain any other
      * algorithms.
      */
-    public static final String DIGEST_ALGORITHM_OID = CMSSignedDataGenerator.DIGEST_SHA256;
+    public static final String DIGEST_ALGORITHM_OID = CMSSignedGenerator.DIGEST_SHA256;
 
     private final byte[] encoded;
 

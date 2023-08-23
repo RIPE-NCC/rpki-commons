@@ -11,15 +11,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
-public class GhostbustersCmsParser extends RpkiSignedObjectParser {
+public class GhostbustersCmsParser extends RpkiSignedObjectParser<GhostbustersCms> {
 
     private String vCardPayload;
 
     @Override
-    public void parse(ValidationResult result, byte[] encoded) {
-        super.parse(result, encoded);
+    protected Optional<GhostbustersCms> validateTypeSpecific(RpkiSignedObjectInfo info) {
         validateGhostbusters();
+        return getValidationResult().hasFailureForCurrentLocation() ? Optional.empty() : Optional.of(new GhostbustersCms(info, vCardPayload));
     }
 
     @Override
@@ -56,16 +57,11 @@ public class GhostbustersCmsParser extends RpkiSignedObjectParser {
         }
     }
 
+    @Deprecated(forRemoval = true)
     public GhostbustersCms getGhostbustersCms() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("Ghostbuster record validation failed: " + getValidationResult().getFailuresForCurrentLocation());
-        }
-        RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
-        return new GhostbustersCms(cmsObjectData, vCardPayload);
-    }
-
-    public boolean isSuccess() {
-        return !getValidationResult().hasFailureForCurrentLocation();
+        return getResult().orElseThrow(
+            () -> new IllegalArgumentException("Ghostbuster record validation failed: " + getValidationResult().getFailuresForCurrentLocation())
+        );
     }
 
 }

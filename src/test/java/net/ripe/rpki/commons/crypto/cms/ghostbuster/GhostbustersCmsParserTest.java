@@ -7,6 +7,7 @@ import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDes
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -21,8 +22,8 @@ import java.time.ZonedDateTime;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static net.ripe.rpki.commons.validation.ValidationString.GHOSTBUSTERS_RECORD_SINGLE_VCARD;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class GhostbustersCmsParserTest {
 
@@ -41,7 +42,7 @@ public class GhostbustersCmsParserTest {
         GhostbustersCmsParser parser = new GhostbustersCmsParser();
         parser.parse(ValidationResult.withLocation("test1.gbr"), bytes);
 
-        GhostbustersCms ghostbustersCms = parser.getGhostbustersCms();
+        GhostbustersCms ghostbustersCms = parser.getResult().orElseThrow();
         String vCard = ghostbustersCms.getVCardContent();
         assertEquals("""
             BEGIN:VCARD\r
@@ -61,9 +62,9 @@ public class GhostbustersCmsParserTest {
     public void ghostbusters_record_must_have_vcard() {
         ValidationResult validationResult = validatePayload("");
 
-        assertTrue(validationResult.hasFailures());
-        assertTrue(validationResult.getFailuresForCurrentLocation().stream()
-            .anyMatch(c -> GHOSTBUSTERS_RECORD_SINGLE_VCARD.equals(c.getKey())));
+        assertThat(validationResult.hasFailures()).isTrue();
+        assertThat(validationResult.getFailuresForCurrentLocation())
+            .anyMatch(c -> GHOSTBUSTERS_RECORD_SINGLE_VCARD.equals(c.getKey()));
     }
 
     @Test
@@ -75,9 +76,9 @@ public class GhostbustersCmsParserTest {
             END:VCARD
             """);
 
-        assertTrue(validationResult.hasFailures());
-        assertTrue(validationResult.getFailuresForCurrentLocation().stream()
-            .anyMatch(c -> GHOSTBUSTERS_RECORD_SINGLE_VCARD.equals(c.getKey())));
+        assertThat(validationResult.hasFailures()).isTrue();
+        assertThat(validationResult.getFailuresForCurrentLocation())
+            .anyMatch(c -> GHOSTBUSTERS_RECORD_SINGLE_VCARD.equals(c.getKey()));
     }
 
     private ValidationResult validatePayload(String vCardPayload) {
@@ -99,13 +100,14 @@ public class GhostbustersCmsParserTest {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         GhostbustersCmsParser parser = new GhostbustersCmsParser();
         parser.parse(ValidationResult.withLocation("test2.gbr"), bytes);
-        parser.getGhostbustersCms().getVCardContent();
+        parser.getResult().orElseThrow(IllegalArgumentException::new);
     }
 
     private static X509ResourceCertificate createCertificate() {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
+        builder.withKeyUsage(KeyUsage.digitalSignature);
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         var now = ZonedDateTime.now(ZoneOffset.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));

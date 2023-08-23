@@ -33,7 +33,7 @@ import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATUR
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
-public abstract class RpkiSignedObjectParser {
+public abstract class RpkiSignedObjectParser<T extends RpkiSignedObject> {
     private static final int CMS_OBJECT_VERSION = 3;
     private static final int CMS_OBJECT_SIGNER_VERSION = 3;
 
@@ -46,16 +46,27 @@ public abstract class RpkiSignedObjectParser {
     private Optional<Instant> signingTime;
 
     private ValidationResult validationResult;
+    @Nullable private Optional<T> result;
 
     public final void parse(String location, byte[] encoded) {
         parse(ValidationResult.withLocation(location), encoded);
     }
 
-    public void parse(ValidationResult result, byte[] encoded) {
+    public final void parse(ValidationResult result, byte[] encoded) {
         this.validationResult = result;
         this.encoded = encoded;
         parseCms();
+        if (!result.hasFailureForCurrentLocation()) {
+            var info = new RpkiSignedObjectInfo(encoded, certificate, contentType, signingTime.orElse(null));
+            this.result = validateTypeSpecific(info);
+        }
     }
+
+    public final boolean isSuccess() {
+        return result != null && result.isPresent();
+    }
+
+    protected abstract Optional<T> validateTypeSpecific(RpkiSignedObjectInfo info);
 
     protected byte[] getEncoded() {
         return encoded;
@@ -65,8 +76,11 @@ public abstract class RpkiSignedObjectParser {
         return validationResult;
     }
 
-    protected X509ResourceCertificate getCertificate() {
-        return certificate;
+    public final Optional<T> getResult() {
+        if (this.result == null) {
+            throw new IllegalStateException("parse method has not been invoked yet");
+        }
+        return result;
     }
 
     protected X509ResourceCertificate getResourceCertificate() {

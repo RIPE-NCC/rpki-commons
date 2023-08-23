@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Optional;
 
-import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CONTENT_TYPE;
+import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CONTENT_STRUCTURE;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class AspaCmsParserTest {
@@ -55,6 +55,6 @@ class AspaCmsParserTest {
         parser.parse(result, Resources.toByteArray(Resources.getResource("conformance/root/goodROAASIDZero.roa")));
 
         assertThat(result.hasFailures()).isTrue();
-        assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_CONTENT_TYPE.equals(check.getKey()));
+        assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_CONTENT_STRUCTURE.equals(check.getKey()));
     }
 }

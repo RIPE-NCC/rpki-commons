@@ -13,9 +13,14 @@ import java.util.Optional;
 
 import static net.ripe.rpki.commons.util.RepositoryObjectType.*;
 
-public class GenericRpkiSignedObjectParser extends RpkiSignedObjectParser {
+public class GenericRpkiSignedObjectParser extends RpkiSignedObjectParser<RpkiSignedObject> {
     public @Nullable Instant getSigningTime() {
         return super.getSigningTime();
+    }
+
+    @Override
+    protected Optional<RpkiSignedObject> validateTypeSpecific(RpkiSignedObjectInfo info) {
+        return Optional.of(new RpkiSignedObject(info));
     }
 
     public Optional<RepositoryObjectType> getRepositoryObjectType() {

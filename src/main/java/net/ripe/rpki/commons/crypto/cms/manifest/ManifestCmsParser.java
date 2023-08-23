@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
@@ -19,7 +20,7 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
  * See {@see http://tools.ietf.org/html/draft-ietf-sidr-rpki-manifests-07}
  */
 
-public class ManifestCmsParser extends RpkiSignedObjectParser {
+public class ManifestCmsParser extends RpkiSignedObjectParser<ManifestCms> {
 
     private int version = ManifestCms.DEFAULT_VERSION;
 
@@ -34,25 +35,18 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
     private Map<String, byte[]> files;
 
     @Override
-    public void parse(ValidationResult result, byte[] encoded) {
-        super.parse(result, encoded);
-        if (isSuccess()) {
-            validateManifest();
-        }
+    protected Optional<ManifestCms> validateTypeSpecific(RpkiSignedObjectInfo info) {
+        validateManifest();
+        return getValidationResult().hasFailureForCurrentLocation()
+            ? Optional.empty()
+            : Optional.of(new ManifestCms(info, new ManifestCmsGeneralInfo(version, number, thisUpdateTime, nextUpdateTime, fileHashAlgorithm), files));
     }
 
-    public boolean isSuccess() {
-        return !getValidationResult().hasFailures();
-    }
-
+    @Deprecated(forRemoval = true)
     public ManifestCms getManifestCms() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("Manifest validation failed: " + getValidationResult().getFailuresForCurrentLocation());
-        }
-
-        RpkiSignedObjectInfo cmsObjectData = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
-        ManifestCmsGeneralInfo manifestCmsGeneralInfo = new ManifestCmsGeneralInfo(version, number, thisUpdateTime, nextUpdateTime, fileHashAlgorithm);
-        return new ManifestCms(cmsObjectData, manifestCmsGeneralInfo, files);
+        return getResult().orElseThrow(
+            () -> new IllegalArgumentException("Manifest validation failed: " + getValidationResult().getFailuresForCurrentLocation())
+        );
     }
 
     private void validateManifest() {

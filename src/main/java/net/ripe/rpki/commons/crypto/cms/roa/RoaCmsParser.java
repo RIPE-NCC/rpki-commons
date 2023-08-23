@@ -17,33 +17,28 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
-public class RoaCmsParser extends RpkiSignedObjectParser {
+public class RoaCmsParser extends RpkiSignedObjectParser<RoaCms> {
 
-    private Asn asn;
+    Asn asn;
 
-    private List<RoaPrefix> prefixes = new ArrayList<>();
+    List<RoaPrefix> prefixes = new ArrayList<>();
 
     @Override
-    public void parse(ValidationResult result, byte[] encoded) {
-        super.parse(result, encoded);
+    protected Optional<RoaCms> validateTypeSpecific(RpkiSignedObjectInfo info) {
         validateRoa();
+        return getValidationResult().hasFailureForCurrentLocation() ? Optional.empty() : Optional.of(new RoaCms(info, asn, prefixes));
     }
 
-    public boolean isSuccess() {
-        return !getValidationResult().hasFailureForCurrentLocation();
-    }
-
+    @Deprecated(forRemoval = true)
     public RoaCms getRoaCms() {
-        if (!isSuccess()) {
-            throw new IllegalArgumentException("ROA validation failed: " + getValidationResult().getFailuresForCurrentLocation());
-        }
-
-        RpkiSignedObjectInfo cmsObjectInfo = new RpkiSignedObjectInfo(getEncoded(), getResourceCertificate(), getContentType(), getSigningTime());
-        return new RoaCms(cmsObjectInfo, asn, prefixes);
+        return getResult().orElseThrow(
+            () -> new IllegalArgumentException("ROA validation failed: " + getValidationResult().getFailuresForCurrentLocation())
+        );
     }
 
     private void validateRoa() {
