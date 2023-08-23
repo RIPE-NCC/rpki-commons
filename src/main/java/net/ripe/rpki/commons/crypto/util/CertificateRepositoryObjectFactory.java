@@ -31,7 +31,7 @@ public final class CertificateRepositoryObjectFactory {
      */
     public static CertificateRepositoryObject createCertificateRepositoryObject(byte[] encoded, ValidationResult validationResult) {
 
-        RepositoryObjectType objectType = RepositoryObjectType.parse(validationResult.getCurrentLocation().getName());
+        RepositoryObjectType objectType = RepositoryObjectType.parse(validationResult.getCurrentLocation().name());
 
         ValidationChecks.knownObjectType(objectType, validationResult);
 

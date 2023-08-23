@@ -12,9 +12,9 @@ public final class ValidationChecks {
 
     public static void knownObjectType(RepositoryObjectType objectType, ValidationResult validationResult) {
         if (objectType == Unknown) {
-            validationResult.error(KNOWN_OBJECT_TYPE, validationResult.getCurrentLocation().getName());
+            validationResult.error(KNOWN_OBJECT_TYPE, validationResult.getCurrentLocation().name());
         } else {
-            validationResult.pass(KNOWN_OBJECT_TYPE, validationResult.getCurrentLocation().getName());
+            validationResult.pass(KNOWN_OBJECT_TYPE, validationResult.getCurrentLocation().name());
         }
     }
 }

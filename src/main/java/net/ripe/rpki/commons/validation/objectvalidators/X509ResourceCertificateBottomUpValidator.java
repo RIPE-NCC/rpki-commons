@@ -70,7 +70,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
         IpResourceSet resources = parent.getResources();
 
         for (CertificateWithLocation certificateWithLocation : certificates) {
-            String childLocation = certificateWithLocation.location().getName();
+            String childLocation = certificateWithLocation.location().name();
             X509ResourceCertificate child = certificateWithLocation.certificate();
 
             X509Crl crl = getCRL(child, result);
