@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.Period;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
 /**
@@ -26,8 +27,8 @@ public record ValidityPeriod(@NotNull Instant notValidBefore, @NotNull Instant n
         this(Instant.ofEpochMilli(notValidBefore.getTime()), Instant.ofEpochMilli(notValidAfter.getTime()));
     }
 
-    public ValidityPeriod(@NotNull ZonedDateTime notValidBefore, @NotNull ZonedDateTime notValidAfter) {
-        this(notValidBefore.toInstant(), notValidAfter.toInstant());
+    public ValidityPeriod(@NotNull TemporalAccessor notValidBefore, @NotNull TemporalAccessor notValidAfter) {
+        this(Instant.from(notValidBefore), Instant.from(notValidAfter));
     }
 
     public static ValidityPeriod of(@NotNull ZonedDateTime notValidBefore, @NotNull Period period) {
