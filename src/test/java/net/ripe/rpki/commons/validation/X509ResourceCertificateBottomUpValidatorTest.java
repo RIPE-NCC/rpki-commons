@@ -21,8 +21,8 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 
@@ -39,7 +39,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only - RIPE NCC - NL");
     private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
-    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(1), ZonedDateTime.now(ZoneOffset.UTC).plusYears(1));
+    private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(OffsetDateTime.now(ZoneOffset.UTC).minusMinutes(1), OffsetDateTime.now(ZoneOffset.UTC).plusYears(1));
 
     private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only - First Child - NL");
     private static final BigInteger FIRST_CHILD_SERIAL_NUMBER = ROOT_SERIAL_NUMBER.add(BigInteger.valueOf(1));
@@ -47,7 +47,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final BigInteger SECOND_CHILD_SERIAL_NUMBER = FIRST_CHILD_SERIAL_NUMBER.add(BigInteger.valueOf(1));
     private static final IpResourceSet CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/17, ffce::/16, AS21212");
     private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
-    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(ZonedDateTime.now(ZoneOffset.UTC).minusMonths(2), ZonedDateTime.now(ZoneOffset.UTC).minusMonths(1));
+    private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(OffsetDateTime.now(ZoneOffset.UTC).minusMonths(2), OffsetDateTime.now(ZoneOffset.UTC).minusMonths(1));
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
     private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -289,7 +289,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
         builder.withThisUpdateTime(VALIDITY_PERIOD.notValidBefore().plus(1, ChronoUnit.DAYS));
-        builder.withNextUpdateTime(ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
+        builder.withNextUpdateTime(OffsetDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -301,7 +301,7 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         builder.withIssuerDN(FIRST_CHILD_CERTIFICATE_NAME);
         builder.withThisUpdateTime(VALIDITY_PERIOD.notValidBefore().plus(1, ChronoUnit.DAYS));
-        builder.withNextUpdateTime(ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
+        builder.withNextUpdateTime(OffsetDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(FIRST_CHILD_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

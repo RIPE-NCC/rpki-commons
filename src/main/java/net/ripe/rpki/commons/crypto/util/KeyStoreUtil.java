@@ -23,8 +23,8 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -152,7 +152,7 @@ public final class KeyStoreUtil {
     }
 
     public static X509Certificate generateCertificate(KeyPair keyPair, String signatureProvider) {
-        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
         X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
                 new X500Principal("CN=issuer"),
                 BigInteger.ONE,

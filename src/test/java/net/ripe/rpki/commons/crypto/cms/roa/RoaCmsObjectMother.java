@@ -14,8 +14,9 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsTest.CRL_DP;
@@ -32,8 +33,8 @@ public class RoaCmsObjectMother {
     public static final X500Principal TEST_DN = new X500Principal("CN=Test");
     public static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
 
-    public static RoaCms getRoaCms(ZonedDateTime now) {
-        ValidityPeriod validityPeriod = new ValidityPeriod(now, now.plusYears(1));
+    public static RoaCms getRoaCms(TemporalAccessor now) {
+        var validityPeriod = new ValidityPeriod(now, OffsetDateTime.from(now).plusYears(1));
         return getRoaCms(validityPeriod);
     }
 

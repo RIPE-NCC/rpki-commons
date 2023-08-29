@@ -18,8 +18,8 @@ import org.junit.Test;
 import javax.security.auth.x500.X500Principal;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
@@ -47,7 +47,7 @@ public class XStreamXmlSerializerBuilderTest {
         XStreamXmlSerializerBuilder<ValidityPeriod> builder = new XStreamXmlSerializerBuilder<>(ValidityPeriod.class, NOT_STRICT);
         XStreamXmlSerializer<ValidityPeriod> serializer = builder.build();
 
-        var now = ZonedDateTime.of(2023, 7, 21, 12, 5, 37, 0, ZoneOffset.UTC);
+        var now = OffsetDateTime.of(2023, 7, 21, 12, 5, 37, 0, ZoneOffset.UTC);
         String serializedData = serializer.serialize(new ValidityPeriod(now, now));
         Assert.assertEquals("""
             <ValidityPeriod>
@@ -82,7 +82,7 @@ public class XStreamXmlSerializerBuilderTest {
     public void shouldAliasDateTimeAndUseConverter() {
         XStreamXmlSerializerBuilder<Instant> builder = new XStreamXmlSerializerBuilder<>(Instant.class, NOT_STRICT);
         XStreamXmlSerializer<Instant> serializer = builder.build();
-        Instant dateTime = ZonedDateTime.of(2011, 1, 31, 13, 59, 59, 0, ZoneOffset.UTC).toInstant();
+        Instant dateTime = OffsetDateTime.of(2011, 1, 31, 13, 59, 59, 0, ZoneOffset.UTC).toInstant();
 
         String serializedData = serializer.serialize(dateTime);
         Assert.assertEquals("<datetime>2011-01-31T13:59:59Z</datetime>", serializedData);
@@ -93,7 +93,7 @@ public class XStreamXmlSerializerBuilderTest {
     public void shouldConvertDateTimeFromTimeStamp() {
         XStreamXmlSerializerBuilder<Timestamp> builder = new XStreamXmlSerializerBuilder<>(Timestamp.class, NOT_STRICT);
         XStreamXmlSerializer<Timestamp> serializer = builder.build();
-        Timestamp timestamp = new Timestamp(ZonedDateTime.of(2011, 1, 31, 13, 59, 59, 4_000_000, ZoneOffset.UTC).toInstant().toEpochMilli());
+        Timestamp timestamp = new Timestamp(OffsetDateTime.of(2011, 1, 31, 13, 59, 59, 4_000_000, ZoneOffset.UTC).toInstant().toEpochMilli());
 
         String serializedData = serializer.serialize(timestamp);
         Assert.assertEquals("<sql-timestamp>2011-01-31T13:59:59.004Z</sql-timestamp>", serializedData);
@@ -148,7 +148,7 @@ public class XStreamXmlSerializerBuilderTest {
     public void shouldConvertRoaCms() {
         XStreamXmlSerializerBuilder<RoaCms> builder = new XStreamXmlSerializerBuilder<>(RoaCms.class, NOT_STRICT);
         XStreamXmlSerializer<RoaCms> serializer = builder.build();
-        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(ZonedDateTime.now(ZoneOffset.UTC));
+        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(OffsetDateTime.now(ZoneOffset.UTC));
 
         String serializedData = serializer.serialize(roaCms);
         Assert.assertTrue(Pattern.matches("<RoaCms>\\s*<encoded>[^<]+</encoded>\\s*</RoaCms>", serializedData));

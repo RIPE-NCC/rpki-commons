@@ -7,8 +7,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.regex.Pattern;
 
 public class RoaCmsConverterTest {
@@ -36,14 +36,14 @@ public class RoaCmsConverterTest {
 
     @Test
     public void shouldOnlyUseEncodedWhenSerializingRoa() {
-        RoaCms roa = RoaCmsObjectMother.getRoaCms(ZonedDateTime.now(ZoneOffset.UTC));
+        RoaCms roa = RoaCmsObjectMother.getRoaCms(OffsetDateTime.now(ZoneOffset.UTC));
         String xml = xStream.toXML(roa);
         Assert.assertTrue(Pattern.matches(expectedXmlRegEx, xml));
     }
 
     @Test
     public void shouldDoRoundTripSerializeAndDesirializeRoa() {
-        RoaCms roa = RoaCmsObjectMother.getRoaCms(ZonedDateTime.now(ZoneOffset.UTC));
+        RoaCms roa = RoaCmsObjectMother.getRoaCms(OffsetDateTime.now(ZoneOffset.UTC));
         String xml = xStream.toXML(roa);
 
         RoaCms processedRoa = (RoaCms) xStream.fromXML(xml);

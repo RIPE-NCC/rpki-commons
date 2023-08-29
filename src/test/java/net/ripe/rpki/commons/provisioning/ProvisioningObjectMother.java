@@ -27,8 +27,8 @@ import java.net.URI;
 import java.security.KeyPair;
 import java.security.cert.X509CRL;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class ProvisioningObjectMother {
@@ -66,7 +66,7 @@ public class ProvisioningObjectMother {
         builder.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        var now = ZonedDateTime.of(2011, 3, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var now = OffsetDateTime.of(2011, 3, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now, now.plusYears(5)));
         builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(RPKI_CA_CERT_REQUEST_CA_CRL_URI);

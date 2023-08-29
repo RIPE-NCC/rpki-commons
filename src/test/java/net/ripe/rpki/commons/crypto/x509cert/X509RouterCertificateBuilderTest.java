@@ -12,9 +12,9 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.cert.CertificateParsingException;
+import java.time.OffsetDateTime;
 import java.time.Period;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER;
@@ -34,7 +34,7 @@ public class X509RouterCertificateBuilderTest {
         subject.withSerial(BigInteger.ONE);
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
         subject.withValidityPeriod(ValidityPeriod.of(now, Period.ofYears(1)));
         subject.withAsns(new int[]{1, 2, 3, 4, 5});
     }

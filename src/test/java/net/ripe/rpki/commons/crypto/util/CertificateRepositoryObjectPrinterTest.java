@@ -18,8 +18,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 
 public class CertificateRepositoryObjectPrinterTest {
 
-    private final Clock clock = Clock.fixed(ZonedDateTime.of(2008, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(), ZoneOffset.UTC);
+    private final Clock clock = Clock.fixed(OffsetDateTime.of(2008, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(), ZoneOffset.UTC);
 
     @Test
     public void shouldPrintManifestCms() {
@@ -54,8 +54,8 @@ public class CertificateRepositoryObjectPrinterTest {
     public void shouldPrintResourceCertificate() {
         X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
         builder.withValidityPeriod(new ValidityPeriod(
-            ZonedDateTime.of(2008, 1, 4, 0, 0, 0, 0, ZoneOffset.UTC),
-            ZonedDateTime.of(2009, 1, 4, 0, 0, 0, 0, ZoneOffset.UTC)));
+            OffsetDateTime.of(2008, 1, 4, 0, 0, 0, 0, ZoneOffset.UTC),
+            OffsetDateTime.of(2009, 1, 4, 0, 0, 0, 0, ZoneOffset.UTC)));
         X509ResourceCertificate certificate = builder.build();
 
         StringWriter output = new StringWriter();
@@ -77,7 +77,7 @@ public class CertificateRepositoryObjectPrinterTest {
     @Test
     public void shouldPrintRoa() {
         StringWriter output = new StringWriter();
-        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(ZonedDateTime.now(clock));
+        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(OffsetDateTime.now(clock));
 
         CertificateRepositoryObjectPrinter.print(new PrintWriter(output), roaCms);
 

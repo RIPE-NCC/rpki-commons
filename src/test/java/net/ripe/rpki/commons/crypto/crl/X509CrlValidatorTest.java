@@ -19,8 +19,8 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -163,7 +163,7 @@ public class X509CrlValidatorTest {
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
         builder.withThisUpdateTime(VALIDITY_PERIOD.notValidBefore().plus(1, ChronoUnit.DAYS));
-        builder.withNextUpdateTime(ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
+        builder.withNextUpdateTime(OffsetDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant());
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

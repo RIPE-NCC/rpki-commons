@@ -7,13 +7,15 @@ import java.time.*;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class ValidityPeriodTest {
 
     public final Clock clock = Clock.fixed(
-        ZonedDateTime.of(2008, 4, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(),
+        OffsetDateTime.of(2008, 4, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(),
         ZoneOffset.UTC
     );
 
@@ -41,19 +43,19 @@ public class ValidityPeriodTest {
     @Test
     public void shouldTruncateToOneSecondAccuracy() {
         ValidityPeriod subject = new ValidityPeriod(
-            ZonedDateTime.of(2008, 3, 30, 15, 44, 58, 943, ZoneOffset.UTC),
-            ZonedDateTime.of(2008, 5, 30, 15, 44, 23, 123, ZoneOffset.UTC)
+            OffsetDateTime.of(2008, 3, 30, 15, 44, 58, 943, ZoneOffset.UTC),
+            OffsetDateTime.of(2008, 5, 30, 15, 44, 23, 123, ZoneOffset.UTC)
         );
-        assertEquals(ZonedDateTime.of(2008, 3, 30, 15, 44, 58, 0, ZoneOffset.UTC).toInstant(), subject.notValidBefore());
-        assertEquals(ZonedDateTime.of(2008, 5, 30, 15, 44, 23, 0, ZoneOffset.UTC).toInstant(), subject.notValidAfter());
+        assertEquals(OffsetDateTime.of(2008, 3, 30, 15, 44, 58, 0, ZoneOffset.UTC).toInstant(), subject.notValidBefore());
+        assertEquals(OffsetDateTime.of(2008, 5, 30, 15, 44, 23, 0, ZoneOffset.UTC).toInstant(), subject.notValidAfter());
     }
 
     @Test
     public void shouldSupportIntersection() {
-        var t1 = ZonedDateTime.of(2008, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-        var t2 = ZonedDateTime.of(2008, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-        var t3 = ZonedDateTime.of(2008, 11, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-        var t4 = ZonedDateTime.of(2008, 12, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var t1 = OffsetDateTime.of(2008, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var t2 = OffsetDateTime.of(2008, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var t3 = OffsetDateTime.of(2008, 11, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        var t4 = OffsetDateTime.of(2008, 12, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
         assertEquals(null, new ValidityPeriod(t1, t2).intersectedWith(new ValidityPeriod(t3, t4)));
         assertEquals(new ValidityPeriod(t2, t3), new ValidityPeriod(t1, t3).intersectedWith(new ValidityPeriod(t2, t4)));

@@ -10,8 +10,8 @@ import org.junit.Test;
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
@@ -30,8 +30,8 @@ public class X509ResourceCertificateBuilderTest {
         subject.withSerial(BigInteger.ONE);
         subject.withPublicKey(TEST_KEY_PAIR.getPublic());
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        var now = ZonedDateTime.now(ZoneOffset.UTC);
-        subject.withValidityPeriod(new ValidityPeriod(now, ZonedDateTime.of(now.getYear() + 1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)));
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
+        subject.withValidityPeriod(new ValidityPeriod(now, OffsetDateTime.of(now.getYear() + 1, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)));
         subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
 

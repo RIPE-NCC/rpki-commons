@@ -5,8 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.Period;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
@@ -31,7 +31,7 @@ public record ValidityPeriod(@NotNull Instant notValidBefore, @NotNull Instant n
         this(Instant.from(notValidBefore), Instant.from(notValidAfter));
     }
 
-    public static ValidityPeriod of(@NotNull ZonedDateTime notValidBefore, @NotNull Period period) {
+    public static ValidityPeriod of(@NotNull OffsetDateTime notValidBefore, @NotNull Period period) {
         return new ValidityPeriod(notValidBefore, notValidBefore.plus(period));
     }
 

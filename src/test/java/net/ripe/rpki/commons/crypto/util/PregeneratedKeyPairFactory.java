@@ -19,8 +19,8 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 /**
  * Caches generated keys in a key store so that they can be reused in the next test run. FOR TESTING ONLY!
@@ -91,7 +91,7 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withSignatureProvider("SunRsaSign");
         builder.withSerial(BigInteger.ONE);
-        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now.minusYears(2), now.minusYears(1)));
         builder.withCa(false);
         builder.withIssuerDN(new X500Principal("CN=issuer"));

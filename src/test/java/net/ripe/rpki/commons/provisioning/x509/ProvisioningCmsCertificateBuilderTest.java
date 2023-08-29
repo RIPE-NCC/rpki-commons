@@ -11,8 +11,8 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -122,7 +122,7 @@ public class ProvisioningCmsCertificateBuilderTest {
 
     @Test
     public void shouldSetValidityPeriod() {
-        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
         final ValidityPeriod yearInDays = new ValidityPeriod(now, now.plusDays(365));
 
         final X509Certificate certificate = subject.withValidityPeriod(yearInDays).build().getCertificate();

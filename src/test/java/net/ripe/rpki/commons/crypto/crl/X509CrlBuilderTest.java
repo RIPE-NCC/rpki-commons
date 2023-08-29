@@ -16,8 +16,8 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
@@ -28,9 +28,9 @@ public class X509CrlBuilderTest {
     private static final PublicKey PUBLIC_KEY = KeyPairFactoryTest.TEST_KEY_PAIR.getPublic();
     private static final PrivateKey PRIVATE_KEY = KeyPairFactoryTest.TEST_KEY_PAIR.getPrivate();
 
-    private static final Instant THIS_UPDATE_TIME = ZonedDateTime.of(2007, 2, 28, 2, 53, 23, 0, ZoneOffset.UTC).toInstant();
-    private static final Instant NEXT_UPDATE_TIME = ZonedDateTime.of(2007, 3, 1, 2, 53, 23, 0, ZoneOffset.UTC).toInstant();
-    private static final Instant REVOCATION_TIME = ZonedDateTime.of(2007, 2, 25, 19, 23, 44, 123000000, ZoneOffset.UTC).toInstant();
+    private static final Instant THIS_UPDATE_TIME = OffsetDateTime.of(2007, 2, 28, 2, 53, 23, 0, ZoneOffset.UTC).toInstant();
+    private static final Instant NEXT_UPDATE_TIME = OffsetDateTime.of(2007, 3, 1, 2, 53, 23, 0, ZoneOffset.UTC).toInstant();
+    private static final Instant REVOCATION_TIME = OffsetDateTime.of(2007, 2, 25, 19, 23, 44, 123000000, ZoneOffset.UTC).toInstant();
 
     private X509CrlBuilder subject;
     private X509Crl emptyCrl;

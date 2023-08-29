@@ -18,8 +18,8 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import org.junit.Test;
 
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import static net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory.createCertificateRepositoryObject;
@@ -81,7 +81,7 @@ public class CertificateRepositoryObjectFactoryTest {
     @Test
     public void shouldParseRoaCms() {
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation("roa.roa"));
-        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(ZonedDateTime.now(ZoneOffset.UTC));
+        RoaCms roaCms = RoaCmsObjectMother.getRoaCms(OffsetDateTime.now(ZoneOffset.UTC));
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(roaCms.getEncoded(), validationResult);
 

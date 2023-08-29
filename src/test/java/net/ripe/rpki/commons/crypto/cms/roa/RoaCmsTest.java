@@ -22,8 +22,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +92,7 @@ public class RoaCmsTest {
         builder.withPublicKey(keyPair.getPublic());
         builder.withSigningKeyPair(keyPair);
         builder.withKeyUsage(KeyUsage.digitalSignature);
-        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
         builder.withResources(resources);
         builder.withCrlDistributionPoints(CRL_DP);

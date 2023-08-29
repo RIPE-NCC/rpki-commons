@@ -4,8 +4,8 @@ import org.junit.Test;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class ValidationResultTest {
 
     private static final ValidationLocation FIRST_LOCATION = new ValidationLocation("firstValidatedObject");
 
-    private static final Instant NOW = ZonedDateTime.of(2008, 4, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
+    private static final Instant NOW = OffsetDateTime.of(2008, 4, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
 
     private ValidationResult result;
 

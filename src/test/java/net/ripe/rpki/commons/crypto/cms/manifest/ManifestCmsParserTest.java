@@ -17,8 +17,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,8 +36,8 @@ public class ManifestCmsParserTest {
     public static final X500Principal TEST_DN = new X500Principal("CN=Test");
     public static final KeyPair TEST_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
 
-    public static final Instant THIS_UPDATE_TIME = ZonedDateTime.of(2008, 9, 1, 22, 43, 29, 0, ZoneOffset.UTC).toInstant();
-    public static final Instant NEXT_UPDATE_TIME = ZonedDateTime.of(2008, 9, 2, 6, 43, 29, 0, ZoneOffset.UTC).toInstant();
+    public static final Instant THIS_UPDATE_TIME = OffsetDateTime.of(2008, 9, 1, 22, 43, 29, 0, ZoneOffset.UTC).toInstant();
+    public static final Instant NEXT_UPDATE_TIME = OffsetDateTime.of(2008, 9, 2, 6, 43, 29, 0, ZoneOffset.UTC).toInstant();
 
     public static final byte[] FOO_CONTENT = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32};
 

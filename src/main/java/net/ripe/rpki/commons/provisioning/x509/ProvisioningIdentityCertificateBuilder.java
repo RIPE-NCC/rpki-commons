@@ -8,8 +8,8 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 
 public class ProvisioningIdentityCertificateBuilder {
@@ -61,7 +61,7 @@ public class ProvisioningIdentityCertificateBuilder {
 
     private void setUpImplicitRequirementsForBuilderHelper() {
         builderHelper.withSerial(BigInteger.ONE); // Self-signed! So this is the first!
-        var now = ZonedDateTime.now(ZoneOffset.UTC);
+        var now = OffsetDateTime.now(ZoneOffset.UTC);
         builderHelper.withValidityPeriod(new ValidityPeriod(now, now.plusYears(DEFAULT_VALIDITY_TIME_YEARS_FROM_NOW)));
         builderHelper.withCa(true);
         builderHelper.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);

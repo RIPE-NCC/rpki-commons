@@ -3,8 +3,8 @@ package net.ripe.rpki.commons.xml.converters;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -66,11 +66,11 @@ public class InstantConverter implements SingleValueConverter {
 
     @Override
     public String toString(Object instant) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant((Instant) instant, ZoneOffset.UTC);
+        var offsetDateTime = OffsetDateTime.ofInstant((Instant) instant, ZoneOffset.UTC);
         if (useMillis) {
-            return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.format(zonedDateTime);
+            return FORMATTER_DATE_TIME_WITH_MILLIS_AND_ZONE.format(offsetDateTime);
         } else {
-            return FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.format(zonedDateTime);
+            return FORMATTER_DATE_TIME_NO_MILLIS_AND_ZONE.format(offsetDateTime);
         }
     }
 }

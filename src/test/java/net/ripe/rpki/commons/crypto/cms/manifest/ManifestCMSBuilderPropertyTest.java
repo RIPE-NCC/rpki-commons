@@ -5,8 +5,8 @@ import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.runner.RunWith;
 
 import java.math.BigInteger;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.createValidManifestEECertificate;
@@ -26,7 +26,7 @@ public class ManifestCMSBuilderPropertyTest {
             builder.withManifestNumber(manifestNumber);
             builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
             builder.withCertificate(createValidManifestEECertificate(TEST_KEY_PAIR));
-            var start = ZonedDateTime.now(ZoneOffset.UTC);
+            var start = OffsetDateTime.now(ZoneOffset.UTC);
             builder.withThisUpdateTime(start.toInstant());
             builder.withNextUpdateTime(start.plusHours(validityHours).toInstant());
             ManifestCms manifestCms = builder.build(TEST_KEY_PAIR.getPrivate());
