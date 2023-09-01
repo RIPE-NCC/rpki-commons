@@ -8,48 +8,52 @@ import net.ripe.ipresource.UniqueIpResource;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERBitString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoderTest.*;
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class Asn1UtilTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldFailToParseNonZeroPadBits() {
         byte[] WRONG_ENCODED_IPV4_10_5_0_0_23 = {0x03, 0x04, 0x01, 0x0a, 0x05, 0x01};
-        parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23));
+        assertThatThrownBy(() -> parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23)))
+                .isIn(IllegalArgumentException.class);
     }
 
-    @Test(expected = Asn1UtilException.class)
+    @Test
     public void shouldFailIPv4ParsingWhenNoValidDerBitStringFoundP() {
         // bouncy castle 1.70+ catches this invalid case when decoding
         byte[] WRONG_ENCODED_IPV4_10_5_0_0_23 = {0x05, 0x04, 0x01, 0x0a, 0x05, 0x01};
-        parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23));
+        assertThatThrownBy(() -> parseIpAddressAsPrefix(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0_23)))
+                .isInstanceOf(Asn1UtilException.class);
     }
 
     @Test
     public void shouldParseIpv4Address() {
-        assertEquals(IpResource.parse("0.0.0.0/0"), parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_0_0_0_0_0)));
-        assertEquals(IpResource.parse("10.5.0.4/32"), parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_5_0_4_32)));
-        assertEquals(IpResource.parse("10.5.0.0/23"), parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_5_0_0_23)));
-        assertEquals(IpResource.parse("10.64.0.0/12"), parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_64_0_0_12)));
-        assertEquals(IpResource.parse("10.64.0.0/20"), parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_64_0_0_20)));
-        assertEquals(IpResource.parse("128.5.0.4/32"), parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_128_5_0_4_32)));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_0_0_0_0_0))).isEqualTo(IpResource.parse("0.0.0.0/0"));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_5_0_4_32))).isEqualTo(IpResource.parse("10.5.0.4/32"));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_5_0_0_23))).isEqualTo(IpResource.parse("10.5.0.0/23"));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_64_0_0_12))).isEqualTo(IpResource.parse("10.64.0.0/12"));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_10_64_0_0_20))).isEqualTo(IpResource.parse("10.64.0.0/20"));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv4, decode(ENCODED_IPV4_128_5_0_4_32))).isEqualTo(IpResource.parse("128.5.0.4/32"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldFailToParseNonZeroPadBitsIpv4Address() {
         byte[] WRONG_ENCODED_IPV4_10_5_0_0 = {0x03, 0x03, 0x01, 0x0a, 0x05};
-        parseIpAddress(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0), false);
+        assertThatThrownBy(() -> parseIpAddress(IpResourceType.IPv4, decode(WRONG_ENCODED_IPV4_10_5_0_0), false))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void shouldParseIpv6Addresses() {
-        assertEquals(IpResource.parse("2001:0:200:3::1/128"),
-                parseIpAddressAsPrefix(IpResourceType.IPv6, decode(ENCODED_IPV6_2001_0_200_3_0_0_0_1_128)));
-        assertEquals(IpResource.parse("2001:0:200::/39"), parseIpAddressAsPrefix(IpResourceType.IPv6, decode(ENCODED_IPV6_2001_0_200_39)));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv6, decode(ENCODED_IPV6_2001_0_200_3_0_0_0_1_128)))
+                .isEqualTo(IpResource.parse("2001:0:200:3::1/128"));
+        assertThat(parseIpAddressAsPrefix(IpResourceType.IPv6, decode(ENCODED_IPV6_2001_0_200_39))).isEqualTo(IpResource.parse("2001:0:200::/39"));
     }
 
     @Test
@@ -78,16 +82,17 @@ public class Asn1UtilTest {
 
     @Test
     public void shouldDecodeAsn() {
-        assertEquals(ASN_0, parseAsId(decode(ENCODED_ASN_0)));
-        assertEquals(ASN_127, parseAsId(decode(ENCODED_ASN_127)));
-        assertEquals(ASN_128, parseAsId(decode(ENCODED_ASN_128)));
-        assertEquals(ASN_412_233, parseAsId(decode(ENCODED_ASN_412_233)));
-        assertEquals(ASN_65535_65535, parseAsId(decode(ENCODED_ASN_65535_65535)));
+        assertThat(parseAsId(decode(ENCODED_ASN_0))).isEqualTo(ASN_0);
+        assertThat(parseAsId(decode(ENCODED_ASN_127))).isEqualTo(ASN_127);
+        assertThat(parseAsId(decode(ENCODED_ASN_128))).isEqualTo(ASN_128);
+        assertThat(parseAsId(decode(ENCODED_ASN_412_233))).isEqualTo(ASN_412_233);
+        assertThat(parseAsId(decode(ENCODED_ASN_65535_65535))).isEqualTo(ASN_65535_65535);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldFailOnOutOfRangeAsn() {
-        parseAsId(new ASN1Integer(-1));
+        assertThatThrownBy(() -> parseAsId(new ASN1Integer(-1)))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -100,12 +105,12 @@ public class Asn1UtilTest {
         IpRange ipAfter = Asn1Util.parseIpAddressAsPrefix(IpResourceType.IPv4, bitString);
         String actual = ipAfter.toString();
 
-        assertEquals("The ip addresses should not have mutated!", expected + "/16", actual);
+        assertThat(actual).isEqualTo(expected + "/16")
+                .withFailMessage("The ip addresses should not have mutated!");
     }
 
     public static void assertEncoded(byte[] expected, ASN1Encodable encodable) {
         byte[] actual = encode(encodable);
-        assertArrayEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
     }
-
 }
