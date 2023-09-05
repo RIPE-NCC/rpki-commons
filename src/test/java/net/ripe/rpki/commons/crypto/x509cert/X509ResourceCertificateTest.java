@@ -15,6 +15,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.util.encoders.Base64;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -152,7 +153,6 @@ public class X509ResourceCertificateTest {
     @Test
     public void shouldSupportInheritedAsnsOnly() {
         X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.parse("10.0.0.0/8")).withInheritedResourceTypes(EnumSet.of(IpResourceType.ASN)).build();
-        System.out.println(BaseEncoding.base64().encode(subject.getEncoded()));
 
         assertTrue(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.ASN)));
         assertFalse(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv4)));
@@ -180,9 +180,17 @@ public class X509ResourceCertificateTest {
         assertTrue(resourceCertificate.isEe());
         assertFalse(resourceCertificate.isCa());
 
+        System.out.println("-----BEGIN CERTIFICATE-----");
+        System.out.println(BaseEncoding.base64().encode(resourceCertificate.getEncoded()));
+        System.out.println("-----END CERTIFICATE-----");
+
         X509ResourceCertificate cert = createSelfSignedCaResourceCertificateBuilder().build();
         assertTrue(cert.isCa());
         assertFalse(cert.isEe());
+
+        System.out.println("-----BEGIN CERTIFICATE-----");
+        System.out.println(BaseEncoding.base64().encode(cert.getEncoded()));
+        System.out.println("-----END CERTIFICATE-----");
     }
 
     @Test
