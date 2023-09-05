@@ -180,13 +180,29 @@ public class X509ResourceCertificateTest {
         assertTrue(resourceCertificate.isEe());
         assertFalse(resourceCertificate.isCa());
 
-        System.out.println("-----BEGIN CERTIFICATE-----");
-        System.out.println(BaseEncoding.base64().encode(resourceCertificate.getEncoded()));
-        System.out.println("-----END CERTIFICATE-----");
-
         X509ResourceCertificate cert = createSelfSignedCaResourceCertificateBuilder().build();
         assertTrue(cert.isCa());
         assertFalse(cert.isEe());
+    }
+
+    @Test
+    public void shouldSupportCaAndLeafCertificate() {
+        X509ResourceCertificate root = createSelfSignedCaResourceCertificateBuilder().build();
+        assertFalse(root.isEe());
+        assertTrue(root.isCa());
+
+        System.out.println("-----BEGIN CERTIFICATE-----");
+        System.out.println(BaseEncoding.base64().encode(root.getEncoded()));
+        System.out.println("-----END CERTIFICATE-----");
+
+        var leafDn = new X500Principal("CN=EE");
+
+        X509ResourceCertificate cert = createSelfSignedEeCertificateBuilder()
+                .withSubjectDN(leafDn)
+                .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
+                .build();
+        assertFalse(cert.isCa());
+        assertTrue(cert.isEe());
 
         System.out.println("-----BEGIN CERTIFICATE-----");
         System.out.println(BaseEncoding.base64().encode(cert.getEncoded()));
