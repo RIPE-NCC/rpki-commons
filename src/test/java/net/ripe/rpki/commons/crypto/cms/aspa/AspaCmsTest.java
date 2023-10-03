@@ -27,7 +27,9 @@ import java.security.KeyPair;
 import java.util.Comparator;
 import java.util.List;
 
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.EC_TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
@@ -82,14 +84,14 @@ public class AspaCmsTest {
         builder.withProviderASSet(
             providerAsSet
         );
-        builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
-        return builder.build(TEST_KEY_PAIR.getPrivate());
+        builder.withSignatureProvider(ECDSA_SIGNATURE_PROVIDER);
+        return builder.build(EC_TEST_KEY_PAIR.getPrivate());
     }
 
     private static X509ResourceCertificate createCertificate(IpResourceSet resources) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
-        builder.withPublicKey(TEST_KEY_PAIR.getPublic());
+        builder.withPublicKey(EC_TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         final DateTime now = UTC.dateTime();
         builder.withKeyUsage(KeyUsage.digitalSignature);

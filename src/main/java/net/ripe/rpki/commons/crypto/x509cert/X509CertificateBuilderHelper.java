@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import lombok.Getter;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -75,8 +76,10 @@ public final class X509CertificateBuilderHelper {
 
     private static final BigInteger MAX_20_OCTETS = BigInteger.ONE.shiftLeft(160).subtract(BigInteger.ONE);
 
+    @Getter
     private String signatureProvider;
 
+    @Getter
     private String signatureAlgorithm;
 
     private BigInteger serial;
@@ -91,6 +94,7 @@ public final class X509CertificateBuilderHelper {
 
     private PublicKey publicKey;
 
+    @Getter
     private KeyPair signingKeyPair;
 
     private int keyUsage;

@@ -26,10 +26,10 @@ public class X509ResourceCertificateBuilder {
     private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
 
     public X509ResourceCertificateBuilder() {
-        builderHelper = new X509CertificateBuilderHelper()
-                .withSignatureProvider(X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER)
-                .withSignatureAlgorithm(X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM);
-        builderHelper.withResources(resources);
+        builderHelper = new X509CertificateBuilderHelper();
+        builderHelper.withResources(resources)
+                .withSignatureProvider(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER)
+                .withSignatureAlgorithm(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM);
         // https://tools.ietf.org/html/rfc6487#section-4.8.9
         builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
     }
@@ -109,6 +109,14 @@ public class X509ResourceCertificateBuilder {
         if (inheritedResourceTypes.isEmpty()) {
             Validate.notNull(resources, "no resources");
             Validate.isTrue(!resources.isEmpty(), "empty resources");
+        }
+
+        if (builderHelper.getSigningKeyPair().getPublic().getAlgorithm() == "EC") {
+            builderHelper.withSignatureProvider(X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER);
+
+            if (X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER.equals(builderHelper.getSignatureProvider())) {
+                builderHelper.withSignatureAlgorithm(X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM);
+            }
         }
         return new X509ResourceCertificate(builderHelper.generateCertificate());
     }

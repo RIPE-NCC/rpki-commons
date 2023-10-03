@@ -37,6 +37,9 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER;
+
 public abstract class RpkiSignedObjectBuilder {
 
     protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, byte[] content) {
@@ -62,12 +65,15 @@ public abstract class RpkiSignedObjectBuilder {
                 break;
             case "EC":
                 signatureAlgorithm = X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM;
+                if (DEFAULT_SIGNATURE_PROVIDER.equals(signatureProvider)) {
+                    signatureProvider = ECDSA_SIGNATURE_PROVIDER;
+                }
                 break;
             default:
                 Preconditions.checkArgument(false, "Not a supported public key type");
         }
         Preconditions.checkArgument(!(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM.equals(signatureAlgorithm) && X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER.equals(signatureProvider)));
-        Preconditions.checkArgument(!(X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM.equals(signatureAlgorithm) && X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER.equals(signatureProvider)));
+        Preconditions.checkArgument(!(X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM.equals(signatureAlgorithm) && DEFAULT_SIGNATURE_PROVIDER.equals(signatureProvider)));
 
 
         addSignerInfo(generator, privateKey, signatureProvider, signatureAlgorithm, signingCertificate);
