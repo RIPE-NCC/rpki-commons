@@ -67,6 +67,7 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
   * Prefixes in ROAs are sorted by (prefix, maxlength - missing first)
   * Incorporate a number of extra checks on resource extensions
   * Update ASPA implementation to create objects in [draft-ietf-sidrops-aspa-profile-16](https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-16) profile.
+  * Bouncy Castle 1.74
 
 ### 2023-06-26 1.34
   * Add `GenericRpkiSignedObjectParser` to parse object type from `content-type` and signing time.
