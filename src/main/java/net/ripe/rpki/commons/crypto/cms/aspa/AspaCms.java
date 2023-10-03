@@ -11,6 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 import java.util.Objects;
+import java.util.SortedSet;
 
 /**
  * See https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-07.
@@ -44,11 +45,11 @@ public class AspaCms extends RpkiSignedObject {
      * address family received from the customer.
      */
     @NonNull
-    ImmutableSortedSet<ProviderAS> providerASSet;
+    SortedSet<Asn> providerASSet;
 
-    public AspaCms(RpkiSignedObjectInfo cmsObjectData, int version, Asn customerAsn, ImmutableSortedSet<ProviderAS> providerASSet) {
+    public AspaCms(RpkiSignedObjectInfo cmsObjectData, int version, Asn customerAsn, SortedSet<Asn> providerASSet) {
         super(cmsObjectData);
-        Validate.isTrue(version == 0, "version must be 0");
+        Validate.isTrue(version == 1, "version must be 1");
         this.version = version;
         this.customerAsn = customerAsn;
         this.providerASSet = providerASSet;

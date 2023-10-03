@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GenericRpkiSignedObjectParserTest {
     @Test
     void should_parse_aspa() throws IOException {
-        GenericRpkiSignedObjectParser parser = parse("interop/aspa/AS211321.asa");
+        GenericRpkiSignedObjectParser parser = parse("interop/aspa/GOOD-profile-15-draft-ietf-sidrops-profile-15-sample.asa");
 
         assertThat(parser.getRepositoryObjectType().get()).isEqualTo(RepositoryObjectType.Aspa);
-        assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2021-11-11T11:19:00+00:00"));
+        assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2023-06-07T09:08:41+00:00"));
     }
 
     @Disabled("Our parser rejects GBR objects: corrupted stream - out of bounds length found: 115 >= 32")

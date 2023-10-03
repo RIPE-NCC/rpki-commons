@@ -2,37 +2,78 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.io.Resources;
 import net.ripe.ipresource.Asn;
-import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import static net.ripe.rpki.commons.validation.ValidationString.ASPA_CONTENT_TYPE;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AspaCmsParserTest {
 
     @Test
-    void should_parse_aspa_rpkimancer() throws IOException {
-        AspaCms aspa = parseValidAspa("interop/aspa/aspa-rpkimancer.asa");
-        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS65000"));
+    void should_parse_draft15_aspa() throws IOException {
+        AspaCms aspa = parseValidAspa("interop/aspa/GOOD-profile-15-draft-ietf-sidrops-profile-15-sample.asa");
+        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS15562"));
+        assertThat(aspa.getVersion()).isEqualTo(1);
         assertThat(aspa.getProviderASSet()).containsExactly(
-                        new ProviderAS(Asn.parse("AS65001"), Optional.empty()),
-                        new ProviderAS(Asn.parse("AS65002"), Optional.of(AddressFamily.IPV4))
+                        Asn.parse("AS2914"),
+                        Asn.parse("AS8283"),
+                        Asn.parse("AS51088"),
+                        Asn.parse("206238")
         );
     }
 
     @Test
-    void should_parse_aspa_krill() throws IOException {
-        AspaCms aspa = parseValidAspa("interop/aspa/AS211321.asa");
-        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS211321"));
+    void should_parse_draft15_rpki_commons_object() throws IOException {
+        AspaCms aspa = parseValidAspa("interop/aspa/GOOD-profile-15-rpki-commons-propertytest-sample.asa");
+        assertThat(aspa.getVersion()).isEqualTo(1);
+    }
+    
+    @Test
+    void should_accept_apnic_test_aspa_v1() throws IOException {
+        AspaCms aspa = parseValidAspa("interop/aspa/GOOD-profile-15-APNIC-rpki-aspa-demo-AS1000.asa");
+        assertThat(aspa.getCustomerAsn()).isEqualTo(Asn.parse("AS1000"));
+        assertThat(aspa.getVersion()).isEqualTo(1);
         assertThat(aspa.getProviderASSet()).containsExactly(
-                        new ProviderAS(Asn.parse("AS65000"), Optional.empty()),
-                        new ProviderAS(Asn.parse("AS65001"), Optional.of(AddressFamily.IPV4)),
-                        new ProviderAS(Asn.parse("AS65002"), Optional.of(AddressFamily.IPV6))
+                        Asn.parse("AS1025")
         );
+    }
+
+    /**
+     * draft 15 mentions <emph>implicit</emph> tags by accident, this was changed without a OID change later.
+     */
+    @Test
+    void should_reject_draft15_rpki_commons_with_implicit_tag() throws IOException {
+        AspaCmsParser parser = new AspaCmsParser();
+        ValidationResult result = ValidationResult.withLocation("BAD-profile-15-rpki-commons-propertytest-sample-implicit-tag.asa");
+        parser.parse(result, Resources.toByteArray(Resources.getResource("interop/aspa/BAD-profile-15-rpki-commons-propertytest-sample-implicit-tag.asa")));
+
+        assertThat(result.hasFailures()).isTrue();
+        // Content structure check should fail because tags are wrong
+        assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_CONTENT_STRUCTURE.equals(check.getKey()));
+    }
+
+    @Test
+    void should_reject_apnic_test_aspa_WRONG_VERSION() throws IOException {
+        AspaCmsParser parser = new AspaCmsParser();
+        ValidationResult result = ValidationResult.withLocation("BAD-profile-15-APNIC-rpki-aspa-demo-AS1000.asa");
+        parser.parse(result, Resources.toByteArray(Resources.getResource("interop/aspa/BAD-profile-15-APNIC-rpki-aspa-demo-AS1000.asa")));
+
+        assertThat(result.hasFailures()).isTrue();
+        assertThat(result.getFailuresForAllLocations()).anyMatch(check -> ASPA_VERSION.equals(check.getKey()));
+    }
+
+    @Test
+    void parseAspa_wrong_profile_version() throws IOException {
+        AspaCmsParser parser = new AspaCmsParser();
+        ValidationResult result = ValidationResult.withLocation("BAD-profile-13-AS211321-profile-13.asa");
+        parser.parse(result, Resources.toByteArray(Resources.getResource("interop/aspa/BAD-profile-13-AS211321-profile-13.asa")));
+
+        assertThat(result.hasFailures()).isTrue();
+        // Abort after wrong version
+        assertThat(result.getFailuresForAllLocations()).allMatch(check -> ASPA_VERSION.equals(check.getKey()));
     }
 
     private AspaCms parseValidAspa(String path) throws IOException {
