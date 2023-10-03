@@ -62,9 +62,11 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
-## 2023-xx-xx 1.35
+## 2023-10-03 1.35
   * Build targets JDK 11
   * Prefixes in ROAs are sorted by (prefix, maxlength - missing first)
+  * Incorporate a number of extra checks on resource extensions
+  * Update ASPA implementation to create objects in [draft-ietf-sidrops-aspa-profile-16](https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-16) profile.
 
 ### 2023-06-26 1.34
   * Add `GenericRpkiSignedObjectParser` to parse object type from `content-type` and signing time.
