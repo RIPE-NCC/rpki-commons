@@ -45,6 +45,18 @@ public class GenericRpkiSignedObjectParserTest {
         assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2011-11-11T01:55:18+00:00"));
     }
 
+    /**
+     * Parse an invalid object, but still extract validity period and signing time.
+     */
+    @Test
+    void should_parse_generic() throws IOException {
+        GenericRpkiSignedObjectParser parser = parse("interop/aspa/BAD-profile-13-AS211321-profile-13.asa");
+
+        assertThat(parser.getSigningTime()).isEqualTo(DateTime.parse("2021-11-11T11:19:00Z"));
+
+        assertThat(parser.getCertificate().getValidityPeriod().getNotValidBefore()).isEqualTo(DateTime.parse("2021-11-11T11:14:00Z"));
+    }
+
 
     private GenericRpkiSignedObjectParser parse(String path) throws IOException {
         byte[] bytes = Resources.toByteArray(Resources.getResource(path));
