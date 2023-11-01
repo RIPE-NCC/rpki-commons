@@ -19,6 +19,11 @@ public class GenericRpkiSignedObjectParser extends RpkiSignedObjectParser {
         return super.getSigningTime();
     }
 
+    /**
+     * Extend visibility of the certificate to make it public.
+     * @return the certificate.
+     */
+    @Override
     public X509ResourceCertificate getCertificate() {
         return super.getCertificate();
     }
