@@ -62,6 +62,9 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
+## 2023-10-31 1.36
+  * Access the certificate for the generic signed object parser.
+
 ## 2023-10-03 1.35
   * Build targets JDK 11
   * Prefixes in ROAs are sorted by (prefix, maxlength - missing first)
