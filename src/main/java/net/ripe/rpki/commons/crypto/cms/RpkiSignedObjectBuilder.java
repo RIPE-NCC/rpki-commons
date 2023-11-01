@@ -1,9 +1,11 @@
 package net.ripe.rpki.commons.crypto.cms;
 
+import com.google.common.base.Preconditions;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import org.apache.commons.lang3.Validate;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -35,6 +37,9 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER;
+
 public abstract class RpkiSignedObjectBuilder {
 
     protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, byte[] content) {
@@ -53,15 +58,33 @@ public abstract class RpkiSignedObjectBuilder {
         Validate.notNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
 
         RPKISignedDataGenerator generator = new RPKISignedDataGenerator();
-        addSignerInfo(generator, privateKey, signatureProvider, signingCertificate);
+        String signatureAlgorithm = null;
+        switch (signingCertificate.getPublicKey().getAlgorithm()) {
+            case "RSA":
+                signatureAlgorithm = X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM;
+                break;
+            case "EC":
+                signatureAlgorithm = X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM;
+                if (DEFAULT_SIGNATURE_PROVIDER.equals(signatureProvider)) {
+                    signatureProvider = ECDSA_SIGNATURE_PROVIDER;
+                }
+                break;
+            default:
+                Preconditions.checkArgument(false, "Not a supported public key type");
+        }
+        Preconditions.checkArgument(!(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM.equals(signatureAlgorithm) && X509CertificateBuilderHelper.ECDSA_SIGNATURE_PROVIDER.equals(signatureProvider)));
+        Preconditions.checkArgument(!(X509CertificateBuilderHelper.ECDSA_SIGNATURE_ALGORITHM.equals(signatureAlgorithm) && DEFAULT_SIGNATURE_PROVIDER.equals(signatureProvider)));
+
+
+        addSignerInfo(generator, privateKey, signatureProvider, signatureAlgorithm, signingCertificate);
         generator.addCertificates(new JcaCertStore(Collections.singleton(signingCertificate)));
 
         CMSSignedData data = generator.generate(new CMSProcessableByteArray(contentTypeOid, content), true);
         return data.getEncoded();
     }
 
-    private void addSignerInfo(RPKISignedDataGenerator generator, PrivateKey privateKey, String signatureProvider, X509Certificate signingCertificate) throws OperatorCreationException {
-        ContentSigner signer = new JcaContentSignerBuilder(X509CertificateBuilderHelper.DEFAULT_SIGNATURE_ALGORITHM).setProvider(signatureProvider).build(privateKey);
+    private void addSignerInfo(RPKISignedDataGenerator generator, PrivateKey privateKey, String signatureProvider, String signatureAlgorithm, X509Certificate signingCertificate) throws OperatorCreationException {
+        ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(signatureProvider).build(privateKey);
         DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
         SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(
             new DefaultSignedAttributeTableGenerator(createSignedAttributes(signingCertificate.getNotBefore())) {
@@ -76,8 +99,13 @@ public abstract class RpkiSignedObjectBuilder {
 
     private AttributeTable createSignedAttributes(Date signingTime) {
         Hashtable<ASN1ObjectIdentifier, Attribute> attributes = new Hashtable<>();
+
         Attribute signingTimeAttribute = new Attribute(CMSAttributes.signingTime, new DERSet(new Time(signingTime)));
         attributes.put(CMSAttributes.signingTime, signingTimeAttribute);
+
+        Attribute binarySigningTime = new Attribute(CMSAttributes.binarySigningTime, new DERSet(new ASN1Integer(signingTime.toInstant().toEpochMilli() / 1000)));
+        attributes.put(CMSAttributes.binarySigningTime, binarySigningTime);
+
         return new AttributeTable(attributes);
     }
 }

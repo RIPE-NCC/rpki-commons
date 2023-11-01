@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.io.BaseEncoding;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import org.junit.Before;
@@ -36,14 +37,15 @@ public class RoaCmsBuilderTest {
         subject.withCertificate(createCertificate(allPrefixes));
         subject.withAsn(TEST_ASN);
         subject.withPrefixes(allPrefixes);
-        subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+        subject.withSignatureProvider(ECDSA_SIGNATURE_PROVIDER);
     }
 
     @Test
     public void shouldGenerateRoaCms() {
-        RoaCms result = subject.build(KeyPairFactoryTest.TEST_KEY_PAIR.getPrivate());
+        RoaCms result = subject.build(KeyPairFactoryTest.EC_TEST_KEY_PAIR.getPrivate());
         assertNotNull(result);
         assertNotNull(result.getEncoded());
+        System.out.println(BaseEncoding.base64().encode(result.getEncoded()));
     }
 
     @Test

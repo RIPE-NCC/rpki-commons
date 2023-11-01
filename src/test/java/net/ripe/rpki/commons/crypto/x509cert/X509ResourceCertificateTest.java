@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.io.BaseEncoding;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -14,6 +15,7 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.util.encoders.Base64;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -75,8 +77,8 @@ public class X509ResourceCertificateTest {
         builder.withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
         builder.withSerial(TEST_SERIAL_NUMBER);
         builder.withValidityPeriod(TEST_VALIDITY_PERIOD);
-        builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
-        builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
+        builder.withPublicKey(KeyPairFactoryTest.EC_TEST_KEY_PAIR.getPublic());
+        builder.withSigningKeyPair(KeyPairFactoryTest.EC_TEST_KEY_PAIR);
         builder.withAuthorityKeyIdentifier(true);
 
         X509CertificateInformationAccessDescriptor[] descriptors = {
@@ -181,6 +183,30 @@ public class X509ResourceCertificateTest {
         X509ResourceCertificate cert = createSelfSignedCaResourceCertificateBuilder().build();
         assertTrue(cert.isCa());
         assertFalse(cert.isEe());
+    }
+
+    @Test
+    public void shouldSupportCaAndLeafCertificate() {
+        X509ResourceCertificate root = createSelfSignedCaResourceCertificateBuilder().build();
+        assertFalse(root.isEe());
+        assertTrue(root.isCa());
+
+        System.out.println("-----BEGIN CERTIFICATE-----");
+        System.out.println(BaseEncoding.base64().encode(root.getEncoded()));
+        System.out.println("-----END CERTIFICATE-----");
+
+        var leafDn = new X500Principal("CN=EE");
+
+        X509ResourceCertificate cert = createSelfSignedEeCertificateBuilder()
+                .withSubjectDN(leafDn)
+                .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
+                .build();
+        assertFalse(cert.isCa());
+        assertTrue(cert.isEe());
+
+        System.out.println("-----BEGIN CERTIFICATE-----");
+        System.out.println(BaseEncoding.base64().encode(cert.getEncoded()));
+        System.out.println("-----END CERTIFICATE-----");
     }
 
     @Test

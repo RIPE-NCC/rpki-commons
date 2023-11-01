@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.EC_TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,9 +66,9 @@ public class RoaCmsTest {
         RoaCmsBuilder builder = new RoaCmsBuilder();
         builder.withCertificate(createCertificate(prefixes)).withAsn(TEST_ASN);
         builder.withPrefixes(prefixes);
-        builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+        builder.withSignatureProvider(ECDSA_SIGNATURE_PROVIDER);
 
-        return builder.build(TEST_KEY_PAIR.getPrivate());
+        return builder.build(EC_TEST_KEY_PAIR.getPrivate());
     }
 
     // TODO: Refactor to RoaCmsObjectMother
@@ -78,7 +79,7 @@ public class RoaCmsTest {
     }
 
     public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes){
-        return createCertificate(prefixes, TEST_KEY_PAIR);
+        return createCertificate(prefixes, EC_TEST_KEY_PAIR);
     }
     public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes, KeyPair keyPair) {
         IpResourceSet resources = new IpResourceSet();
@@ -90,7 +91,7 @@ public class RoaCmsTest {
     }
 
     private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources) {
-            return createCertificateBuilder(resources, TEST_KEY_PAIR);
+            return createCertificateBuilder(resources, EC_TEST_KEY_PAIR);
     }
     private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources, KeyPair keyPair) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
