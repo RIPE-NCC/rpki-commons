@@ -47,11 +47,11 @@
 
         <net.ripe.ipresource.version>1.52</net.ripe.ipresource.version>
         <bouncycastle.version>1.74</bouncycastle.version>
-        <guava.version>32.0.0-jre</guava.version>
+        <guava.version>32.1.2-jre</guava.version>
         <joda-time.version>2.10.13</joda-time.version>
         <xstream.version>1.4.20</xstream.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <lombok.version>1.18.22</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <dependencies>
@@ -138,7 +138,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.2.0</version>
+            <version>5.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
