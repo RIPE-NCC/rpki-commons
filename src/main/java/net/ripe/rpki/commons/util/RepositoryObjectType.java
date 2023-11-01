@@ -5,20 +5,25 @@ import lombok.Getter;
 import java.util.Arrays;
 
 public enum RepositoryObjectType {
+    Certificate("cer", false),
+    Crl("crl", false),
+    Aspa("asa", true),
+    Gbr("gbr", true),
+    Manifest("mft", true),
+    Roa("roa", true),
+    SignedChecklist("sig", true),
+    TrustAnchorKey("tak", true),
+    Unknown("unknown", false);
 
-    Manifest("mft"),
-    Roa("roa"),
-    Certificate("cer"),
-    Crl("crl"),
-    Gbr("gbr"),
-    Aspa("asa"),
-    Unknown("unknown");
+    @Getter
+    private final boolean isCmsBased;
 
     @Getter
     private final String fileExtension;
 
-    RepositoryObjectType(String fileExtension) {
+    RepositoryObjectType(String fileExtension, boolean isCmsBased) {
         this.fileExtension = fileExtension;
+        this.isCmsBased = isCmsBased;
     }
 
     /**
