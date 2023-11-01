@@ -19,7 +19,7 @@ public class SignedObjectUtilTest {
     @DisplayName("Should parse the file creation time from RPKI objects")
     @ParameterizedTest(name = "{index} => {0} filename={1} expected-creation-time={3} path={2}")
     @CsvSource({
-            "ASPA, sample.asa, interop/aspa/GOOD-profile-15-draft-ietf-sidrops-profile-15-sample.asa, 2023-06-07T09:08:41+00:00",
+            "ASPA, sample.asa, interop/aspa/GOOD-profile-15-draft-ietf-sidrops-profile-15-sample.asa, 2023-06-07T09:08:41Z",
             // GBR parser has issues
             // "GBR, sample.gbr, conformance/root/goodRealGbrNothingIsWrong.gbr, 2023-06-07T09:01:01Z",
             // router certificate case is missing due to lack of samples.

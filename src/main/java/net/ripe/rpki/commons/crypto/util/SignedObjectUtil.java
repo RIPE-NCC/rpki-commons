@@ -14,9 +14,13 @@ import java.net.URI;
 @UtilityClass
 public class SignedObjectUtil {
     /**
-     * Extract the creation time from an object following the method described in https://datatracker.ietf.org/doc/draft-timbru-sidrops-publication-server-bcp/00/.
-     * Note that this uses <emph>notBefore</emph> for signed objects because this is guaranteed to match between a
-     * Manifest and its corresponding CRL.
+     * Extract the creation time from an object. This does <emph>not yet</emph> follow the method described in
+     * https://datatracker.ietf.org/doc/draft-timbru-sidrops-publication-server-bcp/00/. It differs in that it uses
+     * the signing time for RPKI signed objects. This is a trade-off:
+     *   * signing-time is more correct when multi-use EE certificates are present.
+     *   * signing-time likely does not match the modification time of the CRL.
+     *
+     * This needs to be revisited in 2024.
      *
      * @param uri URL of the object
      * @param decoded object bytes
@@ -35,8 +39,12 @@ public class SignedObjectUtil {
                     var signedObjectParser = new GenericRpkiSignedObjectParser();
 
                     signedObjectParser.parse(ValidationResult.withLocation(uri), decoded);
+                    var signingTime = signedObjectParser.getSigningTime();
 
-                    return signedObjectParser.getCertificate().getValidityPeriod().getNotValidBefore().toInstant();
+                    if (signingTime == null) {
+                        return signedObjectParser.getCertificate().getValidityPeriod().getNotValidBefore().toInstant();
+                    }
+                    return signingTime.toInstant();
                 case Certificate:
                     X509ResourceCertificateParser x509CertificateParser = new X509ResourceCertificateParser();
                     x509CertificateParser.parse(ValidationResult.withLocation(uri), decoded);
