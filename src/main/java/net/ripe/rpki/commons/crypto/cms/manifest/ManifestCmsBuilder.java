@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
@@ -54,6 +55,13 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
 
     public ManifestCmsBuilder withNextUpdateTime(DateTime instant) {
         this.nextUpdateTime = instant;
+        return this;
+    }
+
+    // This is preferred since ValidityPeriod will validate the dates
+    public ManifestCmsBuilder withValidityPeriod(ValidityPeriod validityPeriod) {
+        this.thisUpdateTime = validityPeriod.getNotValidBefore();
+        this.nextUpdateTime = validityPeriod.getNotValidAfter();
         return this;
     }
 

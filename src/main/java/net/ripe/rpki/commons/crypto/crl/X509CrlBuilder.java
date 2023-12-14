@@ -1,5 +1,8 @@
 package net.ripe.rpki.commons.crypto.crl;
 
+import lombok.Getter;
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsBuilder;
 import net.ripe.rpki.commons.crypto.crl.X509Crl.Entry;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
@@ -29,7 +32,9 @@ public class X509CrlBuilder {
     public static final int CRL_VERSION_2 = 2;
 
     private X500Principal issuerDN;
+    @Getter
     private DateTime thisUpdateTime;
+    @Getter
     private DateTime nextUpdateTime;
     private AuthorityKeyIdentifier authorityKeyIdentifier;
     private CRLNumber crlNumber;
@@ -53,18 +58,18 @@ public class X509CrlBuilder {
         return this;
     }
 
-    public DateTime getThisUpdateTime() {
-        return thisUpdateTime;
-    }
-
     public X509CrlBuilder withNextUpdateTime(DateTime instant) {
         this.nextUpdateTime = instant;
         return this;
     }
 
-    public DateTime getNextUpdateTime() {
-        return nextUpdateTime;
+    // This is preferred since ValidityPeriod will validate the dates
+    public X509CrlBuilder withValidityPeriod(ValidityPeriod validityPeriod) {
+        this.thisUpdateTime = validityPeriod.getNotValidBefore();
+        this.nextUpdateTime = validityPeriod.getNotValidAfter();
+        return this;
     }
+
 
     /**
      * CRL number must be representable in 20 octets
