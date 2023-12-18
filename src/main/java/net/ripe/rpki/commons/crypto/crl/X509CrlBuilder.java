@@ -53,11 +53,20 @@ public class X509CrlBuilder {
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #withValidityPeriod} instead
+     */
+    @Deprecated
     public X509CrlBuilder withThisUpdateTime(DateTime instant) {
         this.thisUpdateTime = instant;
         return this;
     }
 
+
+    /**
+     * @deprecated Use {@link #withValidityPeriod} instead
+     */
+    @Deprecated
     public X509CrlBuilder withNextUpdateTime(DateTime instant) {
         this.nextUpdateTime = instant;
         return this;

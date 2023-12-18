@@ -48,11 +48,19 @@ public class ManifestCmsBuilder extends RpkiSignedObjectBuilder {
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #withValidityPeriod} instead
+     */
+    @Deprecated
     public ManifestCmsBuilder withThisUpdateTime(DateTime instant) {
         this.thisUpdateTime = instant;
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #withValidityPeriod} instead
+     */
+    @Deprecated
     public ManifestCmsBuilder withNextUpdateTime(DateTime instant) {
         this.nextUpdateTime = instant;
         return this;
