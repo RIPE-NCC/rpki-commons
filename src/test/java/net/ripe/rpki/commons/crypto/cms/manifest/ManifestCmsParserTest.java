@@ -144,7 +144,7 @@ public class ManifestCmsParserTest {
         DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.getMillis());
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
         builder.withCertificate(createValidManifestEECertificate()).withManifestNumber(BigInteger.valueOf(68));
-        builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
+        builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         builder.addFile("foo1", FOO_CONTENT);
         builder.addFile("BaR", BAR_CONTENT);
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -201,7 +201,7 @@ public class ManifestCmsParserTest {
 
         // Use 10/8 EE cert
         builder.withCertificate(createTenSlashEightResourceCertificate()).withManifestNumber(BigInteger.valueOf(68));
-        builder.withThisUpdateTime(THIS_UPDATE_TIME).withNextUpdateTime(NEXT_UPDATE_TIME);
+        builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         builder.addFile("foo1", FOO_CONTENT);
         builder.addFile("BaR", BAR_CONTENT);
 

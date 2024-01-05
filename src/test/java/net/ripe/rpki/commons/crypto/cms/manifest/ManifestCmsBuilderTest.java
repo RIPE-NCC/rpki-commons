@@ -27,8 +27,7 @@ public class ManifestCmsBuilderTest {
     @Before
     public void setUp() {
         subject.withManifestNumber(BigInteger.valueOf(68));
-        subject.withThisUpdateTime(THIS_UPDATE_TIME);
-        subject.withNextUpdateTime(NEXT_UPDATE_TIME);
+        subject.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         subject.withCertificate(createValidManifestEECertificate());
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
     }
