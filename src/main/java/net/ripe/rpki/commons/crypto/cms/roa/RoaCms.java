@@ -39,15 +39,4 @@ public class RoaCms extends RpkiSignedObject implements Roa {
     public List<RoaPrefix> getPrefixes() {
         return Collections.unmodifiableList(prefixes);
     }
-
-    /**
-     * @deprecated use {@link RoaCmsParser#parse(ValidationResult, byte[]) RoaCmsParser} or
-     * {@link net.ripe.rpki.commons.crypto.util.CertificateRepositoryObjectFactory#createCertificateRepositoryObject(byte[], ValidationResult) CertificateRepositoryObjectParser}
-     */
-    @Deprecated
-    public static RoaCms parseDerEncoded(byte[] encoded) {
-        RoaCmsParser parser = new RoaCmsParser();
-        parser.parse(ValidationResult.withLocation("unknown.roa"), encoded);
-        return parser.getRoaCms();
-    }
 }
