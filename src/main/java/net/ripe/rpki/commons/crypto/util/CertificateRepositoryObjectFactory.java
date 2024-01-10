@@ -48,6 +48,10 @@ public final class CertificateRepositoryObjectFactory {
                 return parseGbr(encoded, validationResult);
             case Aspa:
                 return parseAspa(encoded, validationResult);
+            // TODO: Implement when TAK/RSC is implemented
+            case SignedChecklist:
+            case TrustAnchorKey:
+                throw new IllegalArgumentException("Unsupported repository object type: " + objectType);
             case Unknown:
                 return new UnknownCertificateRepositoryObject(encoded);
         }
