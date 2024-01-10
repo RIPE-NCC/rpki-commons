@@ -98,6 +98,7 @@ public class ManifestCmsBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void shouldBeEquivalentToSetDateInDifferentWays() {
         var builder1 = new ManifestCmsBuilder();
         builder1.withManifestNumber(BigInteger.valueOf(68));

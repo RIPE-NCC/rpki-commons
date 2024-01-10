@@ -159,6 +159,7 @@ public class X509CrlBuilderTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void shouldBeEquivalentToSetDateInDifferentWays() {
         var builder1 = new X509CrlBuilder();
         builder1.withIssuerDN(new X500Principal("CN=ROOT"));
