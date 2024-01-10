@@ -62,7 +62,7 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
-## 20234-xx-xx
+## 2024-xx-xx
   * Add support for router certificates to the time parsing in `SignedObjectUtil`.
 
 ## 2023-10-31 1.36
