@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.ripe.rpki.commons.crypto.cms.GenericRpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateParser;
 import net.ripe.rpki.commons.util.RepositoryObjectType;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.joda.time.Instant;
@@ -46,10 +46,8 @@ public class SignedObjectUtil {
                     }
                     return signingTime.toInstant();
                 case Certificate:
-                    X509ResourceCertificateParser x509CertificateParser = new X509ResourceCertificateParser();
-                    x509CertificateParser.parse(ValidationResult.withLocation(uri), decoded);
-                    final var cert = x509CertificateParser.getCertificate().getCertificate();
-                    return Instant.ofEpochMilli(cert.getNotBefore().getTime());
+                    var genericCert = X509CertificateParser.parseCertificate(ValidationResult.withLocation(uri), decoded);
+                    return Instant.ofEpochMilli(genericCert.getCertificate().getNotBefore().getTime());
                 case Crl:
                     var x509Crl = X509Crl.parseDerEncoded(decoded, ValidationResult.withLocation(uri));
                     var crl = x509Crl.getCrl();
