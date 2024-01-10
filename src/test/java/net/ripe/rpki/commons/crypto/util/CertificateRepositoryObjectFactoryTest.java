@@ -14,6 +14,7 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlTest;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateTest;
+import net.ripe.rpki.commons.util.RepositoryObjectType;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
@@ -217,15 +218,17 @@ public class CertificateRepositoryObjectFactoryTest {
      *   * Trust Anchor Key
      *   * Resource Signed Checklist
      */
-    @ParameterizedTest(name = "{index} => {0} path={2}")
+    @ParameterizedTest(name = "{index} => {0} type={1} path={2}")
     @CsvSource({
-            "interop/openbsd-regress/05F53BCE4DAA11EDB9AC0C5B9E174E93.tak",
-            "interop/openbsd-regress/42AE70A64DA711EDB37796549E174E93.tak",
-            "interop/openbsd-regress/B7C2334E4DA911EDAF862D5A9E174E93.tak",
-            "interop/openbsd-regress/c6938fc00af6496d9d4e6e2d876e4b4811887b60f4f1bc9cd0b3cdb7c57c6d5e.sig",
-            "interop/openbsd-regress/checklist-08.sig",
+            "TrustAnchorKey,interop/openbsd-regress/05F53BCE4DAA11EDB9AC0C5B9E174E93.tak",
+            "TrustAnchorKey,interop/openbsd-regress/42AE70A64DA711EDB37796549E174E93.tak",
+            "TrustAnchorKey,interop/openbsd-regress/B7C2334E4DA911EDAF862D5A9E174E93.tak",
+            "SignedChecklist,interop/openbsd-regress/c6938fc00af6496d9d4e6e2d876e4b4811887b60f4f1bc9cd0b3cdb7c57c6d5e.sig",
+            "SignedChecklist,interop/openbsd-regress/checklist-08.sig",
     })
-    public void shouldParseUnsupportedFiles(String path) throws IOException {
+    public void shouldParseUnsupportedFiles(String type, String path) throws IOException {
+        assertThat(RepositoryObjectType.parse(path)).isEqualTo(RepositoryObjectType.valueOf(type));
+
         byte[] encoded = Resources.toByteArray(Resources.getResource(path));
 
         ValidationResult validationResult = ValidationResult.withLocation(new ValidationLocation(path));
