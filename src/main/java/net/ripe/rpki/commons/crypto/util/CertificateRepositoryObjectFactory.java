@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.util;
 
+import lombok.extern.slf4j.Slf4j;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.UnknownCertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.cms.aspa.AspaCms;
@@ -17,6 +18,9 @@ import net.ripe.rpki.commons.util.RepositoryObjectType;
 import net.ripe.rpki.commons.validation.ValidationChecks;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
+import static net.ripe.rpki.commons.validation.ValidationString.KNOWN_OBJECT_TYPE;
+
+@Slf4j
 public final class CertificateRepositoryObjectFactory {
 
 
@@ -48,6 +52,10 @@ public final class CertificateRepositoryObjectFactory {
                 return parseGbr(encoded, validationResult);
             case Aspa:
                 return parseAspa(encoded, validationResult);
+            case SignedChecklist:
+            case TrustAnchorKey:
+                log.info("Encountered unsupported object type: {} uri={}", objectType, validationResult.getCurrentLocation().getName());
+                validationResult.error(KNOWN_OBJECT_TYPE, validationResult.getCurrentLocation().getName());
             case Unknown:
                 return new UnknownCertificateRepositoryObject(encoded);
         }
