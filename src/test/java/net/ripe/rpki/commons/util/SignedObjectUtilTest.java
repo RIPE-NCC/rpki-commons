@@ -26,6 +26,7 @@ public class SignedObjectUtilTest {
             "Manifest, sample.mft, conformance/root/root.mft, 2013-10-28T21:24:39Z",
             "ROA, sample.roa, interop/rpkid-objects/nI2bsx18I5mlex8lBpY0WSJUYio.roa, 2011-11-11T01:55:18Z",
             "'Generic signed object (that does not match object profile)', generic-signed-object.gbr, interop/aspa/BAD-profile-13-AS211321-profile-13.asa, 2021-11-11T11:19:00Z",
+            "router certificate, router.cer, router/router_certificate.cer, 2017-12-06T18:50:59Z"
     })
     void shouldParseObject(String description, String fileName, String path, String modified) throws IOException, SignedObjectUtil.NoTimeParsedException {
         Instant creationTime = SignedObjectUtil.getFileCreationTime(URI.create(fileName), Resources.toByteArray(Resources.getResource(path)));
