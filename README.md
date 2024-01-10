@@ -66,6 +66,7 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
   * Add support for router certificates to the time parsing in `SignedObjectUtil`.
   * Add string representation for `RepositoryObjectType`
   * Add `isCmsBased` property on `RepositoryObjectType`.
+  * Add initial step towards Resource Signed Checklist/Trust Anchor Key support, extensions are now recorgnised.
 
 ## 2023-10-31 1.36
   * Access the certificate for the generic signed object parser.
