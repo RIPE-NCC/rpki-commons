@@ -2,9 +2,10 @@ package net.ripe.rpki.commons.crypto.util;
 
 import org.junit.Test;
 
-import java.security.KeyPair;
+import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.ECGenParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,19 @@ public class KeyPairFactoryTest {
 
     public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
     public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+
+    public static KeyPair EC256R1_KEY_PAIR;
+
+    static {
+        try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC"); //Provider is SunEC version 1.8
+            ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256r1");
+            kpg.initialize(ecSpec, new SecureRandom());
+            EC256R1_KEY_PAIR = kpg.generateKeyPair();
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<String, KeyPair>();
 
