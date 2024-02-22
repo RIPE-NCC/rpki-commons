@@ -53,6 +53,16 @@ public class RoaCmsBuilderTest {
     }
 
     @Test
+    public void shouldNotEncodeRedundantMaxLength() {
+        var withRedundantMaxLength = new RoaPrefix(TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix().getPrefixLength());
+
+        // Ensure base case was already covered
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, subject.encodeRoaIpAddress(TEST_IPV4_PREFIX_2));
+        // a redundant maxLength in the prefix should not be encoded -> it should result in the same encoding.
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, subject.encodeRoaIpAddress(withRedundantMaxLength));
+    }
+
+    @Test
     public void shouldEncodeRoaIpAddressFamily() {
         assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY, subject.encodeRoaIpAddressFamily(AddressFamily.IPV4, Set.copyOf(ipv4Prefixes)));
     }
