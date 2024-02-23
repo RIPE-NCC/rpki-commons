@@ -4,10 +4,7 @@ import com.google.common.collect.Sets;
 import net.ripe.ipresource.IpRange;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -61,10 +58,10 @@ public class RoaPrefixTest {
         var p2_8 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 8);
         var p2_24 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 24);
 
-        var prefixList = new ArrayList(List.of(p2_24, p1, p2_8, p2));
+        var prefixList = List.of(p2_24, p1, p2_8, p2);
 
         // Static case of re-sorting a list in wrong order
-        var toSort = new ArrayList(List.of(p2_24, p1, p2_8, p2));
+        var toSort = new ArrayList(prefixList);
         Collections.sort(toSort);
         assertThat(toSort).containsExactly(p1, p2, p2_8, p2_24);
 
@@ -73,8 +70,8 @@ public class RoaPrefixTest {
 
         // But test a number of random shuffles as well
         for (int i=0; i < 16; i++) {
-            Collections.shuffle(prefixList);
             toSort = new ArrayList(prefixList);
+            Collections.shuffle(toSort);
             Collections.sort(toSort);
             assertThat(toSort).containsExactly(p1, p2, p2_8, p2_24);
         }

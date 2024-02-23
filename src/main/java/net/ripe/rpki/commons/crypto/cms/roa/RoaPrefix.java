@@ -1,21 +1,18 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import com.google.common.annotations.VisibleForTesting;
-import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.ipresource.IpRange;
-import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.annotation.CheckForNull;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Objects;
 
-@EqualsAndHashCode
+@ToString
 public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
     private static final Comparator<RoaPrefix> ROA_PREFIX_COMPARATOR = Comparator.comparing(RoaPrefix::getPrefix)
-            .thenComparing(RoaPrefix::getMaximumLength, Comparator.nullsFirst(Comparator.naturalOrder()));
+            .thenComparing(RoaPrefix::getEffectiveMaximumLength, Comparator.nullsFirst(Comparator.naturalOrder()));
     private static final long serialVersionUID = 1L;
 
     private final IpRange prefix;
@@ -47,6 +44,10 @@ public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
         return prefix;
     }
 
+    /**
+     * Return the maximum length as specified in the structure of the ROA.
+     * <emph>Needed to exactly represent a decoded ROA.</emph> When consuming these objects, use {@link #getEffectiveMaximumLength()} where possible.
+     */
     public Integer getMaximumLength() {
         return maximumLength;
     }
@@ -56,12 +57,19 @@ public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append("prefix", getPrefix()).append("maximumLength", maximumLength).toString();
+    public int compareTo(RoaPrefix o) {
+        return ROA_PREFIX_COMPARATOR.compare(this, o);
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoaPrefix roaPrefix = (RoaPrefix) o;
+        return Objects.equals(prefix, roaPrefix.prefix) && Objects.equals(getEffectiveMaximumLength(), roaPrefix.getEffectiveMaximumLength());
     }
 
     @Override
-    public int compareTo(RoaPrefix o) {
-        return ROA_PREFIX_COMPARATOR.compare(this, o);
+    public int hashCode() {
+        return Objects.hash(prefix, getEffectiveMaximumLength());
     }
 }
