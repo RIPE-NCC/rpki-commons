@@ -71,7 +71,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     ASN1Object encodeRoaIpAddress(RoaPrefix prefix) {
         DERBitString address = Asn1Util.resourceToBitString(prefix.getPrefix().getStart(), prefix.getPrefix().getPrefixLength());
         ASN1Encodable[] encodables;
-        if (prefix.getMaximumLength() == null) {
+        if (prefix.getPrefix().getPrefixLength() == prefix.getEffectiveMaximumLength()) {
             encodables = new ASN1Encodable[]{address};
         } else {
             encodables = new ASN1Encodable[]{address, new ASN1Integer(prefix.getMaximumLength())};

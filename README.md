@@ -62,12 +62,13 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
-## 2024-xx-xx
+## 2024-xx-yy 1.37
+  * **fix**: Do not encode redundant maxlength in ROAs
   * Add support for router certificates to the time parsing in `SignedObjectUtil`.
   * Add withValidityPeriod to manifest and CRL builders
   * Add string representation for `RepositoryObjectType`
   * Add `isCmsBased` property on `RepositoryObjectType`.
-  * Add initial step towards Resource Signed Checklist/Trust Anchor Key support, extensions are now recorgnised.
+  * Add initial step towards Resource Signed Checklist/Trust Anchor Key support, extensions are now recognised.
 
 ## 2023-10-31 1.36
   * Access the certificate for the generic signed object parser.
