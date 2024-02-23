@@ -1,6 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import com.google.common.collect.Sets;
+import com.google.common.testing.EqualsTester;
 import net.ripe.ipresource.IpRange;
 import org.junit.Test;
 
@@ -8,46 +8,23 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.fail;
 
 
 public class RoaPrefixTest {
     @Test
     public void shouldEqualWhenSemanticallyEqual() {
-        var s1 = new RoaPrefix(IpRange.parse("10.0.0.0/8"));
-        var s1_null = new RoaPrefix(IpRange.parse("10.0.0.0/8"), null);
-        var s1_8 = new RoaPrefix(IpRange.parse("10.0.0.0/8"), 8);
-
-        var s1_32 = new RoaPrefix(IpRange.parse("10.0.0.0/8"), 32);
-
-        var s2 = new RoaPrefix(IpRange.parse("11.0.0.0/8"));
-        var s2_8 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 8);
-
-        // hashcode contract
-        assertThat(s1.hashCode()).isEqualTo(s1_null.hashCode());
-        assertThat(s1.hashCode()).isEqualTo(s1_8.hashCode());
-
-        // not equal when differing prefix or differing maxlength
-        assertThat(s1).isNotEqualTo(s1_32);
-        assertThat(s1).isNotEqualTo(s2);
-        assertThat(s1).isNotEqualTo(s2_8);
-        // or whatever
-        assertThat(s1).isNotEqualTo("🤷‍♂️");
-
-        // reflexive
-        assertThat(s1).isEqualTo(s1);
-        assertThat(s1).isEqualTo(s1_null);
-        assertThat(s1).isEqualTo(s1_8);
-
-        // symmetric
-        assertThat(s1_8).isEqualTo(s1);
-        assertThat(s1_null).isEqualTo(s1);
-
-        // transitive
-        assertThat(s1).isEqualTo(s1_null);
-        assertThat(s1_null).isEqualTo(s1_8);
-        // =>
-        assertThat(s1).isEqualTo(s1_8);
+        // recall: EqualsTester includes a test against an artibtrary object of another class
+        new EqualsTester()
+                .addEqualityGroup(
+                        new RoaPrefix(IpRange.parse("10.0.0.0/8")),
+                          new RoaPrefix(IpRange.parse("10.0.0.0/8"), null),
+                          new RoaPrefix(IpRange.parse("10.0.0.0/8"), 8)
+                ).addEqualityGroup(
+                        new RoaPrefix(IpRange.parse("10.0.0.0/8"), 32)
+                ).addEqualityGroup(
+                        new RoaPrefix(IpRange.parse("11.0.0.0/8")),
+                        new RoaPrefix(IpRange.parse("11.0.0.0/8"), 8)
+                );
     }
 
     @Test
