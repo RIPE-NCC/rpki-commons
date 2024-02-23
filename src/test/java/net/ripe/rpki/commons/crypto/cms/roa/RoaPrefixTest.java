@@ -51,6 +51,20 @@ public class RoaPrefixTest {
     }
 
     @Test
+    public void testCalculateEffectiveLength() {
+        var p2 = new RoaPrefix(IpRange.parse("11.0.0.0/8"));
+        // An equal copy of p2
+        var p2_8 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 8);
+        var p2_32 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 32);
+
+        // implict maximum length is the prefix length
+        assertThat(p2.getEffectiveMaximumLength()).isEqualTo(8);
+        assertThat(p2_8.getEffectiveMaximumLength()).isEqualTo(8);
+        // and effective maximum length reflects the actual maximum length
+        assertThat(p2_32.getEffectiveMaximumLength()).isEqualTo(32);
+    }
+
+    @Test
     public void shouldSortRoaPrefixByPrefixThenMaximumLength() {
         var p1 = new RoaPrefix(IpRange.parse("10.0.0.0/8"));
         var p2 = new RoaPrefix(IpRange.parse("11.0.0.0/8"));
