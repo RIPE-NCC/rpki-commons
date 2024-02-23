@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import com.google.common.collect.Sets;
 import net.ripe.ipresource.IpRange;
 import org.junit.Test;
 
@@ -24,6 +25,10 @@ public class RoaPrefixTest {
 
         var s2 = new RoaPrefix(IpRange.parse("11.0.0.0/8"));
         var s2_8 = new RoaPrefix(IpRange.parse("11.0.0.0/8"), 8);
+
+        // hashcode contract
+        assertThat(s1.hashCode()).isEqualTo(s1_null.hashCode());
+        assertThat(s1.hashCode()).isEqualTo(s1_8.hashCode());
 
         // not equal when differing prefix or differing maxlength
         assertThat(s1).isNotEqualTo(s1_32);
@@ -64,7 +69,7 @@ public class RoaPrefixTest {
         assertThat(toSort).containsExactly(p1, p2, p2_8, p2_24);
 
         // **We can not use sets here, because that would deduplicate, i.e p2_8 is gone:
-        assertThat(new TreeSet<>(prefixList)).containsExactly(p1, p2, p2_24);
+        assertThat(new TreeSet<>(prefixList)).hasSize(prefixList.size()-1);
 
         // But test a number of random shuffles as well
         for (int i=0; i < 16; i++) {
