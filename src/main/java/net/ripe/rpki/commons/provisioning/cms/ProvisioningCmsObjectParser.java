@@ -12,7 +12,6 @@ import net.ripe.rpki.commons.provisioning.payload.PayloadParser;
 import net.ripe.rpki.commons.provisioning.x509.ProvisioningCmsCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -123,7 +122,7 @@ public class ProvisioningCmsObjectParser {
             messages.add(t.getMessage());
             t = t.getCause();
         }
-        return StringUtils.join(messages, ", reason: ");
+        return String.join(", reason: ", messages);
     }
 
     public ProvisioningCmsObject getProvisioningCmsObject() {

@@ -9,8 +9,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;

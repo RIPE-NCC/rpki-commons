@@ -1,5 +1,7 @@
 package net.ripe.rpki.commons.provisioning.x509;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.util.UTC;
@@ -48,9 +50,9 @@ public class ProvisioningIdentityCertificateBuilder {
     }
 
     public ProvisioningIdentityCertificate build() {
-        Validate.notNull(selfSigningKeyPair, "Self Signing KeyPair is required");
-        Validate.notNull(selfSigningSubject, "Self Signing DN is required");
-        Validate.notNull(signatureProvider, "Signature Provider is required");
+        Preconditions.checkNotNull(selfSigningKeyPair, "Self Signing KeyPair is required");
+        Preconditions.checkNotNull(selfSigningSubject, "Self Signing DN is required");
+        Preconditions.checkNotNull(signatureProvider, "Signature Provider is required");
         setUpImplicitRequirementsForBuilderHelper();
         builderHelper.withPublicKey(selfSigningKeyPair.getPublic());
         builderHelper.withSigningKeyPair(selfSigningKeyPair);
