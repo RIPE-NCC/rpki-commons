@@ -102,8 +102,8 @@ public class BBNCertificateConformanceTest {
     public void shouldRejectCertificateWithInvalidResourceExtension(String testCasenumber, String testCaseFile, String testCaseDescription) throws IOException {
         final String fileName = String.format("root/badCert%s.cer", testCaseFile);
 
-        assertThatThrownBy(() -> parseCertificate(fileName))
-                .isInstanceOfAny(IllegalArgumentException.class, IllegalStateException.class)
+        assertThatThrownBy(() -> assertThat(parseCertificate(fileName)).isFalse())
+                .isInstanceOfAny(IllegalArgumentException.class, IllegalStateException.class, AssertionError.class)
                 .withFailMessage("Should reject certificate with " + testCaseDescription + " from " + fileName);
     }
 
@@ -114,7 +114,9 @@ public class BBNCertificateConformanceTest {
         var parser = new X509ResourceCertificateParser();
         parser.parse(result, encoded);
         // Trigger some lazy parsing
-        parser.getCertificate();
+        if (!result.hasFailures()) {
+            parser.getCertificate();
+        }
         return result.hasFailures() || result.hasWarnings();
     }
 
@@ -124,8 +126,9 @@ public class BBNCertificateConformanceTest {
         ValidationResult result = ValidationResult.withLocation(file.getName());
         var parser = new X509ResourceCertificateParser();
         parser.parse(result, encoded);
-
-        parser.getCertificate();
+        if (!result.hasFailures()) {
+            parser.getCertificate();
+        }
         return result.hasFailures();
     }
 }
