@@ -30,6 +30,9 @@ public class ResourceExtensionParser {
         ImmutableResourceSet.Builder builder = new ImmutableResourceSet.Builder();
         byte[] ipAddressBlocksExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId());
         if (ipAddressBlocksExtension != null) {
+            if (!certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId())) {
+                throw new IllegalAsn1StructureException("id-pe-ipAddrBlocks must be marked as critical.");
+            }
             SortedMap<AddressFamily, IpResourceSet> ipResources = parseIpAddressBlocks(ipAddressBlocksExtension);
             for (Map.Entry<AddressFamily, IpResourceSet> resourcesByType : ipResources.entrySet()) {
                 if (resourcesByType.getValue() == null) {
@@ -42,6 +45,9 @@ public class ResourceExtensionParser {
 
         byte[] asnExtension = certificate.getExtensionValue(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId());
         if (asnExtension != null) {
+            if (!certificate.getCriticalExtensionOIDs().contains(ResourceExtensionEncoder.OID_AUTONOMOUS_SYS_IDS.getId())) {
+                throw new IllegalAsn1StructureException("id-pe-autonomousSysIds must be marked as critical.");
+            }
             IpResourceSet asResources = parseAsIdentifiers(asnExtension);
             if (asResources == null) {
                 inheritedResourceTypes.add(IpResourceType.ASN);
@@ -102,6 +108,7 @@ public class ResourceExtensionParser {
         ASN1Sequence seq = expect(der, ASN1Sequence.class);
         SortedMap<AddressFamily, IpResourceSet> map = new TreeMap<>();
 
+        Preconditions.checkArgument(seq.size() > 0, "IPAddrBlocks MUST NOT be empty");
         for (int i = 0; i < seq.size(); i++) {
             derToIpAddressFamily(seq.getObjectAt(i), map);
         }
@@ -220,6 +227,7 @@ public class ResourceExtensionParser {
         // range whenever possible.  The AS identifiers in the asIdsOrRanges
         // element MUST be sorted by increasing numeric value.
         IpResource previous = null;
+        Preconditions.checkArgument(seq.size() > 0, "asIdsOrRanges MUST NOT be empty");
         for (int i = 0; i < seq.size(); ++i) {
             IpResource current = derToAsIdOrRange(seq.getObjectAt(i));
 
