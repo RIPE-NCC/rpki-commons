@@ -63,6 +63,7 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ## Changelog
 
 ## 2024-xx-yy 1.37
+  * Use bouncy castle 1.77 (and update API usage accordingly)
   * **fix**: Do not encode redundant maxlength in ROAs
   * Add support for router certificates to the time parsing in `SignedObjectUtil`.
   * Add withValidityPeriod to manifest and CRL builders
