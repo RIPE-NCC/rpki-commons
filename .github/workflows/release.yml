@@ -23,12 +23,10 @@ jobs:
 
       - name: Release
         env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_KEY: ${{ secrets.GPG_KEY }}
-          SONATYPE_NEXUS_SNAPSHOTS_USERNAME: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_USERNAME }}
-          SONATYPE_NEXUS_SNAPSHOTS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_PASSWORD }}
-          SONATYPE_NEXUS_STAGING_USERNAME: ${{ secrets.SONATYPE_NEXUS_STAGING_USERNAME }}
-          SONATYPE_NEXUS_STAGING_PASSWORD: ${{ secrets.SONATYPE_NEXUS_STAGING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_KEY }}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_PASSWORD }}
         run: |
           gpg --batch --no-tty --allow-secret-key-import --import - <<< "$GPG_KEY"
           unset GPG_KEY

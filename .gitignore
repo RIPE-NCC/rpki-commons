@@ -17,3 +17,5 @@ target/
 .vscode/settings.jsonbuilds
 builds
 .factorypath
+build
+.gradle
