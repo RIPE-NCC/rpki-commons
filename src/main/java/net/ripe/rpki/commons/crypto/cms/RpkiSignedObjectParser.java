@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms;
 
+import net.ripe.rpki.commons.crypto.IllegalAsn1StructureException;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -373,18 +374,34 @@ public abstract class RpkiSignedObjectParser {
         validationResult.rejectIfFalse(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);
     }
 
-    protected static BigInteger getRpkiObjectVersion(ASN1Sequence seq) {
-        ASN1Primitive asn1Version = seq.getObjectAt(0).toASN1Primitive();
-        BigInteger version = null;
-        if (asn1Version instanceof ASN1Integer) {
-            version = ((ASN1Integer) asn1Version).getValue();
-        } else if (asn1Version instanceof DERTaggedObject){
-            final ASN1Primitive o = ((DERTaggedObject) asn1Version).getObject();
-            if (o instanceof ASN1Integer) {
-                version = ((ASN1Integer) o).getValue();
-            }
-        }
-        return version;
-    }
+    /**
+     * Parse the version field in a signed object.
+     * By convention, the version is the first field in the sequence, and it is explicitly tagged.
+     * @param tagNo tag number
+     * @param seq sequence of content
+     * @return version number if present, empty otherwise.
+     */
+    protected static Optional<BigInteger> getTaggedVersion(int tagNo, ASN1Sequence seq) throws IllegalAsn1StructureException {
+        try {
+            ASN1Encodable maybeVersion = seq.getObjectAt(0).toASN1Primitive();
+            if (maybeVersion instanceof DLTaggedObject) {
+                ASN1TaggedObject tagged = (ASN1TaggedObject) maybeVersion;
+                if (tagged.getTagNo() == tagNo) {
+                    var integerVersion = tagged.getExplicitBaseObject();
+                    if (!tagged.isExplicit()) {
+                        throw new IllegalAsn1StructureException("Expected explicit tag for version field");
+                    }
 
+                    if (integerVersion instanceof ASN1Integer) {
+                        return Optional.of(((ASN1Integer) integerVersion).getValue());
+                    }
+                }
+            }
+
+            return Optional.empty();
+        } catch (IllegalStateException e) {
+            // for example: version is implicitly tagged instead of explicitly
+            throw new IllegalAsn1StructureException("Error parsing version field", e);
+        }
+    }
 }

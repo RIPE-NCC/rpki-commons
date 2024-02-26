@@ -46,8 +46,7 @@
         <java.runtime.version>11</java.runtime.version>
 
         <net.ripe.ipresource.version>1.52</net.ripe.ipresource.version>
-        <!-- TODO: Use 1.77 and patch API changes -->
-        <bouncycastle.version>1.74</bouncycastle.version>
+        <bouncycastle.version>1.77</bouncycastle.version>
         <guava.version>33.0.0-jre</guava.version>
         <joda-time.version>2.12.7</joda-time.version>
         <xstream.version>1.4.20</xstream.version>

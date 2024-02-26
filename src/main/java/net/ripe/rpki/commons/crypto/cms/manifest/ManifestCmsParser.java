@@ -17,6 +17,7 @@ import org.joda.time.DateTime;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
@@ -102,8 +103,13 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
             final int itemCount = seq.size();
             int offset = 0;
             if (itemCount == 6) {
-                BigInteger version = getRpkiObjectVersion(seq);
-                validationResult.rejectIfFalse(BigInteger.ZERO.equals(version), "mf.version", "manifest version must be 0, but is " + version);
+                Optional<BigInteger> optionalVersion = getTaggedVersion(0, seq);
+                optionalVersion.ifPresentOrElse(foundVersion -> {
+                    validationResult.rejectIfFalse(BigInteger.ZERO.equals(foundVersion), MANIFEST_VERSION, optionalVersion.get().toString());
+                    version = 0;
+                }, () -> {
+                    validationResult.error(MANIFEST_VERSION, "missing/not explicitly tagged");
+                });
                 offset++;
             } else if (itemCount == 5) {
                 version = ManifestCms.DEFAULT_VERSION;

@@ -1,15 +1,9 @@
 package net.ripe.rpki.commons.crypto.rfc3779;
 
+import com.google.common.base.Preconditions;
 import net.ripe.ipresource.*;
-import org.apache.commons.lang3.Validate;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Null;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERBitString;
+import net.ripe.rpki.commons.crypto.IllegalAsn1StructureException;
+import org.bouncycastle.asn1.*;
 
 import java.security.cert.X509Certificate;
 import java.util.EnumSet;
@@ -80,7 +74,7 @@ public class ResourceExtensionParser {
         }
 
         for (AddressFamily addressFamily : map.keySet()) {
-            Validate.isTrue(!addressFamily.hasSubsequentAddressFamilyIdentifier(), "SAFI not supported");
+            Preconditions.checkArgument(!addressFamily.hasSubsequentAddressFamilyIdentifier(), "SAFI not supported");
         }
 
         return map;
@@ -96,8 +90,8 @@ public class ResourceExtensionParser {
         expect(octetString, ASN1OctetString.class);
         ASN1OctetString o = (ASN1OctetString) octetString;
         IpResourceSet[] resources = derToAsIdentifiers(decode(o.getOctets()));
-        Validate.notNull(resources[1], "inheritance of resources has not been implemented yet");
-        Validate.isTrue(resources[1].isEmpty(), "routing domain identifiers (RDI) not supported");
+        Preconditions.checkNotNull(resources[1], "inheritance of resources has not been implemented yet");
+        Preconditions.checkArgument(resources[1].isEmpty(), "routing domain identifiers (RDI) not supported");
         return resources[0];
     }
 
@@ -120,7 +114,7 @@ public class ResourceExtensionParser {
      */
     void derToIpAddressFamily(ASN1Encodable der, SortedMap<AddressFamily, IpResourceSet> map) {
         ASN1Sequence seq = expect(der, ASN1Sequence.class);
-        Validate.isTrue(seq.size() == 2, "IpAddressFamily must have exactly two entries: addressFamily and IpAddressChoice");
+        Preconditions.checkArgument(seq.size() == 2, "IpAddressFamily must have exactly two entries: addressFamily and IpAddressChoice");
 
         AddressFamily addressFamily = AddressFamily.fromDer(seq.getObjectAt(0));
         IpResourceSet resources = derToIpAddressChoice(addressFamily.toIpResourceType(), seq.getObjectAt(1));
@@ -144,14 +138,14 @@ public class ResourceExtensionParser {
                 IpResource current = derToIpAddressOrRange(type, seq.getObjectAt(i));
                 // Check if previous and next are (1) in order and (2) not continuous
                 if (previous != null) {
-                    Validate.isTrue(!previous.adjacent(current), "IP resources in extension MUST NOT be adjacent");
+                    Preconditions.checkArgument(!previous.adjacent(current), "IP resources in extension MUST NOT be adjacent");
                     //    The addressesOrRanges element is a SEQUENCE OF IPAddressOrRange
                     //   types.  The addressPrefix and addressRange elements MUST be sorted
                     //   using the binary representation of:
                     //
                     //      <lowest IP address in range> | <prefix length>
                     UniqueIpResource start = current.getStart();
-                    Validate.isTrue(previous.getEnd().compareTo(start) < 0, "addressOrRanges MUST be sorted");
+                    Preconditions.checkArgument(previous.getEnd().compareTo(start) < 0, "addressOrRanges MUST be sorted");
                 }
 
                 result.add(current);
@@ -182,7 +176,7 @@ public class ResourceExtensionParser {
      */
     IpResource derToIpRange(IpResourceType type, ASN1Encodable der) {
         ASN1Sequence sequence = expect(der, ASN1Sequence.class);
-        Validate.isTrue(sequence.size() == 2, "IPRange MUST consist of two entries (start and end)");
+        Preconditions.checkArgument(sequence.size() == 2, "IPRange MUST consist of two entries (start and end)");
 
         IpAddress start = parseIpAddress(type, sequence.getObjectAt(0), false);
         IpAddress end = parseIpAddress(type, sequence.getObjectAt(1), true);
@@ -195,7 +189,7 @@ public class ResourceExtensionParser {
      */
     IpResourceRange derToAsRange(ASN1Encodable der) {
         ASN1Sequence seq = expect(der, ASN1Sequence.class);
-        Validate.isTrue(seq.size() == 2, "ASN1Sequence with two elements expected");
+        Preconditions.checkArgument(seq.size() == 2, "ASN1Sequence with two elements expected");
         return parseAsId(seq.getObjectAt(0)).upTo(parseAsId(seq.getObjectAt(1)));
     }
 
@@ -232,8 +226,8 @@ public class ResourceExtensionParser {
             if (previous != null) {
                 UniqueIpResource start = current.getStart();
 
-                Validate.isTrue(!start.adjacent(previous.getEnd()), "ASIdOrRange entries MUST NOT be adjacent");
-                Validate.isTrue(start.max(previous.getEnd()).equals(start), "ASIdOrRange entries MUST be sorted by increasing numeric value");
+                Preconditions.checkArgument(!start.adjacent(previous.getEnd()), "ASIdOrRange entries MUST NOT be adjacent");
+                Preconditions.checkArgument(start.max(previous.getEnd()).equals(start), "ASIdOrRange entries MUST be sorted by increasing numeric value");
             }
             result.add(current);
             previous = current;
@@ -267,17 +261,22 @@ public class ResourceExtensionParser {
      */
     IpResourceSet[] derToAsIdentifiers(ASN1Encodable der) {
         expect(der, ASN1Sequence.class);
-        ASN1Sequence seq = (ASN1Sequence) der;
-        Validate.isTrue(seq.size() <= 2, "ASN1Sequence with 2 or fewer elements expected");
+        try {
+            ASN1Sequence seq = (ASN1Sequence) der;
+            Preconditions.checkArgument(seq.size() <= 2, "ASN1Sequence with 2 or fewer elements expected");
 
-        IpResourceSet[] result = {new IpResourceSet(), new IpResourceSet()};
-        for (int i = 0; i < seq.size(); ++i) {
-            expect(seq.getObjectAt(i), ASN1TaggedObject.class);
-            ASN1TaggedObject tagged = (ASN1TaggedObject) seq.getObjectAt(i);
-            Validate.isTrue(tagged.getTagNo() == 0 || tagged.getTagNo() == 1, "unknown tag no: " + tagged.getTagNo());
-            result[tagged.getTagNo()] = derToAsIdentifierChoice(tagged.getObject());
+            IpResourceSet[] result = {new IpResourceSet(), new IpResourceSet()};
+            for (int i = 0; i < seq.size(); ++i) {
+                expect(seq.getObjectAt(i), ASN1TaggedObject.class);
+                ASN1TaggedObject tagged = (ASN1TaggedObject) seq.getObjectAt(i);
+                Preconditions.checkArgument(tagged.getTagNo() == 0 || tagged.getTagNo() == 1, "unknown tag no: " + tagged.getTagNo());
+                Preconditions.checkArgument((tagged.getTagClass() & BERTags.CONTEXT_SPECIFIC) != 0, "element tag is context specific.");
+                result[tagged.getTagNo()] = derToAsIdentifierChoice(tagged.getExplicitBaseObject());
+            }
+            return result;
+        } catch (IllegalStateException e) {
+            throw new IllegalAsn1StructureException("Could not parse AsIdentifiers extension", e);
         }
-        return result;
     }
 
 }
