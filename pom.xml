@@ -141,9 +141,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.thaiopensource</groupId>
+            <groupId>org.relaxng</groupId>
             <artifactId>jing</artifactId>
-            <version>20091111</version>
+            <version>20220510</version>
             <scope>test</scope>
             <exclusions>
                 <!-- Avoid bringing in some very old dependencies that are now part of the Java Platform anyway -->
