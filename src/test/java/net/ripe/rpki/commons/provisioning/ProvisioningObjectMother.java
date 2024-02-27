@@ -81,8 +81,7 @@ public class ProvisioningObjectMother {
         builder.withIssuerDN(new X500Principal("CN=nl.bluelight"));
         builder.withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic());
         DateTime now = UTC.dateTime();
-        builder.withThisUpdateTime(now);
-        builder.withNextUpdateTime(now.plusHours(24));
+        builder.withValidityPeriod(new ValidityPeriod(now, now.plusHours(24)));
         builder.withNumber(BigInteger.TEN);
 
         return builder.build(TEST_KEY_PAIR.getPrivate()).getCrl();

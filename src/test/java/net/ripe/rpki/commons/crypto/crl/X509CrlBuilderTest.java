@@ -44,8 +44,7 @@ public class X509CrlBuilderTest {
     public void setUp() {
         subject = new X509CrlBuilder();
         subject.withIssuerDN(new X500Principal("CN=ROOT"));
-        subject.withThisUpdateTime(THIS_UPDATE_TIME);
-        subject.withNextUpdateTime(NEXT_UPDATE_TIME);
+        subject.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         subject.withNumber(BigInteger.ONE);
         subject.withAuthorityKeyIdentifier(PUBLIC_KEY);
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

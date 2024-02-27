@@ -216,11 +216,13 @@ public class ManifestCmsTest {
         );
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void shouldRejectWhenThisUpdateTimeIsNotBeforeNextUpdateTime() {
         X509Crl crl = getRootCrl();
         DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
 
+        // validity period checks the ordering of the dates, so use withThisUpdate explicitly
         subject = getRootManifestBuilder().withThisUpdateTime(NEXT_UPDATE_TIME.plusSeconds(1)).build(MANIFEST_KEY_PAIR.getPrivate());
 
         IpResourceSet resources = rootCertificate.getResources();
@@ -443,8 +445,7 @@ public class ManifestCmsTest {
     private X509CrlBuilder getRootCrlBuilder() {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(X509ResourceCertificateTest.TEST_SELF_SIGNED_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(NEXT_UPDATE_TIME.minusHours(24));
-        builder.withNextUpdateTime(NEXT_UPDATE_TIME.plusHours(24));
+        builder.withValidityPeriod(new ValidityPeriod(NEXT_UPDATE_TIME.minusHours(24), NEXT_UPDATE_TIME.plusHours(24)));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
