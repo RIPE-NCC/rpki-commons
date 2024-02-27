@@ -362,7 +362,7 @@ public class ManifestCmsTest {
                 new ValidationCheck(
                         ValidationStatus.ERROR,
                         ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE,
-                        ", \\u0000,    , ., .., cannot-contain-a/slash.cer, extension-must-be-lowercase.CER, multiple.dots.not.allowed, non-empty-extension-required., only-letters-allowed-for-extension.123"
+                        ", %00, +++, ., .., cannot-contain-a%2Fslash.cer, extension-must-be-lowercase.CER, multiple.dots.not.allowed, non-empty-extension-required., only-letters-allowed-for-extension.123"
                 ),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE)
         );
