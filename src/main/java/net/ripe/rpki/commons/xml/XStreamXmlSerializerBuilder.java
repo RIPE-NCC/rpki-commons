@@ -87,7 +87,7 @@ public class XStreamXmlSerializerBuilder<T> {
 
         // Allow type this serializer is instantiated for as well as its descendant types
         xStream.allowTypeHierarchy(this.objectType);
-        xStream.allowTypes(new Class[]{ this.objectType });
+        xStream.allowTypes(new Class<?>[]{ this.objectType });
         // Not all registered types are part of this module.
         // A wildcard could pull in classes that are not safe to deserialize -> allow types from net.ripe
         // for which there exists an alias.
@@ -178,7 +178,7 @@ public class XStreamXmlSerializerBuilder<T> {
      * @param classType type to allow.
      */
     public final XStreamXmlSerializerBuilder<T> withAllowedType(Class<?> classType) {
-        xStream.allowTypes(new Class[]{classType});
+        xStream.allowTypes(new Class<?>[]{classType});
         return this;
     }
 
