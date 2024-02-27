@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -83,7 +84,7 @@ public final class X509CertificateBuilderHelper {
 
     private ValidityPeriod validityPeriod;
 
-    private IpResourceSet resources;
+    private ImmutableResourceSet resources;
 
     private PublicKey publicKey;
 
@@ -134,7 +135,7 @@ public final class X509CertificateBuilderHelper {
         return this;
     }
 
-    public X509CertificateBuilderHelper withResources(IpResourceSet resources) {
+    public X509CertificateBuilderHelper withResources(ImmutableResourceSet resources) {
         this.resources = resources;
         return this;
     }
@@ -294,7 +295,7 @@ public final class X509CertificateBuilderHelper {
      * must be present. This means at least one IPvX or ASN must be either set
      * explicitly or inherited..
      */
-    protected void validateResource(IpResourceSet resources) {
+    protected void validateResource(ImmutableResourceSet resources) {
         // at least one resource type must be either set or inherited
         final boolean atLeastOneResourceTypeUsed = EnumSet.allOf(IpResourceType.class)
             .stream()

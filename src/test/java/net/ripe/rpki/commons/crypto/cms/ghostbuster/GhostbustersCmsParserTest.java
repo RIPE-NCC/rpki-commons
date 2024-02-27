@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.ghostbuster;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
@@ -103,7 +104,7 @@ public class GhostbustersCmsParserTest {
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         final DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now.minusMinutes(1), now.plusYears(1)));
-        builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        builder.withResources(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(CRL_DP);
         builder.withSubjectInformationAccess(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT, TEST_ROA_LOCATION));
         builder.withAuthorityInformationAccess(new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_CA_CA_ISSUERS, TEST_CA_LOCATION));

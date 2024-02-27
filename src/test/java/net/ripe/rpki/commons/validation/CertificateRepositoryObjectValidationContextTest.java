@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.validation;
 
 import com.google.common.testing.EqualsTester;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
 
 public class CertificateRepositoryObjectValidationContextTest {
 
-    private static final IpResourceSet CHILD_RESOURCE_SET = IpResourceSet.parse("10.8.0.0/16");
+    private static final ImmutableResourceSet CHILD_RESOURCE_SET = ImmutableResourceSet.parse("10.8.0.0/16");
 
     private static URI location = URI.create("rsync://host/path");
     private static X509ResourceCertificate certificate = X509ResourceCertificateTest.createSelfSignedCaResourceCertificate();
@@ -36,7 +37,7 @@ public class CertificateRepositoryObjectValidationContextTest {
         certificateWithInheritedResources = X509ResourceCertificateTest.
                 createSelfSignedCaResourceCertificateBuilder().
                 withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class))
-                .withResources(new IpResourceSet()).
+                .withResources(ImmutableResourceSet.of()).
                         build();
     }
 

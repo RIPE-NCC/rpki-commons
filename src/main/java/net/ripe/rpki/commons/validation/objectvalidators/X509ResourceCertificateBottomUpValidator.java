@@ -66,7 +66,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
         X509ResourceCertificate parent = certificates.get(0).getCertificate();
         certificates.remove(0); // No need to validate the root (1st parent) certificate against itself
 
-        IpResourceSet resources = parent.getResources();
+        var resources = parent.getResources();
 
         for (CertificateWithLocation certificateWithLocation : certificates) {
             String childLocation = certificateWithLocation.getLocation().getName();

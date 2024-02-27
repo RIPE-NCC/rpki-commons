@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.CrlLocator;
@@ -43,7 +44,7 @@ public class RoaCmsTest {
 
     private List<RoaPrefix> ipv4Prefixes;
     private List<RoaPrefix> allPrefixes;
-    private IpResourceSet allResources;
+    private ImmutableResourceSet allResources;
     private RoaCms subject;
 
 
@@ -54,10 +55,10 @@ public class RoaCmsTest {
         ipv4Prefixes.add(TEST_IPV4_PREFIX_2);
         allPrefixes = new ArrayList<>(ipv4Prefixes);
         allPrefixes.add(TEST_IPV6_PREFIX);
-        allResources = new IpResourceSet();
-        for (RoaPrefix prefix : allPrefixes) {
-            allResources.add(prefix.getPrefix());
-        }
+        allResources = allPrefixes.stream().map(RoaPrefix::getPrefix).collect(ImmutableResourceSet.collector());
+
+        assert !allPrefixes.isEmpty();
+
         subject = createRoaCms(allPrefixes);
     }
 
@@ -81,18 +82,16 @@ public class RoaCmsTest {
         return createCertificate(prefixes, TEST_KEY_PAIR);
     }
     public static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes, KeyPair keyPair) {
-        IpResourceSet resources = new IpResourceSet();
-        for (RoaPrefix prefix : prefixes) {
-            resources.add(prefix.getPrefix());
-        }
+        var resources = prefixes.stream().map(RoaPrefix::getPrefix).collect(ImmutableResourceSet.collector());
+
         X509ResourceCertificateBuilder builder = createCertificateBuilder(resources, keyPair);
         return builder.build();
     }
 
-    private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources) {
+    private static X509ResourceCertificateBuilder createCertificateBuilder(ImmutableResourceSet resources) {
             return createCertificateBuilder(resources, TEST_KEY_PAIR);
     }
-    private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources, KeyPair keyPair) {
+    private static X509ResourceCertificateBuilder createCertificateBuilder(ImmutableResourceSet resources, KeyPair keyPair) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(keyPair.getPublic());
@@ -134,7 +133,7 @@ public class RoaCmsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRejectCaCertificateInRoa() {
-        X509ResourceCertificate caCert = createCertificateBuilder(new IpResourceSet(TEST_IPV4_PREFIX_1.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV6_PREFIX.getPrefix())).withCa(true).build();
+        X509ResourceCertificate caCert = createCertificateBuilder(ImmutableResourceSet.of(TEST_IPV4_PREFIX_1.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV6_PREFIX.getPrefix())).withCa(true).build();
         subject = new RoaCmsBuilder().withAsn(TEST_ASN).withPrefixes(allPrefixes).withCertificate(caCert).build(TEST_KEY_PAIR.getPrivate());
     }
 

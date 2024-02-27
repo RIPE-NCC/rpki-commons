@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
@@ -31,7 +32,7 @@ public class X509ResourceCertificateBuilderTest {
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = UTC.dateTime();
         subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
-        subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        subject.withResources(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
 
     @Test(expected = NullPointerException.class)
@@ -42,7 +43,7 @@ public class X509ResourceCertificateBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRequireNonEmptyResourceSetForResourceCertificates() {
-        subject.withResources(IpResourceSet.parse(""));
+        subject.withResources(ImmutableResourceSet.parse(""));
         subject.build();
     }
 
@@ -107,7 +108,7 @@ public class X509ResourceCertificateBuilderTest {
 
     @Test
     public void shouldHaveSubjectKeyIdentifierForResourceCertificates() {
-        subject.withResources(IpResourceSet.parse("10/8"));
+        subject.withResources(ImmutableResourceSet.parse("10/8"));
         X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getSubjectKeyIdentifier());
@@ -115,7 +116,7 @@ public class X509ResourceCertificateBuilderTest {
 
     @Test
     public void shouldHaveAuthorityKeyIdentifierForResourceCertificates() {
-        subject.withResources(IpResourceSet.parse("10/8"));
+        subject.withResources(ImmutableResourceSet.parse("10/8"));
         subject.withAuthorityKeyIdentifier(true);
         X509ResourceCertificate certificate = subject.build();
 
@@ -124,7 +125,7 @@ public class X509ResourceCertificateBuilderTest {
 
     @Test
     public void shouldHaveResourceExtensionForResourceCertificates() {
-        subject.withResources(IpResourceSet.parse("10/8, AS123"));
+        subject.withResources(ImmutableResourceSet.parse("10/8, AS123"));
         X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getCertificate().getExtensionValue(ResourceExtensionEncoder.OID_IP_ADDRESS_BLOCKS.getId()));
@@ -135,7 +136,7 @@ public class X509ResourceCertificateBuilderTest {
     public void shouldHaveKeyUsageIfSet() {
         subject.withCa(true);
         subject.withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
-        subject.withResources(IpResourceSet.parse("10/8"));
+        subject.withResources(ImmutableResourceSet.parse("10/8"));
         X509ResourceCertificate certificate = subject.build();
 
         assertNotNull(certificate.getCertificate().getKeyUsage());
@@ -155,6 +156,4 @@ public class X509ResourceCertificateBuilderTest {
         subject.withSignatureProvider("foo");
         subject.build();
     }
-
-
 }

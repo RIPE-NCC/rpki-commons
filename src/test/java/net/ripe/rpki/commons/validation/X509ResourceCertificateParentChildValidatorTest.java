@@ -3,6 +3,7 @@ package net.ripe.rpki.commons.validation;
 import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
@@ -30,6 +31,7 @@ import java.net.URI;
 import java.security.KeyPair;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.hamcrest.Matchers.greaterThan;
@@ -43,7 +45,7 @@ import static org.junit.Assume.assumeThat;
 public class X509ResourceCertificateParentChildValidatorTest {
 
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
-    private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
+    private static final ImmutableResourceSet ROOT_RESOURCE_SET = ImmutableResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
     private static final DateTime NOW = UTC.dateTime();
     private static final ValidityPeriod VALIDITY_PERIOD = new ValidityPeriod(NOW.minusMinutes(1), NOW.plusYears(1));
@@ -51,7 +53,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     private static final X500Principal FIRST_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=First Child, C=NL");
     private static final BigInteger FIRST_CHILD_SERIAL_NUMBER = ROOT_SERIAL_NUMBER.add(BigInteger.valueOf(1));
     private static final X500Principal SECOND_CHILD_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=Second Child, C=NL");
-    private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
+    private static final ImmutableResourceSet INVALID_CHILD_RESOURCE_SET = ImmutableResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
     private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(NOW.minusMonths(2), NOW.minusMonths(1));
 
     private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
@@ -227,10 +229,10 @@ public class X509ResourceCertificateParentChildValidatorTest {
         assumeThat(parentResources.size(), greaterThan(0));
         assumeThat(childResourceCount, greaterThan(0));
 
-        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
+        final var parentResourceSet = ImmutableResourceSet.of(parentResources);
 
         // some part of the parent resources become child
-        final IpResourceSet childResourceSet = new IpResourceSet(
+        final var childResourceSet = ImmutableResourceSet.of(
             parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()));
         if (childResourceSet.isEmpty()) {
             return;
@@ -246,18 +248,19 @@ public class X509ResourceCertificateParentChildValidatorTest {
                                              List<@From(IpResourceGen.class) IpResource> extraChildResources) {
         assumeThat(parentResources.size(), greaterThan(0));
 
-        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
-        final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
+        final var parentResourceSet = ImmutableResourceSet.of(parentResources);
+        final var childResourceSet = ImmutableResourceSet.of(extraChildResources);
 
         // some part of the parent resources become child
-        parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
+        var parentSubset = parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).stream().collect(ImmutableResourceSet.collector());
+        var totalChildResources = new ImmutableResourceSet.Builder().addAll(childResourceSet).addAll(parentSubset).build();
         assumeThat(childResourceSet.isEmpty(), is(false));
 
-        ValidationResult result = validateParentChildPair(parentResourceSet, childResourceSet);
+        ValidationResult result = validateParentChildPair(parentResourceSet, totalChildResources);
         if (extraChildResources.isEmpty()) {
             assertFalse(result.hasFailures());
         } else {
-            IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
+            IpResourceSet overclaiming = new IpResourceSet(totalChildResources);
             overclaiming.removeAll(parentResourceSet);
             if (!overclaiming.isEmpty()) {
                 final ValidationCheck failure = result.getFailuresForAllLocations().get(0);
@@ -275,16 +278,18 @@ public class X509ResourceCertificateParentChildValidatorTest {
             return;
         }
 
-        final IpResourceSet parentResourceSet = new IpResourceSet(parentResources);
-        final IpResourceSet childResourceSet = new IpResourceSet(extraChildResources);
+        final var parentResourceSet = ImmutableResourceSet.of(parentResources);
+        final var childResourceSet = ImmutableResourceSet.of(extraChildResources);
 
         // some part of the parent resources become child
-        parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).forEach(childResourceSet::add);
+        var overlappingChildResources = parentResources.subList(0, Math.abs(childResourceCount) % parentResources.size()).stream().collect(ImmutableResourceSet.collector());
+        var totalChildResources = new ImmutableResourceSet.Builder().addAll(childResourceSet).addAll(overlappingChildResources).build();
+
         if (childResourceSet.isEmpty()) {
             return;
         }
 
-        ValidationResult result = validateParentChildReconsidered(parentResourceSet, childResourceSet);
+        ValidationResult result = validateParentChildReconsidered(parentResourceSet, totalChildResources);
         assertFalse(result.hasFailures());
         if (!extraChildResources.isEmpty()) {
             IpResourceSet overclaiming = new IpResourceSet(childResourceSet);
@@ -297,15 +302,15 @@ public class X509ResourceCertificateParentChildValidatorTest {
         }
     }
 
-    private ValidationResult validateParentChildReconsidered(IpResourceSet parentResourceSet, IpResourceSet childResourceSet) {
+    private ValidationResult validateParentChildReconsidered(ImmutableResourceSet parentResourceSet, ImmutableResourceSet childResourceSet) {
         return validateParentChildPairImpl(parentResourceSet, childResourceSet, true);
     }
 
-    private ValidationResult validateParentChildPair(IpResourceSet parentResourceSet, IpResourceSet childResourceSet) {
+    private ValidationResult validateParentChildPair(ImmutableResourceSet parentResourceSet, ImmutableResourceSet childResourceSet) {
         return validateParentChildPairImpl(parentResourceSet, childResourceSet, false);
     }
 
-    private ValidationResult validateParentChildPairImpl(IpResourceSet parentResourceSet, IpResourceSet childResourceSet, boolean reconsidered) {
+    private ValidationResult validateParentChildPairImpl(ImmutableResourceSet parentResourceSet, ImmutableResourceSet childResourceSet, boolean reconsidered) {
         final X509ResourceCertificate parentCertificate = createRootCertificateBuilder()
             .withResources(parentResourceSet)
             .build();
@@ -334,7 +339,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
     }
 
     private X509ResourceCertificate getRootResourceCertificateWithInheritedResources() {
-        return createRootCertificateBuilder().withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).withResources(new IpResourceSet()).build();
+        return createRootCertificateBuilder().withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).withResources(ImmutableResourceSet.empty()).build();
     }
 
     private X509ResourceCertificateBuilder createRootCertificateBuilder() {

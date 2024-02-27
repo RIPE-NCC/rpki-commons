@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
 import com.google.common.collect.Lists;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -27,15 +28,18 @@ public class CertificateRepositoryObjectValidationContext {
 
     private final X509CertificateObject certificate;
 
-    private final IpResourceSet resources;
+    /**
+     * Mutable because it can be reduced when overclaiming
+     */
+    private final ImmutableResourceSet resources;
 
-    private IpResourceSet overclaiming = new IpResourceSet();
+    private ImmutableResourceSet overclaiming = ImmutableResourceSet.empty();
 
     public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
         this(location, certificate, certificate.getResources(), Lists.newArrayList(certificate.getSubject().getName()));
     }
 
-    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources, List<String> subjectChain) {
+    public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, ImmutableResourceSet resources, List<String> subjectChain) {
         this.location = location;
         this.certificate = certificate;
         this.resources = resources;
@@ -85,28 +89,32 @@ public class CertificateRepositoryObjectValidationContext {
     }
 
     public void addOverclaiming(IpResourceSet overclaiming) {
-        this.overclaiming.addAll(overclaiming);
+        this.overclaiming = new ImmutableResourceSet.Builder().addAll(this.overclaiming).addAll(overclaiming).build();
     }
 
     public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
-        IpResourceSet effectiveResources = childCertificate.deriveResources(resources);
+        var effectiveResources = childCertificate.deriveResources(resources);
         removeOverclaimingResources(effectiveResources);
         List<String> childSubjects = Lists.newArrayList(subjectChain);
         childSubjects.add(childCertificate.getSubject().getName());
         return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, effectiveResources, childSubjects);
     }
 
-    public IpResourceSet getResources() {
-        IpResourceSet result = new IpResourceSet(resources);
-        removeOverclaimingResources(result);
-        return result;
+    public ImmutableResourceSet getResources() {
+        return removeOverclaimingResources(resources);
     }
 
-    private void removeOverclaimingResources(IpResourceSet resources) {
+    /**
+     * Remove the resources that are overclaimed in this context from the passed in resources.
+     * @param resources resources to clean
+     * @return resources - overclaiming
+     */
+    private ImmutableResourceSet removeOverclaimingResources(ImmutableResourceSet resources) {
         if (overclaiming.isEmpty() || resources.isEmpty()) {
-            return;
+            return resources;
         }
-        resources.removeAll(overclaiming);
+
+        return new ImmutableResourceSet.Builder().addAll(resources).removeAll(overclaiming).build();
     }
 
     @Override

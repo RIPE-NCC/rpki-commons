@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
 import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
@@ -31,7 +32,7 @@ public class RoaCms extends RpkiSignedObject implements Roa {
         return asn;
     }
 
-    public IpResourceSet getResources() {
+    public ImmutableResourceSet getResources() {
         return getCertificate().getResources();
     }
 

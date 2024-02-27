@@ -2,6 +2,7 @@ package net.ripe.rpki.commons.crypto.x509cert;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharSource;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,10 +20,10 @@ public class X509CertificateUtilTest {
 
     @Test
     public void shouldGetEncodedSubjectPublicKeyInfo() throws CertificateEncodingException, IOException {
-        X509ResourceCertificate cert1 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES).build();
+        X509ResourceCertificate cert1 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES).build();
         String encoded1 = X509CertificateUtil.getEncodedSubjectPublicKeyInfo(cert1.getCertificate());
 
-        X509ResourceCertificate cert2 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES).build();
+        X509ResourceCertificate cert2 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES).build();
         String encoded2 = X509CertificateUtil.getEncodedSubjectPublicKeyInfo(cert2.getCertificate());
 
         assertNotNull(encoded1);

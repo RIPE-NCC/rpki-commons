@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -22,7 +23,7 @@ import java.util.EnumSet;
  */
 public class X509ResourceCertificateBuilder {
     private final X509CertificateBuilderHelper builderHelper;
-    private IpResourceSet resources = new IpResourceSet();
+    private ImmutableResourceSet resources = ImmutableResourceSet.empty();
     private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
 
     public X509ResourceCertificateBuilder() {
@@ -72,7 +73,7 @@ public class X509ResourceCertificateBuilder {
         return this;
     }
 
-    public X509ResourceCertificateBuilder withResources(IpResourceSet resources) {
+    public X509ResourceCertificateBuilder withResources(ImmutableResourceSet resources) {
         this.resources = resources;
         builderHelper.withResources(resources);
         return this;

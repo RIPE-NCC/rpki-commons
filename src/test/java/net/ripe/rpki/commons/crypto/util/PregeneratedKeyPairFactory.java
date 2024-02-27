@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.util;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -96,7 +97,7 @@ public final class PregeneratedKeyPairFactory extends KeyPairFactory {
         builder.withCa(false);
         builder.withIssuerDN(new X500Principal("CN=issuer"));
         builder.withSubjectDN(new X500Principal("CN=subject"));
-        builder.withResources(IpResourceSet.parse("AS1-AS10,10/8,ffc0::/16"));
+        builder.withResources(ImmutableResourceSet.parse("AS1-AS10,10/8,ffc0::/16"));
         builder.withSigningKeyPair(keyPair);
         builder.withPublicKey(keyPair.getPublic());
         return builder.build();

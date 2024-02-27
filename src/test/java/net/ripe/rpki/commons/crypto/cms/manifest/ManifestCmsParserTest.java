@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -103,7 +104,7 @@ public class ManifestCmsParserTest {
         builder.withCa(false).withKeyUsage(KeyUsage.digitalSignature).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(keyPair.getPublic());
         builder.withSigningKeyPair(keyPair);
-        builder.withResources(new IpResourceSet());
+        builder.withResources(ImmutableResourceSet.empty());
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         builder.withSubjectInformationAccess(
@@ -117,7 +118,7 @@ public class ManifestCmsParserTest {
         builder.withCa(false).withKeyUsage(KeyUsage.digitalSignature).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        builder.withResources(new IpResourceSet());
+        builder.withResources(ImmutableResourceSet.empty());
         builder.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
         builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         builder.withSubjectInformationAccess(
@@ -131,7 +132,7 @@ public class ManifestCmsParserTest {
         builder.withCa(false).withKeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign).withSubjectDN(TEST_DN).withIssuerDN(TEST_DN).withSerial(BigInteger.ONE);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(TEST_KEY_PAIR);
-        builder.withResources(IpResourceSet.parse("10.0.0.0/8"));
+        builder.withResources(ImmutableResourceSet.parse("10.0.0.0/8"));
         builder.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         return builder.build();
     }

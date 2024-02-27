@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -17,7 +18,7 @@ public abstract class GenericRpkiCertificateBuilder {
     private PublicKey publicKey;
     private KeyPair signingKeyPair;
     private BigInteger serial;
-    private IpResourceSet resources = new IpResourceSet();
+    private ImmutableResourceSet resources = ImmutableResourceSet.empty();
     private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
     private X500Principal subject;
     private X500Principal issuer;
@@ -40,7 +41,7 @@ public abstract class GenericRpkiCertificateBuilder {
         this.serial = serial;
     }
 
-    public void withResources(IpResourceSet resources) {
+    public void withResources(ImmutableResourceSet resources) {
         this.resources = resources;
     }
 

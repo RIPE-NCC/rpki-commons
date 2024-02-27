@@ -31,8 +31,8 @@ public class X509ResourceCertificateParentChildLooseValidator extends X509Certif
     private void verifyResources() {
         final ValidationResult result = getValidationResult();
         final X509ResourceCertificate child = getChild();
-        final IpResourceSet resources = context.getResources();
-        final IpResourceSet childResourceSet = child.deriveResources(resources);
+        final var resources = context.getResources();
+        final var childResourceSet = child.deriveResources(resources);
 
         if (child.isRoot()) {
             result.rejectIfTrue(child.isResourceSetInherited(), ROOT_INHERITS_RESOURCES);

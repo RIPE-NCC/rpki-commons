@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -74,7 +75,7 @@ public class X509RouterCertificateBuilder {
             for (int asn : asns) {
                 resources.add(new Asn(asn));
             }
-            builderHelper.withResources(resources);
+            builderHelper.withResources(ImmutableResourceSet.of(resources));
         }
         return this;
     }

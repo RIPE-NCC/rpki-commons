@@ -1,9 +1,6 @@
 package net.ripe.rpki.commons.crypto.rfc3779;
 
-import net.ripe.ipresource.Asn;
-import net.ripe.ipresource.IpRange;
-import net.ripe.ipresource.IpResourceSet;
-import net.ripe.ipresource.IpResourceType;
+import net.ripe.ipresource.*;
 import net.ripe.rpki.commons.crypto.util.Asn1UtilTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -185,7 +182,7 @@ public class ResourceExtensionEncoderTest {
 
     @Test
     public void shouldEncodeIpAddressChoice() {
-        IpResourceSet resources = new IpResourceSet(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
+        var resources = ImmutableResourceSet.of(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
         Asn1UtilTest.assertEncoded(ENCODED_IPV4_RESOURCES, subject.ipAddressChoiceToDer(IpResourceType.IPv4, resources));
         Asn1UtilTest.assertEncoded(ENCODED_NULL, subject.ipAddressChoiceToDer(IpResourceType.IPv4, null));
 
@@ -193,35 +190,35 @@ public class ResourceExtensionEncoderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRejectEmptyIpAddressesOrRanges() {
-        IpResourceSet resources = new IpResourceSet(IpRange.parse("128.5.0.4/30"));
+        var resources = ImmutableResourceSet.of(IpRange.parse("128.5.0.4/30"));
         subject.ipAddressChoiceToDer(IpResourceType.IPv6, resources);
     }
 
     @Test
     public void shouldEncodeIpAddressFamily() {
-        IpResourceSet resources = new IpResourceSet(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
+        var resources = ImmutableResourceSet.of(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
         Asn1UtilTest.assertEncoded(ENCODED_IPV4_ADDRESS_FAMILY_RESOURCES, subject.ipAddressFamilyToDer(AddressFamily.IPV4, resources));
     }
 
     @Test
     public void shouldEncodeIpAddressFamilyWithSafi() {
-        IpResourceSet resources = new IpResourceSet(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
+        var resources = ImmutableResourceSet.of(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
         Asn1UtilTest.assertEncoded(ENCODED_IPV4_MULTICAST_ADDRESS_FAMILY_RESOURCES, subject.ipAddressFamilyToDer(AddressFamily.IPV4.withSubsequentAddressFamilyIdentifier(2), resources));
 
     }
 
     @Test
     public void shouldEncodeIpAddressBlocks() throws IOException {
-        IpResourceSet resources = new IpResourceSet(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"), IpRange.parse("2001:0:200::-2001:0:3ff:ffff:ffff:ffff:ffff:ffff"));
+        var resources = ImmutableResourceSet.of(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"), IpRange.parse("2001:0:200::-2001:0:3ff:ffff:ffff:ffff:ffff:ffff"));
         assertArrayEquals(ENCODED_IP_ADDRESS_BLOCKS, subject.encodeIpAddressBlocks(false, false, resources).getEncoded());
 
-        resources = new IpResourceSet(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
-        assertArrayEquals(ENCODED_IPV4_ONLY_ADDRESS_BLOCKS, subject.encodeIpAddressBlocks(false, false, resources).getEncoded());
+        var otherResources = ImmutableResourceSet.of(IpRange.parse("128.5.0.4/32"), IpRange.parse("10.5.4.0-10.5.15.255"));
+        assertArrayEquals(ENCODED_IPV4_ONLY_ADDRESS_BLOCKS, subject.encodeIpAddressBlocks(false, false, otherResources).getEncoded());
     }
 
     @Test
     public void shouldNotEncodeEmptyIpAddressBlocksExtension() {
-        assertNull(subject.encodeIpAddressBlocks(false, false, new IpResourceSet()));
+        assertNull(subject.encodeIpAddressBlocks(false, false, ImmutableResourceSet.empty()));
     }
 
     @Test
@@ -247,26 +244,26 @@ public class ResourceExtensionEncoderTest {
 
     @Test
     public void shouldEncodeAsIdsOrRanges() {
-        IpResourceSet resources = new IpResourceSet(ASN_412_233, ASN_127.upTo(ASN_128));
+        var resources = ImmutableResourceSet.of(ASN_412_233, ASN_127.upTo(ASN_128));
         Asn1UtilTest.assertEncoded(ENCODED_AS_IDS_OR_RANGES, subject.asIdsOrRangesToDer(resources));
     }
 
     @Test
     public void shouldEncodeAsIdentifierChoice() {
-        IpResourceSet resources = new IpResourceSet(ASN_412_233, ASN_127.upTo(ASN_128));
+        var resources = ImmutableResourceSet.of(ASN_412_233, ASN_127.upTo(ASN_128));
         Asn1UtilTest.assertEncoded(ENCODED_NULL, subject.asIdentifierChoiceToDer(true, resources));
         Asn1UtilTest.assertEncoded(ENCODED_AS_IDS_OR_RANGES, subject.asIdentifierChoiceToDer(false, resources));
     }
 
     @Test
     public void shouldEncodeAsIdentifiers() throws IOException {
-        IpResourceSet resources = new IpResourceSet(ASN_412_233, ASN_127.upTo(ASN_128));
+        var resources = ImmutableResourceSet.of(ASN_412_233, ASN_127.upTo(ASN_128));
         assertArrayEquals(ENCODED_AS_IDENTIFIERS, subject.encodeAsIdentifiers(false, resources).getEncoded());
     }
 
     @Test
     public void shouldNotEncodeEmptyAsIdentifiersExtension() {
-        assertNull(subject.encodeAsIdentifiers(false, IpResourceSet.parse("10.0.0.0/8")));
+        assertNull(subject.encodeAsIdentifiers(false, ImmutableResourceSet.parse("10.0.0.0/8")));
     }
 
     /**
@@ -274,9 +271,9 @@ public class ResourceExtensionEncoderTest {
      */
     @Test
     public void shouldEncodeRfc3779AppendixBFirstExample() {
-        SortedMap<AddressFamily, IpResourceSet> resources = new TreeMap<AddressFamily, IpResourceSet>();
+        SortedMap<AddressFamily, ImmutableResourceSet> resources = new TreeMap<>();
         resources.put(AddressFamily.IPV4.withSubsequentAddressFamilyIdentifier(1),
-                IpResourceSet.parse("10.0.32.0/20, 10.0.64.0/24, 10.1.0.0/16, 10.2.48.0/20, 10.2.64.0/24, 10.3.0.0/16"));
+                ImmutableResourceSet.parse("10.0.32.0/20, 10.0.64.0/24, 10.1.0.0/16, 10.2.48.0/20, 10.2.64.0/24, 10.3.0.0/16"));
         resources.put(AddressFamily.IPV6, null);
         Asn1UtilTest.assertEncoded(RFC3779_APPENDIX_B_EXAMPLE_1, subject.ipAddressBlocksToDer(resources));
     }
@@ -288,10 +285,10 @@ public class ResourceExtensionEncoderTest {
      */
     @Test
     public void shouldEncodeRfc3779AppendixBSecondExample() {
-        SortedMap<AddressFamily, IpResourceSet> resources = new TreeMap<AddressFamily, IpResourceSet>();
-        resources.put(AddressFamily.IPV6, IpResourceSet.parse("2001:0:2::/48"));
+        SortedMap<AddressFamily, ImmutableResourceSet> resources = new TreeMap<>();
+        resources.put(AddressFamily.IPV6, ImmutableResourceSet.parse("2001:0:2::/48"));
         resources.put(AddressFamily.IPV4.withSubsequentAddressFamilyIdentifier(1),
-                IpResourceSet.parse("10.0.0.0/8,176.16.0.0/12"));
+                ImmutableResourceSet.parse("10.0.0.0/8,176.16.0.0/12"));
         resources.put(AddressFamily.IPV4.withSubsequentAddressFamilyIdentifier(2), null);
         Asn1UtilTest.assertEncoded(RFC3779_APPENDIX_B_EXAMPLE_2, subject.ipAddressBlocksToDer(resources));
     }
@@ -301,7 +298,7 @@ public class ResourceExtensionEncoderTest {
      */
     @Test
     public void shouldEncodeRfc3779AppendixCExample() {
-        IpResourceSet asnResources = IpResourceSet.parse("AS135, AS3000-AS3999, AS5001");
+        var asnResources = ImmutableResourceSet.parse("AS135, AS3000-AS3999, AS5001");
         Asn1UtilTest.assertEncoded(RFC3779_APPENDIX_C_EXAMPLE, subject.asIdentifiersToDer(false, asnResources, true, null));
     }
 

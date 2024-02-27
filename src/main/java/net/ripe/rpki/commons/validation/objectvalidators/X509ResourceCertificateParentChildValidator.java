@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -11,13 +12,13 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class X509ResourceCertificateParentChildValidator extends X509CertificateParentChildValidator<X509ResourceCertificate> implements X509ResourceCertificateValidator {
 
-    private IpResourceSet resources;
+    private ImmutableResourceSet resources;
 
     public X509ResourceCertificateParentChildValidator(ValidationOptions options,
                                                        ValidationResult result,
                                                        X509ResourceCertificate parent,
                                                        X509Crl crl,
-                                                       IpResourceSet resources) {
+                                                       ImmutableResourceSet resources) {
         super(options, result, parent, crl);
         this.resources = resources;
     }
@@ -31,7 +32,7 @@ public class X509ResourceCertificateParentChildValidator extends X509Certificate
     private void verifyResources() {
         final ValidationResult result = getValidationResult();
         final X509ResourceCertificate child = getChild();
-        final IpResourceSet childResourceSet = child.deriveResources(resources);
+        final var childResourceSet = child.deriveResources(resources);
 
         if (child.isRoot()) {
             result.rejectIfTrue(child.isResourceSetInherited(), ROOT_INHERITS_RESOURCES);
