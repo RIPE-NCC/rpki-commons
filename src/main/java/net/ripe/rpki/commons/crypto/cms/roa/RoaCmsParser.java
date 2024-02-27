@@ -4,6 +4,7 @@ import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.IllegalAsn1StructureException;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
@@ -17,6 +18,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -96,11 +98,15 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
 
             final int itemCount = seq.size();
             if (itemCount == 3) {
-                BigInteger version = getRpkiObjectVersion(seq);
-                if (validationResult.rejectIfFalse(BigInteger.ZERO.equals(version), ROA_ATTESTATION_VERSION, "attestation version must be 0, but is " + version)) {
-                    asn = Asn1Util.parseAsId(seq.getObjectAt(1));
-                    prefixes = parseRoaIpAddressFamilySequence(seq.getObjectAt(2));
-                }
+                Optional<BigInteger> maybeVersion = getTaggedVersion(0, seq);
+                maybeVersion.ifPresentOrElse(version -> {
+                    if (validationResult.rejectIfFalse(BigInteger.ZERO.equals(version), ROA_ATTESTATION_VERSION, "attestation version must be 0, but is " + version)) {
+                        asn = Asn1Util.parseAsId(seq.getObjectAt(1));
+                        prefixes = parseRoaIpAddressFamilySequence(seq.getObjectAt(2));
+                    }
+                }, () -> {
+                    validationResult.error(ROA_ATTESTATION_VERSION, "missing/not explicitly tagged");
+                });
             } else if (itemCount == 2) {
                 asn = Asn1Util.parseAsId(seq.getObjectAt(0));
                 prefixes = parseRoaIpAddressFamilySequence(seq.getObjectAt(1));
