@@ -63,7 +63,6 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ## Changelog
 
 ## 2024-xx-yy 1.38
-  * Use newer version of dependency scan plugin due to build failures
 
 ## 2024-02-28 1.37
   * Use bouncy castle 1.77 (and update API usage accordingly)
