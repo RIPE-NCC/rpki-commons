@@ -37,7 +37,7 @@ import org.joda.time.Period;
 
 import javax.security.auth.x500.X500Principal;
 
-public class XStreamXmlSerializerBuilder<T> {
+public final class XStreamXmlSerializerBuilder<T> {
 
     private static final boolean STRICT = true;
     private static final boolean NOT_STRICT = false;
@@ -47,27 +47,28 @@ public class XStreamXmlSerializerBuilder<T> {
 
 
     public static <C> XStreamXmlSerializerBuilder<C> newStrictXmlSerializerBuilder(Class<C> objectType) {
-        return new XStreamXmlSerializerBuilder<C>(objectType, STRICT);
+        return new XStreamXmlSerializerBuilder<>(objectType, STRICT);
     }
 
     public static <C> XStreamXmlSerializerBuilder<C> newForgivingXmlSerializerBuilder(Class<C> objectType) {
-        return new XStreamXmlSerializerBuilder<C>(objectType, NOT_STRICT);
+        return new XStreamXmlSerializerBuilder<>(objectType, NOT_STRICT);
     }
 
-    protected XStreamXmlSerializerBuilder(Class<T> objectType, boolean strict) {
+    XStreamXmlSerializerBuilder(Class<T> objectType, boolean strict) {
+        super();
         this.objectType = objectType;
         createDefaultXStream(strict);
     }
 
     /**
-     * Instantiate XStream and set-up the security framework to prevent injection and remote code execution.
+     * Instantiate XStream and set up the security framework to prevent injection and remote code execution.
      *
      * Types that are allowed are:
      *   * A list of default types included in XStream.
      *   * The type the serializer is built for.
      *   * Types that have been aliased (i.e. the mapped name of the class is not it's qualified name).
      *
-     * Note that the whitelist is <emph>only</emph> checked on deserialization.
+     * Note that the allowlist is <emph>only</emph> checked on deserialization.
      */
     private void createDefaultXStream(boolean strict) {
         if(strict) {
@@ -87,7 +88,7 @@ public class XStreamXmlSerializerBuilder<T> {
 
         // Allow type this serializer is instantiated for as well as its descendant types
         xStream.allowTypeHierarchy(this.objectType);
-        xStream.allowTypes(new Class[]{ this.objectType });
+        xStream.allowTypes(new Class<?>[]{ this.objectType });
         // Not all registered types are part of this module.
         // A wildcard could pull in classes that are not safe to deserialize -> allow types from net.ripe
         // for which there exists an alias.
@@ -98,12 +99,8 @@ public class XStreamXmlSerializerBuilder<T> {
         registerRpkiRelated();
     }
 
-    protected HierarchicalStreamDriver getStreamDriver() {
+    private HierarchicalStreamDriver getStreamDriver() {
         return new XppDriver();
-    }
-
-    protected final Class<T> getObjectType() {
-        return objectType;
     }
 
     private void registerIpResourceRelated() {
@@ -148,12 +145,12 @@ public class XStreamXmlSerializerBuilder<T> {
         withAllowedType(RoaCms.class);
     }
 
-    public final XStreamXmlSerializerBuilder<T> withConverter(Converter converter) {
+    public XStreamXmlSerializerBuilder<T> withConverter(Converter converter) {
         xStream.registerConverter(converter);
         return this;
     }
 
-    public final XStreamXmlSerializerBuilder<T> withConverter(SingleValueConverter converter) {
+    public XStreamXmlSerializerBuilder<T> withConverter(SingleValueConverter converter) {
         xStream.registerConverter(converter);
         return this;
     }
@@ -178,7 +175,7 @@ public class XStreamXmlSerializerBuilder<T> {
      * @param classType type to allow.
      */
     public final XStreamXmlSerializerBuilder<T> withAllowedType(Class<?> classType) {
-        xStream.allowTypes(new Class[]{classType});
+        xStream.allowTypes(new Class<?>[]{classType});
         return this;
     }
 
@@ -199,14 +196,10 @@ public class XStreamXmlSerializerBuilder<T> {
     }
 
     public XStreamXmlSerializer<T> build() {
-        return new XStreamXmlSerializer<T>(xStream, objectType);
+        return new XStreamXmlSerializer<>(xStream, objectType);
     }
 
-    protected XStream getXStream() {
-        return xStream;
-    }
-
-    private final static class MyXStream extends XStream {
+    private static final class MyXStream extends XStream {
 
         private MyXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
             super(new SunUnsafeReflectionProvider(), hierarchicalStreamDriver);

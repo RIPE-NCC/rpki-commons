@@ -33,6 +33,7 @@ public final class CertificateRepositoryObjectFactory {
      * @return a parsed {@link CertificateRepositoryObject} or {@code null} in case the encoded object has a valid location
      * but its contents can not be parsed.
      */
+    @SuppressWarnings("fallthrough")
     public static CertificateRepositoryObject createCertificateRepositoryObject(byte[] encoded, ValidationResult validationResult) {
 
         RepositoryObjectType objectType = RepositoryObjectType.parse(validationResult.getCurrentLocation().getName());
@@ -52,6 +53,7 @@ public final class CertificateRepositoryObjectFactory {
                 return parseGbr(encoded, validationResult);
             case Aspa:
                 return parseAspa(encoded, validationResult);
+            // intentional usage of fall-through: All three cases should result in UnknownCertificateRepositoryObject, yet only two are unsupported.
             case SignedChecklist:
             case TrustAnchorKey:
                 log.info("Encountered unsupported object type: {} uri={}", objectType, validationResult.getCurrentLocation().getName());

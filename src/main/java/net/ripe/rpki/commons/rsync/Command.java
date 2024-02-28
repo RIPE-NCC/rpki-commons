@@ -83,7 +83,7 @@ public class Command extends Thread {
             outputReader.start();
 
             //allows the readers to start
-            yield();
+            Thread.yield();
 
             outputReader.join();
             errorReader.join();

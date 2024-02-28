@@ -21,19 +21,6 @@ public class ProvisioningCmsObject {
     /** Signing time MUST be present https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.3 */
     private final DateTime signingTime;
 
-    // No support for signingTime, which is a required attribute for valid objects.
-    @Deprecated
-    public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload) {
-        // -
-        // ArrayIsStoredDirectly
-        this.encodedContent = encodedContent;
-        this.cmsCertificate = cmsCertificate;
-        this.caCertificates = caCertificates;
-        this.crl = crl;
-        this.payload = payload;
-        this.signingTime = null;
-    }
-
     public ProvisioningCmsObject(byte[] encodedContent, X509Certificate cmsCertificate, Collection<X509Certificate> caCertificates, X509CRL crl, AbstractProvisioningPayload payload, @NonNull DateTime signingTime) {
         // -
         // ArrayIsStoredDirectly

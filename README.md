@@ -64,6 +64,8 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## 2024-xx-yy 1.37
   * Use bouncy castle 1.77 (and update API usage accordingly)
+  * **removed** deprecated RemoteCertificateFetcher
+  * **removed** deprected ProvisioningCmsObject constructor
   * Improved the parsing of resource extensions
   * **fix**: Do not encode redundant maxlength in ROAs
   * Use a more modern version of the jing (RelaxNG) library

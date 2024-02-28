@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import com.google.common.collect.Lists;
 import com.google.common.testing.EqualsTester;
 import net.ripe.ipresource.IpRange;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class RoaPrefixTest {
         var prefixList = List.of(p2_24, p1, p2_8, p2);
 
         // Static case of re-sorting a list in wrong order
-        var toSort = new ArrayList(prefixList);
+        var toSort = Lists.newArrayList(prefixList);
         Collections.sort(toSort);
         assertThat(toSort).containsExactly(p1, p2, p2_8, p2_24);
 
@@ -61,7 +62,7 @@ public class RoaPrefixTest {
 
         // But test a number of random shuffles as well
         for (int i=0; i < 16; i++) {
-            toSort = new ArrayList(prefixList);
+            toSort = Lists.newArrayList(prefixList);
             Collections.shuffle(toSort);
             Collections.sort(toSort);
             assertThat(toSort).containsExactly(p1, p2, p2_8, p2_24);

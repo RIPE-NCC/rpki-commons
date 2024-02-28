@@ -25,7 +25,7 @@ public class ManifestCmsConverterTest {
         subject = new ManifestCmsConverter();
         xStream = new XStream();
         xStream.registerConverter(subject);
-        xStream.allowTypes(new Class[]{ManifestCms.class});
+        xStream.allowTypes(new Class<?>[]{ManifestCms.class});
     }
 
     @Test

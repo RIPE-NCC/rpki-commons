@@ -125,6 +125,8 @@ public class ProvisioningCmsObjectBuilder {
         generator.addSignerInfoGenerator(
             new JcaSignerInfoGeneratorBuilder(digestProvider)
                 .setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator(createSignedAttributes()) {
+
+                    @SuppressWarnings("rawtypes")
                     @Override
                     public AttributeTable getAttributes(Map parameters) {
                         return super.getAttributes(parameters).remove(CMSAttributes.cmsAlgorithmProtect);

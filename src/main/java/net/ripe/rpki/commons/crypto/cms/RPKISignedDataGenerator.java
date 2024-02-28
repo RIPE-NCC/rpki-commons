@@ -1,11 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignerInfo;
@@ -19,6 +14,8 @@ import org.bouncycastle.cms.SignerInformation;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.cms.CMSUtils.attachSignersToOutputStream;
 import static net.ripe.rpki.commons.crypto.cms.CMSUtils.createDerSetFromList;
@@ -44,6 +41,7 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
      * @param content the content to be signed.
      * @param encapsulate true if the content should be encapsulated in the signature, false otherwise.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public CMSSignedData generate(
         // FIXME Avoid accessing more than once to support CMSProcessableInputStream
@@ -85,7 +83,7 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
                 bOut = new ByteArrayOutputStream();
             }
 
-            OutputStream cOut = attachSignersToOutputStream(signerGens, bOut);
+            OutputStream cOut = attachSignersToOutputStream((Collection<SignerInfoGenerator>)signerGens, bOut);
 
             // Just in case it's unencapsulated and there are no signers!
             cOut = getSafeOutputStream(cOut);
@@ -125,14 +123,14 @@ public class RPKISignedDataGenerator extends CMSSignedDataGenerator
 
         if (!certs.isEmpty())
         {
-            certificates = createDerSetFromList(certs);
+            certificates = createDerSetFromList((List<? extends ASN1Encodable>) certs);
         }
 
         ASN1Set certrevlist = null;
 
         if (!crls.isEmpty())
         {
-            certrevlist = createDerSetFromList(crls);
+            certrevlist = createDerSetFromList((List<? extends  ASN1Encodable>)crls);
         }
 
         ContentInfo encInfo = new ContentInfo(contentTypeOID, octs);
