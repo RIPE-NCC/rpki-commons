@@ -42,8 +42,16 @@ public class RpkiCaCertificateRequestParser {
     private PublicKey publicKey;
 
     public RpkiCaCertificateRequestParser(PKCS10CertificationRequest pkcs10CertificationRequest) throws RpkiCaCertificateRequestParserException {
-        this.pkcs10CertificationRequest = new JcaPKCS10CertificationRequest(pkcs10CertificationRequest);
-        process();
+        // change in bouncy castle 1.74-1.74: PKCS10CertificationRequest constructor now throws NPE if object with
+        // null attributes is passed (e.g. a mock).
+        //
+        // Re-throw a checked exception on NPE.
+        try {
+            this.pkcs10CertificationRequest = new JcaPKCS10CertificationRequest(pkcs10CertificationRequest);
+            process();
+        } catch (NullPointerException e) {
+            throw new RpkiCaCertificateRequestParserException("Error while processing certification request.", e);
+        }
 
         if (caRepositoryUri == null) {
             throw new RpkiCaCertificateRequestParserException("No CA Repository URI included in SIA in request");
