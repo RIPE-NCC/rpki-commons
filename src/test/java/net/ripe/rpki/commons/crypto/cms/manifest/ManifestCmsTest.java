@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import com.google.common.collect.Lists;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -55,7 +56,7 @@ public class ManifestCmsTest {
     private static final URI ROOT_MANIFEST_CRL_LOCATION = URI.create("rsync://foo.host/bar/bar.crl");
 
     // Root certificate
-    private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
+    private static final ImmutableResourceSet ROOT_RESOURCE_SET = ImmutableResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     public static final KeyPair ROOT_KEY_PAIR = KeyPairFactoryTest.TEST_KEY_PAIR;
 
     // Manifest EE certificate
@@ -125,7 +126,7 @@ public class ManifestCmsTest {
     @Test
     public void shouldValidateManifestCms() {
         X509Crl crl = getRootCrl();
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
@@ -140,7 +141,7 @@ public class ManifestCmsTest {
 
     @Test
     public void shouldNotValidateWithInvalidCrl() {
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
         final ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
@@ -170,7 +171,7 @@ public class ManifestCmsTest {
 
         DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
 
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
@@ -197,7 +198,7 @@ public class ManifestCmsTest {
 
         DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.minusDays(1).getMillis());
 
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
@@ -225,7 +226,7 @@ public class ManifestCmsTest {
         // validity period checks the ordering of the dates, so use withThisUpdate explicitly
         subject = getRootManifestBuilder().withThisUpdateTime(NEXT_UPDATE_TIME.plusSeconds(1)).build(MANIFEST_KEY_PAIR.getPrivate());
 
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(
                 ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
@@ -249,7 +250,7 @@ public class ManifestCmsTest {
 
         DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
 
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
@@ -277,7 +278,7 @@ public class ManifestCmsTest {
 
         DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(8).getMillis());
 
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
@@ -310,7 +311,7 @@ public class ManifestCmsTest {
 
         DateTimeUtils.setCurrentMillisFixed(THIS_UPDATE_TIME.minusSeconds(1).getMillis());
 
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
 
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
@@ -350,7 +351,7 @@ public class ManifestCmsTest {
 
         subject = builder.build(MANIFEST_KEY_PAIR.getPrivate());
 
-        IpResourceSet resources = rootCertificate.getResources();
+        var resources = rootCertificate.getResources();
         CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
 
         ValidationOptions options = ValidationOptions.strictValidation();

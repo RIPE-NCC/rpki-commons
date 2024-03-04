@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -12,7 +13,7 @@ public class ResourceValidatorFactory {
             CertificateRepositoryObjectValidationContext context,
             ValidationOptions options, ValidationResult result, X509Crl crl) {
 
-        return new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
+        return new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, ImmutableResourceSet.of(context.getResources()));
     }
 
     public static X509ResourceCertificateValidator getX509ResourceCertificateValidator(
@@ -22,12 +23,12 @@ public class ResourceValidatorFactory {
         if (options.isAllowOverclaimParentChild())
             return new X509ResourceCertificateParentChildLooseValidator(options, result, crl, context);
 
-        return new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, context.getResources());
+        return new X509ResourceCertificateParentChildValidator(options, result, context.getCertificate(), crl, ImmutableResourceSet.of(context.getResources()));
     }
 
     public static X509ResourceCertificateParentChildValidator getX509ResourceCertificateParentChildStrictValidator(
             ValidationOptions options, ValidationResult result, X509ResourceCertificate parent,
-            IpResourceSet resources, X509Crl crl) {
+            ImmutableResourceSet resources, X509Crl crl) {
         return new X509ResourceCertificateParentChildValidator(options, result, parent, crl, resources);
     }
 }

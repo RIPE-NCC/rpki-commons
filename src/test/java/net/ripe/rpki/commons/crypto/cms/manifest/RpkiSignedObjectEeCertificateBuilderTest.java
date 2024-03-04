@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -60,7 +61,7 @@ public class RpkiSignedObjectEeCertificateBuilderTest {
 
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
 
-        subject.withResources(new IpResourceSet());
+        subject.withResources(ImmutableResourceSet.empty());
         subject.withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class));
 
         // when

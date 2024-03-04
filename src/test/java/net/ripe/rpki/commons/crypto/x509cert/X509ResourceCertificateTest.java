@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -48,7 +49,7 @@ public class X509ResourceCertificateTest {
 
     private static final ValidationLocation CRL_DP_VALIDATION_LOCATION = new ValidationLocation(TEST_TA_CRL);
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
-    private static final IpResourceSet TEST_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
+    private static final ImmutableResourceSet TEST_RESOURCE_SET = ImmutableResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private CrlLocator crlLocator;
 
     private static final ValidityPeriod TEST_VALIDITY_PERIOD;
@@ -94,7 +95,7 @@ public class X509ResourceCertificateTest {
         return createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
     }
 
-    public static X509ResourceCertificate createSelfSignedCaResourceCertificate(IpResourceSet ipResourceSet) {
+    public static X509ResourceCertificate createSelfSignedCaResourceCertificate(ImmutableResourceSet ipResourceSet) {
         X509ResourceCertificateBuilder builder = createSelfSignedCaResourceCertificateBuilder().withResources(ipResourceSet);
         return builder.build();
     }
@@ -140,7 +141,7 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldSupportResourceInheritance() {
-        X509ResourceCertificate inherited = createSelfSignedCaResourceCertificateBuilder().withResources(new IpResourceSet()).withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).build();
+        X509ResourceCertificate inherited = createSelfSignedCaResourceCertificateBuilder().withResources(ImmutableResourceSet.empty()).withInheritedResourceTypes(EnumSet.allOf(IpResourceType.class)).build();
         assertTrue(inherited.isResourceSetInherited());
         assertTrue(inherited.getResources().isEmpty());
         assertFalse(createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET).isResourceSetInherited());
@@ -150,7 +151,7 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldSupportInheritedAsnsOnly() {
-        X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.parse("10.0.0.0/8")).withInheritedResourceTypes(EnumSet.of(IpResourceType.ASN)).build();
+        X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(ImmutableResourceSet.parse("10.0.0.0/8")).withInheritedResourceTypes(EnumSet.of(IpResourceType.ASN)).build();
 
         assertTrue(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.ASN)));
         assertFalse(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv4)));
@@ -162,7 +163,7 @@ public class X509ResourceCertificateTest {
 
     @Test
     public void shouldSupportInheritedIpAddressesOnly() {
-        X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.parse("AS1234")).withInheritedResourceTypes(EnumSet.of(IpResourceType.IPv4, IpResourceType.IPv6)).build();
+        X509ResourceCertificate subject = createSelfSignedCaCertificateBuilder().withResources(ImmutableResourceSet.parse("AS1234")).withInheritedResourceTypes(EnumSet.of(IpResourceType.IPv4, IpResourceType.IPv6)).build();
 
         assertFalse(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.ASN)));
         assertTrue(subject.isResourceTypesInherited(EnumSet.of(IpResourceType.IPv4)));
@@ -304,12 +305,15 @@ public class X509ResourceCertificateTest {
         assertFalse(result.hasFailureForLocation(CERT_URI_VALIDATION_LOCATION));
     }
 
+    /**
+     * This is effectively an invariant of ImmutableResourceSet
+     */
     @Test
     public void shouldReturnImmutableResources() {
         X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
 
-        IpResourceSet resources = cert.getResources();
-        resources.removeAll(new IpResourceSet(resources));
+        var resources = cert.getResources();
+        resources.forEach(resources::remove);
 
         assertFalse(cert.getResources().isEmpty());
     }

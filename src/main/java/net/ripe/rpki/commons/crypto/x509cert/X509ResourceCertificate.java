@@ -44,8 +44,8 @@ public class X509ResourceCertificate extends X509GenericCertificate implements X
         return resourceExtension.getResources();
     }
 
-    public IpResourceSet getResources() {
-        return new IpResourceSet(resources());
+    public ImmutableResourceSet getResources() {
+        return resources();
     }
 
     public EnumSet<IpResourceType> getInheritedResourceTypes() {

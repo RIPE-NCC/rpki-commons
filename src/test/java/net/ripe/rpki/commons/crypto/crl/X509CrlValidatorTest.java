@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.crl;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
@@ -29,7 +30,7 @@ public class X509CrlValidatorTest {
 
     // Test data
     private static final X500Principal ROOT_CERTIFICATE_NAME = new X500Principal("CN=For Testing Only, CN=RIPE NCC, C=NL");
-    private static final IpResourceSet ROOT_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
+    private static final ImmutableResourceSet ROOT_RESOURCE_SET = ImmutableResourceSet.parse("10.0.0.0/8, 192.168.0.0/16, ffce::/16, AS21212");
     private static final BigInteger ROOT_SERIAL_NUMBER = BigInteger.valueOf(900);
     private static final ValidityPeriod VALIDITY_PERIOD;
 

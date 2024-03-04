@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.provisioning;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
@@ -67,7 +68,7 @@ public class ProvisioningObjectMother {
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = new DateTime(2011, 3, 1, 0, 0, 0, 0, DateTimeZone.UTC);
         builder.withValidityPeriod(new ValidityPeriod(now, now.plusYears(5)));
-        builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        builder.withResources(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withCrlDistributionPoints(RPKI_CA_CERT_REQUEST_CA_CRL_URI);
         builder.withSubjectInformationAccess(
                 new X509CertificateInformationAccessDescriptor(X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY, RPKI_CA_CERT_REQUEST_CA_REPO_URI),

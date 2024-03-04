@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
 import net.ripe.ipresource.Asn;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -15,6 +16,7 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 
@@ -63,17 +65,15 @@ public class RoaCmsObjectMother {
     }
 
     private static X509ResourceCertificate createCertificate(List<RoaPrefix> prefixes, ValidityPeriod validityPeriod) {
-        IpResourceSet resources = new IpResourceSet();
-        for (RoaPrefix prefix : prefixes) {
-            resources.add(prefix.getPrefix());
-        }
+        var resources = prefixes.stream().map(RoaPrefix::getPrefix).collect(ImmutableResourceSet.collector());
+
         X509ResourceCertificateBuilder builder = createCertificateBuilder(resources, validityPeriod);
         builder.withSigningKeyPair(TEST_KEY_PAIR);
         X509ResourceCertificate result = builder.build();
         return result;
     }
 
-    private static X509ResourceCertificateBuilder createCertificateBuilder(IpResourceSet resources, ValidityPeriod validityPeriod) {
+    private static X509ResourceCertificateBuilder createCertificateBuilder(ImmutableResourceSet resources, ValidityPeriod validityPeriod) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(BigInteger.TEN);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());

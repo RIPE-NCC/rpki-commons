@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -38,7 +39,7 @@ public class X509CertificateBuilderHelperTest {
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = UTC.dateTime();
         subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
-        subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        subject.withResources(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -55,13 +56,13 @@ public class X509CertificateBuilderHelperTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnEmptyResources() {
-        subject.withResources(new IpResourceSet());
+        subject.withResources(ImmutableResourceSet.empty());
         subject.generateCertificate();
     }
 
     @Test
     public void shouldNotFailOnOneInheritResourceType() {
-        subject.withResources(new IpResourceSet());
+        subject.withResources(ImmutableResourceSet.empty());
         subject.withInheritedResourceTypes(EnumSet.of(IpResourceType.IPv4));
         subject.generateCertificate();
     }

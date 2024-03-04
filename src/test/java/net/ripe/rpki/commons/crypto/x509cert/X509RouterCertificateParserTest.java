@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import com.google.common.io.Files;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.util.UTC;
@@ -68,7 +69,7 @@ public class X509RouterCertificateParserTest {
         builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
-        builder.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        builder.withResources(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES);
         builder.withSignatureAlgorithm("MD5withRSA");
         X509Certificate certificate = builder.generateCertificate();
 

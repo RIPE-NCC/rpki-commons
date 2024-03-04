@@ -37,7 +37,7 @@ import org.joda.time.Period;
 
 import javax.security.auth.x500.X500Principal;
 
-public final class XStreamXmlSerializerBuilder<T> {
+public class XStreamXmlSerializerBuilder<T> {
 
     private static final boolean STRICT = true;
     private static final boolean NOT_STRICT = false;
@@ -47,28 +47,29 @@ public final class XStreamXmlSerializerBuilder<T> {
 
 
     public static <C> XStreamXmlSerializerBuilder<C> newStrictXmlSerializerBuilder(Class<C> objectType) {
-        return new XStreamXmlSerializerBuilder<>(objectType, STRICT);
+        return new XStreamXmlSerializerBuilder<C>(objectType, STRICT);
     }
 
     public static <C> XStreamXmlSerializerBuilder<C> newForgivingXmlSerializerBuilder(Class<C> objectType) {
-        return new XStreamXmlSerializerBuilder<>(objectType, NOT_STRICT);
+        return new XStreamXmlSerializerBuilder<C>(objectType, NOT_STRICT);
     }
 
-    XStreamXmlSerializerBuilder(Class<T> objectType, boolean strict) {
+    @SuppressWarnings("this-escape")
+    protected XStreamXmlSerializerBuilder(Class<T> objectType, boolean strict) {
         super();
         this.objectType = objectType;
         createDefaultXStream(strict);
     }
 
     /**
-     * Instantiate XStream and set up the security framework to prevent injection and remote code execution.
+     * Instantiate XStream and set-up the security framework to prevent injection and remote code execution.
      *
      * Types that are allowed are:
      *   * A list of default types included in XStream.
      *   * The type the serializer is built for.
      *   * Types that have been aliased (i.e. the mapped name of the class is not it's qualified name).
      *
-     * Note that the allowlist is <emph>only</emph> checked on deserialization.
+     * Note that the whitelist is <emph>only</emph> checked on deserialization.
      */
     private void createDefaultXStream(boolean strict) {
         if(strict) {
@@ -99,8 +100,12 @@ public final class XStreamXmlSerializerBuilder<T> {
         registerRpkiRelated();
     }
 
-    private HierarchicalStreamDriver getStreamDriver() {
+    protected HierarchicalStreamDriver getStreamDriver() {
         return new XppDriver();
+    }
+
+    protected final Class<T> getObjectType() {
+        return objectType;
     }
 
     private void registerIpResourceRelated() {
@@ -145,12 +150,12 @@ public final class XStreamXmlSerializerBuilder<T> {
         withAllowedType(RoaCms.class);
     }
 
-    public XStreamXmlSerializerBuilder<T> withConverter(Converter converter) {
+    public final XStreamXmlSerializerBuilder<T> withConverter(Converter converter) {
         xStream.registerConverter(converter);
         return this;
     }
 
-    public XStreamXmlSerializerBuilder<T> withConverter(SingleValueConverter converter) {
+    public final XStreamXmlSerializerBuilder<T> withConverter(SingleValueConverter converter) {
         xStream.registerConverter(converter);
         return this;
     }
@@ -196,10 +201,14 @@ public final class XStreamXmlSerializerBuilder<T> {
     }
 
     public XStreamXmlSerializer<T> build() {
-        return new XStreamXmlSerializer<>(xStream, objectType);
+        return new XStreamXmlSerializer<T>(xStream, objectType);
     }
 
-    private static final class MyXStream extends XStream {
+    protected XStream getXStream() {
+        return xStream;
+    }
+
+    private final static class MyXStream extends XStream {
 
         private MyXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
             super(new SunUnsafeReflectionProvider(), hierarchicalStreamDriver);

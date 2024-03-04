@@ -8,6 +8,7 @@ import com.pholser.junit.quickcheck.When;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.AsnGen;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
@@ -77,7 +78,7 @@ public class AspaCmsTest {
 
     public static AspaCms createAspa(Asn customerAsn, ImmutableSortedSet<Asn> providerAsSet) {
         AspaCmsBuilder builder = new AspaCmsBuilder();
-        builder.withCertificate(createCertificate(new IpResourceSet(customerAsn)));
+        builder.withCertificate(createCertificate(ImmutableResourceSet.of(customerAsn)));
         builder.withCustomerAsn(customerAsn);
         builder.withProviderASSet(
             providerAsSet
@@ -86,7 +87,7 @@ public class AspaCmsTest {
         return builder.build(TEST_KEY_PAIR.getPrivate());
     }
 
-    private static X509ResourceCertificate createCertificate(IpResourceSet resources) {
+    private static X509ResourceCertificate createCertificate(ImmutableResourceSet resources) {
         X509ResourceCertificateBuilder builder = new X509ResourceCertificateBuilder();
         builder.withCa(false).withIssuerDN(TEST_DN).withSubjectDN(TEST_DN).withSerial(ROA_CERT_SERIAL);
         builder.withPublicKey(TEST_KEY_PAIR.getPublic());
