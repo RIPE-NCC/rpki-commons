@@ -14,23 +14,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static net.ripe.rpki.commons.validation.roa.RouteOriginValidationPolicy.validateAnnouncedRoute;
 import static org.junit.Assert.*;
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
 
 
 public class RouteOriginValidationPolicyTest {
-
-    private RouteOriginValidationPolicy subject;
-
     static NestedIntervalMap<IpResource, List<AllowedRoute>> roa(RoaPrefix... roaPrefixes) {
         RoaCms roa = RoaCmsTest.createRoaCms(Arrays.asList(roaPrefixes));
         List<AllowedRoute> allowed = AllowedRoute.fromRoas(Collections.singletonList(roa));
         return RouteOriginValidationPolicy.allowedRoutesToNestedIntervalMap(allowed);
-    }
-
-    @Before
-    public void setup() {
-        subject = new RouteOriginValidationPolicy();
     }
 
     @Test
@@ -88,7 +81,7 @@ public class RouteOriginValidationPolicyTest {
         NestedIntervalMap<IpResource, List<AllowedRoute>> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("192.169.0.0/16"), 20));
 
         AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20"));
-        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(prefixes, route);
+        RouteValidityState validityStateFound = validateAnnouncedRoute(prefixes, route);
         assertEquals(RouteValidityState.VALID, validityStateFound);
     }
 
@@ -97,7 +90,7 @@ public class RouteOriginValidationPolicyTest {
         NestedIntervalMap<IpResource, List<AllowedRoute>> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
 
         AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/20"));
-        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(prefixes, route);
+        RouteValidityState validityStateFound = validateAnnouncedRoute(prefixes, route);
         assertEquals(RouteValidityState.VALID, validityStateFound);
     }
 
@@ -106,7 +99,7 @@ public class RouteOriginValidationPolicyTest {
         NestedIntervalMap<IpResource, List<AllowedRoute>> prefixes = roa(new RoaPrefix(IpRange.parse("192.168.0.0/16"), 20), new RoaPrefix(IpRange.parse("10.10.0.0/16")));
 
         AnnouncedRoute route = new AnnouncedRoute(TEST_ASN, IpRange.parse("192.168.0.0/24"));
-        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(prefixes, route);
+        RouteValidityState validityStateFound = validateAnnouncedRoute(prefixes, route);
         assertEquals(RouteValidityState.INVALID_LENGTH, validityStateFound);
 
     }
@@ -114,7 +107,7 @@ public class RouteOriginValidationPolicyTest {
     private void testValidatityDetermination(String roaIpPrefix, int roaMaxLength, Asn routeAsn, String routePrefix, RouteValidityState expectedResult) {
         NestedIntervalMap<IpResource, List<AllowedRoute>> rtrPrefixes = roa(new RoaPrefix(IpRange.parse(roaIpPrefix), roaMaxLength));
         AnnouncedRoute route = new AnnouncedRoute(routeAsn, IpRange.parse(routePrefix));
-        RouteValidityState validityStateFound = subject.validateAnnouncedRoute(rtrPrefixes, route);
+        RouteValidityState validityStateFound = validateAnnouncedRoute(rtrPrefixes, route);
         assertEquals(expectedResult, validityStateFound);
     }
 

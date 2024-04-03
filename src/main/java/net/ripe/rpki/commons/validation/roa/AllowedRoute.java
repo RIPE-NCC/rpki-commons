@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * A route allowed by a ROA configuration.
  */
-public class AllowedRoute extends EqualsSupport implements Serializable {
+public class AllowedRoute extends EqualsSupport implements RoaPrefixData, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final Asn asn;
