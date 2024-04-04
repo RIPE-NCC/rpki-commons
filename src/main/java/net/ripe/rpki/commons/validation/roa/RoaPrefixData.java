@@ -27,4 +27,8 @@ public interface RoaPrefixData extends Comparable<RoaPrefixData> {
     default int compareTo(RoaPrefixData o) {
         return ROA_PREFIX_DATA_COMPARATOR.compare(this, o);
     }
+
+    default AllowedRoute toAllowedRoute() {
+        return new AllowedRoute(getAsn(), getPrefix(), getMaximumLength());
+    }
 }
