@@ -62,6 +62,10 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
+## 2024-xx-yy 1.39
+  * Use dependabot for regular dependency updates in addition to security
+    updates.
+
 ## 2024-02-29 1.38
   * Raise RpkiCaCertificateRequestParserException instead of NPE when an
     invalid CSR is passed.
