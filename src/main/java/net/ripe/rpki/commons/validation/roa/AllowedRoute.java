@@ -42,14 +42,17 @@ public class AllowedRoute implements RoaPrefixData, Serializable {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public Asn getAsn() {
         return asn;
     }
 
+    @Override
     public IpRange getPrefix() {
         return prefix;
     }
 
+    @Override
     public int getMaximumLength() {
         return maximumLength;
     }
