@@ -68,6 +68,7 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
   * Remove the dependency check maven plugin, which was unreliable, now that
     dependabot does the dependency updates.
   * Add and use interfaces for ValidationState logic
+  * Update release plugin, and do not sign tags with release plugin.
 
 ## 2024-02-29 1.38
   * Raise RpkiCaCertificateRequestParserException instead of NPE when an
