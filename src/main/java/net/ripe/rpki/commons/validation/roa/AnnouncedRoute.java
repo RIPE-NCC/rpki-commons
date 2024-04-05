@@ -7,13 +7,12 @@ import net.ripe.ipresource.IpRange;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
-import java.util.Comparator;
 
 /**
  * A route announced on BGP.
  */
-@Getter
 @EqualsAndHashCode
+@Getter(onMethod_ = {@Override})
 public final class AnnouncedRoute implements Serializable, RouteData {
     private static final long serialVersionUID = 1L;
     private final Asn originAsn;

@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.validation;
 
+import lombok.Getter;
 import lombok.Value;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
@@ -45,6 +46,7 @@ class AllowedRouteTest {
     }
 
     @Value
+    @Getter(onMethod = @__(@Override))
     static class RoaDoa implements Roa {
         Asn asn;
         List<RoaPrefix> prefixes;
