@@ -46,7 +46,7 @@ class AllowedRouteTest {
     }
 
     @Value
-    @Getter(onMethod = @__(@Override))
+    @Getter
     static class RoaDoa implements Roa {
         Asn asn;
         List<RoaPrefix> prefixes;

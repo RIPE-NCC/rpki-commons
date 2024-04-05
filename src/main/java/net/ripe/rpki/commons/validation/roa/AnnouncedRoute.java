@@ -12,7 +12,7 @@ import java.io.Serializable;
  * A route announced on BGP.
  */
 @EqualsAndHashCode
-@Getter(onMethod_ = {@Override})
+@Getter
 public final class AnnouncedRoute implements Serializable, RouteData {
     private static final long serialVersionUID = 1L;
     private final Asn originAsn;
