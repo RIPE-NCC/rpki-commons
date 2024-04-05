@@ -1,22 +1,25 @@
 package net.ripe.rpki.commons.validation.roa;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.rpki.commons.crypto.cms.roa.Roa;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
-import net.ripe.rpki.commons.util.EqualsSupport;
 import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
  * A route allowed by a ROA configuration.
  */
-public class AllowedRoute extends EqualsSupport implements RoaPrefixData, Serializable {
-    private static final long serialVersionUID = 1L;
+@ToString
+@EqualsAndHashCode
+public class AllowedRoute implements RoaPrefixData, Serializable {
+    private static final long serialVersionUID = 2L;
 
     private final Asn asn;
     private final IpRange prefix;
@@ -32,13 +35,11 @@ public class AllowedRoute extends EqualsSupport implements RoaPrefixData, Serial
     }
 
     public static List<AllowedRoute> fromRoas(List<? extends Roa> roas) {
-        List<AllowedRoute> result = new ArrayList<AllowedRoute>();
-        for (Roa roa : roas) {
-            for (RoaPrefix roaPrefix : roa.getPrefixes()) {
-                result.add(new AllowedRoute(roa.getAsn(), roaPrefix.getPrefix(), roaPrefix.getEffectiveMaximumLength()));
-            }
-        }
-        return result;
+        return roas.stream()
+                .flatMap(roa ->
+                        roa.getPrefixes().stream().map(roaPrefix -> new AllowedRoute(roa.getAsn(), roaPrefix.getPrefix(), roaPrefix.getEffectiveMaximumLength()))
+                )
+                .collect(Collectors.toList());
     }
 
     public Asn getAsn() {
