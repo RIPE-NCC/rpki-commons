@@ -68,7 +68,7 @@ public final class XStreamXmlSerializerBuilder<T> {
      *   * The type the serializer is built for.
      *   * Types that have been aliased (i.e. the mapped name of the class is not it's qualified name).
      *
-     * Note that the allowlist is <emph>only</emph> checked on deserialization.
+     * Note that the allowlist is <b>only</b> checked on deserialization.
      */
     private void createDefaultXStream(boolean strict) {
         if(strict) {

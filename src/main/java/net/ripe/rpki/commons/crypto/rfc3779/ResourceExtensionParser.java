@@ -16,7 +16,7 @@ import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 /**
  * Parses the certificate resource extensions as specified in RFC3779. Resource
  * inheritance is not yet supported.
- * <p/>
+ *
  * The methods in this class are named after the grammar rules in RFC3779,
  * prefixed with "derTo".
  */

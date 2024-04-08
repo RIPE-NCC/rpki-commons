@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 /**
  * A manifest of files published by a CA certificate.
- * <p/>
+ *
  * Use the {@link ManifestCmsBuilder} or {@link ManifestCmsParser} to construct this object.
  */
 public class ManifestCms extends RpkiSignedObject {

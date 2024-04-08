@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.annotations.VisibleForTesting;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -45,7 +46,7 @@ import java.util.EnumSet;
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
  * (delegated to, not extended) specific certificate builders.
- * <p/>
+ *
  * Because we want to maintain the pattern where a specific Certificate builder
  * can be chained like: builder.withValidity(val).withSubjectDn(subject) etc...
  * dynamic typing would be required.. hence delegation.
@@ -61,7 +62,6 @@ import java.util.EnumSet;
  * (@see X509CertificateBuilderHelper.validateResource)
  * which results in an inevitable runtime check. Thus moving resource setting
  * into a separate resource-specialised builder doesn't make sense.
- *
  */
 public final class X509CertificateBuilderHelper {
 
@@ -151,9 +151,10 @@ public final class X509CertificateBuilderHelper {
 
     /**
      * Careful! You probably want to stick to the default. This method is here
-     * mainly to allow for testing the parser -> it should reject sig algos not
-     * allowed by RFC
+     * mainly to allow for testing the parser. The parser should reject signature
+     * algorithms not allowed by RFC.
      */
+    @VisibleForTesting
     public X509CertificateBuilderHelper withSignatureAlgorithm(
             String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;

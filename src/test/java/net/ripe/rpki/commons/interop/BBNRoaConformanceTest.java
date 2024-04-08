@@ -33,7 +33,7 @@ public class BBNRoaConformanceTest {
     /**
      * Apply a number of test cases for version.
      *
-     * Note that in these objects version is <emph>implicit</emph> not <emph>explicit</emph> as required.
+     * Note that in these objects version is <b>implicit</b> not <b>explicit</b> as required.
      */
     @CsvSource({
         "557, VersionV1Explicit, # explicit V1 version (int 0) applied before signature 6482#3",

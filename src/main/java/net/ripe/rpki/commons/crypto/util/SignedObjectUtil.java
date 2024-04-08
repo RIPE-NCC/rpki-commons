@@ -14,13 +14,8 @@ import java.net.URI;
 @UtilityClass
 public class SignedObjectUtil {
     /**
-     * Extract the creation time from an object. This does <emph>not yet</emph> follow the method described in
-     * https://datatracker.ietf.org/doc/draft-timbru-sidrops-publication-server-bcp/00/. It differs in that it uses
-     * the signing time for RPKI signed objects. This is a trade-off:
-     *   * signing-time is more correct when multi-use EE certificates are present.
-     *   * signing-time likely does not match the modification time of the CRL.
-     *
-     * This needs to be revisited in 2024.
+     * Extract the creation time from an object. This uses the signing time for RPKI signed objects with fallback
+     * to notBefore if that is not present.
      *
      * @param uri URL of the object
      * @param decoded object bytes
