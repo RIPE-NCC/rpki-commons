@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import com.google.common.annotations.VisibleForTesting;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -150,9 +151,10 @@ public final class X509CertificateBuilderHelper {
 
     /**
      * Careful! You probably want to stick to the default. This method is here
-     * mainly to allow for testing the parser -> it should reject sig algos not
-     * allowed by RFC
+     * mainly to allow for testing the parser. The parser should reject signature
+     * algorithms not allowed by RFC.
      */
+    @VisibleForTesting
     public X509CertificateBuilderHelper withSignatureAlgorithm(
             String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;

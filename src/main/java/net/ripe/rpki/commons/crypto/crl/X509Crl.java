@@ -213,9 +213,9 @@ public class X509Crl implements CertificateRepositoryObject {
 
     /**
      * This method is required by the interface, but should never be called
-     * on X509Crl objects.. it's pointless. They don't have an AIA.
+     * on X509Crl objects. it's pointless. They don't have an AIA.
      *
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException whenever it is called
      */
     @Override
     public URI getParentCertificateUri() {

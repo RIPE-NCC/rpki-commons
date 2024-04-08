@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 /**
  * See RFC6492 section 3.3.1 (https://tools.ietf.org/html/rfc6492#section-3.3.1). Example:
  *
- * <code>
- * &lt;?xml version="1.0" encoding="UTF-8"?>
- * &lt;message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="list"/>
- * </code>
+ * <pre>{@code
+ *   <xml version="1.0" encoding="UTF-8"?>
+ *   <message xmlns="http://www.apnic.net/specs/rescerts/up-down/" version="1" sender="sender" recipient="recipient" type="list"/>
+ * }</pre>
  */
 public class ResourceClassListResponsePayloadSerializer extends AbstractProvisioningPayloadXmlSerializer<ResourceClassListResponsePayload> {
     public ResourceClassListResponsePayloadSerializer() {
