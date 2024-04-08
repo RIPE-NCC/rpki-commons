@@ -24,7 +24,7 @@ import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 /**
- * @See {@link http://tools.ietf.org/html/draft-ietf-sidr-rpki-manifests-07}
+ * @see <a href="https://datatracker.ietf.org/doc/rfc9286/">RFC9286</a>
  */
 
 public class ManifestCmsParser extends RpkiSignedObjectParser {

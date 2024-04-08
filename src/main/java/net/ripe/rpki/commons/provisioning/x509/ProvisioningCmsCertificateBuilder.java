@@ -58,7 +58,7 @@ public class ProvisioningCmsCertificateBuilder {
     }
 
     /**
-     * Override the <emph>default</emph> validity period of this EE certificate.
+     * Override the <b>default</b> validity period of this EE certificate.
      */
     public ProvisioningCmsCertificateBuilder withValidityPeriod(ValidityPeriod validityPeriod) {
         builderHelper.withValidityPeriod(validityPeriod);

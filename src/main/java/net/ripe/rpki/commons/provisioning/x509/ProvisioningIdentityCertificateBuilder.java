@@ -40,9 +40,9 @@ public class ProvisioningIdentityCertificateBuilder {
     }
 
     /**
-     * Only call this if you need to use a special signature provider, eg for HSM. Leave to use default otherwise
+     * Set a specific signature provider (from a java crypto provider), e.g. for HSM.
      *
-     * @see X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER
+     * Defaults to {@link net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper#DEFAULT_SIGNATURE_PROVIDER}.
      */
     public ProvisioningIdentityCertificateBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;

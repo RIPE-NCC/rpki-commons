@@ -80,7 +80,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     /**
-     * Encode the <emph>unique</emph> (Set) roa-prefixes with the given addressFamily <b>in deterministic order</b>
+     * Encode the <b>unique</b> (Set) roa-prefixes with the given addressFamily <b>in deterministic order</b>
      *
      * <pre>
      * ROAIPAddressFamily ::= SEQUENCE {

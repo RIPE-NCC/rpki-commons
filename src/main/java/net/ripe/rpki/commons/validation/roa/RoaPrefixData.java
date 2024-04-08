@@ -13,12 +13,12 @@ public interface RoaPrefixData extends Comparable<RoaPrefixData> {
     Asn getAsn();
 
     /**
-     * @return The prefix of the entity. <emph>MUST</emph> be a prefix and not a IP range
+     * @return The prefix of the entity. <b>MUST</b> be a prefix and not a IP range
      */
     IpRange getPrefix();
 
     /**
-     * @return The maximum length of the VRP. The maximum length <emph>MUST</emph> be in the range (inclusive) between
+     * @return The maximum length of the VRP. The maximum length <b>MUST</b> be in the range (inclusive) between
      * the prefix length and the length of addresses for the address family.
      */
     int getMaximumLength();

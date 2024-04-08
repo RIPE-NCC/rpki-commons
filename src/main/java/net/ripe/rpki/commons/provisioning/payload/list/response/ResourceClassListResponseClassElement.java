@@ -7,7 +7,7 @@ import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
 
 /**
  * See: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
- * <p/>
+ *
  * This type of class element contains a current certificate element for each key pair,
  * as opposed to just one in the CertificateIssuanceResponse.
  */

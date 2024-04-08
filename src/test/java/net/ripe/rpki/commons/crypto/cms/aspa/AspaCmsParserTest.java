@@ -42,7 +42,7 @@ class AspaCmsParserTest {
     }
 
     /**
-     * draft 15 mentions <emph>implicit</emph> tags by accident, this was changed without a OID change later.
+     * draft 15 mentions <b>implicit</b> tags by accident, this was changed without a OID change later.
      */
     @Test
     void should_reject_draft15_rpki_commons_with_implicit_tag() throws IOException {

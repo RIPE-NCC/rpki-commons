@@ -46,7 +46,7 @@ public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
 
     /**
      * Return the maximum length as specified in the structure of the ROA.
-     * <emph>Needed to exactly represent a decoded ROA.</emph> When consuming these objects, use {@link #getEffectiveMaximumLength()} where possible.
+     * <b>Needed to exactly represent a decoded ROA.</b> When consuming these objects, use {@link #getEffectiveMaximumLength()} where possible.
      */
     public Integer getMaximumLength() {
         return maximumLength;

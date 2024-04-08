@@ -336,11 +336,21 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                        <configuration>
-                            <additionalparam>-Xdoclint:none</additionalparam>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <doclint>all,-missing</doclint>
+                    <tags>
+                        <tag>
+                            <name>requires</name>
+                            <placement>a</placement>
+                        </tag>
+                        <tag>
+                            <name>ensures</name>
+                            <placement>a</placement>
+                        </tag>
+                    </tags>
+                </configuration>
             </plugin>
 
             <plugin>

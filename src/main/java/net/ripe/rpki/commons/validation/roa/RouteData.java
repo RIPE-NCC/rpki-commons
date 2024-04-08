@@ -11,7 +11,7 @@ public interface RouteData extends Comparable<RouteData> {
     Asn getOriginAsn();
 
     /**
-     * @return The prefix of the entity. <emph>MUST</emph> be a prefix and not a IP range
+     * @return The prefix of the entity. <b>MUST</b> be a prefix and not a IP range
      */
     IpRange getPrefix();
 
