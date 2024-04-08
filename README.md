@@ -62,7 +62,12 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
-## 2024-xx-yy 1.39
+## 2024-04-08 1.39.1
+  * Fix: Javadoc syntax error that broke the previous release tag
+  * Javadoc now runs on ever `verify` build.
+  * Sign maven release tags again (and override locally if needed)
+
+## 2024-04-05 1.39
   * Use dependabot for regular dependency updates in addition to security
     updates.
   * Remove the dependency check maven plugin, which was unreliable, now that
