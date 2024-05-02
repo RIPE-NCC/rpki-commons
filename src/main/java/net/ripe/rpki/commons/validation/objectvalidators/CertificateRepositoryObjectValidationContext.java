@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
-import com.google.common.collect.Lists;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateObject;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -11,6 +10,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +32,7 @@ public class CertificateRepositoryObjectValidationContext {
     private IpResourceSet overclaiming = new IpResourceSet();
 
     public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate) {
-        this(location, certificate, certificate.getResources(), Lists.newArrayList(certificate.getSubject().getName()));
+        this(location, certificate, certificate.getResources(), List.of(certificate.getSubject().getName()));
     }
 
     public CertificateRepositoryObjectValidationContext(URI location, X509ResourceCertificate certificate, IpResourceSet resources, List<String> subjectChain) {
@@ -91,7 +91,7 @@ public class CertificateRepositoryObjectValidationContext {
     public CertificateRepositoryObjectValidationContext createChildContext(URI childLocation, X509ResourceCertificate childCertificate) {
         IpResourceSet effectiveResources = childCertificate.deriveResources(resources);
         removeOverclaimingResources(effectiveResources);
-        List<String> childSubjects = Lists.newArrayList(subjectChain);
+        List<String> childSubjects = new ArrayList<>(subjectChain);
         childSubjects.add(childCertificate.getSubject().getName());
         return new CertificateRepositoryObjectValidationContext(childLocation, childCertificate, effectiveResources, childSubjects);
     }

@@ -14,7 +14,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.CMSSignedGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.joda.time.DateTime;
@@ -40,13 +40,9 @@ public class ManifestCms extends RpkiSignedObject {
 
     public static final int DEFAULT_VERSION = 0;
 
-    // since 1.34
-    @Deprecated
-    public static final String CONTENT_TYPE_OID = "1.2.840.113549.1.9.16.1.26";
-
     public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.26");
 
-    public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
+    public static final String FILE_HASH_ALGORITHM = CMSSignedGenerator.DIGEST_SHA256;
 
     /**
      * Allowed format of a manifest entry file name.
@@ -138,7 +134,7 @@ public class ManifestCms extends RpkiSignedObject {
     private void checkEntries(ValidationResult result) {
         List<String> failedEntries = getFileNames().stream()
                 .filter(s -> !FILE_NAME_PATTERN.matcher(s).matches())
-                .collect(Collectors.toList());
+                .toList();
         result.rejectIfFalse(
                 failedEntries.isEmpty(),
                 ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE,
@@ -166,21 +162,13 @@ public class ManifestCms extends RpkiSignedObject {
 
     }
 
-    /**
-     * @deprecated use {@link #verifyFileContents(String, byte[])} or {@link #getFileContentSpecification(String)}.
-     */
-    @Deprecated
-    public byte[] getHash(String fileName) {
-        return hashes.get(fileName);
-    }
-
     public boolean verifyFileContents(String fileName, byte[] contents) {
         return getFileContentSpecification(fileName).isSatisfiedBy(contents);
     }
 
     public FileContentSpecification getFileContentSpecification(String fileName) {
         Validate.isTrue(containsFile(fileName));
-        return new FileContentSpecification(getHash(fileName));
+        return new FileContentSpecification(hashes.get(fileName));
     }
 
     public static byte[] hashContents(byte[] contents) {

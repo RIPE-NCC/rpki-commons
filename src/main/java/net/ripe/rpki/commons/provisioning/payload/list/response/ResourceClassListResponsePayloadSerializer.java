@@ -7,7 +7,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * See RFC6492 section 3.3.1 (https://tools.ietf.org/html/rfc6492#section-3.3.1). Example:
@@ -27,7 +26,7 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         List<ResourceClassListResponseClassElement> classes = getChildElements(message, "class")
                 .stream()
                 .map(element -> parseClassElementXml(element, ResourceClassListResponseClassElement::new))
-                .collect(Collectors.toList());
+                .toList();
         return new ResourceClassListResponsePayload(classes);
     }
 
@@ -36,7 +35,7 @@ public class ResourceClassListResponsePayloadSerializer extends AbstractProvisio
         return payload.getClassElements()
                 .stream()
                 .map(clazz -> generateClassElementXml(document, clazz))
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

@@ -16,7 +16,6 @@ import org.bouncycastle.asn1.*;
 import javax.annotation.CheckForNull;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
@@ -116,7 +115,7 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
             List<Asn> providerAsList = StreamSupport.stream(providerAsnsSequence.spliterator(), false)
                 .map(this::parseProviderAsn)
-                .collect(Collectors.toList());
+                .toList();
 
             //  * The elements of providers MUST be ordered in ascending numerical
             //    order.¶

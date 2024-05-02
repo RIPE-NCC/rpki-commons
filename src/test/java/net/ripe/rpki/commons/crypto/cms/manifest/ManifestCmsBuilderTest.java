@@ -55,7 +55,6 @@ public class ManifestCmsBuilderTest {
 
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public void shouldCalculateHashAndWriteFile() throws IOException {
         byte[] contents = "contents".getBytes();
@@ -67,7 +66,7 @@ public class ManifestCmsBuilderTest {
 
         // The hash below I got using 'shasum -a 256 /tmp/foo1' on OSX, where /tmp/foo1 is the file written above...
         byte[] expectedHash = Hex.decode("d1b2a59fbea7e20077af9f91b27e95e865061b270be03ff539ab3b73587882e8");
-        assertArrayEquals(expectedHash, result.getHash("foo1"));
+        assertArrayEquals(expectedHash, result.getFileContentSpecification("foo1").getHash());
 
         assertTrue(result.verifyFileContents("foo1", contents));
         assertFalse(result.verifyFileContents("foo1", Hex.decode("deadbeaf")));

@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
-import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
@@ -113,7 +112,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
         List<ASN1Encodable> encodables = Stream.concat(
             addRoaIpAddressFamily(IpResourceType.IPv4, prefixes),
             addRoaIpAddressFamily(IpResourceType.IPv6, prefixes)
-        ).collect(Collectors.toList());
+        ).toList();
 
         Validate.isTrue(!encodables.isEmpty(), "no encodable prefixes");
         return new DERSequence(encodables.toArray(new ASN1Encodable[encodables.size()]));
