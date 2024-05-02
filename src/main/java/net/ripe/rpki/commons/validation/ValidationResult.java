@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 public final class ValidationResult implements Serializable {
 
@@ -241,7 +240,7 @@ public final class ValidationResult implements Serializable {
     public List<ValidationCheck> getFailuresForAllLocations() {
         return results.values().stream()
                 .flatMap(location -> location.error.stream())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<ValidationCheck> getFailures(ValidationLocation location) {
@@ -266,7 +265,7 @@ public final class ValidationResult implements Serializable {
     public List<ValidationCheck> getWarnings() {
         return results.values().stream()
                 .flatMap(location -> location.warning.stream())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<ValidationCheck> getAllValidationChecksForCurrentLocation() {

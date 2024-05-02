@@ -62,6 +62,11 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
+## 2024-xx-yy 1.41
+  * Build with JDK 17
+  * Remove deprecated <pre>ManifestCms.CONTENT_TYPE_OID</pre>
+  * Remove deprecated <pre>ManifestCms.getHash</pre>
+
 ## 2024-xx-yy 1.40
   * Clean up some style (SonarQube) warnings
 

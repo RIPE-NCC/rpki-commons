@@ -1,8 +1,8 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateParser;
 import net.ripe.rpki.commons.crypto.x509cert.X509GenericCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
 import net.ripe.rpki.commons.provisioning.payload.common.GenericClassElement;
 import net.ripe.rpki.commons.provisioning.serialization.CertificateUrlListConverter;
@@ -27,12 +27,11 @@ import java.io.StringReader;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload.SUPPORTED_VERSION;
 
 public abstract class AbstractProvisioningPayloadXmlSerializer<T extends AbstractProvisioningPayload> extends DomXmlSerializer<T> {
-    private static final String XMLNS = "http://www.apnic.net/specs/rescerts/up-down/";
+    private static final String UP_DOWN_XMLNS = "http://www.apnic.net/specs/rescerts/up-down/";
 
     /**
      * We use the MIME decoder (RFC 2045) here to make the ProcessApnicPdusTest#apnic_pdu_2011_08_15_1_has_errors test
@@ -43,11 +42,12 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     protected static final IpResourceSetProvisioningConverter IP_RESOURCE_SET_PROVISIONING_CONVERTER = IpResourceSetProvisioningConverter.INSTANCE;
     protected static final CertificateUrlListConverter CERTIFICATE_URL_LIST_CONVERTER = CertificateUrlListConverter.INSTANCE;
     protected static final DateTimeConverter DATE_TIME_CONVERTER = new DateTimeConverter();
+    public static final String ATTR_CERT_URL = "cert_url";
 
     private final PayloadMessageType type;
 
     protected AbstractProvisioningPayloadXmlSerializer(PayloadMessageType type) {
-        super(XMLNS);
+        super(UP_DOWN_XMLNS);
         this.type = type;
     }
 
@@ -57,7 +57,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected X509ResourceCertificate parseX509ResourceCertificate(String base64) {
         ValidationResult result = ValidationResult.withLocation("certificate.cer").withoutStoringPassingChecks();
-        X509GenericCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, BASE64_DECODER.decode(base64.trim()));
+        X509GenericCertificate certificate = X509CertificateParser.parseCertificate(result, BASE64_DECODER.decode(base64.trim()));
         if (result.hasFailureForCurrentLocation()) {
             throw new DomXmlSerializerException("resource certificate validation failed: " + result);
         } else if (certificate instanceof X509ResourceCertificate) {
@@ -133,7 +133,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected CertificateElement parseCertificateElementXml(Element certificate) {
         CertificateElement result = new CertificateElement();
-        result.setIssuerCertificatePublicationLocation(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(certificate, "cert_url")));
+        result.setIssuerCertificatePublicationLocation(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(certificate, ATTR_CERT_URL)));
         result.setAllocatedAsn(getAttributeValue(certificate, "req_resource_set_as").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
         result.setAllocatedIpv4(getAttributeValue(certificate, "req_resource_set_ipv4").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
         result.setAllocatedIpv6(getAttributeValue(certificate, "req_resource_set_ipv6").map(IP_RESOURCE_SET_PROVISIONING_CONVERTER::fromString).orElse(null));
@@ -143,7 +143,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected Element generateCertificateElementXml(Document document, CertificateElement certificate) {
         Element result = document.createElementNS(xmlns, "certificate");
-        result.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(certificate.getIssuerCertificatePublicationUris()));
+        result.setAttribute(ATTR_CERT_URL, CERTIFICATE_URL_LIST_CONVERTER.toString(certificate.getIssuerCertificatePublicationUris()));
         if (certificate.getAllocatedAsn() != null) {
             result.setAttribute("req_resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedAsn()));
         }
@@ -159,7 +159,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected <U extends GenericClassElement> U parseClassElementXml(Element element, Supplier<U> clazzSupplier) {
         U clazz = clazzSupplier.get();
-        clazz.setCertUris(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(element, "cert_url")));
+        clazz.setCertUris(CERTIFICATE_URL_LIST_CONVERTER.fromString(getRequiredAttributeValue(element, ATTR_CERT_URL)));
         clazz.setClassName(getRequiredAttributeValue(element, "class_name"));
         clazz.setResourceSetAs(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_as")));
         clazz.setResourceSetIpv4(IP_RESOURCE_SET_PROVISIONING_CONVERTER.fromString(getRequiredAttributeValue(element, "resource_set_ipv4")));
@@ -169,7 +169,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         List<CertificateElement> certificateElements = getChildElements(element, "certificate")
                 .stream()
                 .map(this::parseCertificateElementXml)
-                .collect(Collectors.toList());
+                .toList();
         clazz.setCertificateElements(certificateElements);
         Element issuerElement = getSingleChildElement(element, "issuer");
         clazz.setIssuer(parseX509ResourceCertificate(issuerElement.getTextContent()));
@@ -178,7 +178,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected Element generateClassElementXml(Document document, GenericClassElement classElement) {
         Element node = document.createElementNS(xmlns, "class");
-        node.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(classElement.getCertificateAuthorityUri()));
+        node.setAttribute(ATTR_CERT_URL, CERTIFICATE_URL_LIST_CONVERTER.toString(classElement.getCertificateAuthorityUri()));
         node.setAttribute("class_name", classElement.getClassName());
         node.setAttribute("resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetAsn()));
         node.setAttribute("resource_set_ipv4", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetIpv4()));
