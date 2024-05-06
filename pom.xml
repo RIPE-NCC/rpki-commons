@@ -46,7 +46,7 @@
         <java.runtime.version>11</java.runtime.version>
 
         <net.ripe.ipresource.version>1.52</net.ripe.ipresource.version>
-        <bouncycastle.version>1.77</bouncycastle.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
         <guava.version>33.1.0-jre</guava.version>
         <joda-time.version>2.12.7</joda-time.version>
         <xstream.version>1.4.20</xstream.version>
