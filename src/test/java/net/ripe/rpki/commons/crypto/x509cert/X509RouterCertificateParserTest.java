@@ -17,13 +17,13 @@ import javax.security.auth.x500.X500Principal;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -79,19 +79,30 @@ public class X509RouterCertificateParserTest {
     }
 
     @Test
-    public void should_validate_key_algorithm_and_size() {
-        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-        X509ResourceCertificate certificate = builder.build();
+    public void shouldFailOnNonECPublicKey() throws CertificateEncodingException {
+        X509RouterCertificateBuilder builder = X509RouterCertificateBuilderTest.createSelfSignedRouterCertificateBuilder().withPublicKey(SECOND_TEST_KEY_PAIR.getPublic());
+        X509RouterCertificate certificate = builder.build();
+
+        subject.parse("certificate", certificate.getEncoded());
+
+        assertTrue(subject.getValidationResult().hasFailures());
+        assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
+    }
+
+    @Test
+    public void should_validate_key_algorithm_and_size() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        X509RouterCertificateBuilder builder = X509RouterCertificateBuilderTest.createSelfSignedRouterCertificateBuilder();
+        X509RouterCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());
 
         assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
-        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
+        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_VALUE).isOk());
     }
 
     @Test
     public void should_parse_the_real_router_certificate() throws IOException {
-        byte[] encoded = Files.toByteArray(new File("src/test/resources/router/router_certificate.cer"));
+        byte[] encoded = Files.asByteSource(new File("src/test/resources/router/router_certificate.cer")).read();
 
         subject.parse("certificate", encoded);
         final ValidationResult validationResult = subject.getValidationResult();
