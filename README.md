@@ -62,6 +62,9 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
 
+## 2024-xx-yy 1.40
+  * Clean up some style (SonarQube) warnings
+
 ## 2024-04-08 1.39.1
   * Fix: Javadoc syntax error that broke the previous release tag
   * Javadoc now runs on ever `verify` build.

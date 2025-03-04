@@ -1,12 +1,10 @@
 package net.ripe.rpki.commons.validation.roa;
 
-import lombok.Singular;
 import lombok.experimental.UtilityClass;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.etree.IpResourceIntervalStrategy;
 import net.ripe.ipresource.etree.NestedIntervalMap;
-import net.ripe.rpki.commons.crypto.cms.roa.RoaPrefix;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +74,7 @@ public class RouteOriginValidationPolicy {
     }
 
     private static <T extends RoaPrefixData> boolean isLengthInvalid(T allowedRoute, IpRange announcedPrefix) {
-        return !(announcedPrefix.getPrefixLength() <= allowedRoute.getMaximumLength());
+        return announcedPrefix.getPrefixLength() > allowedRoute.getMaximumLength();
     }
 
     private static <T extends RoaPrefixData, U extends RouteData> boolean isAsnInvalid(T allowedRoute, U announcedRoute) {
