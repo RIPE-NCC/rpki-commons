@@ -110,6 +110,7 @@ public class X509RouterCertificateBuilder {
     }
 
     public X509RouterCertificate build() {
+        // FIXME: Validate the public key
         Validate.notNull(asns, "no AS resources");
         Validate.isTrue(asns.length > 0, "empty AS resources");
         builderHelper.withRouter(true);
