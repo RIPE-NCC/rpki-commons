@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.xml;
 
-import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.security.ForbiddenClassException;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.IpResourceSet;
