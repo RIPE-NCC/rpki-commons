@@ -11,13 +11,10 @@ public class SaxonArtificialTest {
     @Test
     public void testSaxonDependencyExists() {
         assertEquals("SAXON", Version.getProductName());
-        assertNotNull(Version.getProductVersion());
-        var majorVersion = extractMajorVersion(Version.getProductVersion());
+        var saxonVersion = Version.getProductVersion();
+        assertNotNull(saxonVersion);
+        var majorVersion = Integer.parseInt(saxonVersion.split("\\.")[0]);
         assertTrue("Expected Saxon version >= 12, but got " + majorVersion, majorVersion >= 12);
     }
 
-    static int extractMajorVersion(String version) {
-        String[] parts = version.split("\\.");
-        return Integer.parseInt(parts[0]);
-    }
 }
