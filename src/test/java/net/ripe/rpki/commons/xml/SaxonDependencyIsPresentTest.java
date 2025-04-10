@@ -18,7 +18,7 @@ public class SaxonDependencyIsPresentTest {
             majorVersion = Integer.parseInt(saxonVersion.split("\\.")[0]);
         } catch (NumberFormatException e) {
             fail("Failed to parse Saxon version: " + saxonVersion);
-            return; // This line will never be reached, but is required to satisfy the compiler
+            return; 
         }
         assertTrue("Expected Saxon version >= 12, but got " + majorVersion, majorVersion >= 12);
     }
