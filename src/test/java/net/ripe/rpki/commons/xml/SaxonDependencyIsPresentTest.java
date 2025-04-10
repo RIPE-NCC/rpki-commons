@@ -13,7 +13,13 @@ public class SaxonDependencyIsPresentTest {
         assertEquals("SAXON", Version.getProductName());
         var saxonVersion = Version.getProductVersion();
         assertNotNull(saxonVersion);
-        var majorVersion = Integer.parseInt(saxonVersion.split("\\.")[0]);
+        int majorVersion;
+        try {
+            majorVersion = Integer.parseInt(saxonVersion.split("\\.")[0]);
+        } catch (NumberFormatException e) {
+            fail("Failed to parse Saxon version: " + saxonVersion);
+            return; // This line will never be reached, but is required to satisfy the compiler
+        }
         assertTrue("Expected Saxon version >= 12, but got " + majorVersion, majorVersion >= 12);
     }
 
