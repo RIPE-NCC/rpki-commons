@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 // This test exists only to prevent the Saxon dependency from being removed.
 // It is needed at runtime by rpki-core.
-public class SaxonArtificialTest {
+public class SaxonDependencyIsPresentTest {
     @Test
     public void testSaxonDependencyExists() {
         assertEquals("SAXON", Version.getProductName());
