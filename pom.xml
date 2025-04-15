@@ -143,7 +143,7 @@
         <dependency>
             <groupId>org.relaxng</groupId>
             <artifactId>jing</artifactId>
-            <version>20220510</version>
+            <version>20241231</version>
             <scope>test</scope>
             <exclusions>
                 <!-- Avoid bringing in some very old dependencies that are now part of the Java Platform anyway -->
