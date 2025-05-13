@@ -47,7 +47,7 @@
 
         <net.ripe.ipresource.version>1.52</net.ripe.ipresource.version>
         <bouncycastle.version>1.80</bouncycastle.version>
-        <guava.version>33.4.0-jre</guava.version>
+        <guava.version>33.4.8-jre</guava.version>
         <joda-time.version>2.14.0</joda-time.version>
         <xstream.version>1.4.21</xstream.version>
         <lombok.version>1.18.38</lombok.version>
