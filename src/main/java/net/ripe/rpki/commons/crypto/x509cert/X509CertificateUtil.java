@@ -48,6 +48,7 @@ import java.util.List;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public final class X509CertificateUtil {
+    public static final String RSYNC = "rsync";
 
     private X509CertificateUtil() {
         //Utility classes should not have a public or default constructor.
@@ -90,7 +91,7 @@ public final class X509CertificateUtil {
     /**
      * Get a base 64-encoded, DER-encoded X.509 subjectPublicKeyInfo as used for the Trust Anchor Locator (TAL)
      *
-     * @throws X509CertificateOperationException
+     * @throws X509CertificateOperationException when SPKI can not be extracted
      */
     public static String getEncodedSubjectPublicKeyInfo(X509Certificate certificate) {
 
@@ -179,12 +180,12 @@ public final class X509CertificateUtil {
 
     public static URI findFirstAuthorityInformationAccessByMethod(X509Certificate certificate, ASN1ObjectIdentifier method) {
         Validate.notNull(method, "method is null");
-        return findFirstByMethod(method, "rsync", getAuthorityInformationAccess(certificate));
+        return findFirstByMethod(method, RSYNC, getAuthorityInformationAccess(certificate));
     }
 
     public static URI findFirstSubjectInformationAccessByMethod(X509Certificate certificate, ASN1ObjectIdentifier method) {
         Validate.notNull(method, "method is null");
-        return findFirstByMethod(method, "rsync", getSubjectInformationAccess(certificate));
+        return findFirstByMethod(method, RSYNC, getSubjectInformationAccess(certificate));
     }
 
     private static URI findFirstByMethod(ASN1ObjectIdentifier method, String scheme, X509CertificateInformationAccessDescriptor[] accessDescriptor) {
@@ -213,7 +214,7 @@ public final class X509CertificateUtil {
     }
 
     private static URI[] convertCrlDistributionPointToUris(CRLDistPoint crldp) {
-        List<URI> result = new ArrayList<URI>();
+        List<URI> result = new ArrayList<>();
         for (DistributionPoint dp : crldp.getDistributionPoints()) {
             GeneralNames names = (GeneralNames) dp.getDistributionPoint().getName();
             for (GeneralName name : names.getNames()) {
@@ -230,7 +231,7 @@ public final class X509CertificateUtil {
             return null;
         }
         for (URI uri : crlDistributionPoints) {
-            if (uri != null && "rsync".equalsIgnoreCase(uri.getScheme())) {
+            if (uri != null && RSYNC.equalsIgnoreCase(uri.getScheme())) {
                 return uri;
             }
         }

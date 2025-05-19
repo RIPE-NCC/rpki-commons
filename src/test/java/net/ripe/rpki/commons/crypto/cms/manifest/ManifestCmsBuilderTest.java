@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import net.ripe.rpki.commons.FixedDateRule;
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,8 +27,7 @@ public class ManifestCmsBuilderTest {
     @Before
     public void setUp() {
         subject.withManifestNumber(BigInteger.valueOf(68));
-        subject.withThisUpdateTime(THIS_UPDATE_TIME);
-        subject.withNextUpdateTime(NEXT_UPDATE_TIME);
+        subject.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         subject.withCertificate(createValidManifestEECertificate());
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
     }
@@ -95,5 +95,29 @@ public class ManifestCmsBuilderTest {
         subject.addFile("foo1", FOO_CONTENT);
         subject.addFile("BaR", BAR_CONTENT);
         assertArrayEquals(ENCODED_MANIFEST, subject.encodeManifest());
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void shouldBeEquivalentToSetDateInDifferentWays() {
+        var builder1 = new ManifestCmsBuilder();
+        builder1.withManifestNumber(BigInteger.valueOf(68));
+        builder1.withThisUpdateTime(THIS_UPDATE_TIME);
+        builder1.withNextUpdateTime(NEXT_UPDATE_TIME);
+        builder1.withCertificate(createValidManifestEECertificate());
+        builder1.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+
+        var builder2 = new ManifestCmsBuilder();
+        builder2.withManifestNumber(BigInteger.valueOf(68));
+        builder2.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
+        builder2.withNextUpdateTime(NEXT_UPDATE_TIME);
+        builder2.withCertificate(createValidManifestEECertificate());
+        builder2.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+
+        ManifestCms m1 = builder1.build(TEST_KEY_PAIR.getPrivate());
+        ManifestCms m2 = builder1.build(TEST_KEY_PAIR.getPrivate());
+
+        assertEquals(m1.getThisUpdateTime(), m2.getThisUpdateTime());
+        assertEquals(m1.getNextUpdateTime(), m2.getNextUpdateTime());
     }
 }

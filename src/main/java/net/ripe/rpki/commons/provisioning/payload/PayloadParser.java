@@ -17,7 +17,6 @@ import net.ripe.rpki.commons.provisioning.payload.revocation.response.Certificat
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.xml.XmlSerializer;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +95,7 @@ public final class PayloadParser {
             case error_response:
                 return ERROR_RESPONSE_SERIALIZER.serialize((RequestNotPerformedResponsePayload) payload);
             default:
-                throw new NotImplementedException("Don't have serializer for PayloadMessageType: " + type);
+                throw new UnsupportedOperationException("Don't have serializer for PayloadMessageType: " + type);
         }
     }
 }

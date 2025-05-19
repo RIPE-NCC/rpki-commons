@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.roa;
 
+import com.google.common.collect.ImmutableSortedSet;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectBuilder;
@@ -15,8 +16,9 @@ import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERSequence;
 
 import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Creates a RoaCms using the DER encoding specified in the ROA format standard.
@@ -69,7 +71,7 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     ASN1Object encodeRoaIpAddress(RoaPrefix prefix) {
         DERBitString address = Asn1Util.resourceToBitString(prefix.getPrefix().getStart(), prefix.getPrefix().getPrefixLength());
         ASN1Encodable[] encodables;
-        if (prefix.getMaximumLength() == null) {
+        if (prefix.getPrefix().getPrefixLength() == prefix.getEffectiveMaximumLength()) {
             encodables = new ASN1Encodable[]{address};
         } else {
             encodables = new ASN1Encodable[]{address, new ASN1Integer(prefix.getMaximumLength())};
@@ -78,18 +80,25 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
     }
 
     /**
+     * Encode the <b>unique</b> (Set) roa-prefixes with the given addressFamily <b>in deterministic order</b>
+     *
      * <pre>
      * ROAIPAddressFamily ::= SEQUENCE {
      *     addressFamily OCTET STRING (SIZE (2..3)),
      *     addresses SEQUENCE OF ROAIPAddress }
      * </pre>
+     *
+     * @requires all prefixes are of given addressFamily.
      */
-    ASN1Encodable encodeRoaIpAddressFamily(AddressFamily addressFamily, List<RoaPrefix> prefixes) {
-        ASN1Encodable[] encodablesPrefixes = new ASN1Encodable[prefixes.size()];
-        for (int i = 0; i < prefixes.size(); ++i) {
-            encodablesPrefixes[i] = encodeRoaIpAddress(prefixes.get(i));
-        }
-        ASN1Encodable[] seq = {addressFamily.toDer(), new DERSequence(encodablesPrefixes)};
+    ASN1Encodable encodeRoaIpAddressFamily(AddressFamily addressFamily, Set<RoaPrefix> prefixes) {
+        Validate.isTrue(addressFamily == AddressFamily.IPV4 || addressFamily == AddressFamily.IPV6, "ROA can only contain IPv4 or IPv6 AFI");
+
+        ASN1Encodable[] encodablePrefixes = prefixes.stream()
+                .sorted() // sort before encoding - ensures natural order is used as comparator.
+                .map(this::encodeRoaIpAddress)
+                .toArray(ASN1Encodable[]::new);
+
+        ASN1Encodable[] seq = {addressFamily.toDer(), new DERSequence(encodablePrefixes)};
         return new DERSequence(seq);
     }
 
@@ -100,28 +109,33 @@ public class RoaCmsBuilder extends RpkiSignedObjectBuilder {
      */
     ASN1Encodable encodeRoaIpAddressFamilySequence(List<RoaPrefix> prefixes) {
         Validate.isTrue(!prefixes.isEmpty(), "no prefixes");
-        List<ASN1Encodable> encodables = new ArrayList<ASN1Encodable>(2);
-        addRoaIpAddressFamily(encodables, IpResourceType.IPv4, prefixes);
-        addRoaIpAddressFamily(encodables, IpResourceType.IPv6, prefixes);
+
+        List<ASN1Encodable> encodables = Stream.concat(
+            addRoaIpAddressFamily(IpResourceType.IPv4, prefixes),
+            addRoaIpAddressFamily(IpResourceType.IPv6, prefixes)
+        ).collect(Collectors.toList());
+
         Validate.isTrue(!encodables.isEmpty(), "no encodable prefixes");
         return new DERSequence(encodables.toArray(new ASN1Encodable[encodables.size()]));
     }
 
-    private void addRoaIpAddressFamily(List<ASN1Encodable> encodables, IpResourceType type, List<RoaPrefix> prefixes) {
-        List<RoaPrefix> selectedPrefixes = selectPrefixes(type, prefixes);
-        if (!selectedPrefixes.isEmpty()) {
-            encodables.add(encodeRoaIpAddressFamily(AddressFamily.fromIpResourceType(type), selectedPrefixes));
-        }
-    }
+    /**
+     * Encode the roaprefixes for the given address family.
+     *
+     * @param type IPv4 || IPv6
+     * @param prefixes prefixes to encode
+     * @return DER encoding of prefixes
+     */
+    private Stream<ASN1Encodable> addRoaIpAddressFamily(IpResourceType type, List<RoaPrefix> prefixes) {
+        Set<RoaPrefix> selectedPrefixes = prefixes.stream()
+                .filter(roaPrefix -> type == roaPrefix.getPrefix().getType())
+                .collect(Collectors.toSet());
 
-    private List<RoaPrefix> selectPrefixes(IpResourceType type, List<RoaPrefix> prefixes) {
-        List<RoaPrefix> result = new ArrayList<RoaPrefix>();
-        for (RoaPrefix roaPrefix : prefixes) {
-            if (type == roaPrefix.getPrefix().getType()) {
-                result.add(roaPrefix);
-            }
+        if (selectedPrefixes.isEmpty()) {
+            return Stream.empty();
         }
-        return result;
+
+        return Stream.of(encodeRoaIpAddressFamily(AddressFamily.fromIpResourceType(type), selectedPrefixes));
     }
 
     /**

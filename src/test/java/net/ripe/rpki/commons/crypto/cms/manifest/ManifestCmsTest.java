@@ -216,24 +216,30 @@ public class ManifestCmsTest {
         );
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void shouldRejectWhenThisUpdateTimeIsNotBeforeNextUpdateTime() {
         X509Crl crl = getRootCrl();
         DateTimeUtils.setCurrentMillisFixed(NEXT_UPDATE_TIME.plusDays(1).getMillis());
 
+        // validity period checks the ordering of the dates, so use withThisUpdate explicitly
         subject = getRootManifestBuilder().withThisUpdateTime(NEXT_UPDATE_TIME.plusSeconds(1)).build(MANIFEST_KEY_PAIR.getPrivate());
 
         IpResourceSet resources = rootCertificate.getResources();
 
-        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(
+                ROOT_CERTIFICATE_LOCATION, rootCertificate, resources, Lists.newArrayList(rootCertificate.getSubject().getName()));
         ValidationResult result = ValidationResult.withLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION);
 
         subject.validateWithCrl(ROOT_SIA_MANIFEST_RSYNC_LOCATION.toASCIIString(), context, ValidationOptions.strictValidation(), result, crl);
 
         assertTrue(result.hasFailures());
         assertEquals(
-                new ValidationCheck(ValidationStatus.ERROR, ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME, NEXT_UPDATE_TIME.plusSeconds(1).toString(), NEXT_UPDATE_TIME.toString()),
-                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME)
+                new ValidationCheck(ValidationStatus.ERROR,
+                        ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME,
+                        NEXT_UPDATE_TIME.plusSeconds(1).toString(), NEXT_UPDATE_TIME.toString()),
+                result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION),
+                        ValidationString.MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME)
         );
     }
 
@@ -358,7 +364,7 @@ public class ManifestCmsTest {
                 new ValidationCheck(
                         ValidationStatus.ERROR,
                         ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE,
-                        ", \\u0000,    , ., .., cannot-contain-a/slash.cer, extension-must-be-lowercase.CER, multiple.dots.not.allowed, non-empty-extension-required., only-letters-allowed-for-extension.123"
+                        ", %00, +++, ., .., cannot-contain-a%2Fslash.cer, extension-must-be-lowercase.CER, multiple.dots.not.allowed, non-empty-extension-required., only-letters-allowed-for-extension.123"
                 ),
                 result.getResult(new ValidationLocation(ROOT_SIA_MANIFEST_RSYNC_LOCATION), ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE)
         );
@@ -439,8 +445,7 @@ public class ManifestCmsTest {
     private X509CrlBuilder getRootCrlBuilder() {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(X509ResourceCertificateTest.TEST_SELF_SIGNED_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(NEXT_UPDATE_TIME.minusHours(24));
-        builder.withNextUpdateTime(NEXT_UPDATE_TIME.plusHours(24));
+        builder.withValidityPeriod(new ValidityPeriod(NEXT_UPDATE_TIME.minusHours(24), NEXT_UPDATE_TIME.plusHours(24)));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -455,7 +460,7 @@ public class ManifestCmsTest {
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
         builder.withCertificate(getManifestEEResourceCertificateBuilder().build());
         builder.withManifestNumber(BigInteger.valueOf(68));
-        builder.withThisUpdateTime(validityPeriod.getNotValidBefore()).withNextUpdateTime(validityPeriod.getNotValidAfter());
+        builder.withValidityPeriod(validityPeriod);
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
         return builder;
     }

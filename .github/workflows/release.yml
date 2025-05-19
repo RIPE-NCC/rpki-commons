@@ -1,0 +1,46 @@
+name: release
+
+on:
+  push:
+    tags: 'rpki-commons-*'
+
+jobs:
+  build:
+    if: github.repository == 'RIPE-NCC/rpki-commons'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare environment
+        run: |
+            sudo apt-get install rsync git gnupg
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: temurin
+
+      - name: Release
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY: ${{ secrets.GPG_KEY }}
+          SONATYPE_NEXUS_SNAPSHOTS_USERNAME: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_USERNAME }}
+          SONATYPE_NEXUS_SNAPSHOTS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_PASSWORD }}
+          SONATYPE_NEXUS_STAGING_USERNAME: ${{ secrets.SONATYPE_NEXUS_STAGING_USERNAME }}
+          SONATYPE_NEXUS_STAGING_PASSWORD: ${{ secrets.SONATYPE_NEXUS_STAGING_PASSWORD }}
+        run: |
+          gpg --batch --no-tty --allow-secret-key-import --import - <<< "$GPG_KEY"
+          unset GPG_KEY
+          export GPG_KEYID=$(gpg --with-colon --list-secret-keys | head -n1 | cut -d : -f 5)
+
+          # GPG stuff works, do the release
+          export MAVEN_OPTS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Dmaven.repo.local=$HOME/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+
+          VERSION="${GITHUB_REF#refs/*/rpki-commons-}"
+          echo "Will be releasing ${VERSION}"
+
+          mvn versions:set -DnewVersion=${VERSION}
+          mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -P default,release
+          echo "done"

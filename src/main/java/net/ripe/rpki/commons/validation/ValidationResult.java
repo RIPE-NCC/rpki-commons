@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public final class ValidationResult implements Serializable {
 
@@ -195,10 +196,9 @@ public final class ValidationResult implements Serializable {
     }
 
     public ValidationResult addMetric(String name, String value) {
-        if (!metrics.containsKey(currentLocation)) {
-            metrics.put(currentLocation, new ArrayList<>());
-        }
-        metrics.get(currentLocation).add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+        var metricsForLocation = metrics.computeIfAbsent(currentLocation, (x) -> new ArrayList<>());
+        metricsForLocation.add(new ValidationMetric(name, value, DateTimeUtils.currentTimeMillis()));
+
         return this;
     }
 
@@ -235,15 +235,13 @@ public final class ValidationResult implements Serializable {
     }
 
     public Set<ValidationCheck> getFailuresForCurrentLocation() {
-        return new HashSet<ValidationCheck>(getFailures(currentLocation));
+        return new HashSet<>(getFailures(currentLocation));
     }
 
     public List<ValidationCheck> getFailuresForAllLocations() {
-        List<ValidationCheck> failures = new ArrayList<ValidationCheck>();
-        for (ResultsPerLocation checks : results.values()) {
-            failures.addAll(checks.error);
-        }
-        return failures;
+        return results.values().stream()
+                .flatMap(location -> location.error.stream())
+                .collect(Collectors.toList());
     }
 
     public List<ValidationCheck> getFailures(ValidationLocation location) {
@@ -266,11 +264,9 @@ public final class ValidationResult implements Serializable {
     }
 
     public List<ValidationCheck> getWarnings() {
-        List<ValidationCheck> warnings = new ArrayList<ValidationCheck>();
-        for (ResultsPerLocation checks : results.values()) {
-            warnings.addAll(checks.warning);
-        }
-        return warnings;
+        return results.values().stream()
+                .flatMap(location -> location.warning.stream())
+                .collect(Collectors.toList());
     }
 
     public List<ValidationCheck> getAllValidationChecksForCurrentLocation() {

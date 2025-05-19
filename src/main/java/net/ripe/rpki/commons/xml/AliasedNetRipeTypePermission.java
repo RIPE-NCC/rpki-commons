@@ -23,6 +23,7 @@ public class AliasedNetRipeTypePermission implements TypePermission {
      * @param type type to check
      * @return whether an alias has been applied to the type
      */
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean allows(Class type) {
         return type.getName().startsWith("net.ripe.") && !type.getName().equals(xStream.getMapper().serializedClass(type));

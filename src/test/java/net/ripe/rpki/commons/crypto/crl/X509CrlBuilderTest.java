@@ -1,5 +1,8 @@
 package net.ripe.rpki.commons.crypto.crl;
 
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
+import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
+import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsBuilder;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.util.UTC;
@@ -19,6 +22,8 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 
+import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.*;
+import static net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParserTest.TEST_KEY_PAIR;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 import static org.junit.Assert.*;
 
@@ -39,8 +44,7 @@ public class X509CrlBuilderTest {
     public void setUp() {
         subject = new X509CrlBuilder();
         subject.withIssuerDN(new X500Principal("CN=ROOT"));
-        subject.withThisUpdateTime(THIS_UPDATE_TIME);
-        subject.withNextUpdateTime(NEXT_UPDATE_TIME);
+        subject.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
         subject.withNumber(BigInteger.ONE);
         subject.withAuthorityKeyIdentifier(PUBLIC_KEY);
         subject.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
@@ -151,5 +155,30 @@ public class X509CrlBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldRejectVeryBigCrlNumber() {
         subject.withNumber(BigInteger.valueOf(2).pow(160));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void shouldBeEquivalentToSetDateInDifferentWays() {
+        var builder1 = new X509CrlBuilder();
+        builder1.withIssuerDN(new X500Principal("CN=ROOT"));
+        builder1.withThisUpdateTime(THIS_UPDATE_TIME);
+        builder1.withNextUpdateTime(NEXT_UPDATE_TIME);
+        builder1.withNumber(BigInteger.ONE);
+        builder1.withAuthorityKeyIdentifier(PUBLIC_KEY);
+        builder1.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+
+        var builder2 = new X509CrlBuilder();
+        builder2.withIssuerDN(new X500Principal("CN=ROOT"));
+        builder2.withValidityPeriod(new ValidityPeriod(THIS_UPDATE_TIME, NEXT_UPDATE_TIME));
+        builder2.withNumber(BigInteger.ONE);
+        builder2.withAuthorityKeyIdentifier(PUBLIC_KEY);
+        builder2.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);
+
+        var c1 = builder1.build(PRIVATE_KEY);
+        var c2 = builder2.build(PRIVATE_KEY);
+
+        assertEquals(c1.getThisUpdateTime(), c2.getThisUpdateTime());
+        assertEquals(c1.getNextUpdateTime(), c2.getNextUpdateTime());
     }
 }

@@ -4,7 +4,7 @@ RPKI - Commons
 License
 -------
 
-Copyright (c) 2010-2022 RIPE NCC
+Copyright (c) 2010-2023 RIPE NCC
 All rights reserved.
 
 This software, including all its separate source codes, is licensed under the
@@ -52,14 +52,77 @@ Releasing
 ----------
 
 To release a version of rpki-commons you can push a tag
-`rpki-commons-<VERSION>`. The RIPENCC internal Gitlab pipeline will build and
-publish the artifacts for `<VERSION>`. E.g. a tag `rpki-commons-1.0` updates the
-POM version to `1.0` and then builds and releases the artifacts.
+`rpki-commons-<VERSION>`. The Github release action will build and
+publish the artifacts for `<VERSION>`. E.g. a tag `rpki-commons-1.0`
+updates the POM version to `1.0` and then builds and releases the
+artifacts.
 
+After successful deployment update the pom version to point to the
+next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Changelog
-### 2022-xx-yy 1.31-SNAPSHOT
-### 2022-5-11 1.30
+
+## Unreleased
+  * Clean up some style (SonarQube) warnings
+  * Update Github build actions
+
+## 2024-04-08 1.39.1
+  * Fix: Javadoc syntax error that broke the previous release tag
+  * Javadoc now runs on ever `verify` build.
+  * Sign maven release tags again (and override locally if needed)
+
+## 2024-04-05 1.39
+  * Use dependabot for regular dependency updates in addition to security
+    updates.
+  * Remove the dependency check maven plugin, which was unreliable, now that
+    dependabot does the dependency updates.
+  * Add and use interfaces for ValidationState logic
+  * Update release plugin, and do not sign tags with release plugin.
+
+## 2024-02-29 1.38
+  * Raise RpkiCaCertificateRequestParserException instead of NPE when an
+    invalid CSR is passed.
+
+## 2024-02-28 1.37
+  * Use bouncy castle 1.77 (and update API usage accordingly)
+  * **removed** deprecated RemoteCertificateFetcher
+  * **removed** deprected ProvisioningCmsObject constructor
+  * Improved the parsing of resource extensions
+  * **fix**: Do not encode redundant maxlength in ROAs
+  * Use a more modern version of the jing (RelaxNG) library
+  * Add support for router certificates to the time parsing in `SignedObjectUtil`.
+  * Add withValidityPeriod to manifest and CRL builders
+  * Add string representation for `RepositoryObjectType`
+  * Add `isCmsBased` property on `RepositoryObjectType`.
+  * Add initial step towards Resource Signed Checklist/Trust Anchor Key support, extensions are now recognised.
+
+## 2023-10-31 1.36
+  * Access the certificate for the generic signed object parser.
+
+## 2023-10-03 1.35
+  * Build targets JDK 11
+  * Prefixes in ROAs are sorted by (prefix, maxlength - missing first)
+  * Incorporate a number of extra checks on resource extensions
+  * Update ASPA implementation to create objects in [draft-ietf-sidrops-aspa-profile-16](https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-16) profile.
+  * Bouncy Castle 1.74
+
+### 2023-06-26 1.34
+  * Add `GenericRpkiSignedObjectParser` to parse object type from `content-type` and signing time.
+  * Update a number of dependencies.
+  * Verify non-overlap, not being continous, being in order of resource
+    extension elements.
+
+### 2023-04-20 1.33
+  * Add `ResourceExtension` class to represent the RFC3779 resource extension.
+
+### 2022-11-16 1.32
+  * Use ImmutableResourceSet to store resources of X509ResourceCertificate.
+    This breaks serialisation compatibility.
+
+### 2022-11-09 1.31
+  * Validate that ASPA customer ASN does not appear in provider ASNs.
+
+### 2022-05-11 1.30
   * Improve binary signing time support for CMS
   * Support ASPA CMS objects based on draft standard and sidrops mailing list
     ASN.1 schema.

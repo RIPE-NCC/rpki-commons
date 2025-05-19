@@ -213,9 +213,9 @@ public class X509Crl implements CertificateRepositoryObject {
 
     /**
      * This method is required by the interface, but should never be called
-     * on X509Crl objects.. it's pointless. They don't have an AIA.
+     * on X509Crl objects. it's pointless. They don't have an AIA.
      *
-     * @throws: {@link UnsupportedOperationException}
+     * @throws UnsupportedOperationException whenever it is called
      */
     @Override
     public URI getParentCertificateUri() {
@@ -225,13 +225,7 @@ public class X509Crl implements CertificateRepositoryObject {
     public void verify(PublicKey publicKey) throws SignatureException {
         try {
             getCrl().verify(publicKey, DEFAULT_SIGNATURE_PROVIDER);
-        } catch (InvalidKeyException e) {
-            throw new IllegalArgumentException(e);
-        } catch (CRLException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchProviderException e) {
+        } catch (InvalidKeyException | CRLException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new IllegalArgumentException(e);
         }
     }

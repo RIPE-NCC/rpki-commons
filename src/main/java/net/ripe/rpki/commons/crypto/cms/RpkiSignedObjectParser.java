@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms;
 
+import net.ripe.rpki.commons.crypto.IllegalAsn1StructureException;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapperException;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
@@ -26,9 +27,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.ALLOWED_SIGNATURE_ALGORITHM_OIDS;
 import static net.ripe.rpki.commons.crypto.cms.RpkiSignedObject.DIGEST_ALGORITHM_OID;
@@ -129,7 +128,6 @@ public abstract class RpkiSignedObjectParser {
             validationResult.pass(DECODE_CONTENT);
         } catch (IOException e) {
             validationResult.error(DECODE_CONTENT);
-            return;
         }
     }
 
@@ -164,7 +162,7 @@ public abstract class RpkiSignedObjectParser {
             return;
         }
 
-        validationResult.rejectIfFalse(crls.size() == 0, CMS_NO_CRL_ALLOWED);
+        validationResult.rejectIfFalse(crls.isEmpty(), CMS_NO_CRL_ALLOWED);
     }
 
     private List<? extends X509CRL> extractCrl(CMSSignedDataParser sp) {
@@ -273,21 +271,31 @@ public abstract class RpkiSignedObjectParser {
 
         //To loop over
         ASN1EncodableVector signedAttributes = signer.getSignedAttributes().toASN1EncodableVector();
+        Set<Attribute> seenAttributes = new HashSet<>();
 
         boolean allAttributesCorrect = true;
         for (int i = 0; i < signedAttributes.size(); i++) {
-            ASN1Encodable signedAttribute = signedAttributes.get(i);
-            if (!isAllowedSignedAttribute((Attribute) signedAttribute)) {
+            Attribute signedAttribute = (Attribute)signedAttributes.get(i);
+            if (!isAllowedSignedAttribute(signedAttribute)) {
+                allAttributesCorrect = false;
+                break;
+            }
+
+            // The signedAttrs element MUST include only a single instance of any particular attribute.
+            if (!seenAttributes.add(signedAttribute)) {
+                allAttributesCorrect = false;
+                break;
+            }
+
+            // Additionally, even though the syntax allows for a SET OF AttributeValue, in an RPKI signed object, the
+            // attrValues MUST consist of only a single AttributeValue.
+            if (signedAttribute.getAttributeValues() == null || signedAttribute.getAttributeValues().length != 1) {
                 allAttributesCorrect = false;
                 break;
             }
         }
 
-        if (allAttributesCorrect) {
-            validationResult.pass(SIGNED_ATTRS_CORRECT);
-        } else {
-            validationResult.warn(SIGNED_ATTRS_CORRECT);
-        }
+        validationResult.rejectIfFalse(allAttributesCorrect, SIGNED_ATTRS_CORRECT);
 
         return allAttributesCorrect;
     }
@@ -300,6 +308,8 @@ public abstract class RpkiSignedObjectParser {
         if (!validationResult.rejectIfNull(signer.getSignedAttributes(), SIGNED_ATTRS_PRESENT)) {
             return false;
         }
+        // Checks that signedAttrs match content-type and digest in EncapsulatedContentInfo are implemented in CMS
+        // parsing by bouncy castle through SignerInformation.verify.
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.contentType), CONTENT_TYPE_ATTR_PRESENT);
         validationResult.rejectIfNull(signer.getSignedAttributes().get(CMSAttributes.messageDigest), MSG_DIGEST_ATTR_PRESENT);
 
@@ -310,6 +320,7 @@ public abstract class RpkiSignedObjectParser {
 
         //Check if the signedAttributes are allowed
         verifyOptionalSignedAttributes(signer);
+
         verifyUnsignedAttributes(signer);
 
         SignerId signerId = signer.getSID();
@@ -341,6 +352,11 @@ public abstract class RpkiSignedObjectParser {
             final SignerInformationVerifier verifier = new JcaSignerInfoVerifierBuilder(
                 BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER).build(certificate.getPublicKey());
 
+            // In addition to signature, checks:
+            // * RFC 3852 11.1 Check the content-type attribute is correct
+            // * RFC 6211 Validate Algorithm Identifier protection attribute if present
+            // * RFC 3852 11.2 Check the message-digest attribute is correct
+            // * RFC 3852 11.4 Validate countersignature attribute(s)
             validationResult.rejectIfFalse(signer.verify(verifier), SIGNATURE_VERIFICATION);
         } catch (OperatorCreationException | CMSException e) {
             errorMessage = String.valueOf(e.getMessage());
@@ -358,18 +374,34 @@ public abstract class RpkiSignedObjectParser {
         validationResult.rejectIfFalse(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);
     }
 
-    protected static BigInteger getRpkiObjectVersion(ASN1Sequence seq) {
-        ASN1Primitive asn1Version = seq.getObjectAt(0).toASN1Primitive();
-        BigInteger version = null;
-        if (asn1Version instanceof ASN1Integer) {
-            version = ((ASN1Integer) asn1Version).getValue();
-        } else if (asn1Version instanceof DERTaggedObject){
-            final ASN1Primitive o = ((DERTaggedObject) asn1Version).getObject();
-            if (o instanceof ASN1Integer) {
-                version = ((ASN1Integer) o).getValue();
-            }
-        }
-        return version;
-    }
+    /**
+     * Parse the version field in a signed object.
+     * By convention, the version is the first field in the sequence, and it is explicitly tagged.
+     * @param tagNo tag number
+     * @param seq sequence of content
+     * @return version number if present, empty otherwise.
+     */
+    protected static Optional<BigInteger> getTaggedVersion(int tagNo, ASN1Sequence seq) throws IllegalAsn1StructureException {
+        try {
+            ASN1Encodable maybeVersion = seq.getObjectAt(0).toASN1Primitive();
+            if (maybeVersion instanceof DLTaggedObject) {
+                ASN1TaggedObject tagged = (ASN1TaggedObject) maybeVersion;
+                if (tagged.getTagNo() == tagNo) {
+                    var integerVersion = tagged.getExplicitBaseObject();
+                    if (!tagged.isExplicit()) {
+                        throw new IllegalAsn1StructureException("Expected explicit tag for version field");
+                    }
 
+                    if (integerVersion instanceof ASN1Integer) {
+                        return Optional.of(((ASN1Integer) integerVersion).getValue());
+                    }
+                }
+            }
+
+            return Optional.empty();
+        } catch (IllegalStateException e) {
+            // for example: version is implicitly tagged instead of explicitly
+            throw new IllegalAsn1StructureException("Error parsing version field", e);
+        }
+    }
 }

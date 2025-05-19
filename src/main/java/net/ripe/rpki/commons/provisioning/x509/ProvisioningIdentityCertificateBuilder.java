@@ -1,9 +1,9 @@
 package net.ripe.rpki.commons.provisioning.x509;
 
+import com.google.common.base.Preconditions;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.util.UTC;
-import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
 
@@ -38,9 +38,9 @@ public class ProvisioningIdentityCertificateBuilder {
     }
 
     /**
-     * Only call this if you need to use a special signature provider, eg for HSM. Leave to use default otherwise
+     * Set a specific signature provider (from a java crypto provider), e.g. for HSM.
      *
-     * @see X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER
+     * Defaults to {@link net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper#DEFAULT_SIGNATURE_PROVIDER}.
      */
     public ProvisioningIdentityCertificateBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
@@ -48,9 +48,9 @@ public class ProvisioningIdentityCertificateBuilder {
     }
 
     public ProvisioningIdentityCertificate build() {
-        Validate.notNull(selfSigningKeyPair, "Self Signing KeyPair is required");
-        Validate.notNull(selfSigningSubject, "Self Signing DN is required");
-        Validate.notNull(signatureProvider, "Signature Provider is required");
+        Preconditions.checkNotNull(selfSigningKeyPair, "Self Signing KeyPair is required");
+        Preconditions.checkNotNull(selfSigningSubject, "Self Signing DN is required");
+        Preconditions.checkNotNull(signatureProvider, "Signature Provider is required");
         setUpImplicitRequirementsForBuilderHelper();
         builderHelper.withPublicKey(selfSigningKeyPair.getPublic());
         builderHelper.withSigningKeyPair(selfSigningKeyPair);

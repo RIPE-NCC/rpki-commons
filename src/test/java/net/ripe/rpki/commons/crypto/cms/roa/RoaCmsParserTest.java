@@ -36,11 +36,11 @@ public class RoaCmsParserTest {
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
             BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20, // 10.32.0.0/12
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
             BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-            BERTags.INTEGER, 0x01, 0x18,
-            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
-            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
+            BERTags.INTEGER, 0x01, 0x18                 // -24
     };
 
     public static final byte[] ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_IPV4 = {
@@ -48,11 +48,11 @@ public class RoaCmsParserTest {
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
             BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20, // 10.32.0.0/12
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
             BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-            BERTags.INTEGER, 0x01, 0x18,
-            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
-            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
+            BERTags.INTEGER, 0x01, 0x18                 // -24
     };
 
     public static final byte[] ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_ALL = {
@@ -60,11 +60,11 @@ public class RoaCmsParserTest {
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
             BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
-            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
-            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-            BERTags.INTEGER, 0x01, 0x18,
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
             BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20, // 10.32.0.0/12
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
+            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
+            BERTags.INTEGER, 0x01, 0x18,                // -24
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x10,
             BERTags.OCTET_STRING, 0x02, 0x00, 0x02, // IPv6
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x0a,
@@ -81,11 +81,11 @@ public class RoaCmsParserTest {
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x17,
             BERTags.OCTET_STRING, 0x02, 0x00, 0x01, // IPv4
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x11,
+            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
+            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20, // 10.32.0.0/12
             BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x08,
             BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x40, // 10.64.0.0/12
-            BERTags.INTEGER, 0x01, 0x18,
-            BERTags.SEQUENCE | BERTags.CONSTRUCTED, 0x05,
-            BERTags.BIT_STRING, 0x03, 0x04, 0x0a, 0x20 // 10.32.0.0/12
+            BERTags.INTEGER, 0x01, 0x18,                // -24
     };
 
     private RoaCmsParser parser;
@@ -100,8 +100,11 @@ public class RoaCmsParserTest {
         ipv4Prefixes = new ArrayList<RoaPrefix>();
         ipv4Prefixes.add(TEST_IPV4_PREFIX_1);
         ipv4Prefixes.add(TEST_IPV4_PREFIX_2);
+        ipv4Prefixes.sort(RoaPrefix::compareTo);
+
         allPrefixes = new ArrayList<RoaPrefix>(ipv4Prefixes);
-        allPrefixes.add(TEST_IPV6_PREFIX);
+        allPrefixes.add(TEST_IPV6_PREFIX); // no sort needed, added in canonical order.
+
         parser.parse(location, RoaCmsTest.createRoaCms(allPrefixes).getEncoded());
     }
 

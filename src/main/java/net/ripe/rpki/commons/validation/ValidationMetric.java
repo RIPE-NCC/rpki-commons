@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.validation;
 
+import lombok.EqualsAndHashCode;
 import net.ripe.rpki.commons.util.EqualsSupport;
 
 import java.io.Serializable;
@@ -7,6 +8,7 @@ import java.io.Serializable;
 /**
  * Captures interesting statistics related to validation.
  */
+@EqualsAndHashCode
 public class ValidationMetric extends EqualsSupport implements Serializable {
 
     private static final long serialVersionUID = 1L;

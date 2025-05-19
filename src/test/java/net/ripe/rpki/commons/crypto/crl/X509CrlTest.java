@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.crl;
 
+import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.util.UTC;
@@ -38,8 +39,7 @@ public class X509CrlTest {
         X509CrlBuilder builder = new X509CrlBuilder();
         builder.withIssuerDN(new X500Principal("CN=issuer"));
         final DateTime now = UTC.dateTime();
-        builder.withThisUpdateTime(now);
-        builder.withNextUpdateTime(now.plusHours(8));
+        builder.withValidityPeriod(new ValidityPeriod(now, now.plusHours(8)));
         builder.withNumber(BigInteger.TEN);
         builder.withAuthorityKeyIdentifier(TEST_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

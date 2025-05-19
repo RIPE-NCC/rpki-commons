@@ -1,6 +1,10 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import com.google.common.io.Files;
+import com.pholser.junit.quickcheck.From;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.generator.Size;
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.util.UTC;
@@ -9,9 +13,11 @@ import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
+import net.ripe.rpki.commons.validation.properties.URIGen;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.File;
@@ -20,6 +26,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelperTest.CAB_BASELINE_REQUIREMENTS_POLICY;
@@ -29,6 +37,8 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.junit.Assert.*;
 
 
+
+@RunWith(JUnitQuickcheck.class)
 public class X509ResourceCertificateParserTest {
 
     private X509ResourceCertificateParser subject = new X509ResourceCertificateParser();
@@ -137,6 +147,38 @@ public class X509ResourceCertificateParserTest {
         assertEquals(ValidationStatus.PASSED, result.getResult(new ValidationLocation("test"), CERT_SIA_IS_PRESENT).getStatus());
         assertEquals(ValidationStatus.PASSED, result.getResult(new ValidationLocation("test"), CERT_SIA_CA_REPOSITORY_URI_PRESENT).getStatus());
         assertEquals(ValidationStatus.ERROR, result.getResult(new ValidationLocation("test"), CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT).getStatus());
+    }
+
+    @Property
+    public void validURI(
+            @From(URIGen.class) @URIGen.URIControls(schemas = { "rsync" }) URI manifestURI,
+            @From(URIGen.class) @URIGen.URIControls(schemas = { "https" }) URI repoURI,
+            @Size(min=0, max=100) List<@From(URIGen.class) @URIGen.URIControls(schemas = { "https" }) URI> crlURIs) {
+        String name = "test";
+
+        URI[] arrayURIs = new URI[crlURIs.size()];
+        arrayURIs = crlURIs.toArray(arrayURIs);
+
+        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest
+                .createSelfSignedCaResourceCertificateBuilder()
+                .withSubjectInformationAccess(
+                    new X509CertificateInformationAccessDescriptor(ID_AD_RPKI_MANIFEST, manifestURI),
+                    new X509CertificateInformationAccessDescriptor(ID_AD_CA_REPOSITORY, repoURI)
+                ).withCrlDistributionPoints(arrayURIs);
+        X509ResourceCertificate certificate = builder.build();
+
+        // certificate built
+        assertEquals(manifestURI, Arrays.stream(certificate.getSubjectInformationAccess()).filter(f -> f.getMethod().equals(ID_AD_RPKI_MANIFEST)).map(X509CertificateInformationAccessDescriptor::getLocation).findFirst().get());
+        assertEquals(repoURI, Arrays.stream(certificate.getSubjectInformationAccess()).filter(f -> f.getMethod().equals(ID_AD_CA_REPOSITORY)).map(X509CertificateInformationAccessDescriptor::getLocation).findFirst().get());
+        assertArrayEquals(arrayURIs, certificate.getCrlDistributionPoints());
+
+        ValidationResult result = ValidationResult.withLocation(name);
+        final AbstractX509CertificateWrapper certificateWrapper = X509ResourceCertificateParser.parseCertificate(result, certificate.getEncoded());
+        assertNull(certificateWrapper);
+        assertEquals(1, result.getFailuresForCurrentLocation().size());
+        assertEquals(ValidationStatus.PASSED, result.getResult(new ValidationLocation(name), CERT_SIA_IS_PRESENT).getStatus());
+        assertEquals(ValidationStatus.PASSED, result.getResult(new ValidationLocation(name), CERT_SIA_CA_REPOSITORY_URI_PRESENT).getStatus());
+        assertEquals(ValidationStatus.ERROR, result.getResult(new ValidationLocation(name), CERT_SIA_CA_REPOSITORY_RSYNC_URI_PRESENT).getStatus());
     }
 
     @Test

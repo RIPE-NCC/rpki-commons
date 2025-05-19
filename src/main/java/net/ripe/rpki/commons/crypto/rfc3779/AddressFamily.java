@@ -10,9 +10,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * See {@link http://www.ietf.org/rfc/rfc3779.txt},
- * {@link http://www.iana.org/assignments/address-family-numbers} and
- * {@link http://www.iana.org/assignments/safi-namespace}.
+ * See <a href="https://www.ietf.org/rfc/rfc3779.txt">RFC3779</a>,
+ * <a href="https://www.iana.org/assignments/address-family-numbers">The IANA Address Family Numbers registry</a>
+ * and https://www.iana.org/assignments/safi-namespace}.
  */
 @Value
 public class AddressFamily implements Comparable<AddressFamily>, Serializable {

@@ -65,6 +65,7 @@ public abstract class RpkiSignedObjectBuilder {
         DigestCalculatorProvider digestProvider = BouncyCastleUtil.DIGEST_CALCULATOR_PROVIDER;
         SignerInfoGenerator gen = new JcaSignerInfoGeneratorBuilder(digestProvider).setSignedAttributeGenerator(
             new DefaultSignedAttributeTableGenerator(createSignedAttributes(signingCertificate.getNotBefore())) {
+                @SuppressWarnings("rawtypes")
                 @Override
                 public AttributeTable getAttributes(Map parameters) {
                     return super.getAttributes(parameters).remove(CMSAttributes.cmsAlgorithmProtect);

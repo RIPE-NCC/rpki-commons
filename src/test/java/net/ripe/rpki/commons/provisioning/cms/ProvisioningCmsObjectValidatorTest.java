@@ -9,6 +9,7 @@ import net.ripe.rpki.commons.provisioning.x509.ProvisioningIdentityCertificateBu
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,7 @@ public class ProvisioningCmsObjectValidatorTest {
     @Test
     public void shouldStopIfCmsObjectIsBadlyFormatted() {
         ValidationResult validationResult = ValidationResult.withLocation("n/a");
-        subject = new ProvisioningCmsObjectValidator(options, Optional.empty(), new ProvisioningCmsObject(new byte[]{0}, null, null, null, null), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
+        subject = new ProvisioningCmsObjectValidator(options, Optional.empty(), new ProvisioningCmsObject(new byte[]{0}, null, null, null, null, DateTime.now()), ProvisioningIdentityCertificateBuilderTest.TEST_IDENTITY_CERT);
         subject.validate(validationResult);
 
         assertThat(validationResult.hasFailures()).isTrue();

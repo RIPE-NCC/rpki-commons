@@ -4,7 +4,6 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import org.apache.commons.lang3.Validate;
-import org.bouncycastle.asn1.x509.PolicyInformation;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
@@ -14,7 +13,7 @@ import java.security.PublicKey;
 import java.util.EnumSet;
 
 /**
- * Generic Builder for X509ResourceCertificates<br />
+ * Generic Builder for X509ResourceCertificates.
  * Note that you may want to use one of the following more specific builders to build standard conform signed object EE or CA certificates:
  *
  * @see RpkiSignedObjectEeCertificateBuilder
@@ -29,7 +28,7 @@ public class X509ResourceCertificateBuilder {
         builderHelper = new X509CertificateBuilderHelper();
         builderHelper.withResources(resources);
         // https://tools.ietf.org/html/rfc6487#section-4.8.9
-        builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
+        builderHelper.withPolicies(AbstractX509CertificateWrapper.POLICY_INFORMATION);
     }
 
     public X509ResourceCertificateBuilder withSignatureProvider(String signatureProvider) {
@@ -111,6 +110,7 @@ public class X509ResourceCertificateBuilder {
         return new X509ResourceCertificate(builderHelper.generateCertificate());
     }
 
+    @SuppressWarnings("java:S1319")
     public X509ResourceCertificateBuilder withInheritedResourceTypes(EnumSet<IpResourceType> resourceTypes) {
         this.inheritedResourceTypes = resourceTypes;
         builderHelper.withInheritedResourceTypes(resourceTypes);

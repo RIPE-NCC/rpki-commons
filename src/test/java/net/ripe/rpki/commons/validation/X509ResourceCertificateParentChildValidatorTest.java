@@ -377,8 +377,7 @@ public class X509ResourceCertificateParentChildValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withValidityPeriod(new ValidityPeriod(VALIDITY_PERIOD.getNotValidBefore().plusDays(1), UTC.dateTime().plusMonths(1)));
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

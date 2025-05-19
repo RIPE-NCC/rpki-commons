@@ -24,11 +24,13 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParserTest.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class RoaCmsTest {
@@ -106,14 +108,28 @@ public class RoaCmsTest {
 
     @Test
     public void shouldGenerateRoaCms() {
-        assertEquals(TEST_ASN, subject.getAsn());
-        assertEquals(allPrefixes, subject.getPrefixes());
-        assertEquals(allResources, subject.getResources());
+        assertThat(TEST_ASN).isEqualTo(subject.getAsn());
+        // prefixes in ROA are sorted, but allprefixes is not (yet)
+        assertThat(allPrefixes.stream().sorted().collect(Collectors.toList())).isEqualTo(subject.getPrefixes());
+        assertThat(allResources).isEqualTo(subject.getResources());
+    }
+
+    @Test
+    public void shouldEncodeUniquePrefixes() {
+        var doubledPrefixes = new ArrayList<RoaPrefix>();
+        doubledPrefixes.addAll(allPrefixes);
+        doubledPrefixes.addAll(allPrefixes);
+        assertThat(doubledPrefixes.size()).isEqualTo(2*allPrefixes.size());
+
+        var res = createRoaCms(doubledPrefixes);
+        // allPrefixes is not sorted, so compare w/o considering order.
+        // The order of prefixes is covered above
+        assertThat(allPrefixes).containsExactlyInAnyOrderElementsOf(res.getPrefixes());
     }
 
     @Test
     public void shouldVerifySignature() {
-        assertTrue(subject.signedBy(subject.getCertificate()));
+        assertThat(subject.signedBy(subject.getCertificate())).isTrue();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -125,12 +141,12 @@ public class RoaCmsTest {
     @Test
     public void shouldUseNotValidBeforeTimeForSigningTime() {
         RoaCms roaCms = createRoaCms(allPrefixes);
-        assertEquals(roaCms.getCertificate().getValidityPeriod().getNotValidBefore(), roaCms.getSigningTime());
+        assertThat(roaCms.getCertificate().getValidityPeriod().getNotValidBefore()).isEqualTo(roaCms.getSigningTime());
     }
 
     @Test
     public void shouldPastValidityTimeForCmsBeTheSameAsTheCertificate() {
-        assertEquals(subject.getCertificate().isPastValidityTime(), subject.isPastValidityTime());
+        assertThat(subject.getCertificate().isPastValidityTime()).isEqualTo(subject.isPastValidityTime());
     }
 
     @Test
@@ -147,7 +163,7 @@ public class RoaCmsTest {
 
         subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, ValidationOptions.strictValidation(), ValidationResult.withLocation(TEST_ROA_LOCATION));
 
-        assertTrue("ROA must be revoked", subject.isRevoked());
+        assertThat(subject.isRevoked()).isTrue().withFailMessage("ROA must be revoked");
     }
 
     @Test
@@ -164,6 +180,6 @@ public class RoaCmsTest {
 
         subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, ValidationOptions.strictValidation(), ValidationResult.withLocation(TEST_ROA_LOCATION));
 
-        assertFalse("ROA must not be revoked", subject.isRevoked());
+        assertThat(subject.isRevoked()).isFalse().withFailMessage("ROA must not be revoked");
     }
 }

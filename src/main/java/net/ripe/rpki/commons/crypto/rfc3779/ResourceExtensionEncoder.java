@@ -26,7 +26,7 @@ import java.util.TreeMap;
 /**
  * Encodes the certificate resource extensions as specified in RFC3779. Resource
  * inheritance is not yet supported.
- * <p/>
+ *
  * The methods in this class are named after the grammar rules in RFC3779,
  * suffixed with "ToDer".
  */

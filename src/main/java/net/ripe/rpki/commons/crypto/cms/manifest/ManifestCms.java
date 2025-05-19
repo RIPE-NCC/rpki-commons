@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
+import com.google.common.net.UrlEscapers;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObject;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
@@ -9,12 +10,10 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import net.ripe.rpki.commons.validation.objectvalidators.ResourceValidatorFactory;
-import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificateParentChildValidator;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
 
 /**
  * A manifest of files published by a CA certificate.
- * <p/>
+ *
  * Use the {@link ManifestCmsBuilder} or {@link ManifestCmsParser} to construct this object.
  */
 public class ManifestCms extends RpkiSignedObject {
@@ -41,7 +40,11 @@ public class ManifestCms extends RpkiSignedObject {
 
     public static final int DEFAULT_VERSION = 0;
 
+    // since 1.34
+    @Deprecated
     public static final String CONTENT_TYPE_OID = "1.2.840.113549.1.9.16.1.26";
+
+    public static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.26");
 
     public static final String FILE_HASH_ALGORITHM = CMSSignedDataGenerator.DIGEST_SHA256;
 
@@ -139,7 +142,7 @@ public class ManifestCms extends RpkiSignedObject {
         result.rejectIfFalse(
                 failedEntries.isEmpty(),
                 ValidationString.MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE,
-                failedEntries.stream().map(StringEscapeUtils::escapeJava).collect(Collectors.joining(", "))
+                failedEntries.stream().map(UrlEscapers.urlFormParameterEscaper().asFunction()).collect(Collectors.joining(", "))
         );
     }
 

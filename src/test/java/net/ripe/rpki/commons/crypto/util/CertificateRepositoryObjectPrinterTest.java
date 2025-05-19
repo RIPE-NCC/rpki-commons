@@ -79,7 +79,7 @@ public class CertificateRepositoryObjectPrinterTest {
         CertificateRepositoryObjectPrinter.print(new PrintWriter(output), roaCms);
 
         assertEquals("Object Type: Route Origin Authorisation object\n" + "Signing time: 2007-12-31T23:59:00.000Z\n" + "ASN: AS42\n" + "Prefixes:\n"
-                + "    10.64.0.0/12 [24]\n" + "    10.32.0.0/12\n" + "    2001:0:200::/39\n", output.getBuffer().toString());
+                + "    10.32.0.0/12\n" + "    10.64.0.0/12 [24]\n" + "    2001:0:200::/39\n", output.getBuffer().toString());
     }
 
     @Test

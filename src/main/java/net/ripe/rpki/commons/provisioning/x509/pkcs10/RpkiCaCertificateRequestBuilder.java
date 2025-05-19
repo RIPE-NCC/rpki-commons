@@ -61,8 +61,6 @@ public class RpkiCaCertificateRequestBuilder {
 
     /**
      * Default: SunRsaSign
-     *
-     * @return
      */
     public RpkiCaCertificateRequestBuilder withSignatureProvider(String signatureProvider) {
         this.signatureProvider = signatureProvider;
@@ -71,8 +69,6 @@ public class RpkiCaCertificateRequestBuilder {
 
     /**
      * Default: SHA256withRSA
-     *
-     * @return
      */
     public RpkiCaCertificateRequestBuilder withSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;

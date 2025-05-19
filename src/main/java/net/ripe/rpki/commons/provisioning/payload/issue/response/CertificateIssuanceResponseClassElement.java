@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 /**
  * See: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2
- * <p/>
+ *
  * This type of class element contains the signed certificate for this request/response
  * as oposed to all current certificate elements as used in the list response.
  */

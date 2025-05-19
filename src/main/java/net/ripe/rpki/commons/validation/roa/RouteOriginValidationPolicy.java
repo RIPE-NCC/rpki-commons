@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.validation.roa;
 
+import lombok.experimental.UtilityClass;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResource;
 import net.ripe.ipresource.etree.IpResourceIntervalStrategy;
@@ -12,27 +13,26 @@ import java.util.List;
 /**
  * See http://tools.ietf.org/html/draft-ietf-sidr-roa-validation-10
  */
+@UtilityClass
 public class RouteOriginValidationPolicy {
 
-    public static NestedIntervalMap<IpResource, List<AllowedRoute>> allowedRoutesToNestedIntervalMap(Iterable<? extends AllowedRoute> allowedRoutes) {
-        NestedIntervalMap<IpResource, List<AllowedRoute>> result = new NestedIntervalMap<IpResource, List<AllowedRoute>>(IpResourceIntervalStrategy.getInstance());
-        for (AllowedRoute allowedRoute : allowedRoutes) {
-            List<AllowedRoute> allowed = result.findExact(allowedRoute.getPrefix());
+    public static <T extends RoaPrefixData> NestedIntervalMap<IpResource, List<T>> allowedRoutesToNestedIntervalMap(Iterable<T> allowedRoutes) {
+        NestedIntervalMap<IpResource, List<T>> result = new NestedIntervalMap<>(IpResourceIntervalStrategy.getInstance());
+        for (T allowedRoute : allowedRoutes) {
+            List<T> allowed = result.findExact(allowedRoute.getPrefix());
             if (allowed == null) {
-                List<AllowedRoute> list = new LinkedList<AllowedRoute>();
-                list.add(allowedRoute);
-                result.put(allowedRoute.getPrefix(), list);
-            } else {
-                allowed.add(allowedRoute);
+                allowed = new LinkedList<>();
+                result.put(allowedRoute.getPrefix(), allowed);
             }
+            allowed.add(allowedRoute);
         }
         return result;
     }
 
-    public RouteValidityState validateAnnouncedRoute(NestedIntervalMap<IpResource, ? extends Iterable<? extends AllowedRoute>> allowedRoutes, AnnouncedRoute announcedRoute) {
+    public static <T extends RoaPrefixData, U extends RouteData> RouteValidityState validateAnnouncedRoute(NestedIntervalMap<IpResource, ? extends Iterable<T>> allowedRoutes, U announcedRoute) {
         RouteValidityState result = RouteValidityState.UNKNOWN;
-        for (Iterable<? extends AllowedRoute> routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.getPrefix())) {
-            for (AllowedRoute allowedRoute : routes) {
+        for (var routes : allowedRoutes.findExactAndAllLessSpecific(announcedRoute.getPrefix())) {
+            for (T allowedRoute : routes) {
                 switch (validate(allowedRoute, announcedRoute)) {
                     case VALID:
                         return RouteValidityState.VALID;
@@ -50,7 +50,7 @@ public class RouteOriginValidationPolicy {
         return result;
     }
 
-    private RouteValidityState validate(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
+    private static <T extends RoaPrefixData, U extends RouteData> RouteValidityState validate(T allowedRoute, U announcedRoute) {
         IpRange announcedPrefix = announcedRoute.getPrefix();
 
         if (isUnknown(allowedRoute, announcedPrefix)) {
@@ -68,16 +68,16 @@ public class RouteOriginValidationPolicy {
         return RouteValidityState.VALID;
     }
 
-    private boolean isUnknown(AllowedRoute allowedRoute, IpRange announcedPrefix) {
+    private static <T extends RoaPrefixData> boolean isUnknown(T allowedRoute, IpRange announcedPrefix) {
         // non-intersecting or covering-aggregate
         return !allowedRoute.getPrefix().contains(announcedPrefix);
     }
 
-    private boolean isLengthInvalid(AllowedRoute allowedRoute, IpRange announcedPrefix) {
-        return !(announcedPrefix.getPrefixLength() <= allowedRoute.getMaximumLength());
+    private static <T extends RoaPrefixData> boolean isLengthInvalid(T allowedRoute, IpRange announcedPrefix) {
+        return announcedPrefix.getPrefixLength() > allowedRoute.getMaximumLength();
     }
 
-    private boolean isAsnInvalid(AllowedRoute allowedRoute, AnnouncedRoute announcedRoute) {
+    private static <T extends RoaPrefixData, U extends RouteData> boolean isAsnInvalid(T allowedRoute, U announcedRoute) {
         return !allowedRoute.getAsn().equals(announcedRoute.getOriginAsn());
     }
 

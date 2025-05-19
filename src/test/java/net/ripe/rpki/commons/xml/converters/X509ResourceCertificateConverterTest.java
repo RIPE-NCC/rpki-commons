@@ -18,7 +18,7 @@ public class X509ResourceCertificateConverterTest {
         subject = new X509ResourceCertificateConverter();
         xStream = new XStream();
         xStream.registerConverter(subject);
-        xStream.allowTypes(new Class[]{X509ResourceCertificate.class});
+        xStream.allowTypes(new Class<?>[]{X509ResourceCertificate.class});
     }
 
     @Test

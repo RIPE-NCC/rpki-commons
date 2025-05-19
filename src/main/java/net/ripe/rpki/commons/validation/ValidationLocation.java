@@ -48,11 +48,7 @@ public class ValidationLocation implements Serializable, Comparable<ValidationLo
 
         ValidationLocation that = (ValidationLocation) o;
 
-        if (!name.equals(that.name)) {
-            return false;
-        }
-
-        return true;
+        return name.equals(that.name);
     }
 
     @Override

@@ -175,6 +175,8 @@ public final class ValidationString {
     public static final String MANIFEST_THIS_UPDATE_TIME_BEFORE_NEXT_UPDATE_TIME = "mf.this.update.before.next.update";
     public static final String MANIFEST_ENTRY_FILE_NAME_IS_RELATIVE = "mf.entry.file.name.is.relative";
 
+    public static final String MANIFEST_VERSION = "mf.version";
+
     //ghostbusters
     public static final String GHOSTBUSTERS_RECORD_CONTENT_TYPE = "ghostbusters.record.content.type";
     public static final String GHOSTBUSTERS_RECORD_SINGLE_VCARD = "ghostbusters.record.single.vcard";
@@ -187,11 +189,14 @@ public final class ValidationString {
     public static final String ASPA_CONTENT_TYPE = "aspa.content.type";
     public static final String ASPA_CONTENT_STRUCTURE = "aspa.content.structure";
     public static final String ASPA_VERSION = "aspa.version";
-    public static final String ASPA_ADDR_FAMILY = "aspa.address.family";
     public static final String ASPA_CUSTOMER_ASN_PRESENT = "aspa.customer.asn.present";
     public static final String ASPA_PROVIDER_AS_SEQUENCE_SIZE = "aspa.provider.as.sequence.size";
+
+    public static final String ASPA_CUSTOMER_ASN_NOT_IN_PROVIDER_ASNS = "aspa.customer.asn.ne.provider.asn";
     public static final String ASPA_CUSTOMER_ASN_CERTIFIED = "aspa.customer.asn.certified";
     public static final String ASPA_PROVIDER_AS_SET_NOT_EMPTY = "aspa.provider.as.set.not.empty";
+
+    public static final String ASPA_PROVIDER_AS_SET_VALID = "aspa.provider.as.set.valid";
 
     //validator
     public static final String VALIDATOR_URI_SAFETY = "validator.uri.safety";

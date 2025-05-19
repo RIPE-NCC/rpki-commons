@@ -10,7 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 // CMS signed objects, generic (using ROAs)
 public class BBNCMSConformanceTest {
@@ -60,7 +61,8 @@ public class BBNCMSConformanceTest {
     public void testGenericCMSSignedObject(String testNumber, String testCaseFile, String testCaseDescription) throws IOException {
         final String fileName = String.format("root/badCMS%s.roa", testCaseFile);
 
-        assertTrue("Should reject certificate with " + testCaseDescription + " from " + fileName, parseCertificate(fileName));
+        assertThat(parseCertificate(fileName)).isTrue()
+                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName);
     }
 
     @Disabled("These checks are not implemented yet.")
@@ -74,7 +76,8 @@ public class BBNCMSConformanceTest {
     public void testGenericCMSSignedObject_ignored(String testNumber, String testCaseFile, String testCaseDescription) throws IOException {
         final String fileName = String.format("root/badCMS%s.roa", testCaseFile);
 
-        assertTrue("Should reject certificate with " + testCaseDescription + " from " + fileName, parseCertificate(fileName));
+        assertThat(parseCertificate(fileName)).isTrue()
+                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName);
     }
 
     private boolean parseCertificate(String certificate) throws IOException {

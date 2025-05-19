@@ -17,13 +17,14 @@ import org.joda.time.DateTime;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 /**
- * @See {@link http://tools.ietf.org/html/draft-ietf-sidr-rpki-manifests-07}
+ * @see <a href="https://datatracker.ietf.org/doc/rfc9286/">RFC9286</a>
  */
 
 public class ManifestCmsParser extends RpkiSignedObjectParser {
@@ -64,7 +65,7 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
 
     private void validateManifest() {
         ValidationResult validationResult = getValidationResult();
-        validationResult.rejectIfFalse(new ASN1ObjectIdentifier(ManifestCms.CONTENT_TYPE_OID).equals(getContentType()), MANIFEST_CONTENT_TYPE);
+        validationResult.rejectIfFalse(ManifestCms.CONTENT_TYPE.equals(getContentType()), MANIFEST_CONTENT_TYPE);
         // RFC 6486 section 5.1.2:
         // This EE certificate MUST describe its Internet Number Resources
         // (INRs) using the "inherit" attribute, rather than explicit
@@ -102,8 +103,13 @@ public class ManifestCmsParser extends RpkiSignedObjectParser {
             final int itemCount = seq.size();
             int offset = 0;
             if (itemCount == 6) {
-                BigInteger version = getRpkiObjectVersion(seq);
-                validationResult.rejectIfFalse(BigInteger.ZERO.equals(version), "mf.version", "manifest version must be 0, but is " + version);
+                Optional<BigInteger> optionalVersion = getTaggedVersion(0, seq);
+                optionalVersion.ifPresentOrElse(foundVersion -> {
+                    validationResult.rejectIfFalse(BigInteger.ZERO.equals(foundVersion), MANIFEST_VERSION, optionalVersion.get().toString());
+                    version = 0;
+                }, () -> {
+                    validationResult.error(MANIFEST_VERSION, "missing/not explicitly tagged");
+                });
                 offset++;
             } else if (itemCount == 5) {
                 version = ManifestCms.DEFAULT_VERSION;

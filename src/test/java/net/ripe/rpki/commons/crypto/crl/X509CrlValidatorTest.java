@@ -81,7 +81,7 @@ public class X509CrlValidatorTest {
         DateTime now = UTC.dateTime().withMillisOfSecond(0);
         DateTime thisUpdateTime = now.plusDays(2);
         DateTime nextUpdateTime = now.plusDays(4);
-        X509Crl crl = getRootCRL().withThisUpdateTime(thisUpdateTime).withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        X509Crl crl = getRootCRL().withValidityPeriod(new ValidityPeriod(thisUpdateTime, nextUpdateTime)).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
         result = subject.getValidationResult();
@@ -93,19 +93,22 @@ public class X509CrlValidatorTest {
     public void shouldWarnWhenNextUpdatePassedWithinMaxStaleDays() {
         options = ValidationOptions.withStaleConfigurations(Duration.standardDays(1), Duration.ZERO);
 
-        DateTime nextUpdateTime = UTC.dateTime().minusSeconds(1).withMillisOfSecond(0);
-        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        // Just update next update
+        var newValidity = new ValidityPeriod(getRootCRL().getThisUpdateTime(), UTC.dateTime().minusSeconds(1).withMillisOfSecond(0));
+        X509Crl crl = getRootCRL().withValidityPeriod(newValidity).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
         result = subject.getValidationResult();
         assertFalse(result.hasFailures());
-        assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+        assertEquals(new ValidationCheck(ValidationStatus.WARNING, CRL_NEXT_UPDATE_BEFORE_NOW, newValidity.getNotValidAfter().toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void shouldRejectWhenNextUpdateOutsideMaxStaleDays() {
         options = ValidationOptions.withStaleConfigurations(Duration.standardDays(1), Duration.ZERO);
         subject = new X509CrlValidator(options, result, parent);
+        // validity period checks this invariant -> explicitly set nextUpdateTime
         DateTime nextUpdateTime = UTC.dateTime().minusDays(2).withMillisOfSecond(0); // Truncate millis
         X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
@@ -119,20 +122,21 @@ public class X509CrlValidatorTest {
     public void shouldRejectWhenNextUpdateOutsideNegativeMaxStaleDays() {
         options = ValidationOptions.withStaleConfigurations(Duration.standardDays(-8), Duration.ZERO);
         subject = new X509CrlValidator(options, result, parent);
-        DateTime nextUpdateTime = UTC.dateTime().withMillisOfSecond(0); // Truncate millis
-        X509Crl crl = getRootCRL().withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        var newValidity = new ValidityPeriod(getRootCRL().getThisUpdateTime(), UTC.dateTime().withMillisOfSecond(0)); // Truncate millis
+        X509Crl crl = getRootCRL().withValidityPeriod(newValidity).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
         result = subject.getValidationResult();
         assertTrue(result.hasFailures());
-        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, nextUpdateTime.toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
+        assertEquals(new ValidationCheck(ValidationStatus.ERROR, CRL_NEXT_UPDATE_BEFORE_NOW, newValidity.getNotValidAfter().toString()), result.getResult(new ValidationLocation("location"), CRL_NEXT_UPDATE_BEFORE_NOW));
     }
 
     @Test
     public void shouldNotRejectWhenBetweenThisUpdateAndNextUpdate() {
         DateTime thisUpdateTime = UTC.dateTime().minusDays(1);
         DateTime nextUpdateTime = thisUpdateTime.plusDays(2);
-        X509Crl crl = getRootCRL().withThisUpdateTime(thisUpdateTime).withNextUpdateTime(nextUpdateTime).build(ROOT_KEY_PAIR.getPrivate());
+        var validity = new ValidityPeriod(thisUpdateTime, nextUpdateTime);
+        X509Crl crl = getRootCRL().withValidityPeriod(validity).build(ROOT_KEY_PAIR.getPrivate());
         subject.validate("location", crl);
 
         result = subject.getValidationResult();
@@ -160,8 +164,7 @@ public class X509CrlValidatorTest {
         X509CrlBuilder builder = new X509CrlBuilder();
 
         builder.withIssuerDN(ROOT_CERTIFICATE_NAME);
-        builder.withThisUpdateTime(VALIDITY_PERIOD.getNotValidBefore().plusDays(1));
-        builder.withNextUpdateTime(UTC.dateTime().plusMonths(1));
+        builder.withValidityPeriod(new ValidityPeriod(VALIDITY_PERIOD.getNotValidBefore().plusDays(1), UTC.dateTime().plusMonths(1)));
         builder.withNumber(BigInteger.valueOf(1));
         builder.withAuthorityKeyIdentifier(ROOT_KEY_PAIR.getPublic());
         builder.withSignatureProvider(DEFAULT_SIGNATURE_PROVIDER);

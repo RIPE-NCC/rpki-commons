@@ -11,10 +11,9 @@ import java.security.cert.X509Certificate;
  * This is a self-signed X.509 BPKI certificate that will be the issuer of the BPKI EE certificates that the child uses
  * when sending provisioning protocol messages to the parent.
  */
-public class ProvisioningIdentityCertificate extends ProvisioningCertificate implements Serializable {
+public final class ProvisioningIdentityCertificate extends ProvisioningCertificate implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
 
     public ProvisioningIdentityCertificate(X509Certificate certificate) {
         super(certificate);

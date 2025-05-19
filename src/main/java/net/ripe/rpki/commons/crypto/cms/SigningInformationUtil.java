@@ -38,7 +38,7 @@ public class SigningInformationUtil {
      * of these attributes SHOULD be present". [..] "However, if both of these attributes are present,
      * they MUST provide the same date and time."
      *
-     * @ensures res.valid && all signing time attributes have a single value && all signing time values have the same value
+     * @ensures res.valid &amp;&amp; all signing time attributes have a single value &amp;&amp; all signing time values have the same value
      */
     public static SigningTimeResult extractSigningTime(ValidationResult validationResult, SignerInformation signer) {
         ImmutablePair<DateTime, Boolean> signingTime = extractTime(
