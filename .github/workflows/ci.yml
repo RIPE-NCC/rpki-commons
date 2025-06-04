@@ -7,6 +7,12 @@ on:
   pull_request:
     branches: [ main ]
 
+  workflow_call:
+    outputs:      
+      test-reports:
+        description: "Name of the test reports artifact."
+        value: "test-results"    
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,4 +49,4 @@ jobs:
             target/surefire-reports/
       - name: Publish Test Report
         if: ${{ always() }}
-        uses: scacap/action-surefire-report@v1
+        uses: scacap/action-surefire-report@v1 
