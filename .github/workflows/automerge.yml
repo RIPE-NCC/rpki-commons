@@ -23,12 +23,14 @@ jobs:
       - name: Check if PR is ready for auto-merge
         id: check-pr
         run: |
-          # Only auto-merge patch and minor updates
-          if [[ "${{ github.event.pull_request.title }}" =~ ^(Bump|Update).*\(patch\)|^(Bump|Update).*\(minor\) ]]; then
+          # Test with dependabot metadata if available, otherwise use title
+          if [[ "${{ steps.dependabot-metadata.outputs.update-type }}" == "version-update:semver-patch" ]] || \
+             [[ "${{ steps.dependabot-metadata.outputs.update-type }}" == "version-update:semver-minor" ]] || \
+             [[ "${{ github.event.pull_request.title }}" =~ (patch|minor) ]]; then
             echo "auto_merge=true" >> $GITHUB_OUTPUT
           else
             echo "auto_merge=false" >> $GITHUB_OUTPUT
-          fi          
+          fi       
 
       - name: Enable auto-merge
         if: steps.check-pr.outputs.auto_merge == 'true'
