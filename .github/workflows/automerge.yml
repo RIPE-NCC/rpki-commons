@@ -10,8 +10,8 @@ jobs:
 
   auto-merge:
     runs-on: ubuntu-latest
-    needs: build
-    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'RIPE-NCC/rpki-commons'
+    needs: build    
+    # if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'RIPE-NCC/rpki-commons'
     steps:
       - name: Fetch Dependabot metadata
         id: dependabot-metadata
@@ -24,12 +24,13 @@ jobs:
       - name: Check if PR is ready for auto-merge
         id: check-pr
         run: |
+          echo "user=${{ github.event.pull_request.user.login }}, github.repository=${{ github.repository }}"
           # Test with dependabot metadata if available, otherwise use title
           if [[ "${{ steps.dependabot-metadata.outputs.update-type }}" == "version-update:semver-patch" ]] || \
              [[ "${{ steps.dependabot-metadata.outputs.update-type }}" == "version-update:semver-minor" ]] || \
              [[ "${{ github.event.pull_request.title }}" =~ (patch|minor) ]]; then
             # echo "auto_merge=true" >> $GITHUB_OUTPUT
-            echo "auto_merge=true"
+            echo "auto_merge=true"            
           else
             # echo "auto_merge=false" >> $GITHUB_OUTPUT
             echo "auto_merge=false"
