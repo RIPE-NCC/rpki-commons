@@ -65,6 +65,7 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ## Unreleased
   * Clean up some style (SonarQube) warnings
   * Update Github build actions
+  * Automatically merge PRs created by dependabot for minor and patch dependency version updates
 
 ## 2024-04-08 1.39.1
   * Fix: Javadoc syntax error that broke the previous release tag
