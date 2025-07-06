@@ -1,15 +1,17 @@
 package net.ripe.rpki.commons.ta.domain.request;
 
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import org.joda.time.DateTimeUtils;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+@Getter
+@EqualsAndHashCode
 public class TrustAnchorRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,21 +26,5 @@ public class TrustAnchorRequest implements Serializable {
         this.taCertificatePublicationUri = taCertificatePublicationUri;
         this.taRequests = taRequests;
         this.siaDescriptors = siaDescriptors;
-    }
-
-    public Long getCreationTimestamp() {
-        return creationTimestamp;
-    }
-
-    public URI getTaCertificatePublicationUri() {
-        return taCertificatePublicationUri;
-    }
-
-    public List<TaRequest> getTaRequests() {
-        return taRequests;
-    }
-
-    public X509CertificateInformationAccessDescriptor[] getSiaDescriptors() {
-        return siaDescriptors;
     }
 }
