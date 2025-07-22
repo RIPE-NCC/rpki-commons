@@ -30,6 +30,8 @@ jobs:
           SONATYPE_NEXUS_SNAPSHOTS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_SNAPSHOTS_PASSWORD }}
           SONATYPE_NEXUS_STAGING_USERNAME: ${{ secrets.SONATYPE_NEXUS_STAGING_USERNAME }}
           SONATYPE_NEXUS_STAGING_PASSWORD: ${{ secrets.SONATYPE_NEXUS_STAGING_PASSWORD }}
+          SONATYPE_CENTRAL_USERNAME: ${{ secrets.SONATYPE_CENTRAL_USERNAME }}
+          SONATYPE_CENTRAL_PASSWORD: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}
         run: |
           gpg --batch --no-tty --allow-secret-key-import --import - <<< "$GPG_KEY"
           unset GPG_KEY
