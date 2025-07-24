@@ -67,7 +67,8 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ## 2025-07-17 1.40
   * Clean up some style (SonarQube) warnings
   * Update Github build actions
-  * Automatically merge PRs created by dependabot for minor and patch dependency version updates
+  * Remove Saxon-HE dependency
+  * Simplify merging of PRs created by dependabot for minor and patch dependency version updates
   * Update versions of multiple libraries
 
 ## 2024-04-08 1.39.1
