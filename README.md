@@ -64,10 +64,14 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 
 ## Unreleased
 
+## 2025-08-14 1.41
+
+  * Remove Saxon-HE dependency
+  * Dependency updates
+
 ## 2025-07-17 1.40
   * Clean up some style (SonarQube) warnings
   * Update Github build actions
-  * Remove Saxon-HE dependency
   * Simplify merging of PRs created by dependabot for minor and patch dependency version updates
   * Update versions of multiple libraries
 
