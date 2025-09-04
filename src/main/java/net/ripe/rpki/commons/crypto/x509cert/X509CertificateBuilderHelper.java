@@ -10,19 +10,7 @@ import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -46,18 +34,18 @@ import java.util.EnumSet;
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
  * (delegated to, not extended) specific certificate builders.
- *
+ * <p>
  * Because we want to maintain the pattern where a specific Certificate builder
  * can be chained like: builder.withValidity(val).withSubjectDn(subject) etc...
  * dynamic typing would be required.. hence delegation.
- *
+ * <p>
  * Even though RPKI is all about resource certificates, there is not resource-specific
  * version of this builder helper as it is not so easy to make sure that resources are
  * set in a compile-time guaranteed fashion. Resources can be set
- *
- *  - using withResources;
- *  - using withInheritedResourceTypes.
- *
+ * <p>
+ * - using withResources;
+ * - using withInheritedResourceTypes.
+ * <p>
  * There are complicated relationships between these two ways of setting resources
  * (@see X509CertificateBuilderHelper.validateResource)
  * which results in an inevitable runtime check. Thus moving resource setting
@@ -207,9 +195,9 @@ public final class X509CertificateBuilderHelper {
     }
 
     /**
-     * @requires policies to be unset.
      * @param policies new certificate policies to apply.
      * @return the builder
+     * @requires policies to be unset.
      */
     public X509CertificateBuilderHelper withPolicies(
             PolicyInformation... policies) {
@@ -290,7 +278,7 @@ public final class X509CertificateBuilderHelper {
 
     /**
      * https://tools.ietf.org/html/rfc6487#section-7
-     *
+     * <p>
      * Resource extension validation implies that at least IP or ASN extension
      * must be present. This means at least one IPvX or ASN must be either set
      * explicitly or inherited..
@@ -298,9 +286,9 @@ public final class X509CertificateBuilderHelper {
     protected void validateResource(IpResourceSet resources) {
         // at least one resource type must be either set or inherited
         final boolean atLeastOneResourceTypeUsed = EnumSet.allOf(IpResourceType.class)
-            .stream()
-            .anyMatch(resourceType ->
-                resources.containsType(resourceType) || inheritedResourceTypes.contains(resourceType));
+                .stream()
+                .anyMatch(resourceType ->
+                        resources.containsType(resourceType) || inheritedResourceTypes.contains(resourceType));
 
         if (!atLeastOneResourceTypeUsed) {
             throw new IllegalArgumentException("Resources set " + resources + " must contain at least one IP address or ASN");
@@ -310,18 +298,18 @@ public final class X509CertificateBuilderHelper {
 
     private void addBgpExtension(X509v3CertificateBuilder generator) throws CertIOException {
         generator.addExtension(Extension.extendedKeyUsage, true,
-            new ExtendedKeyUsage(KeyPurposeId.getInstance(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER)));
+                new ExtendedKeyUsage(KeyPurposeId.getInstance(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER)));
     }
 
     private X509v3CertificateBuilder createX509V3CertificateGenerator() {
         validateCertificateFields();
         return new X509v3CertificateBuilder(
-            BouncyCastleUtil.principalToName(issuerDN),
-            serial,
-            new Date(validityPeriod.getNotValidBefore().getMillis()),
-            new Date(validityPeriod.getNotValidAfter().getMillis()),
-            BouncyCastleUtil.principalToName(subjectDN),
-            BouncyCastleUtil.createSubjectPublicKeyInfo(publicKey));
+                BouncyCastleUtil.principalToName(issuerDN),
+                serial,
+                new Date(validityPeriod.getNotValidBefore().getMillis()),
+                new Date(validityPeriod.getNotValidAfter().getMillis()),
+                BouncyCastleUtil.principalToName(subjectDN),
+                BouncyCastleUtil.createSubjectPublicKeyInfo(publicKey));
     }
 
     private void validateCertificateFields() {
@@ -335,7 +323,12 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(publicKey, "no publicKey");
         Validate.notNull(signingKeyPair, "no signingKeyPair");
         Validate.notNull(validityPeriod, "no validityPeriod");
-        Validate.isTrue("RSA".equals(publicKey.getAlgorithm()), "publicKey algorithm is not RSA");
+        if (router) {
+            Validate.isTrue("EC".equals(publicKey.getAlgorithm()),
+                    "publicKey algorithm is not EC which is required for BGPSec certificates");
+        } else {
+            Validate.isTrue("RSA".equals(publicKey.getAlgorithm()), "publicKey algorithm is not RSA");
+        }
         if (!ca) {
             Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
                     "keyCertSign only allowed for ca");
@@ -416,7 +409,7 @@ public final class X509CertificateBuilderHelper {
         }
         GeneralNames names = new GeneralNames(seq);
         DistributionPointName distributionPoint = new DistributionPointName(
-            names);
+                names);
         DistributionPoint[] dps = {new DistributionPoint(distributionPoint, null, null)};
         return new CRLDistPoint(dps);
     }
