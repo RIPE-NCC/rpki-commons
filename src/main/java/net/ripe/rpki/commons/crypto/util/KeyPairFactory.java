@@ -1,44 +1,46 @@
 package net.ripe.rpki.commons.crypto.util;
 
 import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAKeyGenParameterSpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.*;
+import java.security.spec.*;
 
 public class KeyPairFactory {
 
+    public static final String DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
+    public static final String DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER = "SunEC";
+
     public static final String ALGORITHM = "RSA";
+    private static final BigInteger RSA_PUBLIC_EXPONENT = RSAKeyGenParameterSpec.F4;
 
-    static final int RPKI_KEY_PAIR_SIZE = 2048;
+    static final int RPKI_RSA_KEY_PAIR_SIZE = 2048;
 
-    /**
-     * F4 Public Exponent
-     */
-    private static final BigInteger PUBLIC_EXPONENT = RSAKeyGenParameterSpec.F4;
+    public static final String ECDSA_ALGORITHM = "EC";
+    public static final String ECDSA_CURVE = "secp256r1";
 
-    private final String provider;
+    private final static KeyPairGenerator rsaGenerator;
+    private final static KeyPairGenerator ecGenerator;
 
-    public KeyPairFactory(String provider) {
-        this.provider = provider;
+    static {
+        try {
+            rsaGenerator = KeyPairGenerator.getInstance(ALGORITHM, DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER);
+            rsaGenerator.initialize(new RSAKeyGenParameterSpec(RPKI_RSA_KEY_PAIR_SIZE, RSA_PUBLIC_EXPONENT));
+
+            ecGenerator = KeyPairGenerator.getInstance(ECDSA_ALGORITHM, DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER);
+            ecGenerator.initialize(new ECGenParameterSpec(ECDSA_CURVE), new SecureRandom());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public KeyPairFactory() {
     }
 
     public KeyPair generate() {
-        try {
-            final KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM, provider);
-            generator.initialize(new RSAKeyGenParameterSpec(RPKI_KEY_PAIR_SIZE, PUBLIC_EXPONENT));
-            return generator.generateKeyPair();
-        } catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-            throw new KeyPairFactoryException(e);
-        }
+        return rsaGenerator.generateKeyPair();
+    }
+
+    public KeyPair generateEC() {
+        return ecGenerator.generateKeyPair();
     }
 
     /**
@@ -70,7 +72,26 @@ public class KeyPairFactory {
         }
     }
 
-    public KeyPairFactory withProvider(String provider) {
-        return new KeyPairFactory(provider);
+    public static PublicKey decodePublicKeyEC(byte[] encoded) {
+        try {
+            return KeyFactory.getInstance(ECDSA_ALGORITHM).generatePublic(new X509EncodedKeySpec(encoded));
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            throw new KeyPairFactoryException(e);
+        }
+    }
+
+    /**
+     * Decodes a PKCS#8 encoded private key. This is the default encoding for
+     * the private key getEncoded method.
+     *
+     * @param encoded the encoded data.
+     * @return the PrivateKey.
+     */
+    public static PrivateKey decodePrivateKeyEC(byte[] encoded) {
+        try {
+            return KeyFactory.getInstance(ECDSA_ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(encoded));
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            throw new KeyPairFactoryException(e);
+        }
     }
 }
