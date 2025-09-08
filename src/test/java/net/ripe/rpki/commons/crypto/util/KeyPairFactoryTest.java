@@ -14,11 +14,11 @@ import static org.junit.Assert.assertTrue;
 
 public class KeyPairFactoryTest {
 
-    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
 
-    public static KeyPair TEST_EC_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generateEC();
-    public static KeyPair SECOND_EC_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generateEC();
+    public static KeyPair TEST_EC_KEY_PAIR = PregeneratedKeyPairFactory.getEcInstance().generate();
+    public static KeyPair SECOND_EC_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getEcInstance().generate();
 
     @Test
     public void shouldGenerateRsaKeyPairsByDefault() {

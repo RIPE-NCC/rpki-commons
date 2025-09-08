@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 public class ProvisioningCmsCertificateBuilderTest {
 
-    public static final KeyPair EE_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static final KeyPair EE_KEYPAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
 
     public static final ProvisioningCmsCertificate TEST_CMS_CERT = getTestProvisioningCmsCertificate();
 
