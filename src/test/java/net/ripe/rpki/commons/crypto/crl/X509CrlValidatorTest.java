@@ -38,8 +38,8 @@ public class X509CrlValidatorTest {
         VALIDITY_PERIOD = new ValidityPeriod(now.minusDays(2), now.plusDays(2));
     }
 
-    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
 
     private X509CrlValidator subject;
     private X509ResourceCertificate parent;

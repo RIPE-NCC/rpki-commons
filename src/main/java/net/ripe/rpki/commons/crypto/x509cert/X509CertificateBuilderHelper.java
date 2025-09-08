@@ -55,7 +55,11 @@ public final class X509CertificateBuilderHelper {
 
     public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
 
+    public static final String DEFAULT_EC_SIGNATURE_ALGORITHM = "SHA256withECDSA";
+
     public static final String DEFAULT_SIGNATURE_PROVIDER = "SunRsaSign";
+
+    public static final String DEFAULT_EC_SIGNATURE_PROVIDER = "SunEC";
 
     private static final BigInteger MAX_20_OCTETS = BigInteger.ONE.shiftLeft(160).subtract(BigInteger.ONE);
 
@@ -225,7 +229,9 @@ public final class X509CertificateBuilderHelper {
     public X509Certificate generateCertificate() {
         X509v3CertificateBuilder certificateGenerator = createCertificateGenerator();
         try {
-            ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(signatureProvider).build(signingKeyPair.getPrivate());
+            ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm)
+                    .setProvider(signatureProvider)
+                    .build(signingKeyPair.getPrivate());
             return new JcaX509CertificateConverter().getCertificate(certificateGenerator.build(signer));
         } catch (IllegalStateException | OperatorCreationException | CertificateException e) {
             throw new X509ResourceCertificateBuilderException(e);
@@ -281,7 +287,7 @@ public final class X509CertificateBuilderHelper {
      * <p>
      * Resource extension validation implies that at least IP or ASN extension
      * must be present. This means at least one IPvX or ASN must be either set
-     * explicitly or inherited..
+     * explicitly or inherited.
      */
     protected void validateResource(IpResourceSet resources) {
         // at least one resource type must be either set or inherited
@@ -325,13 +331,13 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(validityPeriod, "no validityPeriod");
         if (router) {
             Validate.isTrue("EC".equals(publicKey.getAlgorithm()),
-                    "publicKey algorithm is not EC which is required for BGPSec certificates");
+                    "publicKey algorithm is " + publicKey.getAlgorithm() + " and not EC which is required for BGPSec certificates");
         } else {
-            Validate.isTrue("RSA".equals(publicKey.getAlgorithm()), "publicKey algorithm is not RSA");
+            Validate.isTrue("RSA".equals(publicKey.getAlgorithm()), "publicKey algorithm is " + publicKey.getAlgorithm() + " and not RSA");
         }
         if (!ca) {
             Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
-                    "keyCertSign only allowed for ca");
+                    "keyCertSign only allowed for CA certificates");
         }
     }
 
