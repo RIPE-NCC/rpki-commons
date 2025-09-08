@@ -23,7 +23,7 @@ public class RpkiCaCertificateRequestBuilderParserTest {
         URI caRepositoryUri = URI.create("rsync://host/module/subdir/");
         URI manifestUri = URI.create("rsync://host/module/subdir/subject.mft");
         X500Principal subject = new X500Principal("CN=subject");
-        KeyPair keyPair = PregeneratedKeyPairFactory.getInstance().generate();
+        KeyPair keyPair = PregeneratedKeyPairFactory.getRsaInstance().generate();
 
         requestBuilder.withCaRepositoryUri(caRepositoryUri);
         requestBuilder.withManifestUri(manifestUri);
