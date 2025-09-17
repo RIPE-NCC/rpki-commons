@@ -3,23 +3,26 @@ package net.ripe.rpki.commons.crypto.util;
 import org.junit.Test;
 
 import java.security.KeyPair;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class KeyPairFactoryTest {
 
-    public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
+    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
 
-    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static KeyPair TEST_EC_KEY_PAIR = PregeneratedKeyPairFactory.getEcInstance().generate();
+    public static KeyPair SECOND_EC_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getEcInstance().generate();
 
-    private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<String, KeyPair>();
-
+    private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<>();
 
     public static KeyPair getKeyPair(String name) {
         synchronized (cachedKeyPairs) {
@@ -32,10 +35,9 @@ public class KeyPairFactoryTest {
         }
     }
 
-
     @Test
-    public void shouldGenerateRsaKeyPairs() {
-        KeyPair keyPair = new KeyPairFactory(DEFAULT_KEYPAIR_GENERATOR_PROVIDER).generate();
+    public void shouldGenerateRsaKeyPairsByDefault() {
+        KeyPair keyPair = new KeyPairFactory(KeyPairFactory.DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER).generate();
         assertTrue(keyPair.getPublic() instanceof RSAPublicKey);
         assertTrue(keyPair.getPrivate() instanceof RSAPrivateKey);
 
@@ -44,12 +46,20 @@ public class KeyPairFactoryTest {
 
         RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
         assertEquals("RSA", rsaPublicKey.getAlgorithm());
-        assertEquals(KeyPairFactory.RPKI_KEY_PAIR_SIZE, rsaPublicKey.getModulus().bitLength());
+        assertEquals(KeyPairFactory.RPKI_RSA_KEY_PAIR_SIZE, rsaPublicKey.getModulus().bitLength());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void shouldKeypairGenerationFailOnInvalidProvider() {
-        new KeyPairFactory("invalid_provider").generate();
+    @Test
+    public void shouldGenerateEcKeyPairsWhenAsked() {
+        KeyPair keyPair = new KeyPairFactory(KeyPairFactory.DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER).generateEC();
+        assertTrue(keyPair.getPublic() instanceof ECPublicKey);
+        assertTrue(keyPair.getPrivate() instanceof ECPrivateKey);
+
+        assertEquals(keyPair.getPublic(), KeyPairFactory.decodePublicKeyEC(keyPair.getPublic().getEncoded()));
+        assertEquals(keyPair.getPrivate(), KeyPairFactory.decodePrivateKeyEC(keyPair.getPrivate().getEncoded()));
+
+        ECPublicKey ecPublicKey = (ECPublicKey) keyPair.getPublic();
+        assertEquals("EC", ecPublicKey.getAlgorithm());
     }
 
     @Test(expected = RuntimeException.class)

@@ -82,6 +82,11 @@ public class X509ResourceCertificateBuilder {
         return this;
     }
 
+    public X509ResourceCertificateBuilder withRouter(boolean isRouter) {
+        builderHelper.withRouter(isRouter);
+        return this;
+    }
+
     public X509ResourceCertificateBuilder withAuthorityKeyIdentifier(boolean add) {
         builderHelper.withAuthorityKeyIdentifier(add);
         return this;

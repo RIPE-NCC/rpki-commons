@@ -24,7 +24,6 @@ public class X509RouterCertificateBuilder {
 
     public X509RouterCertificateBuilder() {
         builderHelper = new X509CertificateBuilderHelper();
-        builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
     }
 
     public X509RouterCertificateBuilder withSignatureProvider(String signatureProvider) {
@@ -113,6 +112,7 @@ public class X509RouterCertificateBuilder {
         Validate.notNull(asns, "no AS resources");
         Validate.isTrue(asns.length > 0, "empty AS resources");
         builderHelper.withRouter(true);
+        builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
         return new X509RouterCertificate(builderHelper.generateCertificate());
     }
 
