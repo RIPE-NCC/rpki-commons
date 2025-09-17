@@ -18,97 +18,73 @@ public class KeyPairFactory {
     public static final String ECDSA_ALGORITHM = "EC";
     public static final String ECDSA_CURVE = "secp256r1";
 
-    private KeyPairGenerator rsaGenerator;
-    private KeyPairGenerator ecGenerator;
+    protected final String provider;
 
-    synchronized KeyPairGenerator getEcGenerator() {
-        if (ecGenerator == null) {
-            try {
-                ecGenerator = KeyPairGenerator.getInstance(ECDSA_ALGORITHM, DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER);
-                ecGenerator.initialize(new ECGenParameterSpec(ECDSA_CURVE), new SecureRandom());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+    public static KeyPairGenerator getEcGenerator(String provider) {
+        try {
+            var gen = KeyPairGenerator.getInstance(ECDSA_ALGORITHM, provider);
+            gen.initialize(new ECGenParameterSpec(ECDSA_CURVE), new SecureRandom());
+            return gen;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return ecGenerator;
     }
 
-    synchronized KeyPairGenerator getRsaGenerator() {
-        if (rsaGenerator == null) {
-            try {
-                rsaGenerator = KeyPairGenerator.getInstance(RSA_ALGORITHM, DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER);
-                rsaGenerator.initialize(new RSAKeyGenParameterSpec(RPKI_RSA_KEY_PAIR_SIZE, RSA_PUBLIC_EXPONENT));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+    public static KeyPairGenerator getRsaGenerator(String provider) {
+        try {
+            var gen = KeyPairGenerator.getInstance(RSA_ALGORITHM, provider);
+            gen.initialize(new RSAKeyGenParameterSpec(RPKI_RSA_KEY_PAIR_SIZE, RSA_PUBLIC_EXPONENT));
+            return gen;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return rsaGenerator;
     }
 
-    public KeyPairFactory() {
+    public KeyPairFactory(String provider) {
+        this.provider = provider;
     }
 
     public KeyPair generate() {
-        return getRsaGenerator().generateKeyPair();
+        return getRsaGenerator(provider).generateKeyPair();
     }
 
     public KeyPair generateEC() {
-        return getEcGenerator().generateKeyPair();
+        return getEcGenerator(provider).generateKeyPair();
     }
 
-    /**
-     * Decodes an X.509 encoded public key.
-     *
-     * @param encoded the encoded public key.
-     * @return the PublicKey.
-     */
     public static PublicKey decodePublicKey(byte[] encoded) {
-        try {
-            return KeyFactory.getInstance(RSA_ALGORITHM).generatePublic(new X509EncodedKeySpec(encoded));
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            throw new KeyPairFactoryException(e);
-        }
-    }
-
-    /**
-     * Decodes a PKCS#8 encoded private key. This is the default encoding for
-     * the private key getEncoded method.
-     *
-     * @param encoded the encoded data.
-     * @return the PrivateKey.
-     */
-    public static PrivateKey decodePrivateKey(byte[] encoded) {
-        try {
-            return KeyFactory.getInstance(RSA_ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(encoded));
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            throw new KeyPairFactoryException(e);
-        }
+        return decodeX509PublicKey(RSA_ALGORITHM, encoded);
     }
 
     public static PublicKey decodePublicKeyEC(byte[] encoded) {
-        try {
-            return KeyFactory.getInstance(ECDSA_ALGORITHM).generatePublic(new X509EncodedKeySpec(encoded));
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            throw new KeyPairFactoryException(e);
-        }
+        return decodeX509PublicKey(ECDSA_ALGORITHM, encoded);
     }
 
-    /**
-     * Decodes a PKCS#8 encoded private key. This is the default encoding for
-     * the private key getEncoded method.
-     *
-     * @param encoded the encoded data.
-     * @return the PrivateKey.
-     */
+    public static PrivateKey decodePrivateKey(byte[] encoded) {
+        return decodePKCS8PrivateKey(RSA_ALGORITHM, encoded);
+    }
+
     public static PrivateKey decodePrivateKeyEC(byte[] encoded) {
+        return decodePKCS8PrivateKey(ECDSA_ALGORITHM, encoded);
+    }
+
+    private static PublicKey decodeX509PublicKey(String rsaAlgorithm, byte[] encoded) {
         try {
-            return KeyFactory.getInstance(ECDSA_ALGORITHM).generatePrivate(new PKCS8EncodedKeySpec(encoded));
+            return KeyFactory.getInstance(rsaAlgorithm).generatePublic(new X509EncodedKeySpec(encoded));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new KeyPairFactoryException(e);
         }
     }
 
-    public KeyPairFactory withProvider(String provider) {
+    private static PrivateKey decodePKCS8PrivateKey(String rsaAlgorithm, byte[] encoded) {
+        try {
+            return KeyFactory.getInstance(rsaAlgorithm).generatePrivate(new PKCS8EncodedKeySpec(encoded));
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            throw new KeyPairFactoryException(e);
+        }
+    }
+
+    public static KeyPairFactory withProvider(String provider) {
         return new KeyPairFactory(provider);
     }
 }

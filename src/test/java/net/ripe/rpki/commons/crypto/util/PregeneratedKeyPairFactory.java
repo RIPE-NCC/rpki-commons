@@ -26,10 +26,10 @@ import java.util.function.Supplier;
 public class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     private static final PregeneratedKeyPairFactory RSA_INSTANCE = new PregeneratedKeyPairFactory(
-            DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER, () -> getRsaGenerator().generateKeyPair());
+            DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER, () -> getRsaGenerator(DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER).generateKeyPair());
 
     private static final PregeneratedKeyPairFactory EC_INSTANCE = new PregeneratedKeyPairFactory(
-            DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER, () -> getEcGenerator().generateKeyPair());
+            DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER, () -> getEcGenerator(DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER).generateKeyPair());
 
     private static final char[] PASSPHRASE = "passphrase".toCharArray();
     private final Supplier<KeyPair> kpGenerator;
@@ -37,11 +37,9 @@ public class PregeneratedKeyPairFactory extends KeyPairFactory {
     private File keyStoreFile;
     private KeyStore preGeneratedKeys;
     private int count = 0;
-    private final String provider;
 
     private PregeneratedKeyPairFactory(String provider, Supplier<KeyPair> kpGenerator) {
-        super();
-        this.provider = provider;
+        super(provider);
         this.kpGenerator = kpGenerator;
         initKeyStore(provider);
     }
@@ -62,6 +60,10 @@ public class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     public static PregeneratedKeyPairFactory getRsaInstance() {
         return RSA_INSTANCE;
+    }
+
+    public static PregeneratedKeyPairFactory getInstance() {
+        return getRsaInstance();
     }
 
     public static PregeneratedKeyPairFactory getEcInstance() {
@@ -120,6 +122,7 @@ public class PregeneratedKeyPairFactory extends KeyPairFactory {
 
     private static X509RouterCertificate createEcCertificate(KeyPair keyPair, String provider) {
         X509RouterCertificateBuilder builder = new X509RouterCertificateBuilder();
+        builder.withSignatureProvider(provider);
         builder.withSerial(BigInteger.ONE);
         final DateTime now = UTC.dateTime();
         builder.withValidityPeriod(new ValidityPeriod(now.minusYears(2), now.minusYears(1)));
