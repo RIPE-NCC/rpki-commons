@@ -3,7 +3,7 @@ package net.ripe.rpki.commons.provisioning;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
-import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
@@ -32,10 +32,10 @@ import java.security.cert.X509CRL;
 
 public class ProvisioningObjectMother {
 
-    public static final KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
-    public static final KeyPair TEST_KEY_PAIR_2 = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    public static final KeyPair TEST_KEY_PAIR = KeyPairFactory.rsa().generate();
+    public static final KeyPair TEST_KEY_PAIR_2 = KeyPairFactory.rsa().generate();
     public static final String DEFAULT_KEYPAIR_GENERATOR_PROVIDER = "SunRsaSign";
-    public static final KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    public static final KeyPair SECOND_TEST_KEY_PAIR = KeyPairFactory.rsa().generate();
 
     public static final X509CRL CRL = generateCrl();
 
@@ -50,7 +50,7 @@ public class ProvisioningObjectMother {
     public static final X509ResourceCertificate X509_CA = generateX509();
 
     public static X500Principal RPKI_CA_CERT_REQUEST_CA_SUBJECT = new X500Principal("CN=subject");
-    public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    public static KeyPair RPKI_CA_CERT_REQUEST_KEYPAIR = KeyPairFactory.rsa().generate();
     public static PKCS10CertificationRequest RPKI_CA_CERT_REQUEST = RpkiCaCertificateRequestBuilderParserTest.createRpkiCaCertificateRequest();
     private static final CertificateIssuanceRequestPayload RPKI_CA_CERT_REQUEST_PAYLOAD = CertificateIssuanceRequestPayloadSerializerTest.createCertificateIssuanceRequestPayloadForPkcs10Request(RPKI_CA_CERT_REQUEST);
 

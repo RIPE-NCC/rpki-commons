@@ -6,7 +6,7 @@ import net.ripe.rpki.commons.crypto.CertificateRepositoryObjectFile;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
-import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
@@ -46,9 +46,9 @@ public class X509ResourceCertificateBottomUpValidatorTest {
     private static final IpResourceSet INVALID_CHILD_RESOURCE_SET = IpResourceSet.parse("10.0.0.0/8, 192.168.0.0/15, ffce::/16, AS21212");
     private static final ValidityPeriod EXPIRED_VALIDITY_PERIOD = new ValidityPeriod(UTC.dateTime().minusMonths(2), UTC.dateTime().minusMonths(1));
 
-    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
-    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
-    private static final KeyPair SECOND_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    private static final KeyPair ROOT_KEY_PAIR = KeyPairFactory.rsa().generate();
+    private static final KeyPair FIRST_CHILD_KEY_PAIR = KeyPairFactory.rsa().generate();
+    private static final KeyPair SECOND_CHILD_KEY_PAIR = KeyPairFactory.rsa().generate();
 
 
     private static final ValidationLocation CHILD_VALIDATION_LOCATION = new ValidationLocation("child");

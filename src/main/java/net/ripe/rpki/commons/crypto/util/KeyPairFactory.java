@@ -20,6 +20,26 @@ public class KeyPairFactory {
 
     protected final String provider;
 
+    protected KeyPairFactory(String provider) {
+        this.provider = provider;
+    }
+
+    public KeyPair generate() {
+        return getRsaGenerator(provider).generateKeyPair();
+    }
+
+    public interface Generator {
+        KeyPair generate();
+    }
+
+    public static Generator rsa() {
+        return () -> getRsaGenerator(DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER).generateKeyPair();
+    }
+
+    public static Generator bgpSec() {
+        return () -> getEcGenerator(DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER).generateKeyPair();
+    }
+
     public static KeyPairGenerator getEcGenerator(String provider) {
         try {
             var gen = KeyPairGenerator.getInstance(ECDSA_ALGORITHM, provider);
@@ -38,18 +58,6 @@ public class KeyPairFactory {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public KeyPairFactory(String provider) {
-        this.provider = provider;
-    }
-
-    public KeyPair generate() {
-        return getRsaGenerator(provider).generateKeyPair();
-    }
-
-    public KeyPair generateEC() {
-        return getEcGenerator(provider).generateKeyPair();
     }
 
     public static PublicKey decodePublicKey(byte[] encoded) {

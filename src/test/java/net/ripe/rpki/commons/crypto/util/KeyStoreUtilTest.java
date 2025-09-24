@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 public class KeyStoreUtilTest {
 
-    private static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    private static KeyPair TEST_KEY_PAIR = KeyPairFactory.rsa().generate();
 
     private KeyStore keyStore;
 
