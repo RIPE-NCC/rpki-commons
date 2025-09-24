@@ -10,17 +10,16 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class KeyPairFactoryTest {
 
-    public static KeyPair TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
-    public static KeyPair SECOND_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getRsaInstance().generate();
+    public static KeyPair TEST_KEY_PAIR = KeyPairFactory.rsa().generate();
+    public static KeyPair SECOND_TEST_KEY_PAIR = KeyPairFactory.rsa().generate();
 
-    public static KeyPair TEST_EC_KEY_PAIR = PregeneratedKeyPairFactory.getEcInstance().generate();
-    public static KeyPair SECOND_EC_TEST_KEY_PAIR = PregeneratedKeyPairFactory.getEcInstance().generate();
+    public static KeyPair TEST_EC_KEY_PAIR = KeyPairFactory.bgpSec().generate();
+    public static KeyPair SECOND_EC_TEST_KEY_PAIR = KeyPairFactory.bgpSec().generate();
 
     private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<>();
 
@@ -28,7 +27,7 @@ public class KeyPairFactoryTest {
         synchronized (cachedKeyPairs) {
             KeyPair result = cachedKeyPairs.get(name);
             if (result == null) {
-                result = PregeneratedKeyPairFactory.getInstance().generate();
+                result = KeyPairFactory.rsa().generate();
                 cachedKeyPairs.put(name, result);
             }
             return result;
@@ -50,8 +49,8 @@ public class KeyPairFactoryTest {
     }
 
     @Test
-    public void shouldGenerateEcKeyPairsWhenAsked() {
-        KeyPair keyPair = new KeyPairFactory(KeyPairFactory.DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER).generateEC();
+    public void shouldGenerateBgpSecKeyPairsWhenAsked() {
+        KeyPair keyPair = KeyPairFactory.bgpSec().generate();
         assertTrue(keyPair.getPublic() instanceof ECPublicKey);
         assertTrue(keyPair.getPrivate() instanceof ECPrivateKey);
 

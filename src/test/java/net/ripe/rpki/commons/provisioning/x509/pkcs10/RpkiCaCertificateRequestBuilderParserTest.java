@@ -1,6 +1,6 @@
 package net.ripe.rpki.commons.provisioning.x509.pkcs10;
 
-import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactory;
 import net.ripe.rpki.commons.provisioning.ProvisioningObjectMother;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ public class RpkiCaCertificateRequestBuilderParserTest {
         URI caRepositoryUri = URI.create("rsync://host/module/subdir/");
         URI manifestUri = URI.create("rsync://host/module/subdir/subject.mft");
         X500Principal subject = new X500Principal("CN=subject");
-        KeyPair keyPair = PregeneratedKeyPairFactory.getRsaInstance().generate();
+        KeyPair keyPair = KeyPairFactory.rsa().generate();
 
         requestBuilder.withCaRepositoryUri(caRepositoryUri);
         requestBuilder.withManifestUri(manifestUri);
