@@ -1,15 +1,18 @@
 package net.ripe.rpki.commons.ta.domain.request;
 
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
-import net.ripe.rpki.commons.util.EqualsSupport;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.Serializable;
 import java.security.PublicKey;
 
-public class ResourceCertificateRequestData extends EqualsSupport implements Serializable {
+@Getter
+@EqualsAndHashCode
+public class ResourceCertificateRequestData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,25 +48,5 @@ public class ResourceCertificateRequestData extends EqualsSupport implements Ser
         this.encodedSubjectPublicKey = encodedSubjectPublicKey;
         this.subjectInformationAccess = subjectInformationAccess;
         this.ipResourceSet = ipResourceSet;
-    }
-
-    public String getResourceClassName() {
-        return resourceClassName;
-    }
-
-    public X500Principal getSubjectDN() {
-        return subjectDN;
-    }
-
-    public byte[] getEncodedSubjectPublicKey() {
-        return encodedSubjectPublicKey;
-    }
-
-    public X509CertificateInformationAccessDescriptor[] getSubjectInformationAccess() {
-        return subjectInformationAccess;
-    }
-
-    public IpResourceSet getIpResourceSet() {
-        return ipResourceSet;
     }
 }
