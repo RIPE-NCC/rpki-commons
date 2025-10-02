@@ -303,7 +303,7 @@ public final class X509CertificateBuilderHelper {
 
 
     private void addBgpExtension(X509v3CertificateBuilder generator) throws CertIOException {
-        generator.addExtension(Extension.extendedKeyUsage, true,
+        generator.addExtension(Extension.extendedKeyUsage, false,
                 new ExtendedKeyUsage(KeyPurposeId.getInstance(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER)));
     }
 
