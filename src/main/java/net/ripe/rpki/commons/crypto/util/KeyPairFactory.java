@@ -24,8 +24,17 @@ public class KeyPairFactory {
         this.provider = provider;
     }
 
+    // This is for something like backwards compatibility -- use RSA unless specified otherwise
     public KeyPair generate() {
+        return generateRsa();
+    }
+
+    public KeyPair generateRsa() {
         return getRsaGenerator(provider).generateKeyPair();
+    }
+
+    public KeyPair generateEc() {
+        return getEcGenerator(provider).generateKeyPair();
     }
 
     public interface Generator {
