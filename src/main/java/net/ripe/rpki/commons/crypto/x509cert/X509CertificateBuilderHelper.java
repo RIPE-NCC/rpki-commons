@@ -7,6 +7,7 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactory;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
@@ -330,10 +331,10 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(signingKeyPair, "no signingKeyPair");
         Validate.notNull(validityPeriod, "no validityPeriod");
         if (router) {
-            Validate.isTrue("EC".equals(publicKey.getAlgorithm()),
+            Validate.isTrue(KeyPairFactory.ECDSA_ALGORITHM.equals(publicKey.getAlgorithm()),
                     "publicKey algorithm is " + publicKey.getAlgorithm() + " and not EC which is required for BGPSec certificates");
         } else {
-            Validate.isTrue("RSA".equals(publicKey.getAlgorithm()), "publicKey algorithm is " + publicKey.getAlgorithm() + " and not RSA");
+            Validate.isTrue(KeyPairFactory.RSA_ALGORITHM.equals(publicKey.getAlgorithm()), "publicKey algorithm is " + publicKey.getAlgorithm() + " and not RSA");
         }
         if (!ca) {
             Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
