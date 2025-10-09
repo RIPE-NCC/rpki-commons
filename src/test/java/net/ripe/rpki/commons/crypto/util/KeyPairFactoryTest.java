@@ -62,6 +62,16 @@ public class KeyPairFactoryTest {
     }
 
     @Test(expected = RuntimeException.class)
+    public void shouldFailToGenerateWithMismatchingAlgorithm() {
+        new KeyPairFactory(KeyPairFactory.DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER).generateRsa();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void shouldFailToGenerateWithMismatchingAlgorithm_2() {
+        new KeyPairFactory(KeyPairFactory.DEFAULT_RSA_KEYPAIR_GENERATOR_PROVIDER).generateEc();
+    }
+
+    @Test(expected = RuntimeException.class)
     public void shouldDecodePublicKeyFailOnInvalidInput() {
         KeyPairFactory.decodePublicKey(new byte[]{0});
     }
