@@ -63,9 +63,11 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ## Changelog
 
 ## Unreleased
+  * Delete PregenerateKeyFactory, it introduced a lot of complexity but no measurable speedup.
+  * Rework API of the KeyPairFactory for better separating EC and RSA keys
+  * Refactor certificate object hierarchy
 
 ## 2025-08-14 1.41
-
   * Remove Saxon-HE dependency
   * Dependency updates
 
