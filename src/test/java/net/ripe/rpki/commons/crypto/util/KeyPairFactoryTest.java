@@ -7,6 +7,8 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +20,19 @@ public class KeyPairFactoryTest {
     public static KeyPair SECOND_TEST_KEY_PAIR = KeyPairFactory.rsa().generate();
 
     public static KeyPair TEST_EC_KEY_PAIR = KeyPairFactory.bgpSec().generate();
+
+    private static final Map<String, KeyPair> cachedKeyPairs = new HashMap<>();
+
+    public static KeyPair getKeyPair(String name) {
+        synchronized (cachedKeyPairs) {
+            KeyPair result = cachedKeyPairs.get(name);
+            if (result == null) {
+                result = KeyPairFactory.rsa().generate();
+                cachedKeyPairs.put(name, result);
+            }
+            return result;
+        }
+    }
 
     @Test
     public void shouldGenerateRsaKeyPairsByDefault() {
