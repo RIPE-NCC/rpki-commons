@@ -10,24 +10,12 @@ import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SignatureException;
-import java.security.cert.CertificateException;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class X509RouterCertificateTest {
-
-    private static final URI MFT_URI = URI.create("rsync://host.foo/bar/ta.mft");
-    private static final URI PUB_DIR_URI = URI.create("rsync://host.foo/bar/");
 
     public static final X500Principal TEST_SELF_SIGNED_CERTIFICATE_NAME = new X500Principal("CN=TEST-SELF-SIGNED-CERT");
 
@@ -46,7 +34,7 @@ public class X509RouterCertificateTest {
         builder.withIssuerDN(TEST_SELF_SIGNED_CERTIFICATE_NAME);
         builder.withSerial(TEST_SERIAL_NUMBER);
         builder.withValidityPeriod(TEST_VALIDITY_PERIOD);
-        builder.withPublicKey(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
+        builder.withPublicKey(KeyPairFactoryTest.TEST_EC_KEY_PAIR.getPublic());
         builder.withSigningKeyPair(KeyPairFactoryTest.TEST_KEY_PAIR);
         builder.withAuthorityKeyIdentifier(true);
         builder.withAsns(new int[] {1, 22, 333});
@@ -113,13 +101,13 @@ public class X509RouterCertificateTest {
     }
 
     @Test
-    public void shouldHaveValidSignature() throws InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
+    public void shouldHaveValidSignature() throws Exception {
         X509RouterCertificate certificate = createSelfSignedRouterCertificateBuilder().build();
         certificate.getCertificate().verify(KeyPairFactoryTest.TEST_KEY_PAIR.getPublic());
     }
 
     @Test(expected = SignatureException.class)
-    public void shouldFailOnInvalidSignature() throws InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
+    public void shouldFailOnInvalidSignature() throws Exception {
         X509RouterCertificate certificate = createSelfSignedRouterCertificateBuilder().build();
         certificate.getCertificate().verify(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic());
     }

@@ -1,7 +1,7 @@
 package net.ripe.rpki.commons.provisioning.x509;
 
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
 import net.ripe.rpki.commons.util.UTC;
 import org.joda.time.DateTime;
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 public class ProvisioningCmsCertificateBuilderTest {
 
-    public static final KeyPair EE_KEYPAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    public static final KeyPair EE_KEYPAIR = KeyPairFactory.rsa().generate();
 
     public static final ProvisioningCmsCertificate TEST_CMS_CERT = getTestProvisioningCmsCertificate();
 

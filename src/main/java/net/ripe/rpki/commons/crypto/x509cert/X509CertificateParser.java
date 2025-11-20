@@ -57,13 +57,13 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     /**
      * Parse a certificate and return a parsed certificate of the correct (router or resource certificate) type.
      */
-    public static X509GenericCertificate parseCertificate(ValidationResult result, byte[] encoded) {
+    public static X509ResourceCertificate parseCertificate(ValidationResult result, byte[] encoded) {
         final X509Certificate certificate = parseEncoded(encoded, result);
         if (result.hasFailureForCurrentLocation()) {
             return null;
         }
 
-        X509CertificateParser<? extends X509GenericCertificate> parser;
+        X509CertificateParser<? extends X509ResourceCertificate> parser;
         if (X509CertificateUtil.isRouter(certificate)) {
             parser = new X509RouterCertificateParser();
         } else  {

@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
-import net.ripe.rpki.commons.crypto.x509cert.X509GenericCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.provisioning.payload.common.CertificateElement;
@@ -57,7 +56,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
     protected X509ResourceCertificate parseX509ResourceCertificate(String base64) {
         ValidationResult result = ValidationResult.withLocation("certificate.cer").withoutStoringPassingChecks();
-        X509GenericCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, BASE64_DECODER.decode(base64.trim()));
+        X509ResourceCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, BASE64_DECODER.decode(base64.trim()));
         if (result.hasFailureForCurrentLocation()) {
             throw new DomXmlSerializerException("resource certificate validation failed: " + result);
         } else if (certificate instanceof X509ResourceCertificate) {
