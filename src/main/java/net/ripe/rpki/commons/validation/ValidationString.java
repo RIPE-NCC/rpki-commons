@@ -35,6 +35,7 @@ public final class ValidationString {
     public static final String KEY_USAGE_INVALID = "cert.key.usage.invalid";
     public static final String PUBLIC_KEY_CERT_ALGORITHM = "cert.public.key.algorithm";
     public static final String PUBLIC_KEY_CERT_SIZE = "cert.public.key.size";
+    public static final String PUBLIC_KEY_CERT_VALUE = "cert.public.key.value";
     public static final String KEY_CERT_SIGN = "cert.key.cert.sign";
     public static final String CRL_SIGN = "cert.crl.sign";
     public static final String DIG_SIGN = "cert.dig.sign";
@@ -101,6 +102,9 @@ public final class ValidationString {
 
     // router certificate
     public static final String BGPSEC_EXT_PRESENT = "cert.bgpsec.ext.present";
+    public static final String BGPSEC_EXT_CRITICAL = "cert.bgpsec.ext.critical";
+    public static final String BGPSEC_INHERITS_RESOURCES = "cert.bgpsec.resource.uses.inherit";
+    public static final String BGPSEC_RESOURCES_EMPTY = "cert.bgpsec.resource.empty";
 
     //cms object
     public static final String CMS_DATA_PARSING = "cms.signed.data.parsing";

@@ -78,15 +78,25 @@ public class X509RouterCertificateParserTest {
         assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
     }
 
+    public void shouldFailOnNonECPublicKey() throws CertificateEncodingException {
+        X509RouterCertificateBuilder builder = X509RouterCertificateBuilderTest.createSelfSignedRouterCertificateBuilder().withPublicKey(SECOND_TEST_KEY_PAIR.getPublic());
+        X509RouterCertificate certificate = builder.build();
+
+        subject.parse("certificate", certificate.getEncoded());
+
+        assertTrue(subject.getValidationResult().hasFailures());
+        assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
+    }
+
     @Test
     public void should_validate_key_algorithm_and_size() {
-        X509ResourceCertificateBuilder builder = X509ResourceCertificateTest.createSelfSignedCaResourceCertificateBuilder();
-        X509ResourceCertificate certificate = builder.build();
+        X509RouterCertificateBuilder builder = X509RouterCertificateBuilderTest.createSelfSignedRouterCertificateBuilder();
+        X509RouterCertificate certificate = builder.build();
 
         subject.parse("certificate", certificate.getEncoded());
 
         assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_ALGORITHM).isOk());
-        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_SIZE).isOk());
+        assertTrue(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.PUBLIC_KEY_CERT_VALUE).isOk());
     }
 
     @Test

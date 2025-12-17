@@ -4,6 +4,7 @@ import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
 import net.ripe.rpki.commons.util.UTC;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.joda.time.DateTime;
@@ -18,23 +19,28 @@ import java.security.cert.CertificateParsingException;
 import java.util.List;
 
 import static net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER;
-import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.*;
+import static net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest.SECOND_TEST_KEY_PAIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class X509RouterCertificateBuilderTest {
     private X509RouterCertificateBuilder subject;
 
+    public static X509RouterCertificateBuilder createSelfSignedRouterCertificateBuilder() {
+        X509RouterCertificateBuilder builder = new X509RouterCertificateBuilder();
+        builder.withSubjectDN(new X500Principal("CN=zz.subject")).withIssuerDN(new X500Principal("CN=zz.issuer"));
+        builder.withSerial(BigInteger.ONE);
+        builder.withPublicKey(KeyPairFactoryTest.TEST_EC_KEY_PAIR.getPublic());
+        builder.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
+        builder.withAsns(new int[]{65536});
+        DateTime now = UTC.dateTime();
+        builder.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
+        return builder;
+    }
+
     @Before
     public void setUp() {
-        subject = new X509RouterCertificateBuilder();
-        subject.withSubjectDN(new X500Principal("CN=zz.subject")).withIssuerDN(new X500Principal("CN=zz.issuer"));
-        subject.withSerial(BigInteger.ONE);
-        subject.withPublicKey(TEST_EC_KEY_PAIR.getPublic());
-        subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
-        DateTime now = UTC.dateTime();
-        subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
-        subject.withAsns(new int[]{1, 2, 3, 4, 5});
+        subject = createSelfSignedRouterCertificateBuilder();
     }
 
     @Test(expected = NullPointerException.class)

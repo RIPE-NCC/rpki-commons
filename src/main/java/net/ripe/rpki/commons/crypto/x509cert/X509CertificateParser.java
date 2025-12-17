@@ -4,7 +4,16 @@ import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionEncoder;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import org.apache.commons.lang3.ArrayUtils;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.math.ec.ECCurve;
+import org.bouncycastle.math.ec.ECPoint;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,16 +28,15 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Set;
 
-import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_PARSED;
-import static net.ripe.rpki.commons.validation.ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM;
-import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_ALGORITHM;
-import static net.ripe.rpki.commons.validation.ValidationString.PUBLIC_KEY_CERT_SIZE;
+import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class X509CertificateParser<T extends AbstractX509CertificateWrapper> {
 
     private static final String[] ALLOWED_SIGNATURE_ALGORITHM_OIDS = {
             PKCSObjectIdentifiers.sha256WithRSAEncryption.getId(),
     };
+
+    private static final ECCurve EC_256R1_CURVE = ECNamedCurveTable.getByOID(SECObjectIdentifiers.secp256r1).getCurve();
 
     protected X509Certificate certificate;
 
@@ -40,8 +48,8 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
 
     public void parse(ValidationResult validationResult, byte[] encoded) {
         this.result = validationResult;
-        final X509Certificate certificate = parseEncoded(encoded, result);
-        validateX509Certificate(validationResult, certificate);
+        final X509Certificate parsedEncodedCertificate = parseEncoded(encoded, result);
+        validateX509Certificate(validationResult, parsedEncodedCertificate);
     }
 
     public void validateX509Certificate(ValidationResult validationResult, X509Certificate certificate) {
@@ -66,7 +74,7 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
         X509CertificateParser<? extends X509ResourceCertificate> parser;
         if (X509CertificateUtil.isRouter(certificate)) {
             parser = new X509RouterCertificateParser();
-        } else  {
+        } else {
             parser = new X509ResourceCertificateParser();
         }
 
@@ -100,6 +108,42 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     void validateEcPk() {
         final PublicKey publicKey = certificate.getPublicKey();
         result.rejectIfFalse(isEcPk(publicKey), PUBLIC_KEY_CERT_ALGORITHM, publicKey.getAlgorithm());
+    }
+
+    void validateEcSecp256r1Pk() {
+        // rfc8209#3.3:
+        // o  BGPsec Router Certificates MUST include the subjectPublicKeyInfo
+        // field described in [RFC8208].
+        //
+        // PublicKey.getAlgorithm() would return "EC", more validation is required.
+        final byte[] enc = certificate.getPublicKey().getEncoded();
+        final SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(enc));
+        final AlgorithmIdentifier algorithm = subjectPublicKeyInfo.getAlgorithm();
+        final ASN1ObjectIdentifier algorithmOid = algorithm.getAlgorithm();
+
+        // https://datatracker.ietf.org/doc/html/rfc8208#section-3.1
+        // o  algorithm (an AlgorithmIdentifier type): The id-ecPublicKey OID
+        // MUST be used in the algorithm field, as specified in Section 2.1.1
+        // of [RFC5480].
+        if (result.rejectIfFalse(X9ObjectIdentifiers.id_ecPublicKey.equals(algorithmOid), PUBLIC_KEY_CERT_ALGORITHM, algorithmOid.getId())) {
+            // The value for the associated parameters MUST be
+            // secp256r1, as specified in Section 2.1.1.1 of [RFC5480].
+            ASN1ObjectIdentifier curveOid = (ASN1ObjectIdentifier) algorithm.getParameters();
+            if (result.rejectIfFalse(SECObjectIdentifiers.secp256r1.equals(curveOid), PUBLIC_KEY_CERT_ALGORITHM, curveOid.getId())) {
+                // rfc8208#3.1:
+                //    o  subjectPublicKey: ECPoint MUST be used to encode the certificate's
+                //      subjectPublicKey field, as specified in Section 2.2 of [RFC5480].
+                //
+                // To ensure this, parse the public key on the curve.
+                ECPoint ecPoint = null;
+                try {
+                    ecPoint = EC_256R1_CURVE.decodePoint(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+                } catch (IllegalArgumentException | NullPointerException e) {
+                    // Passed in public key not valid on curve
+                }
+                result.rejectIfNull(ecPoint, PUBLIC_KEY_CERT_VALUE);
+            }
+        }
     }
 
     protected void doTypeSpecificValidation() {
@@ -166,7 +210,11 @@ public abstract class X509CertificateParser<T extends AbstractX509CertificateWra
     protected boolean isBgpSecExtensionPresent() {
         try {
             final List<String> extendedKeyUsage = certificate.getExtendedKeyUsage();
-            return extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+            final boolean present = extendedKeyUsage != null && extendedKeyUsage.contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId());
+            if (present) {
+                result.warnIfTrue(certificate.getCriticalExtensionOIDs().contains(RouterExtensionEncoder.OID_KP_BGPSEC_ROUTER.getId()), BGPSEC_EXT_CRITICAL);
+            }
+            return present;
         } catch (CertificateParsingException e) {
             return false;
         }
