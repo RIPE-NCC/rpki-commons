@@ -10,7 +10,13 @@ public class KeyPairFactory {
     public static final String DEFAULT_EC_KEYPAIR_GENERATOR_PROVIDER = "SunEC";
 
     public static final String RSA_ALGORITHM = "RSA";
+
+    /**
+     * @deprecated Use {@link #RSA_ALGORITHM} or {@link #ECDSA_ALGORITHM} explicitly instead.
+     */
+    @Deprecated
     public static final String ALGORITHM = RSA_ALGORITHM;
+
     private static final BigInteger RSA_PUBLIC_EXPONENT = RSAKeyGenParameterSpec.F4;
 
     static final int RPKI_RSA_KEY_PAIR_SIZE = 2048;
