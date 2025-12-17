@@ -65,7 +65,9 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ## Unreleased
   * Delete PregenerateKeyFactory, it introduced a lot of complexity but no measurable speedup.
   * Rework API of the KeyPairFactory for better separating EC and RSA keys
+  * Improve Router certificate support
   * Refactor certificate object hierarchy
+  * Build targets JDK 17
 
 ## 2025-08-14 1.41
   * Remove Saxon-HE dependency
