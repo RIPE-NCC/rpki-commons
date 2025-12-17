@@ -56,7 +56,7 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
     }
 
     /**
-     * The AS Resources extension MUST include one or more ASNs, and the inherit" element MUST NOT be specified.
+     * The AS Resources extension MUST include one or more ASNs, and the "inherit" element MUST NOT be specified.
      */
     private void validateAsResourcesValue() {
         final ResourceExtensionParser parser = new ResourceExtensionParser();
