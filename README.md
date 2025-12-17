@@ -63,7 +63,7 @@ next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
 ## Changelog
 
 ## Unreleased
-  * Delete PregenerateKeyFactory, it introduced a lot of complexity but no measurable speedup.
+  * Delete PregeneratedKeyPairFactory, it introduced a lot of complexity but no measurable speedup.
   * Rework API of the KeyPairFactory for better separating EC and RSA keys
   * Improve Router certificate support
   * Refactor certificate object hierarchy
