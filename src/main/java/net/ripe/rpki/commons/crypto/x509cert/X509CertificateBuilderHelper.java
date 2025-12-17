@@ -332,9 +332,10 @@ public final class X509CertificateBuilderHelper {
         Validate.notNull(validityPeriod, "no validityPeriod");
         if (router) {
             Validate.isTrue(KeyPairFactory.ECDSA_ALGORITHM.equals(publicKey.getAlgorithm()),
-                    "publicKey algorithm is " + publicKey.getAlgorithm() + " and not EC which is required for BGPSec certificates");
+                    String.format("publicKey algorithm is %s and not EC which is required for BGPSec certificates", publicKey.getAlgorithm()));
         } else {
-            Validate.isTrue(KeyPairFactory.RSA_ALGORITHM.equals(publicKey.getAlgorithm()), "publicKey algorithm is " + publicKey.getAlgorithm() + " and not RSA");
+            Validate.isTrue(KeyPairFactory.RSA_ALGORITHM.equals(publicKey.getAlgorithm()),
+                    String.format("publicKey algorithm is %s and not RSA", publicKey.getAlgorithm()));
         }
         if (!ca) {
             Validate.isTrue((keyUsage & KeyUsage.keyCertSign) == 0,
