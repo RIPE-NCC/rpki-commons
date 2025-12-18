@@ -78,7 +78,7 @@ public class X509RouterCertificateParserTest {
         assertFalse(subject.getValidationResult().getResult(new ValidationLocation("certificate"), ValidationString.CERTIFICATE_SIGNATURE_ALGORITHM).isOk());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void shouldFailOnNonECPublicKey() throws CertificateEncodingException {
         X509RouterCertificateBuilder builder = X509RouterCertificateBuilderTest.createSelfSignedRouterCertificateBuilder().withPublicKey(SECOND_TEST_KEY_PAIR.getPublic());
         X509RouterCertificate certificate = builder.build();
