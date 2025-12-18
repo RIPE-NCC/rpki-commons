@@ -91,17 +91,17 @@ public class KeyPairFactory {
         return decodePKCS8PrivateKey(ECDSA_ALGORITHM, encoded);
     }
 
-    private static PublicKey decodeX509PublicKey(String rsaAlgorithm, byte[] encoded) {
+    private static PublicKey decodeX509PublicKey(String algorithm, byte[] encoded) {
         try {
-            return KeyFactory.getInstance(rsaAlgorithm).generatePublic(new X509EncodedKeySpec(encoded));
+            return KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(encoded));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new KeyPairFactoryException(e);
         }
     }
 
-    private static PrivateKey decodePKCS8PrivateKey(String rsaAlgorithm, byte[] encoded) {
+    private static PrivateKey decodePKCS8PrivateKey(String algorithm, byte[] encoded) {
         try {
-            return KeyFactory.getInstance(rsaAlgorithm).generatePrivate(new PKCS8EncodedKeySpec(encoded));
+            return KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(encoded));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new KeyPairFactoryException(e);
         }
