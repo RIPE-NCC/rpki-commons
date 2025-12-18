@@ -29,7 +29,7 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
     @Getter
     private final ResourceExtension resourceExtension;
-    private Boolean revoked;
+    protected Boolean revoked;
 
     protected X509ResourceCertificate(X509Certificate certificate) {
         super(certificate);

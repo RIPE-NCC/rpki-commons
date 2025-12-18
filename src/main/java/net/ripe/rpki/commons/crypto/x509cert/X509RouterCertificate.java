@@ -14,8 +14,6 @@ import java.security.cert.X509Certificate;
 
 public class X509RouterCertificate extends X509ResourceCertificate implements X509CertificateObject {
 
-    private Boolean revoked;
-
     protected X509RouterCertificate(X509Certificate certificate) {
         super(certificate);
     }
