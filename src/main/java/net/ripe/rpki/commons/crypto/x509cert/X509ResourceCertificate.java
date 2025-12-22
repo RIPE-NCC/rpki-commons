@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import lombok.Getter;
 import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
@@ -22,22 +23,18 @@ import java.util.EnumSet;
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.
  */
-public class X509ResourceCertificate extends X509GenericCertificate implements X509CertificateObject {
+public class X509ResourceCertificate extends AbstractX509CertificateWrapper implements X509CertificateObject {
 
     private static final long serialVersionUID = 3L;
 
+    @Getter
     private final ResourceExtension resourceExtension;
-    private Boolean revoked;
-
+    protected Boolean revoked;
 
     protected X509ResourceCertificate(X509Certificate certificate) {
         super(certificate);
         ResourceExtensionParser parser = new ResourceExtensionParser();
         resourceExtension = parser.parse(certificate);
-    }
-
-    public ResourceExtension getResourceExtension() {
-        return resourceExtension;
     }
 
     public ImmutableResourceSet resources() {

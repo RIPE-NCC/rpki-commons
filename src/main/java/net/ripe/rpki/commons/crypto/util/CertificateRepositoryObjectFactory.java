@@ -12,7 +12,7 @@ import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCmsParser;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCms;
 import net.ripe.rpki.commons.crypto.cms.roa.RoaCmsParser;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
-import net.ripe.rpki.commons.crypto.x509cert.X509GenericCertificate;
+import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.util.RepositoryObjectType;
 import net.ripe.rpki.commons.validation.ValidationChecks;
@@ -68,9 +68,9 @@ public final class CertificateRepositoryObjectFactory {
         return X509Crl.parseDerEncoded(encoded, validationResult);
     }
 
-    private static X509GenericCertificate parseX509Certificate(byte[] encoded, ValidationResult validationResult) {
+    private static X509ResourceCertificate parseX509Certificate(byte[] encoded, ValidationResult validationResult) {
         final ValidationResult temp = ValidationResult.withLocation(validationResult.getCurrentLocation());
-        X509GenericCertificate cert = X509ResourceCertificateParser.parseCertificate(temp, encoded);
+        X509ResourceCertificate cert = X509ResourceCertificateParser.parseCertificate(temp, encoded);
         validationResult.addAll(temp);
         return cert;
     }

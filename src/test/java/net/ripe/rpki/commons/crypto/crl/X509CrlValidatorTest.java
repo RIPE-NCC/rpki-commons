@@ -2,7 +2,7 @@ package net.ripe.rpki.commons.crypto.crl;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
-import net.ripe.rpki.commons.crypto.util.PregeneratedKeyPairFactory;
+import net.ripe.rpki.commons.crypto.util.KeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.util.UTC;
@@ -38,8 +38,8 @@ public class X509CrlValidatorTest {
         VALIDITY_PERIOD = new ValidityPeriod(now.minusDays(2), now.plusDays(2));
     }
 
-    private static final KeyPair ROOT_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
-    private static final KeyPair FIRST_CHILD_KEY_PAIR = PregeneratedKeyPairFactory.getInstance().generate();
+    private static final KeyPair ROOT_KEY_PAIR = KeyPairFactory.rsa().generate();
+    private static final KeyPair FIRST_CHILD_KEY_PAIR = KeyPairFactory.rsa().generate();
 
     private X509CrlValidator subject;
     private X509ResourceCertificate parent;
