@@ -1,6 +1,6 @@
 package net.ripe.rpki.commons.crypto;
 
-import org.apache.commons.lang3.Validate;
+import static java.util.Objects.requireNonNull;
 
 public class CertificateRepositoryObjectFile<T extends CertificateRepositoryObject> {
 
@@ -12,9 +12,9 @@ public class CertificateRepositoryObjectFile<T extends CertificateRepositoryObje
 
 
     public CertificateRepositoryObjectFile(Class<T> expectedType, String name, byte[] content) { //NOPMD - ArrayIsStoredDirectly
-        Validate.notNull(expectedType);
-        Validate.notNull(name);
-        Validate.notNull(content);
+        requireNonNull(expectedType);
+        requireNonNull(name);
+        requireNonNull(content);
         this.expectedType = expectedType;
         this.name = name;
         this.content = content;

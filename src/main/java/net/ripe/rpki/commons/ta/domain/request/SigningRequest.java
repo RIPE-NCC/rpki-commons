@@ -1,8 +1,6 @@
 package net.ripe.rpki.commons.ta.domain.request;
 
-
-
-import org.apache.commons.lang3.Validate;
+import static java.util.Objects.requireNonNull;
 
 public class SigningRequest extends TaRequest {
 
@@ -11,7 +9,7 @@ public class SigningRequest extends TaRequest {
     private final ResourceCertificateRequestData resourceCertificateRequest;
 
     public SigningRequest(ResourceCertificateRequestData resourceCertificateRequest) {
-        Validate.notNull(resourceCertificateRequest, "resourceCertificateRequest is required");
+        requireNonNull(resourceCertificateRequest, "resourceCertificateRequest is required");
         this.resourceCertificateRequest = resourceCertificateRequest;
     }
 

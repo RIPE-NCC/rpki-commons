@@ -7,7 +7,6 @@ import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
 import net.ripe.rpki.commons.crypto.rfc8209.RouterExtensionEncoder;
 import net.ripe.rpki.commons.crypto.util.Asn1Util;
 import net.ripe.rpki.commons.validation.ValidationResult;
-import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
@@ -45,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 
 public final class X509CertificateUtil {
@@ -72,7 +72,7 @@ public final class X509CertificateUtil {
             if (extensionValue == null) {
                 return null;
             }
-            return AuthorityKeyIdentifier.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getKeyIdentifier();
+            return AuthorityKeyIdentifier.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getKeyIdentifierOctets();
         } catch (IOException e) {
             throw new X509CertificateOperationException("Can not get AuthorityKeyIdentifier for certificate", e);
         }
@@ -179,12 +179,12 @@ public final class X509CertificateUtil {
     }
 
     public static URI findFirstAuthorityInformationAccessByMethod(X509Certificate certificate, ASN1ObjectIdentifier method) {
-        Validate.notNull(method, "method is null");
+        requireNonNull(method, "method is null");
         return findFirstByMethod(method, RSYNC, getAuthorityInformationAccess(certificate));
     }
 
     public static URI findFirstSubjectInformationAccessByMethod(X509Certificate certificate, ASN1ObjectIdentifier method) {
-        Validate.notNull(method, "method is null");
+        requireNonNull(method, "method is null");
         return findFirstByMethod(method, RSYNC, getSubjectInformationAccess(certificate));
     }
 

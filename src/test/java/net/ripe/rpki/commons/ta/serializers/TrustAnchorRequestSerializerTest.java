@@ -1,14 +1,9 @@
 package net.ripe.rpki.commons.ta.serializers;
 
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
-import net.ripe.rpki.commons.ta.domain.request.ResourceCertificateRequestData;
-import net.ripe.rpki.commons.ta.domain.request.RevocationRequest;
-import net.ripe.rpki.commons.ta.domain.request.SigningRequest;
-import net.ripe.rpki.commons.ta.domain.request.TaRequest;
-import net.ripe.rpki.commons.ta.domain.request.TrustAnchorRequest;
+import net.ripe.rpki.commons.ta.domain.request.*;
 import net.ripe.rpki.commons.util.XML;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Base64;
@@ -29,13 +24,12 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
 import static net.ripe.rpki.commons.ta.serializers.Utils.cleanupBase64;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class TrustAnchorRequestSerializerTest {
 
@@ -51,7 +45,7 @@ public class TrustAnchorRequestSerializerTest {
 
     @Before
     public void loadState() throws IOException, SAXException, ParserConfigurationException {
-        final String stateXML = Files.asCharSource(new File(TA_REQUEST_PATH), Charsets.UTF_8).read();
+        final String stateXML = Files.asCharSource(new File(TA_REQUEST_PATH), StandardCharsets.UTF_8).read();
 
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         request = trustAnchorRequestSerializer.deserialize(stateXML);
@@ -371,7 +365,7 @@ public class TrustAnchorRequestSerializerTest {
     @Test
     public void itShouldDeserializeLegacyXmlRequestElements() throws IOException {
 
-        final String stateXML = Files.asCharSource(new File(LEGACY_TA_REQUEST_PATH), Charsets.UTF_8).read();
+        final String stateXML = Files.asCharSource(new File(LEGACY_TA_REQUEST_PATH), StandardCharsets.UTF_8).read();
 
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         final TrustAnchorRequest trustAnchorRequest = trustAnchorRequestSerializer.deserialize(stateXML);
@@ -385,7 +379,7 @@ public class TrustAnchorRequestSerializerTest {
     @Test
     public void itShouldDeserializeXmlWithoutTaCertificatePublicationUriElement() throws IOException {
 
-        final String stateXML = Files.asCharSource(new File(TA_REQUEST_NO_TA_URI_PATH), Charsets.UTF_8).read();
+        final String stateXML = Files.asCharSource(new File(TA_REQUEST_NO_TA_URI_PATH), StandardCharsets.UTF_8).read();
 
         final TrustAnchorRequestSerializer trustAnchorRequestSerializer = new TrustAnchorRequestSerializer();
         final TrustAnchorRequest trustAnchorRequest = trustAnchorRequestSerializer.deserialize(stateXML);

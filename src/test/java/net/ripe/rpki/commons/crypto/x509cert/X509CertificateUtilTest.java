@@ -1,13 +1,14 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.CharSource;
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -19,10 +20,10 @@ public class X509CertificateUtilTest {
 
     @Test
     public void shouldGetEncodedSubjectPublicKeyInfo() throws CertificateEncodingException, IOException {
-        X509ResourceCertificate cert1 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES).build();
+        X509ResourceCertificate cert1 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(new IpResourceSet(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES)).build();
         String encoded1 = X509CertificateUtil.getEncodedSubjectPublicKeyInfo(cert1.getCertificate());
 
-        X509ResourceCertificate cert2 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES).build();
+        X509ResourceCertificate cert2 = X509ResourceCertificateTest.createSelfSignedCaCertificateBuilder().withResources(new IpResourceSet(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES)).build();
         String encoded2 = X509CertificateUtil.getEncodedSubjectPublicKeyInfo(cert2.getCertificate());
 
         assertNotNull(encoded1);
@@ -60,12 +61,10 @@ public class X509CertificateUtilTest {
     @Ignore
     public void shouldParseRrdpRepositoryUrl() throws java.security.cert.CertificateException, IOException {
         final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        X509Certificate certificate = (X509Certificate) factory.generateCertificate(CharSource.wrap(CERT_WITH_RRDP_URL).asByteSource(Charsets.UTF_8).openStream());
+        X509Certificate certificate = (X509Certificate) factory.generateCertificate(CharSource.wrap(CERT_WITH_RRDP_URL).asByteSource(StandardCharsets.UTF_8).openStream());
 
         URI rrdpNotifyUri = X509CertificateUtil.getRrdpNotifyUri(certificate);
 
         assertEquals(URI.create("http://localhost:8080/rpki-ca/notify/notify.xml"), rrdpNotifyUri);
     }
 }
-
-

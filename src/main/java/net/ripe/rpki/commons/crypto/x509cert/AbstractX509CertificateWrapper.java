@@ -4,7 +4,6 @@ import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationStatus;
 import net.ripe.rpki.commons.validation.ValidationString;
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -21,6 +20,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractX509CertificateWrapper implements Serializable {
 
@@ -39,7 +40,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
     private final boolean ca;
 
     protected AbstractX509CertificateWrapper(X509Certificate certificate) {
-        Validate.notNull(certificate);
+        requireNonNull(certificate);
         this.certificate = certificate;
         this.ca = X509CertificateUtil.isCa(certificate);
     }

@@ -8,6 +8,8 @@ import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A route announced on BGP.
  */
@@ -19,7 +21,7 @@ public final class AnnouncedRoute implements Serializable, RouteData {
     private final IpRange prefix;
 
     public AnnouncedRoute(Asn originAsn, IpRange prefix) {
-        Validate.notNull(originAsn, "origin is required");
+        requireNonNull(originAsn, "origin is required");
         Validate.isTrue(prefix.isLegalPrefix(), "Prefix must be legal");
         this.originAsn = originAsn;
         this.prefix = prefix;

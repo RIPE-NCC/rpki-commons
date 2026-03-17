@@ -7,6 +7,8 @@ import org.apache.commons.lang3.Validate;
 import java.net.URI;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 public class CertificateElementBuilder {
 
     private List<URI> certificatePublishedLocations;
@@ -31,7 +33,7 @@ public class CertificateElementBuilder {
     public CertificateElement build() {
         boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(certificatePublishedLocations);
         Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
-        Validate.notNull(certificate, "No certificate provided");
+        requireNonNull(certificate, "No certificate provided");
 
         return new CertificateElement()
                 .setIssuerCertificatePublicationLocation(certificatePublishedLocations)

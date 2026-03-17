@@ -14,6 +14,8 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.EnumSet;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Generic Builder for X509RouterCertificates.
  */
@@ -109,7 +111,7 @@ public class X509RouterCertificateBuilder {
     }
 
     public X509RouterCertificate build() {
-        Validate.notNull(asns, "no AS resources");
+        requireNonNull(asns, "no AS resources");
         Validate.isTrue(asns.length > 0, "empty AS resources");
         builderHelper.withRouter(true);
         builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);

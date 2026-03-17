@@ -290,6 +290,7 @@
                 <configuration>
                     <source>${java.language.version}</source>
                     <target>${java.runtime.version}</target>
+                    <release>${java.runtime.version}</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -303,6 +304,7 @@
                         <arg>-Xlint:all</arg>
                         <arg>-Xlint:-processing</arg>
                         <arg>-Xlint:-serial</arg>
+                        <arg>-Werror</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>

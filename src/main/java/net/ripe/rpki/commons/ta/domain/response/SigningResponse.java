@@ -1,11 +1,11 @@
 package net.ripe.rpki.commons.ta.domain.response;
 
-
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
-import org.apache.commons.lang3.Validate;
 
 import java.net.URI;
 import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 public class SigningResponse extends TaResponse {
 
@@ -17,9 +17,9 @@ public class SigningResponse extends TaResponse {
 
     public SigningResponse(UUID requestId, String resourceClassName, URI publicationUri, X509ResourceCertificate certificate) {
         super(requestId);
-        Validate.notNull(resourceClassName, "resourceClassName is required");
-        Validate.notNull(publicationUri, "publicationUri is required");
-        Validate.notNull(certificate, "certificate is required");
+        requireNonNull(resourceClassName, "resourceClassName is required");
+        requireNonNull(publicationUri, "publicationUri is required");
+        requireNonNull(certificate, "certificate is required");
         this.resourceClassName = resourceClassName;
         this.publicationUri = publicationUri;
         this.certificate = certificate;

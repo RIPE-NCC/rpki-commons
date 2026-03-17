@@ -1,15 +1,14 @@
 package net.ripe.rpki.commons.ta.serializers;
 
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObject;
 import net.ripe.rpki.commons.crypto.cms.manifest.ManifestCms;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateObject;
+import net.ripe.rpki.commons.ta.domain.response.SigningResponse;
 import net.ripe.rpki.commons.ta.domain.response.TaResponse;
 import net.ripe.rpki.commons.ta.domain.response.TrustAnchorResponse;
-import net.ripe.rpki.commons.ta.domain.response.SigningResponse;
 import net.ripe.rpki.commons.util.XML;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
@@ -22,21 +21,16 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TrustAnchorResponseSerializerTest {
     private static final String TA_RESPONSE_PATH = "src/test/resources/ta/ta-response.xml";
@@ -49,7 +43,7 @@ public class TrustAnchorResponseSerializerTest {
 
     @Before
     public void loadState() throws IOException, SAXException, ParserConfigurationException {
-        final String responseXML = Files.asCharSource(new File(TA_RESPONSE_PATH), Charsets.UTF_8).read();
+        final String responseXML = Files.asCharSource(new File(TA_RESPONSE_PATH), StandardCharsets.UTF_8).read();
 
         final TrustAnchorResponseSerializer trustAnchorResponseSerializer = new TrustAnchorResponseSerializer();
         response = trustAnchorResponseSerializer.deserialize(responseXML);
@@ -140,7 +134,7 @@ public class TrustAnchorResponseSerializerTest {
 
     @Test
     public void shouldSerialiseAndDeserialise() throws IOException {
-        final String responseXML = Files.asCharSource(new File(TA_RESPONSE_PATH), Charsets.UTF_8).read();
+        final String responseXML = Files.asCharSource(new File(TA_RESPONSE_PATH), StandardCharsets.UTF_8).read();
 
         final TrustAnchorResponseSerializer trustAnchorResponseSerializer = new TrustAnchorResponseSerializer();
         TrustAnchorResponse response = trustAnchorResponseSerializer.deserialize(responseXML);
