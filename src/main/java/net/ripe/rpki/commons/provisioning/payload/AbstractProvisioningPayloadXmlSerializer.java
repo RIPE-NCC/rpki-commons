@@ -59,11 +59,11 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         X509ResourceCertificate certificate = X509ResourceCertificateParser.parseCertificate(result, BASE64_DECODER.decode(base64.trim()));
         if (result.hasFailureForCurrentLocation()) {
             throw new DomXmlSerializerException("resource certificate validation failed: " + result);
-        } else if (certificate instanceof X509ResourceCertificate) {
-            return (X509ResourceCertificate) certificate;
-        } else {
+        }
+        if (certificate == null) {
             throw new DomXmlSerializerException("certificate is not a resource certificate: " + certificate);
         }
+        return certificate;
     }
 
     @Override
