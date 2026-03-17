@@ -290,6 +290,7 @@
                 <configuration>
                     <source>${java.language.version}</source>
                     <target>${java.runtime.version}</target>
+                    <release>${java.runtime.version}</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
