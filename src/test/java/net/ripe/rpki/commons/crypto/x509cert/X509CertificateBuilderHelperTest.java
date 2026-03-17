@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import net.ripe.ipresource.ImmutableResourceSet;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
@@ -39,7 +40,7 @@ public class X509CertificateBuilderHelperTest {
         subject.withSigningKeyPair(SECOND_TEST_KEY_PAIR);
         DateTime now = UTC.dateTime();
         subject.withValidityPeriod(new ValidityPeriod(now, new DateTime(now.getYear() + 1, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)));
-        subject.withResources(IpResourceSet.ALL_PRIVATE_USE_RESOURCES);
+        subject.withResources(new IpResourceSet(ImmutableResourceSet.ALL_PRIVATE_USE_RESOURCES));
     }
 
     @Test
