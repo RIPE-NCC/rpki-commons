@@ -72,7 +72,7 @@ public final class X509CertificateUtil {
             if (extensionValue == null) {
                 return null;
             }
-            return AuthorityKeyIdentifier.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getKeyIdentifier();
+            return AuthorityKeyIdentifier.getInstance(JcaX509ExtensionUtils.parseExtensionValue(extensionValue)).getKeyIdentifierOctets();
         } catch (IOException e) {
             throw new X509CertificateOperationException("Can not get AuthorityKeyIdentifier for certificate", e);
         }

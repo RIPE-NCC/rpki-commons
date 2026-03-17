@@ -36,7 +36,7 @@ public class CertificateRepositoryObjectPrinterTest {
     public void shouldPrintManifestCms() throws IOException {
         ManifestCms manifest = ManifestCmsTest.getRootManifestCms();
         String aki = new String(Hex.encode(BouncyCastleUtil.createAuthorityKeyIdentifier(
-                ManifestCmsTest.ROOT_KEY_PAIR.getPublic()).getKeyIdentifier()));
+                ManifestCmsTest.ROOT_KEY_PAIR.getPublic()).getKeyIdentifierOctets()));
         StringWriter output = new StringWriter();
         CertificateRepositoryObjectPrinter.print(new PrintWriter(output), manifest);
 
