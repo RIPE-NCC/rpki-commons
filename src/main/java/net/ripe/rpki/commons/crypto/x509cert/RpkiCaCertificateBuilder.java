@@ -1,9 +1,10 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
-import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 
 import java.net.URI;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Builder for X509ResourceCertificates used by RPKI CAs
@@ -46,7 +47,7 @@ public class RpkiCaCertificateBuilder extends GenericRpkiCertificateBuilder {
     protected void validateFields() {
         super.validateFields();
 
-        Validate.notNull(caRepositoryUri, "CA Repository URI is required");
-        Validate.notNull(manifestUri, "Manifest URI is required");
+        requireNonNull(caRepositoryUri, "CA Repository URI is required");
+        requireNonNull(manifestUri, "Manifest URI is required");
     }
 }

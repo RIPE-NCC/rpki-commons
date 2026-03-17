@@ -32,6 +32,8 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Fairly generic helper for X509CertificateBuilders. Intended to be used by
  * (delegated to, not extended) specific certificate builders.
@@ -320,16 +322,16 @@ public final class X509CertificateBuilderHelper {
     }
 
     private void validateCertificateFields() {
-        Validate.notNull(issuerDN, "no issuerDN");
-        Validate.notNull(subjectDN, "no subjectDN");
-        Validate.notNull(serial, "no serial");
+        requireNonNull(issuerDN, "no issuerDN");
+        requireNonNull(subjectDN, "no subjectDN");
+        requireNonNull(serial, "no serial");
         Validate.isTrue(
                 serial.compareTo(BigInteger.ZERO) > 0 && serial.compareTo(MAX_20_OCTETS) <= 0,
                 "serial number not in (0..MAX)"
         );
-        Validate.notNull(publicKey, "no publicKey");
-        Validate.notNull(signingKeyPair, "no signingKeyPair");
-        Validate.notNull(validityPeriod, "no validityPeriod");
+        requireNonNull(publicKey, "no publicKey");
+        requireNonNull(signingKeyPair, "no signingKeyPair");
+        requireNonNull(validityPeriod, "no validityPeriod");
         if (router) {
             Validate.isTrue(KeyPairFactory.ECDSA_ALGORITHM.equals(publicKey.getAlgorithm()),
                     String.format("publicKey algorithm is %s and not EC which is required for BGPSec certificates", publicKey.getAlgorithm()));

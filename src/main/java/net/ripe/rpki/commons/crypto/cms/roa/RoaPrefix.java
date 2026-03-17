@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 @ToString
 public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
     private static final Comparator<RoaPrefix> ROA_PREFIX_COMPARATOR = Comparator.comparing(RoaPrefix::getPrefix)
@@ -31,7 +33,7 @@ public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
      * @ensures that the maximumLength is valid compared to the prefix and for the address family of the prefix.
      */
     public RoaPrefix(IpRange prefix, Integer maximumLength) {
-        Validate.notNull(prefix, "prefix is required");
+        requireNonNull(prefix, "prefix is required");
         Validate.isTrue(prefix.isLegalPrefix(), "prefix is not a legal prefix");
         Validate.isTrue(maximumLength == null || (maximumLength >= prefix.getPrefixLength() && maximumLength <= prefix.getType().getBitSize()),
                 "maximum length not in range");

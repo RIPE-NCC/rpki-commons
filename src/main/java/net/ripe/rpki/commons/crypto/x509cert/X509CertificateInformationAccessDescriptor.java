@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 public class X509CertificateInformationAccessDescriptor extends EqualsSupport implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -91,13 +93,13 @@ public class X509CertificateInformationAccessDescriptor extends EqualsSupport im
     }
 
     public static String methodToString(ASN1ObjectIdentifier method) {
-        Validate.notNull(method);
+        requireNonNull(method);
         String result = METHOD_STRING_TABLE.get(method);
         return result == null ? method.toString() : result;
     }
 
     public static ASN1ObjectIdentifier stringToMethod(String method) {
-        Validate.notNull(method);
+        requireNonNull(method);
         for (Map.Entry<ASN1ObjectIdentifier, String> entry : METHOD_STRING_TABLE.entrySet()) {
             if (entry.getValue().equals(method)) {
                 return entry.getKey();

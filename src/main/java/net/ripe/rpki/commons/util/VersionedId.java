@@ -5,6 +5,8 @@ import org.apache.commons.lang3.Validate;
 import java.io.Serializable;
 import java.util.StringTokenizer;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A versioned identifier to uniquely identify a specific version of an entity.
  * This is used to implement optimistic locking.
@@ -73,7 +75,7 @@ public class VersionedId implements Serializable {
     }
 
     public static VersionedId parse(String s) {
-        Validate.notNull(s, "string required");
+        requireNonNull(s, "string required");
         StringTokenizer tokenizer = new StringTokenizer(s, ":");
         int count = tokenizer.countTokens();
         Validate.isTrue(count == 1 || count == 2, "invalid number of tokens in versioned id");

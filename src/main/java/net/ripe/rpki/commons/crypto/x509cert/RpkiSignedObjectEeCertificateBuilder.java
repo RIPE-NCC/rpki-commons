@@ -5,6 +5,8 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 
 import java.net.URI;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Builder for Embedded EE Certificates used in RpkiSignedObjects
  */
@@ -36,6 +38,6 @@ public class RpkiSignedObjectEeCertificateBuilder extends GenericRpkiCertificate
     protected void validateFields() {
         super.validateFields();
         Validate.isTrue(!isSelfSigned(), "EE Certificate can not be self-signed (use EE keypair for public and signing the object, sign this cert with parent key pair)");
-        Validate.notNull(cmsPublicationUri, "CMS Object Publication URI is required");
+        requireNonNull(cmsPublicationUri, "CMS Object Publication URI is required");
     }
 }

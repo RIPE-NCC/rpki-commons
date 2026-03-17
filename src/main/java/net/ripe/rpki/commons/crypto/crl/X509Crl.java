@@ -9,7 +9,6 @@ import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import net.ripe.rpki.commons.validation.objectvalidators.CertificateRepositoryObjectValidationContext;
-import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
@@ -38,6 +37,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static java.util.Objects.requireNonNull;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.*;
 
 public class X509Crl implements CertificateRepositoryObject {
@@ -49,12 +49,12 @@ public class X509Crl implements CertificateRepositoryObject {
     private transient X509CRL crl;
 
     public X509Crl(byte[] encoded) { //NOPMD - ArrayIsStoredDirectly
-        Validate.notNull(encoded);
+        requireNonNull(encoded);
         this.encoded = encoded;
     }
 
     public X509Crl(X509CRL crl) {
-        Validate.notNull(crl);
+        requireNonNull(crl);
         try {
             this.crl = crl;
             this.encoded = crl.getEncoded();
@@ -248,8 +248,8 @@ public class X509Crl implements CertificateRepositoryObject {
         private final DateTime revocationDateTime;
 
         public Entry(BigInteger serial, DateTime revocationDateTime) {
-            Validate.notNull(serial, "serial is required");
-            Validate.notNull(revocationDateTime, "revocationDateTime is required");
+            requireNonNull(serial, "serial is required");
+            requireNonNull(revocationDateTime, "revocationDateTime is required");
             this.serialNumber = serial;
             this.revocationDateTime = revocationDateTime.withMillisOfSecond(0);
         }

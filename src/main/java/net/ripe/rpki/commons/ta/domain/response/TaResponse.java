@@ -2,10 +2,11 @@ package net.ripe.rpki.commons.ta.domain.response;
 
 
 import net.ripe.rpki.commons.util.EqualsSupport;
-import org.apache.commons.lang3.Validate;
 
 import java.io.Serializable;
 import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class TaResponse extends EqualsSupport implements Serializable {
 
@@ -14,7 +15,7 @@ public abstract class TaResponse extends EqualsSupport implements Serializable {
     private UUID requestId;
 
     protected TaResponse(UUID requestId) {
-        Validate.notNull(requestId, "requestId is required");
+        requireNonNull(requestId, "requestId is required");
         this.requestId = requestId;
     }
 

@@ -1,8 +1,8 @@
 package net.ripe.rpki.commons.provisioning.payload.issue.response;
 
 import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
-import org.apache.commons.lang3.Validate;
 
+import static java.util.Objects.requireNonNull;
 
 /**
  * Builder for 'Certificate Issuance Response'<br >
@@ -19,7 +19,7 @@ public class CertificateIssuanceResponsePayloadBuilder extends AbstractPayloadBu
 
     @Override
     public CertificateIssuanceResponsePayload build() {
-        Validate.notNull(classElement, "Need one ClassElement");
+        requireNonNull(classElement, "Need one ClassElement");
         return new CertificateIssuanceResponsePayload(classElement);
     }
 

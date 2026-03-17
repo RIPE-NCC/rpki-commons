@@ -2,8 +2,9 @@ package net.ripe.rpki.commons.provisioning.payload.issue.request;
 
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
-import org.apache.commons.lang3.Validate;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Builder for 'Certificate Issuance Request'<br >
@@ -54,8 +55,8 @@ public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBui
 
     @Override
     public CertificateIssuanceRequestPayload build() {
-        Validate.notNull(className, "No className provided");
-        Validate.notNull(certificateRequest);
+        requireNonNull(className, "No className provided");
+        requireNonNull(certificateRequest);
         CertificateIssuanceRequestElement content = new CertificateIssuanceRequestElement()
                 .setClassName(className)
                 .setAllocatedAsn(asn)

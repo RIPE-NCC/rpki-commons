@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static java.util.Objects.requireNonNull;
+
 public class TrustAnchorResponse extends EqualsSupport implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,7 +26,7 @@ public class TrustAnchorResponse extends EqualsSupport implements Serializable {
     public TrustAnchorResponse(final Long requestCreationTimestamp,
                                final Map<URI, CertificateRepositoryObject> publishedObjects,
                                final List<TaResponse> taResponses) {
-        Validate.notNull(requestCreationTimestamp, "requestCreationTimestamp is required");
+        requireNonNull(requestCreationTimestamp, "requestCreationTimestamp is required");
         Validate.notEmpty(publishedObjects, "publishedObjects is required");
 
         this.requestCreationTimestamp = requestCreationTimestamp;
@@ -72,7 +74,7 @@ public class TrustAnchorResponse extends EqualsSupport implements Serializable {
         }
 
         public Builder addTaResponse(TaResponse taResponse) {
-            Validate.notNull(taResponse, "taResponse is required");
+            requireNonNull(taResponse, "taResponse is required");
             taResponses.add(taResponse);
             return this;
         }
@@ -85,8 +87,8 @@ public class TrustAnchorResponse extends EqualsSupport implements Serializable {
         }
 
         public Builder addPublishedObject(URI file, CertificateRepositoryObject publishedObject) {
-            Validate.notNull(file, "file is required");
-            Validate.notNull(publishedObject, "publishedObject is required");
+            requireNonNull(file, "file is required");
+            requireNonNull(publishedObject, "publishedObject is required");
             Validate.isTrue(!publishedObjects.containsKey(file), "duplicate file name");
             publishedObjects.put(file, publishedObject);
             return this;

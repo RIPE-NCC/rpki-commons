@@ -12,6 +12,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 public class GenericClassElementBuilder {
 
     private String className;
@@ -59,13 +61,13 @@ public class GenericClassElementBuilder {
     }
 
     private void validateFields() {
-        Validate.notNull(className, "No className provided");
+        requireNonNull(className, "No className provided");
         boolean rsyncUriFound = ResourceClassUtil.hasRsyncUri(certificateAuthorityUri);
         Validate.isTrue(rsyncUriFound, "No RSYNC URI provided");
 
-        Validate.notNull(issuer, "issuer certificate is required");
+        requireNonNull(issuer, "issuer certificate is required");
 
-        Validate.notNull(validityNotAfter, "Validity not after is required");
+        requireNonNull(validityNotAfter, "Validity not after is required");
         Validate.isTrue(validityNotAfter.getZone().equals(DateTimeZone.UTC), "Validity time must be in UTC timezone");
     }
 

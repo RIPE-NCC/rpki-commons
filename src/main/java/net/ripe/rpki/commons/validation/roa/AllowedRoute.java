@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
 
 /**
  * A route allowed by a ROA configuration.
@@ -26,8 +27,8 @@ public class AllowedRoute implements RoaPrefixData, Serializable {
     private final int maximumLength;
 
     public AllowedRoute(Asn asn, IpRange prefix, int maximumLength) {
-        Validate.notNull(asn, "asn is required");
-        Validate.notNull(prefix, "prefix is required");
+        requireNonNull(asn, "asn is required");
+        requireNonNull(prefix, "prefix is required");
         Validate.isTrue(maximumLength >= 0 && maximumLength <= prefix.getType().getBitSize(), "maximumLength out of bounds");
         this.asn = asn;
         this.prefix = prefix;

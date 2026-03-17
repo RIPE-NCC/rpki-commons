@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
+import static java.util.Objects.requireNonNull;
+
 public class ProvisioningCmsObjectBuilder {
 
     private static final ASN1ObjectIdentifier CONTENT_TYPE = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.1.28");
@@ -81,8 +83,8 @@ public class ProvisioningCmsObjectBuilder {
     public ProvisioningCmsObject build(PrivateKey privateKey) {
         Validate.notEmpty(payloadContent, "Payload content is required");
 
-        Validate.notNull(cmsCertificate, "cms certificate is required");
-        Validate.notNull(crl, "crl is required");
+        requireNonNull(cmsCertificate, "cms certificate is required");
+        requireNonNull(crl, "crl is required");
 
         ProvisioningCmsObjectParser parser = new ProvisioningCmsObjectParser();
         parser.parseCms("n/a", generateCms(privateKey));

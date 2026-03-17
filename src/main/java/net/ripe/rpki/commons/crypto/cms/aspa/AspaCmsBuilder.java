@@ -15,6 +15,8 @@ import org.bouncycastle.asn1.DLTaggedObject;
 
 import java.security.PrivateKey;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Creates a {@link AspaCms} using the DER encoding.
  */
@@ -70,7 +72,7 @@ public class AspaCmsBuilder extends RpkiSignedObjectBuilder {
      * </pre>
      */
     private byte[] encodeAspa() {
-        Validate.notNull(customerAsn, "Customer AS ID must not be null");
+        requireNonNull(customerAsn, "Customer AS ID must not be null");
         Validate.notEmpty(providerASSet, "ProviderASSet must not be empty");
         ASN1Encodable[] encodables = {
             // Version is needs to be 1, but needs to be explicitly tagged

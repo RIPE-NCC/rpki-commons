@@ -12,6 +12,8 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.EnumSet;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Generic Builder for X509ResourceCertificates.
  * Note that you may want to use one of the following more specific builders to build standard conform signed object EE or CA certificates:
@@ -104,7 +106,7 @@ public class X509ResourceCertificateBuilder {
 
     public X509ResourceCertificate build() {
         if (inheritedResourceTypes.isEmpty()) {
-            Validate.notNull(resources, "no resources");
+            requireNonNull(resources, "no resources");
             Validate.isTrue(!resources.isEmpty(), "empty resources");
         }
         return new X509ResourceCertificate(builderHelper.generateCertificate());

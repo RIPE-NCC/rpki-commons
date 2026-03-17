@@ -1,6 +1,5 @@
 package net.ripe.rpki.commons.validation;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTimeUtils;
@@ -16,6 +15,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 public final class ValidationResult implements Serializable {
 
@@ -104,7 +105,7 @@ public final class ValidationResult implements Serializable {
     }
 
     public boolean warnIfFalse(boolean condition, String key, String... param) {
-        Validate.notNull(key, "key is required");
+        requireNonNull(key, "key is required");
         if (condition) {
             pass(key, param);
         } else {
@@ -162,7 +163,7 @@ public final class ValidationResult implements Serializable {
     }
 
     public boolean rejectIfFalse(boolean condition, String key, String... param) {
-        Validate.notNull(key, "key is required");
+        requireNonNull(key, "key is required");
         if (condition) {
             pass(key, param);
         } else {

@@ -12,6 +12,8 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.EnumSet;
 
+import static java.util.Objects.requireNonNull;
+
 public abstract class GenericRpkiCertificateBuilder {
 
     private PublicKey publicKey;
@@ -62,7 +64,7 @@ public abstract class GenericRpkiCertificateBuilder {
 
 
     public void withCrlUri(URI crlUri) {
-        Validate.notNull(crlUri, "CRL Uri can not be null");
+        requireNonNull(crlUri, "CRL Uri can not be null");
         validateIsRsyncUri(crlUri);
         this.crlUri = crlUri;
     }
@@ -120,21 +122,21 @@ public abstract class GenericRpkiCertificateBuilder {
     }
 
     protected void validateFields() {
-        Validate.notNull(publicKey, "Public Key is required");
-        Validate.notNull(signingKeyPair, "Signing Key Pair is required");
-        Validate.notNull(serial, "Serial is required");
+        requireNonNull(publicKey, "Public Key is required");
+        requireNonNull(signingKeyPair, "Signing Key Pair is required");
+        requireNonNull(serial, "Serial is required");
         Validate.isTrue(!inheritedResourceTypes.isEmpty() || !resources.isEmpty(), "Resources are required. Inherited resources are allowed but not advised (unless you are building an EE cert for manifests)");
-        Validate.notNull(subject, "Subject is required");
-        Validate.notNull(issuer, "Issuer is required");
-        Validate.notNull(validityPeriod, "ValidityPeriod is required");
+        requireNonNull(subject, "Subject is required");
+        requireNonNull(issuer, "Issuer is required");
+        requireNonNull(validityPeriod, "ValidityPeriod is required");
 
 
         if (!isSelfSigned()) {
-            Validate.notNull(crlUri, "CRL URI is required (except for self-signed (root) certificates)");
-            Validate.notNull(parentResourceCertificatePublicationUri, "Parent Certificate Publication URI is required");
+            requireNonNull(crlUri, "CRL URI is required (except for self-signed (root) certificates)");
+            requireNonNull(parentResourceCertificatePublicationUri, "Parent Certificate Publication URI is required");
         }
 
-        Validate.notNull(signatureProvider, "SignatureProvider is required");
+        requireNonNull(signatureProvider, "SignatureProvider is required");
     }
 
 

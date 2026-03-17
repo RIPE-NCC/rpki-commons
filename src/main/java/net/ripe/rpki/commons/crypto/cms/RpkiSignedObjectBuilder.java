@@ -3,7 +3,6 @@ package net.ripe.rpki.commons.crypto.cms;
 import net.ripe.rpki.commons.crypto.util.BouncyCastleUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
-import org.apache.commons.lang3.Validate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -35,6 +34,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 public abstract class RpkiSignedObjectBuilder {
 
     protected byte[] generateCms(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, byte[] content) {
@@ -50,7 +51,7 @@ public abstract class RpkiSignedObjectBuilder {
 
     private byte[] doGenerate(X509Certificate signingCertificate, PrivateKey privateKey, String signatureProvider, ASN1ObjectIdentifier contentTypeOid, byte[] content) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertStoreException, CMSException, NoSuchProviderException, IOException, CertificateEncodingException, OperatorCreationException {
         byte[] subjectKeyIdentifier = X509CertificateUtil.getSubjectKeyIdentifier(signingCertificate);
-        Validate.notNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
+        requireNonNull(subjectKeyIdentifier, "certificate must contain SubjectKeyIdentifier extension");
 
         RPKISignedDataGenerator generator = new RPKISignedDataGenerator();
         addSignerInfo(generator, privateKey, signatureProvider, signingCertificate);

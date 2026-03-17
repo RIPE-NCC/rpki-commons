@@ -3,9 +3,10 @@ package net.ripe.rpki.commons.provisioning.payload.revocation;
 import net.ripe.rpki.commons.crypto.util.KeyPairUtil;
 import net.ripe.rpki.commons.provisioning.payload.AbstractProvisioningPayload;
 import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
-import org.apache.commons.lang3.Validate;
 
 import java.security.PublicKey;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractCertificateRevocationPayloadBuilder<T extends AbstractProvisioningPayload> extends AbstractPayloadBuilder<T> {
 
@@ -26,8 +27,8 @@ public abstract class AbstractCertificateRevocationPayloadBuilder<T extends Abst
     }
 
     protected void validateFields() {
-        Validate.notNull(className, "Classname is required");
-        Validate.notNull(publicKeyHash, "Public Key Hash is required");
+        requireNonNull(className, "Classname is required");
+        requireNonNull(publicKeyHash, "Public Key Hash is required");
     }
 
     protected String getClassName() {

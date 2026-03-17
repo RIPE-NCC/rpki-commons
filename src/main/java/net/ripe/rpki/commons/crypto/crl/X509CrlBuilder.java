@@ -27,6 +27,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
+import static java.util.Objects.requireNonNull;
+
 public class X509CrlBuilder {
 
     public static final int CRL_VERSION_2 = 2;
@@ -126,11 +128,11 @@ public class X509CrlBuilder {
     }
 
     private void validateCrlFields() {
-        Validate.notNull(issuerDN, "issuerDN is null");
-        Validate.notNull(thisUpdateTime, "thisUpdateTime is null");
-        Validate.notNull(nextUpdateTime, "nextUpdateTime is null");
-        Validate.notNull(crlNumber, "crlNumber is null");
-        Validate.notNull(authorityKeyIdentifier, "authorityKeyIdentifier is null");
+        requireNonNull(issuerDN, "issuerDN is null");
+        requireNonNull(thisUpdateTime, "thisUpdateTime is null");
+        requireNonNull(nextUpdateTime, "nextUpdateTime is null");
+        requireNonNull(crlNumber, "crlNumber is null");
+        requireNonNull(authorityKeyIdentifier, "authorityKeyIdentifier is null");
     }
 
     private X509v2CRLBuilder createCrlGenerator() throws CertIOException {
