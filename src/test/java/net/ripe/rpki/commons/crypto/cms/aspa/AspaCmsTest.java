@@ -2,12 +2,10 @@ package net.ripe.rpki.commons.crypto.cms.aspa;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.BaseEncoding;
-import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.When;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.ipresource.Asn;
-import net.ripe.ipresource.AsnGen;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactoryTest;
@@ -30,8 +28,7 @@ import java.util.List;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateBuilderHelper.DEFAULT_SIGNATURE_PROVIDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeThat;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitQuickcheck.class)
 public class AspaCmsTest {
