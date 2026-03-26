@@ -40,31 +40,26 @@
 
         <java.language.version>17</java.language.version>
         <java.runtime.version>17</java.runtime.version>
-
-        <net.ripe.ipresource.version>1.52</net.ripe.ipresource.version>
-        <bouncycastle.version>1.83</bouncycastle.version>
-        <guava.version>33.4.0-jre</guava.version>
-        <joda-time.version>2.14.1</joda-time.version>
-        <xstream.version>1.4.21</xstream.version>
-        <lombok.version>1.18.44</lombok.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+            <version>1.18.44</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>2.0.17</version>
         </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
+            <version>2.14.1</version>
         </dependency>
 
         <dependency>
@@ -76,28 +71,31 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.83</version>
         </dependency>
-
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk18on</artifactId>
+            <version>1.83</version>
         </dependency>
 
         <dependency>
             <groupId>net.ripe.ipresource</groupId>
             <artifactId>ipresource</artifactId>
-            <version>${net.ripe.ipresource.version}</version>
+            <version>1.52</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>33.4.0-jre</version>
         </dependency>
 
         <!-- For XML we use Xstream -->
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
+            <version>1.4.21</version>
         </dependency>
 
         <!-- DEPENDENCIES FOR TESTING -->
@@ -148,25 +146,24 @@
             </exclusions>
         </dependency>
 
-                <dependency>
-                        <groupId>com.pholser</groupId>
-                        <artifactId>junit-quickcheck-core</artifactId>
-                        <version>1.0</version>
-                        <scope>test</scope>
-                </dependency>
-                <dependency>
-                        <groupId>com.pholser</groupId>
-                        <artifactId>junit-quickcheck-generators</artifactId>
-                        <version>1.0</version>
-                        <scope>test</scope>
-                </dependency>
-
+        <dependency>
+            <groupId>com.pholser</groupId>
+            <artifactId>junit-quickcheck-core</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.pholser</groupId>
+            <artifactId>junit-quickcheck-generators</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Used in unit tests for Equals Hashcode tests. -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava-testlib</artifactId>
-            <version>${guava.version}</version>
+            <version>33.4.0-jre</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -179,42 +176,6 @@
                 <version>5.13.4</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcmail-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>2.0.17</version>
-            </dependency>
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>${joda-time.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.thoughtworks.xstream</groupId>
-                <artifactId>xstream</artifactId>
-                <version>${xstream.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -275,7 +236,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
+                            <version>1.18.44</version>
                         </path>
                     </annotationProcessorPaths>
                     <encoding>UTF-8</encoding>
@@ -290,7 +251,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
+                            <version>1.18.44</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
