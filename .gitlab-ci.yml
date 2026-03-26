@@ -59,6 +59,7 @@ build:
   needs: ["dependencies"]
   script:
     - mvn verify
+  coverage: '/all classes\s*\|[^|]+\|[^|]+\|[^|]+\|\s*([\d.]+)%/'
   artifacts:
     access: developer
     expose_as: rpki-commons
@@ -68,6 +69,9 @@ build:
     reports:
       junit:
         - target/surefire-reports/*.xml
+      coverage_report:
+        coverage_format: jacoco
+        path: target/site/jacoco/jacoco.xml
 
 sonarqube-analysis:
   extends: .maven
