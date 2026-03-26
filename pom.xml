@@ -35,6 +35,9 @@
         <build.number>DEV</build.number>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <sonar.projectName>rpki-commons</sonar.projectName>
+        <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
+
         <java.language.version>17</java.language.version>
         <java.runtime.version>17</java.runtime.version>
 
@@ -274,6 +277,12 @@
                           <groupId>org.apache.maven.plugins</groupId>
                           <artifactId>maven-gpg-plugin</artifactId>
                           <version>3.2.8</version>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>org.sonarsource.scanner.maven</groupId>
+                            <artifactId>sonar-maven-plugin</artifactId>
+                            <version>5.5.0.6356</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
