@@ -187,7 +187,6 @@
                 <finalName>${project.artifactId}-${project.version}</finalName>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <executions>
                             <execution>
@@ -200,7 +199,7 @@
                     </plugin>
 
                     <plugin>
-                      <artifactId>maven-gpg-plugin</artifactId>
+                        <artifactId>maven-gpg-plugin</artifactId>
                         <configuration>
                             <gpgArguments>
                                 <!-- for GPG2 -->
@@ -258,7 +257,23 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.awt.headless>true</java.awt.headless>
+                    </systemPropertyVariables>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <pushChanges>false</pushChanges>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
@@ -349,66 +364,21 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.5</version>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <java.awt.headless>true</java.awt.headless>
-                        </systemPropertyVariables>
-                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.5.0</version>
-                    <executions>
-                        <execution>
-                            <id>package</id>
-                            <goals>
-                                <goal>test-jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.12.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.2.8</version>
-                    <configuration>
-                        <gpgArguments>
-                            <!-- for GPG2 -->
-                            <argument>--pinentry-mode=loopback</argument>
-                        </gpgArguments>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.15.0</version>
-                    <configuration>
-                        <source>${java.language.version}</source>
-                        <target>${java.runtime.version}</target>
-                        <encoding>UTF-8</encoding>
-                    </configuration>
-                </plugin>
-
-                <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>3.5.0</version>
                 </plugin>
-
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.15.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.5.5</version>
+                </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
                     <version>3.1.4</version>
                 </plugin>
-
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>3.5.0</version>
@@ -416,6 +386,22 @@
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>3.4.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.12.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.2.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
@@ -436,15 +422,6 @@
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
                     <version>0.10.0</version>
-                </plugin>
-
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-release-plugin</artifactId>
-                  <version>3.2.0</version>
-                  <configuration>
-                      <pushChanges>false</pushChanges>
-                  </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
