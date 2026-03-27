@@ -1,0 +1,6 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>swe/gitlab-support//renovatebot/recommended.json"
+  ]
+}

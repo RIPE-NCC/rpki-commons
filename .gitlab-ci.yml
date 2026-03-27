@@ -1,0 +1,134 @@
+stages:
+  - build
+  - publish
+  - security
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "external"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+include:
+  - project: swe/gitlab-support
+    file: /templates/security.yml
+    inputs:
+      stage: security
+      needs: ["dependencies"]
+  - project: swe/gitlab-support
+    file: /templates/approval.yml
+    inputs:
+      stage: .post
+      label: renovatebot
+      access-token: "$APPROVAL_BOT_ACCESS_TOKEN"
+
+cache: &global_cache
+  key: "rpki-commons-$CI_COMMIT_REF_SLUG"
+  fallback_keys:
+    - "rpki-commons-$CI_DEFAULT_BRANCH"
+  policy: pull
+  paths:
+    - .m2/repository
+
+variables:
+  MAVEN_ARGS: --batch-mode --strict-checksums --fail-at-end -s .m2/settings.xml
+
+.maven:
+  image: maven:3.9.14-eclipse-temurin-17-alpine
+  before_script:
+    - apk add rsync
+
+dependencies:
+  extends: .maven
+  stage: .pre
+  cache:
+    <<: *global_cache
+    policy: pull-push
+  script:
+    - mvn dependency:go-offline
+    - mvn dependency:tree -DoutputType=json -DoutputFile=target/maven.graph.json
+  artifacts:
+    access: developer
+    paths:
+      - "target/maven.graph.json"
+    expire_in: 1 week
+
+build:
+  extends: .maven
+  stage: build
+  needs: ["dependencies"]
+  script:
+    - mvn verify
+  coverage: '/all classes\s*\|[^|]+\|[^|]+\|[^|]+\|\s*([\d.]+)%/'
+  artifacts:
+    access: developer
+    expose_as: rpki-commons
+    paths:
+      - target/rpki-commons-DEV.jar
+    expire_in: 4 weeks
+    reports:
+      junit:
+        - target/surefire-reports/*.xml
+      coverage_report:
+        coverage_format: jacoco
+        path: target/site/jacoco/jacoco.xml
+
+sonarqube-analysis:
+  extends: .maven
+  stage: build
+  needs: ["dependencies"]
+  script:
+    - mvn -Dsonar.projectKey="${SONAR_PROJECT_KEY}" test sonar:sonar
+  rules:
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate/
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      allow_failure: true
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      allow_failure: true
+    - when: on_success
+
+release:
+  extends: .maven
+  stage: publish
+  needs: ["build"]
+  variables:
+    GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    GPG_KEY: ${{ secrets.GPG_KEY }}
+    SONATYPE_CENTRAL_USERNAME: ${{ secrets.SONATYPE_CENTRAL_USERNAME }}
+    SONATYPE_CENTRAL_PASSWORD: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}
+  script: |
+    gpg --batch --no-tty --allow-secret-key-import --import - <<< "$GPG_KEY"
+    unset GPG_KEY
+    export GPG_KEYID=$(gpg --with-colon --list-secret-keys | head -n1 | cut -d : -f 5)
+
+    # GPG stuff works, do the release
+    export MAVEN_OPTS="-Dhttps.protocols=TLSv1.3,TLSv1.2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+
+    VERSION="${CI_COMMIT_TAG#rpki-commons-}"
+    echo "Releasing ${VERSION}"
+
+    mvn versions:set -DnewVersion=${VERSION}
+    mvn $MAVEN_OPTS deploy -P default,release
+    echo "done"
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^rpki-commons-/
+    - when: never
+
+sonarqube-vulnerability-report:
+  image: alpine:3.23.3
+  stage: security
+  needs: ["sonarqube-analysis"]
+  before_script:
+    - apk add curl
+  script:
+    - 'curl -f -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/issues/gitlab_sast_export?projectKey=${SONAR_PROJECT_KEY}&branch=${CI_COMMIT_BRANCH}&pullRequest=${CI_MERGE_REQUEST_IID}" -o gl-sast-sonar-report.json'
+  rules:
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate/
+      when: never
+    - when: on_success
+  artifacts:
+    access: developer
+    expire_in: 1 day
+    reports:
+      sast: gl-sast-sonar-report.json
