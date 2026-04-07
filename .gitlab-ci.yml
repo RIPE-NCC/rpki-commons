@@ -34,7 +34,7 @@ variables:
   MAVEN_ARGS: --batch-mode --strict-checksums --fail-at-end -s .m2/settings.xml
 
 .maven:
-  image: maven:3.9.14-eclipse-temurin-17-alpine
+  image: maven:3.9.14-eclipse-temurin-17-alpine@sha256:4811ba773f3c011cca77c8d22d15bb2e658d9fc1c0f3d41a16b05e543e0e9926
   before_script:
     - apk add rsync
 
@@ -116,7 +116,7 @@ release:
     - when: never
 
 sonarqube-vulnerability-report:
-  image: alpine:3.23.3
+  image: alpine:3.23.3@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659
   stage: security
   needs: ["sonarqube-analysis"]
   before_script:
