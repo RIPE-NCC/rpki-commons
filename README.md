@@ -52,13 +52,13 @@ Releasing
 ----------
 
 To release a version of rpki-commons you can push a tag
-`rpki-commons-<VERSION>`. The Github release action will build and
+`rpki-commons-<VERSION>`. The GitLab release job will build and
 publish the artifacts for `<VERSION>`. E.g. a tag `rpki-commons-1.0`
 updates the POM version to `1.0` and then builds and releases the
 artifacts.
 
-After successful deployment update the pom version to point to the
-next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
+The version defined in the POM is `DEV`, so that a stable version is used throughout
+development.
 
 ## Changelog
 
