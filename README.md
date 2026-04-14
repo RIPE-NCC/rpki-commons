@@ -52,22 +52,24 @@ Releasing
 ----------
 
 To release a version of rpki-commons you can push a tag
-`rpki-commons-<VERSION>`. The Github release action will build and
+`rpki-commons-<VERSION>`. The GitLab release job will build and
 publish the artifacts for `<VERSION>`. E.g. a tag `rpki-commons-1.0`
 updates the POM version to `1.0` and then builds and releases the
 artifacts.
 
-After successful deployment update the pom version to point to the
-next (snapshot) release, e.g. `1.1-SNAPSHOT` after releasing `1.0`.
+The version defined in the POM is `DEV`, so that a stable version is used throughout
+development.
 
 ## Changelog
 
 ## Unreleased
+
+  * Build targets JDK 17
   * Delete PregeneratedKeyPairFactory, it introduced a lot of complexity but no measurable speedup.
   * Rework API of the KeyPairFactory for better separating EC and RSA keys
   * Improve Router certificate support
   * Refactor certificate object hierarchy
-  * Build targets JDK 17
+  * Support for CCR state encoding and decoding
 
 ## 2025-08-14 1.41
   * Remove Saxon-HE dependency
