@@ -48,8 +48,8 @@ public class RoaCmsBuilderTest {
 
     @Test
     public void shouldEncodeRoaIpAddress() {
-        assertEncoded(ENCODED_ROA_IP_ADDRESS, subject.encodeRoaIpAddress(TEST_IPV4_PREFIX_1));
-        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, subject.encodeRoaIpAddress(TEST_IPV4_PREFIX_2));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS, RoaCmsBuilder.encodeRoaIpAddress(TEST_IPV4_PREFIX_1));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, RoaCmsBuilder.encodeRoaIpAddress(TEST_IPV4_PREFIX_2));
     }
 
     @Test
@@ -57,20 +57,20 @@ public class RoaCmsBuilderTest {
         var withRedundantMaxLength = new RoaPrefix(TEST_IPV4_PREFIX_2.getPrefix(), TEST_IPV4_PREFIX_2.getPrefix().getPrefixLength());
 
         // Ensure base case was already covered
-        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, subject.encodeRoaIpAddress(TEST_IPV4_PREFIX_2));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, RoaCmsBuilder.encodeRoaIpAddress(TEST_IPV4_PREFIX_2));
         // a redundant maxLength in the prefix should not be encoded -> it should result in the same encoding.
-        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, subject.encodeRoaIpAddress(withRedundantMaxLength));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_2, RoaCmsBuilder.encodeRoaIpAddress(withRedundantMaxLength));
     }
 
     @Test
     public void shouldEncodeRoaIpAddressFamily() {
-        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY, subject.encodeRoaIpAddressFamily(AddressFamily.IPV4, Set.copyOf(ipv4Prefixes)));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY, RoaCmsBuilder.encodeRoaIpAddressFamily(AddressFamily.IPV4, Set.copyOf(ipv4Prefixes)));
     }
 
     @Test
     public void shouldEncodeRoaIpAddressFamilySequence() {
-        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_IPV4, subject.encodeRoaIpAddressFamilySequence(ipv4Prefixes));
-        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_ALL, subject.encodeRoaIpAddressFamilySequence(allPrefixes));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_IPV4, RoaCmsBuilder.encodeRoaIpAddressFamilySequence(ipv4Prefixes));
+        assertEncoded(ENCODED_ROA_IP_ADDRESS_FAMILY_SEQUENCE_ALL, RoaCmsBuilder.encodeRoaIpAddressFamilySequence(allPrefixes));
     }
 
     @Test
