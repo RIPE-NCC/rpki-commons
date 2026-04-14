@@ -63,11 +63,13 @@ development.
 ## Changelog
 
 ## Unreleased
+
+  * Build targets JDK 17
   * Delete PregeneratedKeyPairFactory, it introduced a lot of complexity but no measurable speedup.
   * Rework API of the KeyPairFactory for better separating EC and RSA keys
   * Improve Router certificate support
   * Refactor certificate object hierarchy
-  * Build targets JDK 17
+  * Support for CCR state encoding and decoding
 
 ## 2025-08-14 1.41
   * Remove Saxon-HE dependency
