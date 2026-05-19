@@ -47,7 +47,7 @@ public class Fixtures {
     public static final RPKICanonicalCacheRepresentation sampleCcr = new RPKICanonicalCacheRepresentation(now, Optional.of(sampleMfts), Optional.of(sampleRPipv6), Optional.of(sampleAP), Optional.of(sampleTrustAnchorState), Optional.of(sampleRouterKeyState));
 
     public static byte[] ccrSampleDer() throws IOException {
-        var file = Fixtures.class.getResource("/ccr/draft-ietf-sidrops-rpki-ccr-03.ccr").getPath();
+        var file = Fixtures.class.getResource("/ccr/draft-ietf-sidrops-rpki-ccr-05.ccr").getPath();
         return Base64.getMimeDecoder().decode(Files.readAllBytes(Path.of(file)));
     }
 }
