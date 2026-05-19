@@ -72,7 +72,7 @@ class RPKICanonicalCacheRepresentationTest {
     }
 
     @Nested
-    class RPKI_CCR_draft_03 {
+    class RPKI_CCR {
         @Test
         void it_decodes_manifests() throws IOException {
             var ccr = RPKICanonicalCacheRepresentation.decode(ccrSampleDer());
