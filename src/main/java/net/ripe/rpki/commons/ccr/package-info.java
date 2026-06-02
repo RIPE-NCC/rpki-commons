@@ -19,6 +19,6 @@
  * provided to more conveniently produce correct state from plain java objects.
  * </p>
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-sidrops-rpki-ccr-05.txt">draft-ietf-sidrops-rpki-ccr-05</a>
+ * @see <a href="https://datatracker.ietf.org/doc/draft-ietf-sidrops-rpki-ccr/">A Profile for RPKI Canonical Cache Representation</a>
  */
 package net.ripe.rpki.commons.ccr;
