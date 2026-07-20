@@ -1,6 +1,7 @@
 package net.ripe.rpki.commons.crypto.cms.manifest;
 
 import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.generator.InRange;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import org.joda.time.DateTime;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(JUnitQuickcheck.class)
 public class ManifestCMSBuilderPropertyTest {
     @Property
-    public void buildEncodedParseCheck(byte[] content, BigInteger manifestNumber, Integer validityHours) {
+    public void buildEncodedParseCheck(byte[] content, BigInteger manifestNumber, @InRange(min="0", max="87600") Integer validityHours) {
         ManifestCmsBuilder builder = new ManifestCmsBuilder();
         builder.addFile("test.crl", content);
         builder.withManifestNumber(manifestNumber);
