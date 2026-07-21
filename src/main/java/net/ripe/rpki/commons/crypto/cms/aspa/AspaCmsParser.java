@@ -13,7 +13,6 @@ import net.ripe.rpki.commons.validation.ValidationResult;
 import net.ripe.rpki.commons.validation.ValidationString;
 import org.bouncycastle.asn1.*;
 
-import javax.annotation.CheckForNull;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +25,6 @@ public class AspaCmsParser extends RpkiSignedObjectParser {
 
     private int version;
 
-    @CheckForNull
     private Asn customerAsn;
     private ImmutableSortedSet<Asn> providerASSet = ImmutableSortedSet.of();
 

@@ -4,7 +4,6 @@ import lombok.ToString;
 import net.ripe.ipresource.IpRange;
 import org.apache.commons.lang3.Validate;
 
-import javax.annotation.CheckForNull;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
@@ -18,7 +17,6 @@ public class RoaPrefix implements Serializable, Comparable<RoaPrefix> {
     private static final long serialVersionUID = 1L;
 
     private final IpRange prefix;
-    @CheckForNull
     private final Integer maximumLength;
 
     public RoaPrefix(IpRange prefix) {
