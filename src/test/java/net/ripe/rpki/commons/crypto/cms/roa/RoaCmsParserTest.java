@@ -3,19 +3,25 @@ package net.ripe.rpki.commons.crypto.cms.roa;
 import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceType;
+import net.ripe.rpki.commons.crypto.util.Asn1Util;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.BERTags;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
-import static org.junit.Assert.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.decode;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
+import static org.junit.Assert.assertEquals;
 
 public class RoaCmsParserTest {
 
-    public static final Asn TEST_ASN = new Asn(42l);
+    public static final Asn TEST_ASN = new Asn(42L);
 
     public static final RoaPrefix TEST_IPV4_PREFIX_1 = new RoaPrefix(IpRange.parse("10.64.0.0/12"), 24);
     public static final RoaPrefix TEST_IPV4_PREFIX_2 = new RoaPrefix(IpRange.parse("10.32.0.0/12"), null);
@@ -135,4 +141,21 @@ public class RoaCmsParserTest {
         assertEquals(ipv4Prefixes, roa.getPrefixes());
     }
 
+    @Test
+    public void shouldRejectMalformedAddress() {
+        assumeThat(parser.isSuccess()).isTrue();
+
+        var v4AFI = new DEROctetString(new byte[]{0, 1});
+        var validPrefix = new DERSequence(
+            v4AFI,
+            new DERSequence(new DERSequence(Asn1Util.encodeIpAddress(IpRange.parse("10.0.0.0/8"))))
+        );
+        var malformedPrefix = new DERSequence(
+            v4AFI,
+            new DERSequence(new ASN1Integer(0)) // ASN1Integer is used where Sequence of BitString is expected
+        );
+        var payload = new DERSequence(validPrefix, malformedPrefix);
+        parser.parseRoaIpAddressFamilySequence(payload);
+        assertThat(parser.isSuccess()).isFalse();
+    }
 }

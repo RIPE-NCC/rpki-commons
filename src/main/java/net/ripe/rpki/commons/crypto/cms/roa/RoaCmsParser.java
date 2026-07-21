@@ -4,7 +4,6 @@ import net.ripe.ipresource.Asn;
 import net.ripe.ipresource.IpRange;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.ipresource.IpResourceType;
-import net.ripe.rpki.commons.crypto.IllegalAsn1StructureException;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectInfo;
 import net.ripe.rpki.commons.crypto.cms.RpkiSignedObjectParser;
 import net.ripe.rpki.commons.crypto.rfc3779.AddressFamily;
@@ -20,7 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static net.ripe.rpki.commons.crypto.util.Asn1Util.*;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.expect;
+import static net.ripe.rpki.commons.crypto.util.Asn1Util.parseIpAddressAsPrefix;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class RoaCmsParser extends RpkiSignedObjectParser {
@@ -135,16 +135,8 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
         ASN1Sequence addresses = (ASN1Sequence) seq.getObjectAt(1);
 
         for (int i = 0; i < addresses.size(); ++i) {
-            RoaPrefix roaPrefix;
-            try {
-                roaPrefix = parseRoaIpAddressFamily(addressFamily.toIpResourceType(), addresses.getObjectAt(i));
-            } catch (IllegalArgumentException e) {
-                roaPrefix = null;
-            }
-
-            if (roaPrefix != null) {
-                roaPrefixList.add(roaPrefix);
-            }
+            var roaPrefix = parseRoaIpAddressFamily(addressFamily.toIpResourceType(), addresses.getObjectAt(i));
+            roaPrefixList.add(roaPrefix);
         }
     }
 
@@ -162,11 +154,8 @@ public class RoaCmsParser extends RpkiSignedObjectParser {
             }
         }
         ValidationResult validationResult = getValidationResult();
-        if (!errorOccured) {
-            validationResult.rejectIfFalse(true, ADDR_FAMILY_AND_ADDR_IN_DER_SEQ);
-            validationResult.rejectIfFalse(true, ADDR_FAMILY);
-        }
-
+        validationResult.rejectIfTrue(errorOccured, ADDR_FAMILY_AND_ADDR_IN_DER_SEQ);
+        validationResult.rejectIfTrue(errorOccured, ADDR_FAMILY);
         validationResult.rejectIfTrue(roaPrefixList.isEmpty(), ROA_PREFIX_LIST);
         return roaPrefixList;
     }
