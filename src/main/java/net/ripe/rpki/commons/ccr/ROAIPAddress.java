@@ -21,7 +21,7 @@ import net.ripe.rpki.commons.crypto.util.Asn1Util;
  *      maxLength     INTEGER (0..ub) OPTIONAL }
  * </pre>
  */
-record ROAIPAddress(
+public record ROAIPAddress(
         IpRange address,
         Optional<Integer> maxLength
 ) implements ASN1Encodable {
