@@ -12,7 +12,9 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.EnumSet;
+import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,8 +25,14 @@ public class X509RouterCertificateBuilder {
 
     private X509CertificateBuilderHelper builderHelper;
     private int[] asns;
+    private final Predicate<X509Certificate> isRootPredicate;
 
     public X509RouterCertificateBuilder() {
+        this(X509CertificateUtil::isRoot);
+    }
+
+    public X509RouterCertificateBuilder(Predicate<X509Certificate> isRootPredicate) {
+        this.isRootPredicate = requireNonNull(isRootPredicate);
         builderHelper = new X509CertificateBuilderHelper();
     }
 
@@ -115,7 +123,7 @@ public class X509RouterCertificateBuilder {
         Validate.isTrue(asns.length > 0, "empty AS resources");
         builderHelper.withRouter(true);
         builderHelper.withPolicies(X509ResourceCertificate.POLICY_INFORMATION);
-        return new X509RouterCertificate(builderHelper.generateCertificate());
+        return new X509RouterCertificate(builderHelper.generateCertificate(), isRootPredicate);
     }
 
     public X509RouterCertificateBuilder withInheritedResourceTypes(EnumSet<IpResourceType> resourceTypes) {

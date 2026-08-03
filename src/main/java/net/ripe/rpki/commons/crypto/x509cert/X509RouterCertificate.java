@@ -11,11 +11,16 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509RouterCertificateVa
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
+import java.util.function.Predicate;
 
 public class X509RouterCertificate extends X509ResourceCertificate implements X509CertificateObject {
 
     protected X509RouterCertificate(X509Certificate certificate) {
         super(certificate);
+    }
+
+    protected X509RouterCertificate(X509Certificate certificate, Predicate<X509Certificate> isRoot) {
+        super(certificate, isRoot);
     }
 
     @Override

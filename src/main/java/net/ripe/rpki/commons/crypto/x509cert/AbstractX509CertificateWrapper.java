@@ -20,6 +20,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
@@ -39,10 +40,17 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     private final boolean ca;
 
+    private final Predicate<X509Certificate> isRootPredicate;
+
     protected AbstractX509CertificateWrapper(X509Certificate certificate) {
+        this(certificate, X509CertificateUtil::isRoot);
+    }
+
+    protected AbstractX509CertificateWrapper(X509Certificate certificate, Predicate<X509Certificate> isRootPredicate) {
         requireNonNull(certificate);
         this.certificate = certificate;
         this.ca = X509CertificateUtil.isCa(certificate);
+        this.isRootPredicate = requireNonNull(isRootPredicate);
     }
 
     public X509Certificate getCertificate() {
@@ -96,7 +104,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
     }
 
     public boolean isRoot() {
-        return X509CertificateUtil.isRoot(certificate);
+        return isRootPredicate.test(certificate);
     }
 
     public boolean isRouter() {

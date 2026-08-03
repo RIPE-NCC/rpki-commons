@@ -19,6 +19,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificate
 import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.EnumSet;
+import java.util.function.Predicate;
 
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.
@@ -33,6 +34,12 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
 
     protected X509ResourceCertificate(X509Certificate certificate) {
         super(certificate);
+        ResourceExtensionParser parser = new ResourceExtensionParser();
+        resourceExtension = parser.parse(certificate);
+    }
+
+    protected X509ResourceCertificate(X509Certificate certificate, Predicate<X509Certificate> isRoot) {
+        super(certificate, isRoot);
         ResourceExtensionParser parser = new ResourceExtensionParser();
         resourceExtension = parser.parse(certificate);
     }

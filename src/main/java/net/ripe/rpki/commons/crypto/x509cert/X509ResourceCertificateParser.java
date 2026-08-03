@@ -16,10 +16,12 @@ import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.*;
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
@@ -28,19 +30,28 @@ import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAc
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.findFirstRsyncCrlDistributionPoint;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.isRoot;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.bouncycastle.asn1.x509.PolicyQualifierId.id_qt_cps;
 
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
 
+    private final Predicate<X509Certificate> isRootPredicate;
+
+    public X509ResourceCertificateParser() {
+        this(X509CertificateUtil::isRoot);
+    }
+
+    public X509ResourceCertificateParser(Predicate<X509Certificate> isRootPredicate) {
+        this.isRootPredicate = isRootPredicate;
+    }
+
     @Override
     public X509ResourceCertificate getCertificate() {
         if (!isSuccess()) {
             throw new IllegalArgumentException(String.format("Resource Certificate validation failed: %s", result.getFailuresForAllLocations()));
         }
-        return new X509ResourceCertificate(getX509Certificate());
+        return new X509ResourceCertificate(getX509Certificate(), isRootPredicate);
     }
 
     @Override
@@ -187,7 +198,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     private void validateCrlDistributionPoints() {
         byte[] extensionValue = certificate.getExtensionValue(Extension.cRLDistributionPoints.getId());
 
-        if (isRoot(certificate)) {
+        if (isRootPredicate.test(certificate)) {
             // early ripe ncc ta certificates have crldp set so for now only warn here
             result.warnIfNotNull(extensionValue, CRLDP_OMITTED);
             return;
