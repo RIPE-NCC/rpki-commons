@@ -39,7 +39,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     private final Predicate<X509Certificate> isRootPredicate;
 
     public X509ResourceCertificateParser() {
-        this(X509CertificateUtil::isRoot);
+        this(X509CertificateUtil::isRootDefault);
     }
 
     public X509ResourceCertificateParser(Predicate<X509Certificate> isRootPredicate) {

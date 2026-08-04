@@ -28,7 +28,7 @@ public class X509RouterCertificateBuilder {
     private final Predicate<X509Certificate> isRootPredicate;
 
     public X509RouterCertificateBuilder() {
-        this(X509CertificateUtil::isRoot);
+        this(X509CertificateUtil::isRootDefault);
     }
 
     public X509RouterCertificateBuilder(Predicate<X509Certificate> isRootPredicate) {

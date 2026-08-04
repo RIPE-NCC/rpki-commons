@@ -117,7 +117,7 @@ public final class X509CertificateUtil {
         }
     }
 
-    public static boolean isRoot(X509Certificate certificate) {
+    public static boolean isRootDefault(X509Certificate certificate) {
         return certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal()) &&
                 isSelfSigned(certificate);
     }

@@ -43,7 +43,7 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
     private final Predicate<X509Certificate> isRootPredicate;
 
     protected AbstractX509CertificateWrapper(X509Certificate certificate) {
-        this(certificate, X509CertificateUtil::isRoot);
+        this(certificate, X509CertificateUtil::isRootDefault);
     }
 
     protected AbstractX509CertificateWrapper(X509Certificate certificate, Predicate<X509Certificate> isRootPredicate) {

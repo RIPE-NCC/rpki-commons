@@ -30,7 +30,7 @@ public class X509ResourceCertificateBuilder {
     private final Predicate<X509Certificate> isRootPredicate;
 
     public X509ResourceCertificateBuilder() {
-        this(X509CertificateUtil::isRoot);
+        this(X509CertificateUtil::isRootDefault);
     }
 
     public X509ResourceCertificateBuilder(Predicate<X509Certificate> isRootPredicate) {

@@ -16,7 +16,7 @@ public class X509RouterCertificateParser extends X509CertificateParser<X509Route
     private final Predicate<X509Certificate> isRootPredicate;
 
     public X509RouterCertificateParser() {
-        this(X509CertificateUtil::isRoot);
+        this(X509CertificateUtil::isRootDefault);
     }
 
     public X509RouterCertificateParser(Predicate<X509Certificate> isRootPredicate) {
