@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.validation;
 
+import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTimeUtils;
@@ -26,10 +27,12 @@ public final class ValidationResult implements Serializable {
 
     private Map<ValidationLocation, ResultsPerLocation> results = new TreeMap<>();
 
+    @Getter
     private ValidationLocation currentLocation;
 
     private Map<ValidationLocation, List<ValidationMetric>> metrics = new TreeMap<>();
 
+    @Getter
     private boolean storingPassingChecks = true;
 
     private ValidationResult(ValidationLocation location) {
@@ -56,10 +59,6 @@ public final class ValidationResult implements Serializable {
             }
         }
         return this;
-    }
-
-    public boolean isStoringPassingChecks() {
-        return storingPassingChecks;
     }
 
     public ValidationResult setLocation(ValidationLocation location) {
@@ -207,10 +206,6 @@ public final class ValidationResult implements Serializable {
 
     public Set<ValidationLocation> getValidatedLocations() {
         return results.keySet();
-    }
-
-    public ValidationLocation getCurrentLocation() {
-        return currentLocation;
     }
 
     public boolean hasFailures() {
