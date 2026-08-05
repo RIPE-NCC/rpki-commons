@@ -80,7 +80,7 @@ public final class X509CertificateUtil {
 
     public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(ValidationResult.withLocation("unknown.cer"), encoded);
+        parser.parse(ValidationResult.unknown(), encoded);
         return parser.getCertificate();
     }
 

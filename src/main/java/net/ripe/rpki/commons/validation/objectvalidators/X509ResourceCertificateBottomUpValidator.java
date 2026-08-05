@@ -24,8 +24,6 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
 
     private static final int MAX_CHAIN_LENGTH = 30;
 
-    public static final ValidationResult SOME_LOCATION = ValidationResult.withLocation("unknown.cer");
-
     private X509ResourceCertificate certificate;
     private final Collection<X509ResourceCertificate> trustAnchors;
     private final ResourceCertificateLocator locator;
@@ -45,11 +43,11 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     }
 
     public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
-        this(ValidationOptions.strictValidation(), SOME_LOCATION, locator, X509CertificateUtil::isRootDefault, trustAnchors);
+        this(ValidationOptions.strictValidation(), ValidationResult.unknown(), locator, X509CertificateUtil::isRootDefault, trustAnchors);
     }
 
     public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Predicate<X509Certificate> isRootPredicate, Collection<X509ResourceCertificate> trustAnchors) {
-        this(ValidationOptions.strictValidation(), SOME_LOCATION, locator, isRootPredicate, trustAnchors);
+        this(ValidationOptions.strictValidation(), ValidationResult.unknown(), locator, isRootPredicate, trustAnchors);
     }
 
     public X509ResourceCertificateBottomUpValidator(ValidationOptions options, ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {

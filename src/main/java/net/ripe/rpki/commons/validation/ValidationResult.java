@@ -51,6 +51,10 @@ public final class ValidationResult implements Serializable {
         return new ValidationResult(location);
     }
 
+    public static ValidationResult unknown() {
+        return new ValidationResult(new ValidationLocation("unknown.cer"));
+    }
+
     public ValidationResult withoutStoringPassingChecks() {
         if (this.storingPassingChecks) {
             this.storingPassingChecks = false;
