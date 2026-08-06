@@ -6,8 +6,6 @@ import net.ripe.rpki.commons.crypto.rfc3779.ResourceExtensionParser;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.function.Predicate;
 
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 

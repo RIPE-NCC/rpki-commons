@@ -12,9 +12,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.EnumSet;
-import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
