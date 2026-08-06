@@ -128,6 +128,7 @@ public class Rsync {
         args.add(COMMAND);
         args.add("--timeout=" + timeoutInSeconds);
         args.addAll(options);
+        args.add("--");
         if ((source != null) && (destination != null)) {
             args.add(source);
             args.add(destination);
