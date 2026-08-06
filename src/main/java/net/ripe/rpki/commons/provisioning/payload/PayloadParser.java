@@ -28,7 +28,7 @@ import static net.ripe.rpki.commons.validation.ValidationString.VALID_PAYLOAD_TY
 
 public final class PayloadParser {
 
-    private static final Pattern TYPE_PATTERN = Pattern.compile(".*<message[^>]*type=['\"]([a-z|\\_]*)['\"].*", Pattern.DOTALL);
+    private static final Pattern TYPE_PATTERN = Pattern.compile("<message[^>]+type=['\"]([a-z|_]{1,20})['\"]", Pattern.DOTALL);
 
     private static final XmlSerializer<ResourceClassListResponsePayload> LIST_RESPONSE_SERIALIZER = new ResourceClassListResponsePayloadSerializer();
     private static final XmlSerializer<ResourceClassListQueryPayload> LIST_SERIALIZER = new ResourceClassListQueryPayloadSerializer();
@@ -55,7 +55,7 @@ public final class PayloadParser {
 
     public static AbstractProvisioningPayload parse(String payloadXml, ValidationResult validationResult) {
         Matcher matcher = TYPE_PATTERN.matcher(payloadXml);
-        validationResult.rejectIfFalse(matcher.matches(), ValidationString.FOUND_PAYLOAD_TYPE);
+        validationResult.rejectIfFalse(matcher.find(), ValidationString.FOUND_PAYLOAD_TYPE);
         if (validationResult.hasFailures()) {
             return null;
         }
