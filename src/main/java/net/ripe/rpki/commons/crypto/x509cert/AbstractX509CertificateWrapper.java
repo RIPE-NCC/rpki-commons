@@ -43,17 +43,10 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
     @Getter
     private final boolean ca;
 
-    private final transient Predicate<X509Certificate> isRootPredicate;
-
     protected AbstractX509CertificateWrapper(X509Certificate certificate) {
-        this(certificate, X509CertificateUtil::isRootDefault);
-    }
-
-    protected AbstractX509CertificateWrapper(X509Certificate certificate, Predicate<X509Certificate> isRootPredicate) {
         requireNonNull(certificate);
         this.certificate = certificate;
         this.ca = X509CertificateUtil.isCa(certificate);
-        this.isRootPredicate = requireNonNull(isRootPredicate);
     }
 
     public byte[] getEncoded() {
@@ -96,10 +89,6 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public boolean isEe() {
         return !isCa();
-    }
-
-    public boolean isRoot() {
-        return isRootPredicate.test(certificate);
     }
 
     public boolean isRouter() {

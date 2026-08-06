@@ -27,14 +27,8 @@ public class X509ResourceCertificateBuilder {
     private final X509CertificateBuilderHelper builderHelper;
     private IpResourceSet resources = new IpResourceSet();
     private EnumSet<IpResourceType> inheritedResourceTypes = EnumSet.noneOf(IpResourceType.class);
-    private final Predicate<X509Certificate> isRootPredicate;
 
     public X509ResourceCertificateBuilder() {
-        this(X509CertificateUtil::isRootDefault);
-    }
-
-    public X509ResourceCertificateBuilder(Predicate<X509Certificate> isRootPredicate) {
-        this.isRootPredicate = requireNonNull(isRootPredicate);
         builderHelper = new X509CertificateBuilderHelper();
         builderHelper.withResources(resources);
         // https://tools.ietf.org/html/rfc6487#section-4.8.9
@@ -117,7 +111,7 @@ public class X509ResourceCertificateBuilder {
             requireNonNull(resources, "no resources");
             Validate.isTrue(!resources.isEmpty(), "empty resources");
         }
-        return new X509ResourceCertificate(builderHelper.generateCertificate(), isRootPredicate);
+        return new X509ResourceCertificate(builderHelper.generateCertificate());
     }
 
     @SuppressWarnings("java:S1319")

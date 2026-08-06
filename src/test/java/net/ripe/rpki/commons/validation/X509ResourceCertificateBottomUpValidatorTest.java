@@ -8,6 +8,7 @@ import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.crl.X509CrlBuilder;
 import net.ripe.rpki.commons.crypto.util.KeyPairFactory;
 import net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateBuilder;
 import net.ripe.rpki.commons.util.UTC;
@@ -308,11 +309,11 @@ public class X509ResourceCertificateBottomUpValidatorTest {
 
         @Override
         public CertificateRepositoryObjectFile<X509ResourceCertificate> findParent(X509ResourceCertificate certificate) {
-            Validate.isTrue(!certificate.isRoot());
+            Validate.isTrue(!X509CertificateUtil.isRootDefault(certificate.getCertificate()));
             if (certificate.equals(grandchild)) {
-                return new CertificateRepositoryObjectFile<X509ResourceCertificate>(X509ResourceCertificate.class, "child", child.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509ResourceCertificate.class, "child", child.getEncoded());
             } else if (certificate.equals(child)) {
-                return new CertificateRepositoryObjectFile<X509ResourceCertificate>(X509ResourceCertificate.class, "root", root.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509ResourceCertificate.class, "root", root.getEncoded());
             } else {
                 throw new IllegalArgumentException("unable to find parent for certificate: " + certificate);
             }
@@ -322,11 +323,11 @@ public class X509ResourceCertificateBottomUpValidatorTest {
         public CertificateRepositoryObjectFile<X509Crl> findCrl(X509ResourceCertificate certificate) {
 
             if (certificate.equals(child)) {
-                return new CertificateRepositoryObjectFile<X509Crl>(X509Crl.class, "rootCrl", rootCrl.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509Crl.class, "rootCrl", rootCrl.getEncoded());
             }
 
             if (certificate.equals(grandchild)) {
-                return new CertificateRepositoryObjectFile<X509Crl>(X509Crl.class, "childCrl", childCrl.getEncoded());
+                return new CertificateRepositoryObjectFile<>(X509Crl.class, "childCrl", childCrl.getEncoded());
             }
 
             return null;

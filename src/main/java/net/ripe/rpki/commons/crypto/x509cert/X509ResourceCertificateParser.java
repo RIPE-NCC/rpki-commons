@@ -36,22 +36,12 @@ import static org.bouncycastle.asn1.x509.PolicyQualifierId.id_qt_cps;
 
 public class X509ResourceCertificateParser extends X509CertificateParser<X509ResourceCertificate> {
 
-    private final Predicate<X509Certificate> isRootPredicate;
-
-    public X509ResourceCertificateParser() {
-        this(X509CertificateUtil::isRootDefault);
-    }
-
-    public X509ResourceCertificateParser(Predicate<X509Certificate> isRootPredicate) {
-        this.isRootPredicate = isRootPredicate;
-    }
-
     @Override
     public X509ResourceCertificate getCertificate() {
         if (!isSuccess()) {
             throw new IllegalArgumentException(String.format("Resource Certificate validation failed: %s", result.getFailuresForAllLocations()));
         }
-        return new X509ResourceCertificate(getX509Certificate(), isRootPredicate);
+        return new X509ResourceCertificate(getX509Certificate());
     }
 
     @Override
@@ -198,7 +188,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     private void validateCrlDistributionPoints() {
         byte[] extensionValue = certificate.getExtensionValue(Extension.cRLDistributionPoints.getId());
 
-        if (isRootPredicate.test(certificate)) {
+        if (X509CertificateUtil.isRootDefault(certificate)) {
             // early ripe ncc ta certificates have crldp set so for now only warn here
             result.warnIfNotNull(extensionValue, CRLDP_OMITTED);
             return;

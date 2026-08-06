@@ -13,22 +13,12 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public class X509RouterCertificateParser extends X509CertificateParser<X509RouterCertificate> {
 
-    private final Predicate<X509Certificate> isRootPredicate;
-
-    public X509RouterCertificateParser() {
-        this(X509CertificateUtil::isRootDefault);
-    }
-
-    public X509RouterCertificateParser(Predicate<X509Certificate> isRootPredicate) {
-        this.isRootPredicate = isRootPredicate;
-    }
-
     @Override
     public X509RouterCertificate getCertificate() {
         if (!isSuccess()) {
             throw new IllegalArgumentException(String.format("Router certificate validation failed: %s", result.getFailuresForAllLocations()));
         }
-        return new X509RouterCertificate(getX509Certificate(), isRootPredicate);
+        return new X509RouterCertificate(getX509Certificate());
     }
 
     @Override

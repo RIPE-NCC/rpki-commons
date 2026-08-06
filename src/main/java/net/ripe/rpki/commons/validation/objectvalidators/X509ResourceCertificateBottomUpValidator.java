@@ -125,7 +125,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
             ValidationLocation parentLocation = new ValidationLocation(parent.getName());
             result.setLocation(parentLocation);
 
-            X509ResourceCertificateParser parser = new X509ResourceCertificateParser(isRootPredicate);
+            X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
             parser.parse(result, parent.getContent());
             if (result.hasFailures()) {
                 return;

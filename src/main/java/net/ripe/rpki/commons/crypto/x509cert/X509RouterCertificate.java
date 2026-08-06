@@ -19,10 +19,6 @@ public class X509RouterCertificate extends X509ResourceCertificate implements X5
         super(certificate);
     }
 
-    protected X509RouterCertificate(X509Certificate certificate, Predicate<X509Certificate> isRoot) {
-        super(certificate, isRoot);
-    }
-
     @Override
     public URI getCrlUri() {
         return findFirstRsyncCrlDistributionPoint();
@@ -34,7 +30,8 @@ public class X509RouterCertificate extends X509ResourceCertificate implements X5
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context,
+                         CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         final ValidationLocation savedCurrentLocation = result.getCurrentLocation();
         result.setLocation(new ValidationLocation(getCrlUri()));
         result.setLocation(savedCurrentLocation);
@@ -52,8 +49,10 @@ public class X509RouterCertificate extends X509ResourceCertificate implements X5
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result) {
-        if (!isRoot() && crl == null) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context,
+                         X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result,
+                         Predicate<X509Certificate> isRoot) {
+        if (!isRoot.test(getCertificate()) && crl == null) {
             result.rejectIfFalse(false, ValidationString.OBJECTS_CRL_VALID, crlUri.toString());
             return;
         }
