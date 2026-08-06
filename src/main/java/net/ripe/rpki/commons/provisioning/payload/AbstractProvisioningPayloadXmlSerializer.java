@@ -121,7 +121,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
 
             var document = XML.newNonNamespaceAwareDocumentBuilder().newDocument();
             for (Node node : generateXmlPayload(document, payload)) {
-                writer.append(serializeNode(node)).append("\n");
+                writer.append(serializeNode(node));
             }
             writer.append("</message>\n");
             return writer.toString();
