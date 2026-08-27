@@ -99,7 +99,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.1
      */
     @Test
     public void shouldCmsObjectHaveCorrectVersionNumber() throws Exception {
@@ -107,7 +107,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.2
      */
     @Test
     public void shouldCmsObjectHaveCorrectDigestAlgorithm() throws Exception {
@@ -122,7 +122,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.3.1
      */
     @Test
     public void shouldCmsObjectHaveCorrectContentType() throws Exception {
@@ -130,7 +130,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.4
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedSigningCertificate() throws Exception {
@@ -150,7 +150,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.5
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.5
      */
     @Test
     public void shouldCmsObjectHaveEmbeddedCrl() throws Exception {
@@ -163,7 +163,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6
      */
     @Test
     public void shouldCmsObjectHaveOnlyOneSigner() throws Exception {
@@ -174,7 +174,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.1
      */
     @Test
     public void shouldCmsObjectSignerVersionBeCorrect() throws Exception {
@@ -184,7 +184,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.2
      */
     @Test
     public void shouldCmsObjectHaveCorrectSubjectKeyIdentifier() throws Exception {
@@ -195,7 +195,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.2
      */
     @Test
     public void shouldCmsObjectHaveSubjectKeyIdentifierOnly() throws Exception {
@@ -207,7 +207,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.3
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.3
      */
     @Test
     public void shouldCmsObjectHaveCorrectDigestAlgorithmOID() throws Exception {
@@ -218,7 +218,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4
      */
     @Test
     public void shouldCmsObjectHaveSignedAttributes() throws Exception {
@@ -229,7 +229,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.1
      */
     @Test
     public void shouldCmsObjectHaveCorrectContentTypeSignedAttribute() throws Exception {
@@ -244,7 +244,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.2
      */
     @Test
     public void shouldCmsObjectHaveCorrectMessageDigestSignedAttribute() throws Exception {
@@ -259,7 +259,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.3
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.3
      */
     @Test
     public void shouldCmsObjectHaveSigningTimeSignedAttribute() throws Exception {
@@ -275,7 +275,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.4
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.4
      */
     @Test
     public void shouldCmsObjectHaveNoBinarySigningTimeSignedAttribute() throws Exception {
@@ -288,7 +288,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.5
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.5
      * http://tools.ietf.org/html/draft-huston-sidr-rpki-algs-00#section-2
      */
     @Test
@@ -300,7 +300,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.6
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.6
      */
     @Test
     public void shouldCmsObjectHaveValidSignature() throws Exception {
@@ -312,7 +312,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.7
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.7
      */
     @Test
     public void shouldCmsObjectHaveNoUnsignedAttribute() throws Exception {
@@ -323,7 +323,7 @@ public class ProvisioningCmsObjectBuilderTest {
     }
 
     /**
-     * https://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4
      */
     @Test
     public void shouldCmsObjectHaveNoRedundantAttribute() throws Exception {

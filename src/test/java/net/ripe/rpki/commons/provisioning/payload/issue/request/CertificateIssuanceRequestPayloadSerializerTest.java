@@ -44,7 +44,7 @@ public class CertificateIssuanceRequestPayloadSerializerTest {
         assertEquals(IpResourceSet.parse("2001:0DB8::/48,2001:0DB8:002::-2001:0DB8:005::"), payloadContent.getAllocatedIpv6());
     }
 
-    // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1
+    // https://datatracker.ietf.org/doc/html/rfc6492#section-3.4.1
     @Test
     public void shouldUsePayloadXmlConformDraft() {
 

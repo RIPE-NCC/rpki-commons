@@ -59,7 +59,7 @@ public class CertificateIssuanceResponsePayloadSerializerTest {
         assertEquals(PayloadMessageType.issue_response, TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD.getType());
     }
 
-    // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.2
+    // see: https://datatracker.ietf.org/doc/html/rfc6492#section-3.4.2
     @Test
     public void shouldHavePayloadXmlConformStandard() {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_ISSUANCE_RESPONSE_PAYLOAD);

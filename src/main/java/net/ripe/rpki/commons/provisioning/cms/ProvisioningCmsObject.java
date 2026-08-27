@@ -63,8 +63,8 @@ public class ProvisioningCmsObject {
 
     /**
      * This is used to check against replay attacks, see <a
-     * href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2"
-     * >http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.2</a><br >
+     * href="https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.2"
+     * >https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.2</a><br >
      */
     public DateTime getSigningTime() {
         return signingTime;

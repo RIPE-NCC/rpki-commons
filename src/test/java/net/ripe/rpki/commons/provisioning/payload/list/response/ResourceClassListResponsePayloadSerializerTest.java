@@ -82,7 +82,7 @@ public class ResourceClassListResponsePayloadSerializerTest {
     }
 
 
-    // see: http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2
+    // see: https://datatracker.ietf.org/doc/html/rfc6492#section-3.3.2
     @Test
     public void shouldCreatePayloadXmlConformDraft() {
         String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD);

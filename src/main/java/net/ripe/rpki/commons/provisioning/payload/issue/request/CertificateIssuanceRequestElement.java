@@ -8,7 +8,7 @@ import org.apache.commons.lang3.Validate;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 /**
- * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
+ * See <a href="https://datatracker.ietf.org/doc/html/rfc6492#section-3.4.1">https://datatracker.ietf.org/doc/html/rfc6492#section-3.4.1</a>
  */
 public class CertificateIssuanceRequestElement extends EqualsSupport {
 

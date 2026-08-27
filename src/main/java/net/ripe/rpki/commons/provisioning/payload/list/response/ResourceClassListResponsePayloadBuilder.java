@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Builder for 'Resource Class List Response'<br >
- * See: <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.2</a>
+ * See: <a href="https://datatracker.ietf.org/doc/html/rfc6492#section-3.3.2">https://datatracker.ietf.org/doc/html/rfc6492#section-3.3.2</a>
  */
 public class ResourceClassListResponsePayloadBuilder extends AbstractPayloadBuilder<ResourceClassListResponsePayload> {
 

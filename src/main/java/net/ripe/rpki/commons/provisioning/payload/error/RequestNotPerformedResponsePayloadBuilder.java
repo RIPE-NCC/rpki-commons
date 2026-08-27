@@ -5,7 +5,7 @@ import net.ripe.rpki.commons.provisioning.payload.common.AbstractPayloadBuilder;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Build a NotPerformed message, see <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.6">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.6</a>
+ * Build a NotPerformed message, see <a href="https://datatracker.ietf.org/doc/html/rfc6492#section-3.6">https://datatracker.ietf.org/doc/html/rfc6492#section-3.6</a>
  */
 public class RequestNotPerformedResponsePayloadBuilder extends AbstractPayloadBuilder<RequestNotPerformedResponsePayload> {
 

@@ -42,7 +42,7 @@ public class ResourceClassListQueryPayloadSerializerTest {
         assertEquals(PayloadMessageType.list, payload.getType());
     }
 
-    // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.1
+    // https://datatracker.ietf.org/doc/html/rfc6492#section-3.3.1
     @Test
     public void shouldCreateXmlConformDraft() {
         ResourceClassListQueryPayload payload = new ResourceClassListQueryPayload();
