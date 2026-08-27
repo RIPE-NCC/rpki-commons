@@ -79,7 +79,7 @@ public class RepositoryResponseSerializer extends IdentitySerializer<RepositoryR
             requestElement.appendChild(bpkiTaElement);
             document.appendChild(requestElement);
 
-            return serialize(document);
+            return serializeDocument(document);
         } catch (ParserConfigurationException | TransformerException e) {
             throw new IdentitySerializerException(e);
         }

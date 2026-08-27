@@ -23,6 +23,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Supplier;
@@ -110,21 +111,20 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     @Override
     public String serialize(T payload) {
         try {
-            final Document document = XML.newNamespaceAwareDocumentBuilder().newDocument();
+            var writer = new StringWriter();
+            writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            writer.append("<message xmlns=\"").append(XMLNS).append("\"\n")
+                  .append("         version=\"").append(String.valueOf(payload.getVersion())).append("\"\n")
+                  .append("         sender=\"").append(payload.getSender()).append("\"\n")
+                  .append("         recipient=\"").append(payload.getRecipient()).append("\"\n")
+                  .append("         type=\"").append(String.valueOf(payload.getType())).append("\">\n");
 
-            final Element message = document.createElementNS(xmlns, "message");
-            message.setAttribute("version", String.valueOf(payload.getVersion()));
-            message.setAttribute("sender", payload.getSender());
-            message.setAttribute("recipient", payload.getRecipient());
-            message.setAttribute("type", String.valueOf(payload.getType()));
-
+            var document = XML.newNonNamespaceAwareDocumentBuilder().newDocument();
             for (Node node : generateXmlPayload(document, payload)) {
-                message.appendChild(node);
+                writer.append(serializeNode(node)).append("\n");
             }
-
-            document.appendChild(message);
-
-            return serialize(document);
+            writer.append("</message>\n");
+            return writer.toString();
         } catch (ParserConfigurationException | TransformerException | IOException e) {
             throw new DomXmlSerializerException(e);
         }
@@ -141,7 +141,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     }
 
     protected Element generateCertificateElementXml(Document document, CertificateElement certificate) {
-        Element result = document.createElementNS(xmlns, "certificate");
+        Element result = document.createElement("certificate");
         result.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(certificate.getIssuerCertificatePublicationUris()));
         if (certificate.getAllocatedAsn() != null) {
             result.setAttribute("req_resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(certificate.getAllocatedAsn()));
@@ -176,7 +176,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
     }
 
     protected Element generateClassElementXml(Document document, GenericClassElement classElement) {
-        Element node = document.createElementNS(xmlns, "class");
+        Element node = document.createElement("class");
         node.setAttribute("cert_url", CERTIFICATE_URL_LIST_CONVERTER.toString(classElement.getCertificateAuthorityUri()));
         node.setAttribute("class_name", classElement.getClassName());
         node.setAttribute("resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(classElement.getResourceSetAsn()));
@@ -189,7 +189,7 @@ public abstract class AbstractProvisioningPayloadXmlSerializer<T extends Abstrac
         classElement.getCertificateElements().stream().map(certificate -> generateCertificateElementXml(document, certificate)).forEachOrdered(node::appendChild);
         X509ResourceCertificate issuer = classElement.getIssuer();
         if (issuer != null) {
-            Element elt = document.createElementNS(xmlns, "issuer");
+            Element elt = document.createElement("issuer");
             elt.setTextContent(issuer.getBase64String());
             node.appendChild(elt);
         }

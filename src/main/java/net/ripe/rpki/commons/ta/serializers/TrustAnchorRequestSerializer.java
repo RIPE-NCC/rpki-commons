@@ -98,7 +98,7 @@ public class TrustAnchorRequestSerializer extends DomXmlSerializer<TrustAnchorRe
                     serializeSia(doc, siaDescriptors, informationAccessDescriptor);
                 }
             }
-            return serialize(doc);
+            return serializeDocument(doc);
 
         } catch (ParserConfigurationException | TransformerException e) {
             throw new DomXmlSerializerException(e);

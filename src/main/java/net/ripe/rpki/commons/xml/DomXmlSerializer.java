@@ -64,18 +64,25 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
         return result;
     }
 
-    protected String serialize(final Document document) throws TransformerException {
+    protected String serializeDocument(Document document) throws TransformerException {
+        return serializeInternal(document, true);
+    }
+
+    protected String serializeNode(Node node) throws TransformerException {
+        return serializeInternal(node, false);
+    }
+
+    private String serializeInternal(Node node, boolean includeXmlDeclaration) throws TransformerException {
         final Transformer transformer = TransformerFactory.newInstance().newTransformer();
 
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, includeXmlDeclaration ? "no" : "yes");
 
-        final StringWriter sw = new StringWriter();
-        transformer.transform(new DOMSource(document), new StreamResult(sw));
-
-        return sw.toString();
+        var writer = new StringWriter();
+        transformer.transform(new DOMSource(node), new StreamResult(writer));
+        return writer.toString();
     }
 
     public Element addChild(Document doc, Node parent, String childName) {

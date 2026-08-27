@@ -25,16 +25,14 @@ public class ResourceClassListResponsePayloadSerializerTest {
 
     private static final XmlSerializer<ResourceClassListResponsePayload> SERIALIZER = new ResourceClassListResponsePayloadSerializer();
 
-
-    private static DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 0).withZone(DateTimeZone.UTC);
+    private static final DateTime validityNotAfter = new DateTime(2011, 1, 1, 23, 58, 23, 0).withZone(DateTimeZone.UTC);
 
     public static ResourceClassListResponsePayload TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD = createResourceClassListResponsePayload();
-
 
     public static ResourceClassListResponsePayload createResourceClassListResponsePayload() {
         ResourceClassListResponsePayloadBuilder builder = new ResourceClassListResponsePayloadBuilder();
         CertificateElement certificateElement = new CertificateElementBuilder().withIpResources(IpResourceSet.parse("123,10.0.0.0/8,2001:0DB8::/48"))
-                .withCertificatePublishedLocations(Arrays.asList(URI.create("rsync://jaja/jja")))
+                .withCertificatePublishedLocations(List.of(URI.create("rsync://jaja/jja")))
                 .withCertificate(ProvisioningObjectMother.X509_CA).build();
 
         GenericClassElementBuilder classElementBuilder = new GenericClassElementBuilder()
@@ -43,7 +41,7 @@ public class ResourceClassListResponsePayloadSerializerTest {
                 .withIpResourceSet(IpResourceSet.parse("1234,456,192.168.0.0/24,2001:db8::/48,2001:0DB8:002::-2001:0DB8:005::"))
                 .withValidityNotAfter(validityNotAfter)
                 .withSiaHeadUri("rsync://some/where")
-                .withCertificateElements(Arrays.asList(certificateElement))
+                .withCertificateElements(List.of(certificateElement))
                 .withIssuer(ProvisioningObjectMother.X509_CA);
 
         builder.addClassElement(classElementBuilder.buildResourceClassListResponseClassElement());
@@ -90,18 +88,20 @@ public class ResourceClassListResponsePayloadSerializerTest {
         String actualXml = SERIALIZER.serialize(TEST_RESOURCE_CLASS_LIST_RESPONSE_PAYLOAD);
 
         Pattern expectedXmlRegex = Pattern.compile(
-                "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n" +
-                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"list_response\"\\s+version=\"1\">\n" +
-                        "   <class\\s+cert_url=\"rsync://localhost/some/where,http://some/other\"\\s+class_name=\"a classname\"\\s+resource_set_as=\"456,1234\"\\s+resource_set_ipv4=\"192.168.0.0/24\"\\s+resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\"\\s+resource_set_notafter=\"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\"\\s+suggested_sia_head=\"rsync://some/where\">\n" +
-                        "      <certificate\\s+cert_url=\"rsync://jaja/jja\"\\s+req_resource_set_as=\"123\"\\s+req_resource_set_ipv4=\"10.0.0.0/8\"\\s+req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>\n" +
-                        "      <issuer>[^<]*</issuer>\n" +
-                        "   </class>\n" +
-                        "   <class\\s+cert_url=\"rsync://localhost/some/where,http://some/other\"\\s+class_name=\"class2\"\\s+resource_set_as=\"456,1234\"\\s+resource_set_ipv4=\"192.168.0.0/24\"\\s+resource_set_ipv6=\"2001:db8::/48,2001:db8:2::-2001:db8:5::\"\\s+resource_set_notafter=\"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z\"\\s+suggested_sia_head=\"rsync://some/where\">\n" +
-                        "      <certificate\\s+cert_url=\"rsync://jaja/jja\"\\s+req_resource_set_as=\"123\"\\s+req_resource_set_ipv4=\"10.0.0.0/8\"\\s+req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>\n" +
-                        "      <certificate\\s+cert_url=\"rsync://jaja/jja\"\\s+req_resource_set_as=\"123\"\\s+req_resource_set_ipv4=\"10.0.0.0/8\"\\s+req_resource_set_ipv6=\"2001:db8::/48\">[^<]*</certificate>\n" +
-                        "      <issuer>[^<]*</issuer>\n" +
-                        "   </class>\n" +
-                        "</message>\n",
+                """
+                <\\?xml version="1.0" encoding="UTF-8"\\?>
+                <message\\s+xmlns="http://www.apnic.net/specs/rescerts/up-down/"\\s+version="1"\\s+sender="sender"\\s+recipient="recipient"\\s+type="list_response">
+                \\s*<class\\s+cert_url="rsync://localhost/some/where,http://some/other"\\s+class_name="a classname"\\s+resource_set_as="456,1234"\\s+resource_set_ipv4="192.168.0.0/24"\\s+resource_set_ipv6="2001:db8::/48,2001:db8:2::-2001:db8:5::"\\s+resource_set_notafter="\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"\\s+suggested_sia_head="rsync://some/where">
+                \\s+<certificate\\s+cert_url="rsync://jaja/jja"\\s+req_resource_set_as="123"\\s+req_resource_set_ipv4="10.0.0.0/8"\\s+req_resource_set_ipv6="2001:db8::/48">[^<]*</certificate>
+                \\s+<issuer>[^<]*</issuer>
+                \\s*</class>
+                \\s*<class\\s+cert_url="rsync://localhost/some/where,http://some/other"\\s+class_name="class2"\\s+resource_set_as="456,1234"\\s+resource_set_ipv4="192.168.0.0/24"\\s+resource_set_ipv6="2001:db8::/48,2001:db8:2::-2001:db8:5::"\\s+resource_set_notafter="\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"\\s+suggested_sia_head="rsync://some/where">
+                \\s+<certificate\\s+cert_url="rsync://jaja/jja"\\s+req_resource_set_as="123"\\s+req_resource_set_ipv4="10.0.0.0/8"\\s+req_resource_set_ipv6="2001:db8::/48">[^<]*</certificate>
+                \\s+<certificate\\s+cert_url="rsync://jaja/jja"\\s+req_resource_set_as="123"\\s+req_resource_set_ipv4="10.0.0.0/8"\\s+req_resource_set_ipv6="2001:db8::/48">[^<]*</certificate>
+                \\s+<issuer>[^<]*</issuer>
+                \\s*</class>
+                </message>
+                """,
                 Pattern.DOTALL);
         assertTrue("actual: " + actualXml, expectedXmlRegex.matcher(actualXml).matches());
     }

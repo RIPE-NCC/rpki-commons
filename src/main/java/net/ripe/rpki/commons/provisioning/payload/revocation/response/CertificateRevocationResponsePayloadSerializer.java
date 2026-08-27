@@ -28,7 +28,7 @@ public class CertificateRevocationResponsePayloadSerializer extends AbstractProv
     @Override
     protected Iterable<? extends Node> generateXmlPayload(Document document, CertificateRevocationResponsePayload payload) {
         CertificateRevocationKeyElement key = payload.getKeyElement();
-        Element keyElement = document.createElementNS(xmlns, "key");
+        Element keyElement = document.createElement("key");
         keyElement.setAttribute("class_name", key.getClassName());
         keyElement.setAttribute("ski", key.getPublicKeyHash());
         return Collections.singletonList(keyElement);
