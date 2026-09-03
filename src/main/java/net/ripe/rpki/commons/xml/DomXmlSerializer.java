@@ -1,13 +1,9 @@
 package net.ripe.rpki.commons.xml;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -64,18 +60,29 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
         return result;
     }
 
-    protected String serialize(final Document document) throws TransformerException {
-        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    protected String serializeDocument(Document document) throws TransformerException {
+        return serializeInternal(document, true);
+    }
 
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+    protected String serializeNode(Node node) throws TransformerException {
+        return serializeInternal(node, false);
+    }
+
+    private String serializeInternal(Node node, boolean includeXmlDeclaration) throws TransformerException {
+        var factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+        var transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, includeXmlDeclaration ? "no" : "yes");
 
-        final StringWriter sw = new StringWriter();
-        transformer.transform(new DOMSource(document), new StreamResult(sw));
-
-        return sw.toString();
+        var writer = new StringWriter();
+        transformer.transform(new DOMSource(node), new StreamResult(writer));
+        return writer.toString();
     }
 
     public Element addChild(Document doc, Node parent, String childName) {

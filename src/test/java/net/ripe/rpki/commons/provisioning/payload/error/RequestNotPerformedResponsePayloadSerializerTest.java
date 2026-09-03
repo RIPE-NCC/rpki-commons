@@ -44,9 +44,9 @@ public class RequestNotPerformedResponsePayloadSerializerTest {
 
         Pattern expectedXml = Pattern.compile(
                 "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n" +
-                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"error_response\"\\s+version=\"1\">\n" +
-                        "   <status>" + TEST_ERROR.getErrorCode() + "</status>\n" +
-                        "   <description xml:lang=\"en-US\">" + TEST_ERROR_DESCRIPTION + "</description>\n" +
+                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+version=\"1\"\\s+sender=\"sender\"\\s+recipient=\"recipient\"\\s+type=\"error_response\">\n" +
+                        "\\s*<status>" + TEST_ERROR.getErrorCode() + "</status>\n" +
+                        "\\s*<description xml:lang=\"en-US\">" + TEST_ERROR_DESCRIPTION + "</description>\n" +
                         "</message>\n",
                 Pattern.DOTALL
         );

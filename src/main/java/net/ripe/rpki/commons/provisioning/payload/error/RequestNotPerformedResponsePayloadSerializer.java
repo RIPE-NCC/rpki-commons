@@ -33,11 +33,11 @@ public class RequestNotPerformedResponsePayloadSerializer extends AbstractProvis
     @Override
     protected Iterable<? extends Node> generateXmlPayload(Document document, RequestNotPerformedResponsePayload payload) {
         List<Element> result = new ArrayList<>();
-        Element statusElement = document.createElementNS(xmlns, "status");
+        Element statusElement = document.createElement("status");
         statusElement.setTextContent(String.valueOf(payload.getStatus().getErrorCode()));
         result.add(statusElement);
         if (payload.getDescription() != null) {
-            Element descriptionElement = document.createElementNS(xmlns, "description");
+            Element descriptionElement = document.createElement("description");
             descriptionElement.setAttribute("xml:lang", "en-US");
             descriptionElement.setTextContent(payload.getDescription());
             result.add(descriptionElement);

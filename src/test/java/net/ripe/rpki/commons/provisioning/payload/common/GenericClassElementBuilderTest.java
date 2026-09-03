@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class GenericClassElementBuilderTest {
 
-    // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3
+    // https://datatracker.ietf.org/doc/html/rfc6492#section-3.3
     @Test(expected = IllegalArgumentException.class)
     public void shouldNotBuildWithoutRsyncURI() throws URISyntaxException {
         GenericClassElementBuilder builder = new GenericClassElementBuilder();

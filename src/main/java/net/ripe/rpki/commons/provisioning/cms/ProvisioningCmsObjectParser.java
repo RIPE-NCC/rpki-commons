@@ -133,14 +133,14 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.1
      */
     private void verifyVersionNumber() {
         validationResult.rejectIfFalse(sp.getVersion() == CMS_OBJECT_VERSION, CMS_SIGNED_DATA_VERSION);
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.2
      */
     private void verifyDigestAlgorithm(byte[] data) {
         validationResult.rejectIfFalse(CMSSignedGenerator.DIGEST_SHA256.equals(getDigestAlgorithmOidFromEncodedCmsObject(data).getAlgorithm().getId()), CMS_SIGNED_DATA_DIGEST_ALGORITHM);
@@ -161,14 +161,14 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.3.1
      */
     private void verifyContentType() {
         validationResult.rejectIfFalse(PROVISIONING_OBJECT_OID_STRING.equals(sp.getSignedContent().getContentType()), CMS_CONTENT_TYPE);
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.3.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.3.2
      */
     private void parseContent() {
         try {
@@ -188,7 +188,7 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.4
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.4
      */
     private void parseCertificates() {
         Collection<? extends Certificate> certificates = extractCertificates(sp);
@@ -259,7 +259,7 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.5
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.5
      */
     private void parseCmsCrl() {
         List<? extends X509CRL> crls = extractCrl(sp);
@@ -290,7 +290,7 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6
      */
     private void verifySignerInfos() {
         SignerInformationStore signerStore = getSignerStore();
@@ -322,14 +322,14 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.1
      */
     private void verifySignerVersion(SignerInformation signer) {
         validationResult.rejectIfFalse(signer.getVersion() == CMS_OBJECT_SIGNER_VERSION, CMS_SIGNER_INFO_VERSION);
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.2
      */
     private void verifySubjectKeyIdentifier(SignerInformation signer) {
         SignerId sid = signer.getSID();
@@ -338,14 +338,14 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.3
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.3
      */
     private void verifyDigestAlgorithm(SignerInformation signer) {
         validationResult.rejectIfFalse(CMSSignedGenerator.DIGEST_SHA256.equals(signer.getDigestAlgOID()), CMS_SIGNER_INFO_DIGEST_ALGORITHM);
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4
      */
     private void verifySignedAttributes(SignerInformation signer) {
         AttributeTable attributeTable = signer.getSignedAttributes();
@@ -359,7 +359,7 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.1
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.1
      */
     private void verifyContentType(AttributeTable attributeTable) {
         Attribute contentType = attributeTable.get(CMSAttributes.contentType);
@@ -373,7 +373,7 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.4.2
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.4.2
      */
     private void verifyMessageDigest(AttributeTable attributeTable) {
         Attribute messageDigest = attributeTable.get(CMSAttributes.messageDigest);
@@ -411,7 +411,7 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.6
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.6
      */
     private void verifySignature(SignerInformation signer) {
         String errorMessage = null;
@@ -430,7 +430,7 @@ public class ProvisioningCmsObjectParser {
     }
 
     /**
-     * http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.1.1.6.7
+     * https://datatracker.ietf.org/doc/html/rfc6492#section-3.1.1.6.7
      */
     private void verifyUnsignedAttributes(SignerInformation signer) {
         validationResult.rejectIfFalse(signer.getUnsignedAttributes() == null, UNSIGNED_ATTRS_OMITTED);

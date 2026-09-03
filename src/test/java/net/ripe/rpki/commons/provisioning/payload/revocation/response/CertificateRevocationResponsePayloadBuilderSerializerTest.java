@@ -44,10 +44,12 @@ public class CertificateRevocationResponsePayloadBuilderSerializerTest {
         String actualXml = SERIALIZER.serialize(TEST_CERTIFICATE_REVOCATION_RESPONSE_PAYLOAD);
 
         Pattern expectedXmlRegex = Pattern.compile(
-                "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>\n" +
-                        "<message\\s+xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\\s+recipient=\"recipient\"\\s+sender=\"sender\"\\s+type=\"revoke_response\"\\s+version=\"1\">\n" +
-                        "   <key\\s+class_name=\"a classname\"\\s+ski=\"[^\"]*\"/>\n" +
-                        "</message>\n",
+                """
+                <\\?xml version="1.0" encoding="UTF-8"\\?>
+                <message\\s+xmlns="http://www.apnic.net/specs/rescerts/up-down/"\\s+version="1"\\s+sender="sender"\\s+recipient="recipient"\\s+type="revoke_response">
+                \\s*<key\\s+class_name="a classname"\\s+ski="[^"]*"/>
+                </message>
+                """,
                 Pattern.DOTALL
         );
 

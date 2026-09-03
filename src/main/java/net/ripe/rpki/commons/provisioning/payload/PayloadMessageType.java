@@ -1,7 +1,7 @@
 package net.ripe.rpki.commons.provisioning.payload;
 
 public enum PayloadMessageType {
-    // in lowercase to comply with http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.1
+    // in lowercase to comply with https://datatracker.ietf.org/doc/html/rfc6492#section-3.3.1
     list,
     list_response,
     issue,

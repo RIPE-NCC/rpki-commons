@@ -8,19 +8,23 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ResourceClassListQueryPayloadSerializerTest {
 
     private static final XmlSerializer<ResourceClassListQueryPayload> SERIALIZER = new ResourceClassListQueryPayloadSerializer();
     public static final ResourceClassListQueryPayload TEST_RESOURCE_CLASS_LIST_QUERY_PAYLOAD = new ResourceClassListQueryPayload();
 
-    public static final String XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<message xmlns=\"http://www.apnic.net/specs/rescerts/up-down/\"\n" +
-            "         recipient=\"recipient attribute\"\n" +
-            "         sender=\"sender attribute\"\n" +
-            "         type=\"list\"\n" +
-            "         version=\"1\"/>\n";
+    public static final String XML = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <message xmlns="http://www.apnic.net/specs/rescerts/up-down/"
+                 version="1"
+                 sender="sender attribute"
+                 recipient="recipient attribute"
+                 type="list">
+        </message>
+        """;
 
     @Test
     public void shouldCreateParsableProvisioningObject() throws IOException {
@@ -38,7 +42,7 @@ public class ResourceClassListQueryPayloadSerializerTest {
         assertEquals(PayloadMessageType.list, payload.getType());
     }
 
-    // http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.3.1
+    // https://datatracker.ietf.org/doc/html/rfc6492#section-3.3.1
     @Test
     public void shouldCreateXmlConformDraft() {
         ResourceClassListQueryPayload payload = new ResourceClassListQueryPayload();

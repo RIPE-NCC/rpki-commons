@@ -34,7 +34,7 @@ public class CertificateIssuanceRequestPayloadSerializer extends AbstractProvisi
     @Override
     protected Iterable<? extends Node> generateXmlPayload(Document document, CertificateIssuanceRequestPayload payload) throws IOException {
         CertificateIssuanceRequestElement request = payload.getRequestElement();
-        Element node = document.createElementNS(xmlns, "request");
+        Element node = document.createElement("request");
         node.setAttribute("class_name", request.getClassName());
         if (request.getAllocatedAsn() != null) {
             node.setAttribute("req_resource_set_as", IP_RESOURCE_SET_PROVISIONING_CONVERTER.toString(request.getAllocatedAsn()));

@@ -66,7 +66,7 @@ public class ParentIdentitySerializer extends IdentitySerializer<ParentIdentity>
             parentResponseElement.appendChild(parentBpkiTaElement);
             document.appendChild(parentResponseElement);
 
-           return serialize(document);
+           return serializeDocument(document);
 
         } catch (ParserConfigurationException | TransformerException e) {
             //TODO: make it a checked exception?

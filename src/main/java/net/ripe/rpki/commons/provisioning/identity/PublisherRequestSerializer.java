@@ -90,7 +90,7 @@ public class PublisherRequestSerializer extends IdentitySerializer<PublisherRequ
             document.appendChild(requestElement);
             referralElement.ifPresent(document::appendChild);
 
-            return serialize(document);
+            return serializeDocument(document);
         } catch (ParserConfigurationException | TransformerException e) {
             throw new IdentitySerializerException(e);
         }

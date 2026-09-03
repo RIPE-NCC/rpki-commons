@@ -111,7 +111,7 @@ public class TrustAnchorResponseSerializer extends DomXmlSerializer<TrustAnchorR
                     addEncodedObject(doc, entryElement, e.getValue());
                 }
             }
-            return serialize(doc);
+            return serializeDocument(doc);
 
         } catch (ParserConfigurationException | TransformerException e) {
             throw new DomXmlSerializerException(e);

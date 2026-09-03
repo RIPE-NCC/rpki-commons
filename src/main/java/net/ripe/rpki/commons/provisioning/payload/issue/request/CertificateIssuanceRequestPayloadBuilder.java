@@ -8,7 +8,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Builder for 'Certificate Issuance Request'<br >
- * See: <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.4.1</a>
+ * See: <a href="https://datatracker.ietf.org/doc/html/rfc6492#section-3.4.1">https://datatracker.ietf.org/doc/html/rfc6492#section-3.4.1</a>
  */
 public class CertificateIssuanceRequestPayloadBuilder extends AbstractPayloadBuilder<CertificateIssuanceRequestPayload> {
 

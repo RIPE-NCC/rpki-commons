@@ -3,7 +3,7 @@ package net.ripe.rpki.commons.provisioning.payload.revocation.request;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * See <a href="http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1">http://tools.ietf.org/html/draft-ietf-sidr-rescerts-provisioning-09#section-3.5.1</a>
+ * See <a href="https://datatracker.ietf.org/doc/html/rfc6492#section-3.5.1">https://datatracker.ietf.org/doc/html/rfc6492#section-3.5.1</a>
  */
 public class CertificateRevocationRequestElement {
     private String className;
