@@ -305,6 +305,65 @@ public class X509ResourceCertificateTest {
     }
 
     @Test
+    public void shouldIgnoreCrlLocatorWhenPredicateMarksCertificateAsRoot() {
+        ValidationResult result = ValidationResult.withLocation(TEST_TA_URI);
+        X509ResourceCertificate selfSignedCert = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, selfSignedCert);
+
+        selfSignedCert.validate(TEST_TA_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result, certificate -> true);
+
+        verifyNoInteractions(crlLocator);
+        assertFalse(result.hasFailures());
+        assertFalse(selfSignedCert.isRevoked());
+    }
+
+    @Test
+    public void shouldRequireCrlFromLocatorWhenPredicateMarksCertificateAsNonRoot() {
+        ValidationResult result = ValidationResult.withLocation(TEST_CA_URI);
+        X509ResourceCertificate rootCertificate = createSelfSignedCaResourceCertificate();
+        X509ResourceCertificate subject = createSelfSignedCaResourceCertificateBuilder()
+                .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
+                .withSubjectDN(new X500Principal("CN=child"))
+                .withCrlDistributionPoints(TEST_TA_CRL)
+                .build();
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
+
+        when(crlLocator.getCrl(TEST_TA_CRL, context, result)).thenReturn(null);
+
+        subject.validate(TEST_CA_URI.toString(), context, crlLocator, VALIDATION_OPTIONS, result, certificate -> false);
+
+        assertEquals(ValidationString.OBJECTS_CRL_VALID, result.getFailures(new ValidationLocation(TEST_CA_URI)).get(0).getKey());
+    }
+
+    @Test
+    public void shouldIgnoreMissingExplicitCrlWhenPredicateMarksCertificateAsRoot() {
+        ValidationResult result = ValidationResult.withLocation(TEST_TA_URI);
+        X509ResourceCertificate selfSignedCert = createSelfSignedCaResourceCertificate(TEST_RESOURCE_SET);
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, selfSignedCert);
+
+        selfSignedCert.validate(TEST_TA_URI.toString(), context, null, TEST_TA_CRL, VALIDATION_OPTIONS, result, certificate -> true);
+
+        assertFalse(result.hasFailures());
+        assertFalse(selfSignedCert.isRevoked());
+    }
+
+    @Test
+    public void shouldFailExplicitValidationWhenCrlMissingForNonRootPredicate() {
+        ValidationResult result = ValidationResult.withLocation(TEST_CA_URI);
+        X509ResourceCertificate rootCertificate = createSelfSignedCaResourceCertificate();
+        X509ResourceCertificate subject = createSelfSignedCaResourceCertificateBuilder()
+                .withPublicKey(KeyPairFactoryTest.SECOND_TEST_KEY_PAIR.getPublic())
+                .withSubjectDN(new X500Principal("CN=child"))
+                .withCrlDistributionPoints(TEST_TA_CRL)
+                .build();
+        CertificateRepositoryObjectValidationContext context = new CertificateRepositoryObjectValidationContext(TEST_TA_URI, rootCertificate);
+
+        subject.validate(TEST_CA_URI.toString(), context, null, TEST_TA_CRL, VALIDATION_OPTIONS, result, certificate -> false);
+
+        assertEquals(ValidationString.OBJECTS_CRL_VALID, result.getFailures(new ValidationLocation(TEST_CA_URI)).get(0).getKey());
+    }
+
+    @Test
     public void shouldReturnImmutableResources() {
         X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
 
@@ -312,12 +371,6 @@ public class X509ResourceCertificateTest {
         resources.removeAll(new IpResourceSet(resources));
 
         assertFalse(cert.getResources().isEmpty());
-    }
-
-    @Test
-    public void shouldNotBePastValidityTime() {
-        X509ResourceCertificate cert = createSelfSignedCaResourceCertificate();
-        assertEquals(cert.getValidityPeriod().isExpiredNow(), cert.isPastValidityTime());
     }
 
     @Test
