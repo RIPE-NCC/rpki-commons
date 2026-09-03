@@ -46,7 +46,6 @@ public class PayloadParserTest {
         assertNull(wrapper);
     }
 
-
     @Test
     public void shouldNotParseWithoutType() {
         String message = """
