@@ -1,5 +1,6 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
+import lombok.Getter;
 import net.ripe.rpki.commons.crypto.ValidityPeriod;
 import net.ripe.rpki.commons.validation.ValidationCheck;
 import net.ripe.rpki.commons.validation.ValidationStatus;
@@ -20,6 +21,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
@@ -35,18 +37,16 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public static final PolicyInformation POLICY_INFORMATION = new PolicyInformation(POLICY_OID);
 
+    @Getter
     private final X509Certificate certificate;
 
+    @Getter
     private final boolean ca;
 
     protected AbstractX509CertificateWrapper(X509Certificate certificate) {
         requireNonNull(certificate);
         this.certificate = certificate;
         this.ca = X509CertificateUtil.isCa(certificate);
-    }
-
-    public X509Certificate getCertificate() {
-        return certificate;
     }
 
     public byte[] getEncoded() {
@@ -89,14 +89,6 @@ public abstract class AbstractX509CertificateWrapper implements Serializable {
 
     public boolean isEe() {
         return !isCa();
-    }
-
-    public boolean isCa() {
-        return ca;
-    }
-
-    public boolean isRoot() {
-        return X509CertificateUtil.isRoot(certificate);
     }
 
     public boolean isRouter() {

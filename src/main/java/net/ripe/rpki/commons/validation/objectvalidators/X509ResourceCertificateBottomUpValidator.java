@@ -3,16 +3,19 @@ package net.ripe.rpki.commons.validation.objectvalidators;
 import net.ripe.ipresource.IpResourceSet;
 import net.ripe.rpki.commons.crypto.CertificateRepositoryObjectFile;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificate;
 import net.ripe.rpki.commons.crypto.x509cert.X509ResourceCertificateParser;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
 import net.ripe.rpki.commons.validation.ValidationResult;
 
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 
@@ -20,28 +23,46 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 public class X509ResourceCertificateBottomUpValidator implements X509ResourceCertificateValidator {
 
     private static final int MAX_CHAIN_LENGTH = 30;
+
     private X509ResourceCertificate certificate;
-    private Collection<X509ResourceCertificate> trustAnchors;
-    private ResourceCertificateLocator locator;
-    private List<CertificateWithLocation> certificates = new LinkedList<>();
-    private ValidationOptions options;
-    private ValidationResult result;
+    private final Collection<X509ResourceCertificate> trustAnchors;
+    private final ResourceCertificateLocator locator;
+    private final List<CertificateWithLocation> certificates = new LinkedList<>();
+    private final ValidationOptions options;
+    private final ValidationResult result;
     private ValidationLocation location;
+    private final Predicate<X509Certificate> isRootPredicate;
 
 
     public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, X509ResourceCertificate... trustAnchors) {
-        this(locator, Arrays.asList(trustAnchors));
+        this(locator, X509CertificateUtil::isRootDefault, trustAnchors);
+    }
+
+    public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Predicate<X509Certificate> isRootPredicate, X509ResourceCertificate... trustAnchors) {
+        this(locator, isRootPredicate, Arrays.asList(trustAnchors));
     }
 
     public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
-        this(ValidationOptions.strictValidation(), ValidationResult.withLocation("unknown.cer"), locator, trustAnchors);
+        this(ValidationOptions.strictValidation(), ValidationResult.unknown(), locator, X509CertificateUtil::isRootDefault, trustAnchors);
+    }
+
+    public X509ResourceCertificateBottomUpValidator(ResourceCertificateLocator locator, Predicate<X509Certificate> isRootPredicate, Collection<X509ResourceCertificate> trustAnchors) {
+        this(ValidationOptions.strictValidation(), ValidationResult.unknown(), locator, isRootPredicate, trustAnchors);
     }
 
     public X509ResourceCertificateBottomUpValidator(ValidationOptions options, ValidationResult result, ResourceCertificateLocator locator, Collection<X509ResourceCertificate> trustAnchors) {
+        this(options, result, locator, X509CertificateUtil::isRootDefault, trustAnchors);
+    }
+
+    public X509ResourceCertificateBottomUpValidator(ValidationOptions options, ValidationResult result,
+                                                    ResourceCertificateLocator locator,
+                                                    Predicate<X509Certificate> isRootPredicate,
+                                                    Collection<X509ResourceCertificate> trustAnchors) {
         this.options = options;
         this.result = result;
         this.location = new ValidationLocation("unknown.cer");
         this.locator = locator;
+        this.isRootPredicate = isRootPredicate;
         this.trustAnchors = trustAnchors;
     }
 
@@ -94,7 +115,7 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
         }
 
         X509ResourceCertificate cert = this.certificate;
-        while (!cert.isRoot()) {
+        while (!isRootPredicate.test(cert.getCertificate())) {
             CertificateRepositoryObjectFile<X509ResourceCertificate> parent = locator.findParent(cert);
 
             if (!result.rejectIfNull(parent, CERT_CHAIN_COMPLETE)) {
@@ -128,8 +149,11 @@ public class X509ResourceCertificateBottomUpValidator implements X509ResourceCer
     }
 
     private void checkTrustAnchor() {
-        if ((trustAnchors != null) && (!trustAnchors.isEmpty())) {
-            result.rejectIfFalse(trustAnchors.contains(certificates.get(0).getCertificate()), ROOT_IS_TA);
+        if (trustAnchors != null && !trustAnchors.isEmpty()) {
+            var topSKI = certificates.get(0).getCertificate().getSubjectKeyIdentifier();
+            var taCertFound = trustAnchors.stream()
+                    .anyMatch(ta -> Arrays.equals(ta.getSubjectKeyIdentifier(), topSKI));
+            result.rejectIfFalse(taCertFound, ROOT_IS_TA);
         }
     }
 

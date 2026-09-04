@@ -1,11 +1,7 @@
 package net.ripe.rpki.commons.crypto.x509cert;
 
 import com.google.common.primitives.Booleans;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -23,12 +19,8 @@ import java.util.TreeSet;
 
 import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.*;
 import static net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper.POLICY_OID;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_CA_REPOSITORY;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_MANIFEST;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_RPKI_NOTIFY;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.ID_AD_SIGNED_OBJECT;
+import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateInformationAccessDescriptor.*;
 import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.findFirstRsyncCrlDistributionPoint;
-import static net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil.isRoot;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
 import static org.bouncycastle.asn1.x509.PolicyQualifierId.id_qt_cps;
 
@@ -187,7 +179,7 @@ public class X509ResourceCertificateParser extends X509CertificateParser<X509Res
     private void validateCrlDistributionPoints() {
         byte[] extensionValue = certificate.getExtensionValue(Extension.cRLDistributionPoints.getId());
 
-        if (isRoot(certificate)) {
+        if (X509CertificateUtil.isRootDefault(certificate)) {
             // early ripe ncc ta certificates have crldp set so for now only warn here
             result.warnIfNotNull(extensionValue, CRLDP_OMITTED);
             return;

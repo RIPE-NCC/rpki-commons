@@ -30,7 +30,7 @@ public class X509ResourceCertificateBase64Converter implements Converter {
         byte[] decodedBytes = (byte[]) context.convertAnother(base64Encoded.getBytes(), byte[].class);
 
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(ValidationResult.withLocation("unknown.cer"), decodedBytes);
+        parser.parse(ValidationResult.unknown(), decodedBytes);
 
         return parser.getCertificate();
     }

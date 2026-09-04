@@ -1,9 +1,9 @@
 package net.ripe.rpki.commons.validation.objectvalidators;
 
 import com.google.common.primitives.Booleans;
-import net.ripe.rpki.commons.crypto.JavaSecurityConstants;
 import net.ripe.rpki.commons.crypto.crl.X509Crl;
 import net.ripe.rpki.commons.crypto.x509cert.AbstractX509CertificateWrapper;
+import net.ripe.rpki.commons.crypto.x509cert.X509CertificateUtil;
 import net.ripe.rpki.commons.util.UTC;
 import net.ripe.rpki.commons.validation.ValidationLocation;
 import net.ripe.rpki.commons.validation.ValidationOptions;
@@ -13,7 +13,9 @@ import org.joda.time.DateTime;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import static net.ripe.rpki.commons.crypto.JavaSecurityConstants.*;
 import static net.ripe.rpki.commons.validation.ValidationString.*;
@@ -21,21 +23,26 @@ import static net.ripe.rpki.commons.validation.ValidationString.*;
 
 public abstract class X509CertificateParentChildValidator<T extends AbstractX509CertificateWrapper> {
 
-    private T parent;
+    private final T parent;
 
     protected T child;
 
-    private X509Crl crl;
+    private final X509Crl crl;
 
     protected final ValidationOptions options;
     protected final ValidationResult result;
-
+    protected final Predicate<X509Certificate> isRoot;
 
     public X509CertificateParentChildValidator(ValidationOptions options, ValidationResult result, T parent, X509Crl crl) {
+        this(options, result, parent, crl, X509CertificateUtil::isRootDefault);
+    }
+
+    public X509CertificateParentChildValidator(ValidationOptions options, ValidationResult result, T parent, X509Crl crl, Predicate<X509Certificate> isRoot) {
         this.options = options;
         this.result = result;
         this.parent = parent;
         this.crl = crl;
+        this.isRoot = isRoot;
     }
 
     public void validate(String location, T certificate) {
@@ -73,7 +80,7 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
 
     private void verifyCrl() {
         if (crl == null) {
-            result.rejectIfFalse(child.isRoot(), CRL_REQUIRED);
+            result.rejectIfFalse(isRoot.test(child.getCertificate()), CRL_REQUIRED);
             return;
         }
 
@@ -128,7 +135,7 @@ public abstract class X509CertificateParentChildValidator<T extends AbstractX509
     }
 
     private void verifyAuthorityKeyIdentifier() {
-        if (child.isRoot()) {
+        if (isRoot.test(child.getCertificate())) {
             // self-signed cert does not have AKI
             return;
         }

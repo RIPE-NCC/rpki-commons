@@ -25,7 +25,7 @@ public abstract class IdentitySerializer<T> extends DomXmlSerializer<T> {
 
     protected ProvisioningIdentityCertificate getProvisioningIdentityCertificate(final String bpkiTa) {
         final ProvisioningIdentityCertificateParser parser = new ProvisioningIdentityCertificateParser();
-        parser.parse(ValidationResult.withLocation("unknown.cer"), Base64.getMimeDecoder().decode(bpkiTa));
+        parser.parse(ValidationResult.unknown(), Base64.getMimeDecoder().decode(bpkiTa));
         return parser.getCertificate();
     }
 

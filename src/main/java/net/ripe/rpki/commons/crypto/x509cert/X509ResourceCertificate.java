@@ -19,6 +19,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509ResourceCertificate
 import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.EnumSet;
+import java.util.function.Predicate;
 
 /**
  * Wraps a X509 certificate containing RFC3779 resource extensions.
@@ -36,7 +37,6 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         ResourceExtensionParser parser = new ResourceExtensionParser();
         resourceExtension = parser.parse(certificate);
     }
-
     public ImmutableResourceSet resources() {
         return resourceExtension.getResources();
     }
@@ -78,9 +78,16 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context,
+                         CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+        validate(location, context, crlLocator, options, result, X509CertificateUtil::isRootDefault);
+    }
+
+    public void validate(String location, CertificateRepositoryObjectValidationContext context,
+                         CrlLocator crlLocator, ValidationOptions options, ValidationResult result,
+                         Predicate<X509Certificate> isRoot) {
         X509Crl crl = null;
-        if (!isRoot()) {
+        if (!isRoot.test(getCertificate())) {
             ValidationLocation savedCurrentLocation = result.getCurrentLocation();
             result.setLocation(new ValidationLocation(getCrlUri()));
             crl = crlLocator.getCrl(getCrlUri(), context, result);
@@ -103,7 +110,17 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
                          URI crlUri,
                          ValidationOptions options,
                          ValidationResult result) {
-        if (!isRoot() && crl == null) {
+        validate(location, context, crl, crlUri, options, result, X509CertificateUtil::isRootDefault);
+    }
+
+    public void validate(String location,
+                         CertificateRepositoryObjectValidationContext context,
+                         X509Crl crl,
+                         URI crlUri,
+                         ValidationOptions options,
+                         ValidationResult result,
+                         Predicate<X509Certificate> isRoot) {
+        if (!isRoot.test(getCertificate()) && crl == null) {
             result.rejectIfFalse(false, ValidationString.OBJECTS_CRL_VALID, crlUri.toString());
             return;
         }
@@ -111,7 +128,6 @@ public class X509ResourceCertificate extends AbstractX509CertificateWrapper impl
         validator.validate(location, this);
 
         revoked = hasErrorInRevocationCheck(result.getFailures(new ValidationLocation(location)));
-
     }
 
     @Override

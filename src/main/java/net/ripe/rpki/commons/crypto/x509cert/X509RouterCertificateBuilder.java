@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class X509RouterCertificateBuilder {
 
-    private X509CertificateBuilderHelper builderHelper;
+    private final X509CertificateBuilderHelper builderHelper;
     private int[] asns;
 
     public X509RouterCertificateBuilder() {

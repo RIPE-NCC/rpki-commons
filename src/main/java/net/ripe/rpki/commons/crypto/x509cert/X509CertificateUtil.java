@@ -80,7 +80,7 @@ public final class X509CertificateUtil {
 
     public static X509ResourceCertificate parseDerEncoded(byte[] encoded) {
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(ValidationResult.withLocation("unknown.cer"), encoded);
+        parser.parse(ValidationResult.unknown(), encoded);
         return parser.getCertificate();
     }
 
@@ -117,8 +117,23 @@ public final class X509CertificateUtil {
         }
     }
 
-    public static boolean isRoot(X509Certificate certificate) {
-        return certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal());
+    public static boolean isRootDefault(X509Certificate certificate) {
+        return certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal()) &&
+                isSelfSigned(certificate);
+    }
+
+    public static boolean isSelfSigned(X509Certificate certificate) {
+        if (!certificate.getSubjectX500Principal().equals(certificate.getIssuerX500Principal())) {
+            return false;
+        }
+        try {
+            certificate.verify(certificate.getPublicKey());
+            return true;
+        } catch (SignatureException | InvalidKeyException e) {
+            return false;
+        } catch (CertificateException | NoSuchAlgorithmException | NoSuchProviderException e) {
+            throw new X509CertificateOperationException("Error verifying self-signed signature", e);
+        }
     }
 
     public static boolean isCa(X509Certificate certificate) {

@@ -33,7 +33,7 @@ public class X509ResourceCertificateConverter implements Converter {
         byte[] encoded = (byte[]) context.convertAnother(null, byte[].class);
         reader.moveUp();
         X509ResourceCertificateParser parser = new X509ResourceCertificateParser();
-        parser.parse(ValidationResult.withLocation("unknown.cer"), encoded);
+        parser.parse(ValidationResult.unknown(), encoded);
         return parser.getCertificate();
     }
 }

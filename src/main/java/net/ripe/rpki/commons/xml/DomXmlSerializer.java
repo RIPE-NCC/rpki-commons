@@ -21,9 +21,8 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
     }
 
     protected String getRequiredAttributeValue(final Element node, final String attr) {
-        return getAttributeValue(node, attr).<DomXmlSerializerException>orElseThrow(() -> {
-            throw new DomXmlSerializerException(String.format("attribute '%s' not found", attr));
-        });
+        return getAttributeValue(node, attr).orElseThrow(() ->
+                new DomXmlSerializerException(String.format("attribute '%s' not found", attr)));
     }
 
     protected Optional<String> getAttributeValue(final Element node, final String attr) {
@@ -45,7 +44,7 @@ public abstract class DomXmlSerializer<T> implements XmlSerializer<T> {
 
     protected Optional<Element> getOptionalSingleChildElement(Element parent, String tagName) {
         NodeList nodeList = parent.getElementsByTagNameNS(xmlns, tagName);
-        if(nodeList.getLength() == 0){
+        if (nodeList.getLength() == 0) {
             return Optional.empty();
         }
         return Optional.of(getSingleChildElement(parent, tagName));

@@ -11,6 +11,7 @@ import net.ripe.rpki.commons.validation.objectvalidators.X509RouterCertificateVa
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
+import java.util.function.Predicate;
 
 public class X509RouterCertificate extends X509ResourceCertificate implements X509CertificateObject {
 
@@ -29,7 +30,8 @@ public class X509RouterCertificate extends X509ResourceCertificate implements X5
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context,
+                         CrlLocator crlLocator, ValidationOptions options, ValidationResult result) {
         final ValidationLocation savedCurrentLocation = result.getCurrentLocation();
         result.setLocation(new ValidationLocation(getCrlUri()));
         result.setLocation(savedCurrentLocation);
@@ -47,8 +49,10 @@ public class X509RouterCertificate extends X509ResourceCertificate implements X5
     }
 
     @Override
-    public void validate(String location, CertificateRepositoryObjectValidationContext context, X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result) {
-        if (!isRoot() && crl == null) {
+    public void validate(String location, CertificateRepositoryObjectValidationContext context,
+                         X509Crl crl, URI crlUri, ValidationOptions options, ValidationResult result,
+                         Predicate<X509Certificate> isRoot) {
+        if (!isRoot.test(getCertificate()) && crl == null) {
             result.rejectIfFalse(false, ValidationString.OBJECTS_CRL_VALID, crlUri.toString());
             return;
         }
