@@ -59,8 +59,7 @@ public final class Asn1Util {
      * Decodes the byte array extension using the {@link ASN1InputStream}.
      */
     public static ASN1Primitive decode(byte[] extension) {
-        try {
-            ASN1InputStream is = new ASN1InputStream(extension);
+        try (ASN1InputStream is = new ASN1InputStream(extension)) {
             return is.readObject();
         } catch (IOException e) {
             throw new Asn1UtilException("IO exception while decoding resource extension", e);
