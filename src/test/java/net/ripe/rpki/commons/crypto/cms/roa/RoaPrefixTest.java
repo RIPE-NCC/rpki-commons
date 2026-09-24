@@ -75,8 +75,7 @@ public class RoaPrefixTest {
         new RoaPrefix(IpRange.parse("10.0.0.0/8"), null);
 
         assertThatThrownBy(() -> new RoaPrefix(IpRange.parse("10.0.0.0-10.0.2.1"), null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .withFailMessage("ROA prefix requires legal prefix");
+                .withFailMessage("ROA prefix requires legal prefix").isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -93,16 +92,16 @@ public class RoaPrefixTest {
         new RoaPrefix(IpRange.parse("ffe0::/16"), 128);
 
         assertThatThrownBy(() -> new RoaPrefix(IpRange.parse("10.0.0.0/8"), 0))
-            .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage("maximum length invalid");
+            .withFailMessage("maximum length invalid")
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new RoaPrefix(IpRange.parse("10.0.0.0/8"), 7))
-            .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage("maximum length invalid");
+            .withFailMessage("maximum length invalid")
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new RoaPrefix(IpRange.parse("10.0.0.0/8"), 33))
-            .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage("maximum length invalid");
+            .withFailMessage("maximum length invalid")
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new RoaPrefix(IpRange.parse("ffe0::/16"), 129))
-            .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage("maximum length invalid");
+            .withFailMessage("maximum length invalid")
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

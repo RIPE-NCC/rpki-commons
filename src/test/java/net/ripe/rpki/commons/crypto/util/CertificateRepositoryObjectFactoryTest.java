@@ -61,8 +61,8 @@ public class CertificateRepositoryObjectFactoryTest {
 
         CertificateRepositoryObject object = createCertificateRepositoryObject(cert.getEncoded(), validationResult);
 
-        assertThat(validationResult.hasFailureForCurrentLocation()).isFalse()
-                .withFailMessage("no validation failures " + validationResult.getFailuresForCurrentLocation());
+        assertThat(validationResult.hasFailureForCurrentLocation())
+                .withFailMessage("no validation failures " + validationResult.getFailuresForCurrentLocation()).isFalse();
         assertThat(object).isInstanceOf(X509ResourceCertificate.class);
         assertThat(cert).isEqualTo(object);
         assertThat(validationResult.getAllValidationChecksForCurrentLocation()).hasSize(32);
@@ -123,8 +123,8 @@ public class CertificateRepositoryObjectFactoryTest {
         assertThat(object).isInstanceOf(ManifestCms.class);
         assertThat(manifestCms).isEqualTo(object);
         assertThat(validationResult.getAllValidationChecksForCurrentLocation()).hasSize(67);
-        assertThat(validationResult.hasNoFailuresOrWarnings()).isTrue()
-                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation());
+        assertThat(validationResult.hasNoFailuresOrWarnings())
+                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation()).isTrue();
         assertThat(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk()).isTrue();
     }
 
@@ -190,10 +190,10 @@ public class CertificateRepositoryObjectFactoryTest {
 
         assertThat(object).isInstanceOf(AspaCms.class);
         assertThat(aspa).isEqualTo(object);
-        assertThat(validationResult.getAllValidationChecksForCurrentLocation()).hasSize(63)
-                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation());
+        assertThat(validationResult.getAllValidationChecksForCurrentLocation())
+                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation()).hasSize(63);
         assertThat(validationResult.hasNoFailuresOrWarnings()).isTrue()
-                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation());
+                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation()).isTrue();
         assertThat(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk()).isTrue();
         assertThat(validationResult.getResultForCurrentLocation(ASPA_CUSTOMER_ASN_CERTIFIED).isOk()).isTrue();
     }
@@ -206,10 +206,10 @@ public class CertificateRepositoryObjectFactoryTest {
         CertificateRepositoryObject object = createCertificateRepositoryObject(encoded, validationResult);
 
         assertThat(object).isNull();
-        assertThat(validationResult.getAllValidationChecksForCurrentLocation()).hasSize(3)
-                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation());
-        assertThat(validationResult.hasNoFailuresOrWarnings()).isFalse()
-                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation());
+        assertThat(validationResult.getAllValidationChecksForCurrentLocation())
+                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation()).hasSize(3);
+        assertThat(validationResult.hasNoFailuresOrWarnings())
+                .withFailMessage("" + validationResult.getAllValidationChecksForCurrentLocation()).isFalse();
         assertThat(validationResult.getResultForCurrentLocation(KNOWN_OBJECT_TYPE).isOk()).isTrue();
     }
 
