@@ -9,7 +9,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.util.io.TeeOutputStream;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
@@ -41,19 +40,17 @@ public class CMSUtils {
     }
 
     static OutputStream getSafeOutputStream(OutputStream s) {
-        OutputStream nullStream = new OutputStream() {
-
-            @Override
-            public void write(int b) throws IOException {
-
-            }
-        };
-        return s == null ? nullStream : s;
+        return s != null ? s : OutputStream.nullOutputStream();
     }
 
     static OutputStream getSafeTeeOutputStream(OutputStream s1,
                                                OutputStream s2) {
-        return s1 == null ? getSafeOutputStream(s2)
-            : s2 == null ? getSafeOutputStream(s1) : new TeeOutputStream(s1, s2);
+        if(s1 == null) {
+          return getSafeOutputStream(s2);
+        }
+        if(s2 == null) {
+           return getSafeOutputStream(s1);
+        }
+        return new TeeOutputStream(s1, s2);
     }
 }
