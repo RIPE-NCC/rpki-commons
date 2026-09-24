@@ -31,7 +31,7 @@ public class SignedObjectUtilTest {
     void shouldParseObject(String description, String fileName, String path, String modified) throws IOException, SignedObjectUtil.NoTimeParsedException {
         Instant creationTime = SignedObjectUtil.getFileCreationTime(URI.create(fileName), Resources.toByteArray(Resources.getResource(path)));
 
-        assertThat(creationTime).isEqualTo(DateTime.parse(modified));
+        assertThat(creationTime).isEqualTo(Instant.parse(modified));
     }
 
     @Test
