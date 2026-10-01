@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 
-public class Command extends Thread {
+public class Command extends Thread{
 
     public static final int NOT_EXECUTED = -1;
     public static final int COMMAND_FAILED = -2;
 
-    private List<String> args;
-    private Map<String, String> envp;
-    private String execDir;
+    private final List<String> args;
+    private final Map<String, String> envp;
+    private final String execDir;
 
     private int exitStatus = NOT_EXECUTED;
 
@@ -92,6 +92,10 @@ public class Command extends Thread {
             errorLines = errorReader.getLines();
 
             return process.waitFor();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            exception = e;
+            throw new CommandExecutionException(e);
         } catch (Exception e) {
             exception = e;
             throw new CommandExecutionException(e);
