@@ -64,8 +64,7 @@ public class BBNCertificateConformanceTest {
         final String fileName = String.format("root/badCert%s.cer", testCaseFile);
 
         assertThat(parseCertificate(fileName))
-                .isTrue()
-                .withFailMessage("Should reject certificate with " + testCaseDescription + " from " + fileName);
+                .withFailMessage("Should reject certificate with " + testCaseDescription + " from " + fileName).isTrue();
     }
 
     @CsvSource({
@@ -82,8 +81,7 @@ public class BBNCertificateConformanceTest {
         final String fileName = String.format("root/goodCert%s.cer", testCaseFile);
 
         assertThat(parseCertificate(fileName))
-                .isFalse()
-                .withFailMessage("Should accept certificate with " + testCaseDescription + " from " + fileName);
+                .withFailMessage("Should accept certificate with " + testCaseDescription + " from " + fileName).isFalse();
     }
 
     @CsvSource({
@@ -103,8 +101,8 @@ public class BBNCertificateConformanceTest {
         final String fileName = String.format("root/badCert%s.cer", testCaseFile);
 
         assertThatThrownBy(() -> assertThat(parseCertificate(fileName)).isFalse())
-                .isInstanceOfAny(IllegalArgumentException.class, IllegalStateException.class, AssertionError.class)
-                .withFailMessage("Should reject certificate with " + testCaseDescription + " from " + fileName);
+                .withFailMessage("Should reject certificate with " + testCaseDescription + " from " + fileName)
+                    .isInstanceOfAny(IllegalArgumentException.class, IllegalStateException.class, AssertionError.class);
     }
 
     private boolean certificateHasWarningOrFailure(String certificate) throws IOException {

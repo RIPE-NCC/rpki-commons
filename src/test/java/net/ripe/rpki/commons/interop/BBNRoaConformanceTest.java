@@ -44,8 +44,9 @@ public class BBNRoaConformanceTest {
     public void shouldRejectBadRoaObject(String testNumber, String testCaseFile, String testCaseDescription) throws IOException {
         final String fileName = String.format("root/badROA%s.roa", testCaseFile);
 
-        assertThat(parseRoa(fileName)).isTrue()
-                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName);
+        assertThat(parseRoa(fileName))
+                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName)
+                .isTrue();
     }
 
     private boolean parseRoa(String roa) throws IOException {

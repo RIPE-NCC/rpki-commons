@@ -24,7 +24,6 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -163,7 +162,7 @@ public class RoaCmsTest {
 
         subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, ValidationOptions.strictValidation(), ValidationResult.withLocation(TEST_ROA_LOCATION));
 
-        assertThat(subject.isRevoked()).isTrue().withFailMessage("ROA must be revoked");
+        assertThat(subject.isRevoked()).withFailMessage("ROA must be revoked").isTrue();
     }
 
     @Test
@@ -180,6 +179,6 @@ public class RoaCmsTest {
 
         subject.validate(TEST_ROA_LOCATION.toString(), validationContext, crlLocator, ValidationOptions.strictValidation(), ValidationResult.withLocation(TEST_ROA_LOCATION));
 
-        assertThat(subject.isRevoked()).isFalse().withFailMessage("ROA must not be revoked");
+        assertThat(subject.isRevoked()).withFailMessage("ROA must not be revoked").isFalse();
     }
 }

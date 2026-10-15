@@ -61,8 +61,9 @@ public class BBNCMSConformanceTest {
     public void testGenericCMSSignedObject(String testNumber, String testCaseFile, String testCaseDescription) throws IOException {
         final String fileName = String.format("root/badCMS%s.roa", testCaseFile);
 
-        assertThat(parseCertificate(fileName)).isTrue()
-                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName);
+        assertThat(parseCertificate(fileName))
+                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName)
+                .isTrue();
     }
 
     @Disabled("These checks are not implemented yet.")
@@ -76,8 +77,9 @@ public class BBNCMSConformanceTest {
     public void testGenericCMSSignedObject_ignored(String testNumber, String testCaseFile, String testCaseDescription) throws IOException {
         final String fileName = String.format("root/badCMS%s.roa", testCaseFile);
 
-        assertThat(parseCertificate(fileName)).isTrue()
-                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName);
+        assertThat(parseCertificate(fileName))
+                .withFailMessage("[" + testNumber + "] Should reject certificate with " + testCaseDescription + " from " + fileName)
+                .isTrue();
     }
 
     private boolean parseCertificate(String certificate) throws IOException {
