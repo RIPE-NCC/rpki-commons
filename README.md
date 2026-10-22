@@ -62,6 +62,16 @@ development.
 
 ## Changelog
 
+## Unstable
+  * Invalidate ROA when one of its prefixes fails to parse from ASN1
+  * rsync: explicitly separate command-line options from directory arguments
+  * Fix possible stack overflows due to backtracking in regular expressions
+  * Improve XML output of Provisioning messages
+  * Improve detection of root certificates
+
+## 2026-05-19 2.0
+  * Update CCR fixture to 05 version of the internet draft
+
 ## 2026-04-14 2.0-rc2
   * Support for CCR state encoding and decoding
 
