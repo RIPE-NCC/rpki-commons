@@ -68,6 +68,7 @@ development.
   * Fix possible stack overflows due to backtracking in regular expressions
   * Improve XML output of Provisioning messages
   * Improve detection of root certificates
+  * Restore publication of `rpki-commons-<x.y.z>-tests.jar` on release
 
 ## 2026-05-19 2.0
   * Update CCR fixture to 05 version of the internet draft

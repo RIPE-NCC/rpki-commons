@@ -203,6 +203,17 @@
                     </plugin>
 
                     <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                          <execution>
+                              <goals>
+                                  <goal>test-jar</goal>
+                              </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <configuration>
                             <gpgArguments>
