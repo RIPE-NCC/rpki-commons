@@ -35,7 +35,7 @@ variables:
   MAVEN_ARGS: --batch-mode --strict-checksums --fail-at-end -s .m2/settings.xml
 
 .maven:
-  image: maven:3.10.0-eclipse-temurin-17-alpine@sha256:61de95c212fdc02a1c0ffe8115cb97f524f022dd145d69570f94050746310ce0
+  image: maven:3.10.0-eclipse-temurin-17-alpine@sha256:6899c871e4eb8c8cf5a5ad3009befca3e4c3eff25159e41b4d6f796271abc9e0
   before_script:
     - apk add rsync
 
