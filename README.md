@@ -62,7 +62,7 @@ development.
 
 ## Changelog
 
-## Unstable
+## 2026-11-26 2.1
   * Invalidate ROA when one of its prefixes fails to parse from ASN1
   * rsync: explicitly separate command-line options from directory arguments
   * Fix possible stack overflows due to backtracking in regular expressions
